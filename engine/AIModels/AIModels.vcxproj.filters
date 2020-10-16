@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Файлы исходного кода">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Заголовочные файлы">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Files">
+      <UniqueIdentifier>{c2ea0e34-491f-4774-8a6a-a3dd338316ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Structure">
+      <UniqueIdentifier>{8977571c-c7dc-4cea-bd2b-80713aa410b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Learning">
+      <UniqueIdentifier>{6dc37c6d-7090-4203-b73d-098dc71c01bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Containers">
+      <UniqueIdentifier>{d7685022-7f23-490b-ac38-8492ce6f2306}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Structure\CNN">
+      <UniqueIdentifier>{8cd10143-a001-4db5-a746-22079ea43b2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Structure\FFNN">
+      <UniqueIdentifier>{da062126-ae36-4de1-8343-2a931ecc4e45}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GZ_File_IO.h">
+      <Filter>Заголовочные файлы\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NN_headers.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Service.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structure\Functions.h">
+      <Filter>Заголовочные файлы\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structure\LearningBatch.h">
+      <Filter>Заголовочные файлы\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structure\HyperData.h">
+      <Filter>Заголовочные файлы\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CNN\Filter_2D.h">
+      <Filter>Заголовочные файлы\Structure\CNN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CNN\Convolution_layer.h">
+      <Filter>Заголовочные файлы\Structure\CNN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FFNN\FFNN.h">
+      <Filter>Заголовочные файлы\Structure\FFNN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FFNN\FFNN_BackPropagation.h">
+      <Filter>Заголовочные файлы\Structure\FFNN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FFNN\FFNN_File_IO.h">
+      <Filter>Заголовочные файлы\Structure\FFNN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FFNN\FFNN_Validation.h">
+      <Filter>Заголовочные файлы\Structure\FFNN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FFNN\BackPropagationWizard.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FFNN\FormalNeuron.h">
+      <Filter>Заголовочные файлы\Structure\FFNN</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
