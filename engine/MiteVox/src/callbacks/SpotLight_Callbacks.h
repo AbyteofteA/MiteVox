@@ -9,10 +9,10 @@ void SpotLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPON
 		return;
 
 	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->componentManagers[TRANSFORM_COMPONENT].getComponentLocation(entityID);
+		_ecs->getComponent<mathem::Transform>(entityID, TRANSFORM_COMPONENT);
 
 	render::SpotLight* spotLight =
-		(render::SpotLight*)_ecs->componentManagers[SPOTLIGHT_COMPONENT].getComponentLocation(entityID);
+		_ecs->getComponent<render::SpotLight>(entityID, SPOTLIGHT_COMPONENT);
 	render::standardShaders[shaderIndex]->setInt("amountOfSpotLights", index + 1);
 
 	std::string spotLights = "spotLights[";
@@ -37,10 +37,10 @@ void SpotLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPON
 	
 	tmpPos.x = spotLight->position.x + transform->x;
 	tmpPos.y = spotLight->position.y + transform->y;
-	tmpPos.z = spotLight->position.z - transform->z;
+	tmpPos.z = spotLight->position.z + transform->z;
 	render::standardShaders[shaderIndex]->setVec3(posResult.c_str(), tmpPos.x, tmpPos.y, tmpPos.z);
 	render::standardShaders[shaderIndex]->setVec3(directionResult.c_str(),
-		spotLight->direction.x, spotLight->direction.y, spotLight->direction.z);
+		spotLight->direction.i, spotLight->direction.j, spotLight->direction.k);
 	render::standardShaders[shaderIndex]->setFloat(angleResult.c_str(), spotLight->angle);
 
 	render::standardShaders[shaderIndex]->setVec3(colorResult.c_str(), spotLight->color.r, spotLight->color.g, spotLight->color.b);

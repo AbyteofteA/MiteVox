@@ -4,28 +4,29 @@
 
 void Model3D_onCreate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
 {
-	render::uploadModel3D(
-		(render::Model3D*)_ecs->componentManagers[MODEL3D_COMPONENT].getComponentLocation(entityID));
+	render::uploadModel3D(_ecs->getComponent<render::Model3D>(entityID, MODEL3D_COMPONENT));
 }
 void Model3D_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
 {
 	long* activeCamera = (long*)data;
 
-	render::Camera* camera = (render::Camera*)_ecs->componentManagers[CAMERA_COMPONENT].getComponentLocation(*activeCamera);
+	render::Camera* camera = 
+		_ecs->getComponent<render::Camera>(*activeCamera, CAMERA_COMPONENT);
 
 	mathem::Transform* globalTransform =
-		(mathem::Transform*)_ecs->componentManagers[TRANSFORM_COMPONENT].getComponentLocation(entityID);
+		_ecs->getComponent<mathem::Transform>(entityID, TRANSFORM_COMPONENT);
 
 	mathem::Transform* cameraTransform =
-		(mathem::Transform*)_ecs->componentManagers[TRANSFORM_COMPONENT].getComponentLocation(*activeCamera);
+		_ecs->getComponent<mathem::Transform>(*activeCamera, TRANSFORM_COMPONENT);
 
 	render::renderModel3D(
-		(render::Model3D*)_ecs->componentManagers[MODEL3D_COMPONENT].getComponentLocation(entityID), globalTransform, camera, cameraTransform);
+		_ecs->getComponent<render::Model3D>(entityID, MODEL3D_COMPONENT), 
+		globalTransform, camera, cameraTransform);
 }
 void Model3D_onDestroy(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
 {
-	render::removeModel3D(
-		(render::Model3D*)_ecs->componentManagers[MODEL3D_COMPONENT].getComponentLocation(entityID));
+	//render::removeModel3D(
+	//	_ecs->getComponent<render::Model3D>(entityID, MODEL3D_COMPONENT));
 }
 
 #endif

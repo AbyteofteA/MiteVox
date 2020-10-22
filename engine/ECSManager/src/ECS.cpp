@@ -44,10 +44,10 @@ namespace ecs
 		std::string name;
 
 		COMPONENT_TYPE maxID = 0; // actually stores max ID + 1
-		COMPONENT_TYPE* IDtoComponent = NULL;
-		COMPONENT_TYPE* componentToID = NULL;
+		COMPONENT_TYPE* IDtoComponent = NULL; // is not packed
+		COMPONENT_TYPE* componentToID = NULL; // is packed
 
-		void* data = NULL;
+		void* data = NULL; // is packed
 		COMPONENT_TYPE amountOfInstances = 0;
 
 		ComponentManager() {}
@@ -88,11 +88,12 @@ namespace ecs
 			}
 			return false;
 		}
-		void* getComponentLocation(COMPONENT_TYPE ID)
+		template <typename T>
+		T* getComponentLocation(COMPONENT_TYPE ID)
 		{
 			if (exists(ID))
 			{
-				return (char*)data + IDtoComponent[ID] * sizeOfComponent;
+				return (T*)data + IDtoComponent[ID];
 			}
 			return NULL;
 		}
@@ -360,41 +361,45 @@ namespace ecs
 		template <typename T>
 		bool attachComponent(COMPONENT_TYPE entityIndex, MANAGER_INDEX_TYPE componentIndex, T* initializer = NULL)
 		{
+			COMPONENT_TYPE entityID = entities[entityIndex].ID;
 			if (entities[entityIndex].components & componentManagers[componentIndex].ID)
 			{
 				return false;
 			}
 			entities[entityIndex].components |= componentManagers[componentIndex].ID;
-			componentManagers[componentIndex].insert(entities[entityIndex].ID);
+			componentManagers[componentIndex].insert(entityID);
 
 			if (initializer)
 			{
-				T* component = getComponent<T>(entityIndex, componentIndex);
+				T* component = getComponent<T>(entityID, componentIndex);
 				*component = *initializer;
 			}
-			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityIndex];
+			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityID];
 			if (onCreate[componentIndex] != NULL)
 			{
-				onCreate[componentIndex](this, componentIndex, entityIndex, initializer, componentLocation);
+				onCreate[componentIndex](this, componentIndex, entityID, initializer, componentLocation);
 			}
 
 			return true;
 		}
 		void detachComponent(COMPONENT_TYPE entityIndex, MANAGER_INDEX_TYPE componentIndex)
 		{
-			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityIndex];
-			entities[entityIndex].components &= ~componentManagers[componentIndex].ID;
+			COMPONENT_TYPE entityID = entities[entityIndex].ID;
+			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityID];
 
-			componentManagers[componentIndex].remove(entities[entityIndex].ID);
 			if (onDestroy[componentIndex] != NULL)
 			{
-				onDestroy[componentIndex](this, componentIndex, entityIndex, NULL, componentLocation);
+				onDestroy[componentIndex](this, componentIndex, entityID, NULL, componentLocation);
 			}
+			
+			entities[entityIndex].components &= ~componentManagers[componentIndex].ID;
+
+			componentManagers[componentIndex].remove(entityID);
 		}
 		template <typename T>
-		T* getComponent(COMPONENT_TYPE entityIndex, MANAGER_INDEX_TYPE componentIndex)
+		T* getComponent(COMPONENT_TYPE entityID, MANAGER_INDEX_TYPE componentIndex)
 		{
-			return (T*)componentManagers[componentIndex].getComponentLocation(entities[entityIndex].ID);
+			return componentManagers[componentIndex].getComponentLocation<T>(entityID);
 		}
 
 		// System methods

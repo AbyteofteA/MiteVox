@@ -6,8 +6,7 @@ void Transform_onCreate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPON
 {
 	if (!data)
 	{
-		*(mathem::Transform*)_ecs->componentManagers[TRANSFORM_COMPONENT].getComponentLocation(entityID)
-			= mathem::Transform();
+		*_ecs->getComponent<mathem::Transform>(entityID, TRANSFORM_COMPONENT) = mathem::Transform();
 	}
 }
 

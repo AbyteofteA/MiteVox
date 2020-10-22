@@ -9,7 +9,7 @@ void DirectedLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, CO
 		return;
 
 	render::DirectedLight* directedLight =
-		(render::DirectedLight*)_ecs->componentManagers[DIRECTEDLIGHT_COMPONENT].getComponentLocation(entityID);
+		_ecs->getComponent<render::DirectedLight>(entityID, DIRECTEDLIGHT_COMPONENT);
 	render::standardShaders[shaderIndex]->setInt("amountOfDirectionalLights", index + 1);
 
 	std::string directedLights = "directionalLights[";
@@ -20,8 +20,10 @@ void DirectedLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, CO
 	std::string directionResult = directedLights + indexStr + direction;
 	std::string colorResult = directedLights + indexStr + color;
 
-	render::standardShaders[shaderIndex]->setVec3(directionResult.c_str(), directedLight->direction.i, directedLight->direction.j, directedLight->direction.k);
-	render::standardShaders[shaderIndex]->setVec3(colorResult.c_str(), directedLight->color.r, directedLight->color.g, directedLight->color.b);
+	render::standardShaders[shaderIndex]->setVec3(directionResult.c_str(), 
+		directedLight->direction.i, directedLight->direction.j, directedLight->direction.k);
+	render::standardShaders[shaderIndex]->setVec3(colorResult.c_str(),
+		directedLight->color.r, directedLight->color.g, directedLight->color.b);
 }
 
 void DirectedLight_onDelete(ecs::ECS* _ecs, unsigned char _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
