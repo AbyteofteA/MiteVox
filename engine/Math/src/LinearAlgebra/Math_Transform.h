@@ -27,11 +27,19 @@ namespace mathem
 
 		mathem::Vector3D getDirectionVector()
 		{
-			mathem::Vector3D resultVector = { 0, 0, -1 };
+			mathem::Vector3D resultVector = { 0, 0, 1 };
+			/*glm::vec3 vector = { 0, 0, 1 };
+			glm::mat4 global = glm::mat4(1.0f);
+			global = glm::rotate(global, glm::radians(angleX), glm::vec3(1.0, 0.0, 0.0));
+			global = glm::rotate(global, glm::radians(angleY), glm::vec3(0.0, 1.0, 0.0));
+			global = glm::rotate(global, glm::radians(angleZ), glm::vec3(0.0, 0.0, 1.0));
+			vector = vector * glm::mat3(global);
+			resultVector.i = vector.x;
+			resultVector.j = vector.y;
+			resultVector.k = vector.z;
+			resultVector.normalize();*/
 
 			resultVector = transformVector(resultVector);
-
-			resultVector.normalize();
 
 			return resultVector;
 		}

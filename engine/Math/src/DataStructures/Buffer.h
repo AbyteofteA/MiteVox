@@ -29,6 +29,10 @@ namespace mathem
 			size = _size;
 			data = (T*)malloc(sizeof(T) * size);
 		}
+		~Buffer()
+		{
+			wipe();
+		}
 
 		void resize(unsigned int _size)
 		{
@@ -66,11 +70,12 @@ namespace mathem
 				data[tmpIndex + i] = iBuffer->data[i];
 			}
 		}
-
-		~Buffer()
+		void wipe()
 		{
 			free(data);
 			data = nullptr;
+			size = 0;
+			sizeData = 0;
 		}
 	};
 
