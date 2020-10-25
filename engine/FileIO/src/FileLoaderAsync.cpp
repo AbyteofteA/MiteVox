@@ -1,5 +1,7 @@
 
 #include "loadBytes.h"
+#include <filesystem>
+namespace fs = std::filesystem;
 
 #include "FileLoaderAsync.h"
 
@@ -11,6 +13,12 @@ namespace fileio
 	{
 		if (exists(_destination))
 		{
+			return;
+		}
+
+		if (!fs::exists(fs::path(_filename)))
+		{
+			printf("ERROR: Cannot open %s", _filename);
 			return;
 		}
 

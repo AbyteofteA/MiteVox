@@ -375,10 +375,8 @@ namespace ecs
 				*component = *initializer;
 			}
 			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityID];
-			if (onCreate[componentIndex] != NULL)
-			{
-				onCreate[componentIndex](this, componentIndex, entityID, initializer, componentLocation);
-			}
+			
+			onCreate[componentIndex](this, componentIndex, entityID, initializer, componentLocation);
 
 			return true;
 		}
@@ -387,10 +385,7 @@ namespace ecs
 			COMPONENT_TYPE entityID = entities[entityIndex].ID;
 			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityID];
 
-			if (onDestroy[componentIndex] != NULL)
-			{
-				onDestroy[componentIndex](this, componentIndex, entityID, NULL, componentLocation);
-			}
+			onDestroy[componentIndex](this, componentIndex, entityID, NULL, componentLocation);
 			
 			entities[entityIndex].components &= ~componentManagers[componentIndex].ID;
 
