@@ -35,6 +35,8 @@ Once the OpenGL Renderer implementation is ready the Renderer API will be freeze
 
 ### ECSManager
 - Entity Component System
+- :warning: Prefabs
+- :warning: Hierarchy
 ### FileIO
 - Asynchronous file loader & parser
 - Binary files
@@ -42,6 +44,7 @@ Once the OpenGL Renderer implementation is ready the Renderer API will be freeze
 - :warning: Audio files (ogg, mp3)
 ### Scripting
 - Native (C/C++)
+- :warning: Lua
 ### Math
 - Data structures:
   - Buffer
@@ -129,5 +132,5 @@ Once the OpenGL Renderer implementation is ready the Renderer API will be freeze
 - [Neural networks. 3Blue1Brown]( https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi )
 
 ## :page_facing_up: License & copyright
-This project is licensed under The MIT [License](LICENSE).
+This project is released under The MIT [License](LICENSE).
 
