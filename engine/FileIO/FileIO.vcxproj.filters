@@ -32,9 +32,6 @@
     <ClCompile Include="src\Image.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\loadBytes.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\FileLoaderAsync.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

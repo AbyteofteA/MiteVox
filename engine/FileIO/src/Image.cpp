@@ -1,4 +1,4 @@
-
+/*
 #include "SOIL.h"
 
 #include "Image.h"
@@ -22,4 +22,4 @@ void fileio::loadImage(std::string filename, void** image, char* flag)
 
 	*flag = 1;
 	return;
-}
+}*/

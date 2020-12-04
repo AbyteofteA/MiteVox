@@ -2,6 +2,10 @@
 #ifndef FILELOADERASYNC_H
 #define FILELOADERASYNC_H
 
+#include "loadBytes.h"
+
+#include <filesystem>
+namespace fs = std::filesystem;
 #include <string>
 #include <thread>
 #include <vector>
@@ -40,22 +44,79 @@ namespace fileio
 			b) if _parseFunction == NULL, assigns objectDestination with the pointer
 		to the read file.
 		*****************************************************************************************/
-		void loadAndParseAsync(std::string _filename, void** _destination, void (*_parseFunction)(std::string filename, void** objectDestination, char* flag) = NULL);
-		
+		inline void loadAndParseAsync(std::string _filename, void** _destination, void (*_parseFunction)(std::string filename, void** objectDestination, char* flag) = NULL)
+		{
+			if (exists(_destination))
+			{
+				return;
+			}
+
+			if (!fs::exists(fs::path(_filename)))
+			{
+				printf("ERROR: Cannot open %s\n", _filename.c_str());
+				return;
+			}
+
+			FileLoaderAsyncInfo* fileInfo = new FileLoaderAsyncInfo();
+			fileInfo->filename = _filename;
+			fileInfo->parseFunction = _parseFunction;
+
+			fileInfo->objectData = NULL;
+			fileInfo->destination = _destination;
+
+			if (_parseFunction == NULL) // there is no load/parse function
+			{
+				fileInfo->loaderThread = std::thread(loadBytes, fileInfo->filename, &fileInfo->objectData, &fileInfo->fileStatus);
+			}
+			else // there is a load/parse function
+			{
+				fileInfo->loaderThread = std::thread(fileInfo->parseFunction, fileInfo->filename, &fileInfo->objectData, &fileInfo->fileStatus);
+			}
+			fileRecords.push_back(fileInfo);
+		}
+
 		/*****************************************************************************************
 		Checks if any of the files is loaded/parsed and updates the file status.
 		*****************************************************************************************/
-		inline void update();
+		inline void update()
+		{
+			for (int i = 0; i < (int)fileRecords.size(); i++)
+			{
+				if (fileRecords[i]->fileStatus == READY)
+				{
+					fileRecords[i]->loaderThread.join();
+					*fileRecords[i]->destination = fileRecords[i]->objectData;
+					fileRecords.erase(fileRecords.begin() + i);
+					i--;
+				}
+			}
+		}
 
 		/*****************************************************************************************
 		Checks if the object is loaded/parsed.
 		*****************************************************************************************/
-		inline bool exists(void** object);
-		
+		inline bool exists(void** object)
+		{
+			for (int i = 0; i < (int)fileRecords.size(); i++)
+			{
+				if (fileRecords[i]->destination == object)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		/*****************************************************************************************
 		Awaits until all files are read and parsed.
 		*****************************************************************************************/
-		void awaitAll();
+		inline void awaitAll()
+		{
+			while (!fileRecords.empty())
+			{
+				update();
+			}
+		}
 
 	};
 
