@@ -90,6 +90,7 @@
     <ClInclude Include="src\FFNN\FFNN_Validation.h" />
     <ClInclude Include="src\CNN\Filter_2D.h" />
     <ClInclude Include="src\CNN\Convolution_layer.h" />
+    <ClInclude Include="src\RNN\HopfieldNN.h" />
     <ClInclude Include="src\Structure\Functions.h" />
     <ClInclude Include="src\GZ_File_IO.h" />
     <ClInclude Include="src\Structure\HyperData.h" />

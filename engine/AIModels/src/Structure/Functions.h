@@ -4,7 +4,7 @@
 namespace aimods
 {
 	// Activation functions
-#define IDENTITY 0	// Seems like it's useless
+#define LINEAR 0
 #define BINARY_STEP 1
 #define BIPOLAR 2
 #define ReLU 3
@@ -22,7 +22,7 @@ namespace aimods
 		switch (function)
 		{
 
-		case IDENTITY:
+		case LINEAR:
 			f = weightedSum;
 			break;
 
@@ -67,7 +67,7 @@ namespace aimods
 		switch (function)
 		{
 
-		case IDENTITY:
+		case LINEAR:
 			der = 1;
 			break;
 

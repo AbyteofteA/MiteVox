@@ -75,6 +75,9 @@
     <ClInclude Include="src\FFNN\FormalNeuron.h">
       <Filter>Заголовочные файлы\Structure\FFNN</Filter>
     </ClInclude>
+    <ClInclude Include="src\RNN\HopfieldNN.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

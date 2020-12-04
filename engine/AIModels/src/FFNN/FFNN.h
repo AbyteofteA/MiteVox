@@ -23,8 +23,6 @@ namespace aimods
 
 		Feedforward_NN()
 		{
-			printf("\n [ Creating a new network ]\n");
-
 			this->fileSize = sizeof(unsigned int);
 
 			this->layerArray = NULL;
@@ -108,7 +106,6 @@ namespace aimods
 
 		void initializeLayer(unsigned int layerIndex)
 		{
-			//printf("\n Initializing a layer..\n");
 			unsigned int i = 0;
 
 			while (i < this->amountOfLayerNeurons[layerIndex])
@@ -134,7 +131,6 @@ namespace aimods
 			deleteBufferPack_BackProp();
 
 			this->amountOfLayers++;
-			printf("\n\tAdding %d neurons to the [%d] layer..\n", size, this->amountOfLayers);
 
 			FormalNeuron** newLayer = (FormalNeuron**)malloc(sizeof(FormalNeuron*) * size);
 			resizeNetwork(this->amountOfLayers);
@@ -190,7 +186,7 @@ namespace aimods
 		}
 
 		/*****************************************************************************************
-		Initializes outputs of neurons of the first layer with random data [-1; 1].
+		Initializes outputs of neurons of the first layer with random data [-0.01; 0.01].
 		*****************************************************************************************/
 		void inputData()
 		{
@@ -214,8 +210,6 @@ namespace aimods
 		*****************************************************************************************/
 		void propagate()
 		{
-			//printf("\n Propagating signals..\n");
-
 			for (unsigned int i = 1; i < this->amountOfLayers; i++)
 			{
 				for (unsigned int j = 0; j < this->amountOfLayerNeurons[i]; j++)
@@ -228,7 +222,6 @@ namespace aimods
 		*****************************************************************************************/
 		unsigned int netResponse()
 		{
-			//printf("\n Prepairing answer..\n");
 			float max = 0;
 			unsigned int maxIndex = 0;
 
@@ -293,8 +286,7 @@ namespace aimods
 		//	TO IMPLEMENT
 		void joinNetworks(Feedforward_NN* secondNet)
 		{
-			printf("\n Joining the networks..\n");
-			//Feedforward_NN* newNetwork = (Feedforward_NN*)malloc(sizeof(newNetwork));
+			
 		}
 	};
 

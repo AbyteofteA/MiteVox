@@ -18,7 +18,9 @@
 #include "FFNN\FormalNeuron.h"
 using namespace aimods;
 #include "FFNN\FFNN.h"
-	// 
+	// RNN
+#include "RNN\HopfieldNN.h"
+
 #include "Service.h"
 
 	// Files

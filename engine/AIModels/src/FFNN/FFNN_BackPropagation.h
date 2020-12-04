@@ -8,8 +8,6 @@ namespace aimods
 		float* localError = (float*)calloc(amountOfLayerNeurons[amountOfLayers - 1], sizeof(float));
 		float resultError = 0;
 
-		printf("\t");
-
 		for (unsigned int b = 0; b < batch->batchSize; b++)	
 		{
 			inputData(batch->input[b]);
@@ -27,8 +25,6 @@ namespace aimods
 			}
 		}
 
-		printf("\n");
-
 		// Process the last layer.
 		for (unsigned int n = 0; n < amountOfLayerNeurons[amountOfLayers - 1]; n++)	
 		{
@@ -42,7 +38,7 @@ namespace aimods
 					dE_dz[amountOfLayers - 1][n] * layerArray[amountOfLayers - 1][n]->weightArray[a];
 			}
 
-			localError[n] /= (2 * batch->batchSize);
+			localError[n] /= 2;
 		}
 
 		// Process the hidden layers.
@@ -77,7 +73,7 @@ namespace aimods
 					layerArray[l][n]->weightArray[a] -=
 						dE_dz[l][n] * layerArray[l][n]->axonArray[a]->output * learningRate;
 				}
-				layerArray[l][n]->threshold -= dE_dz[l][n] * learningRate;
+				layerArray[l][n]->threshold += dE_dz[l][n] * learningRate;
 			}
 		}
 

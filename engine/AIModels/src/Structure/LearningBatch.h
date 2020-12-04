@@ -39,6 +39,35 @@ namespace aimods
 			}
 		}
 
+		void init(float* _input, float* _output)
+		{
+			for (unsigned int j = 0; j < batchSize; j++)
+			{
+				for (unsigned int i = 0; i < sizeOfInput; i++)
+				{
+					input[j][i] = _input[j * batchSize + i];
+				}
+				for (unsigned int i = 0; i < sizeOfOutput; i++)
+				{
+					output[j][i] = _output[j * batchSize + i];
+				}
+			}
+		}
+		void init(float** _input, float** _output)
+		{
+			for (unsigned int j = 0; j < batchSize; j++)
+			{
+				for (unsigned int i = 0; i < sizeOfInput; i++)
+				{
+					input[j][i] = _input[j][i];
+				}
+				for (unsigned int i = 0; i < sizeOfOutput; i++)
+				{
+					output[j][i] = _output[j][i];
+				}
+			}
+		}
+
 		~LearningBatch()
 		{
 			for (unsigned int j = 0; j < batchSize; j++)

@@ -6,41 +6,49 @@ namespace aimods
 	{
 	public:
 
-		unsigned char function;
+		unsigned char function = TanH;
 
-		float output;
-		float threshold;
+		float output = 0;
+		float threshold = 0;
 
-		float* weightArray;
-		FormalNeuron** axonArray;
-		unsigned int amountOfAxons;
+		float* weightArray = NULL;
+		FormalNeuron** axonArray = NULL;
+		unsigned int amountOfAxons = 0;
 
-		FormalNeuron()
-		{
-			this->function = TanH;
-			this->output = 0;
-			this->threshold = 1;
-			this->amountOfAxons = 0;
-
-			this->weightArray = NULL;
-			this->axonArray = NULL;
-		}
-		FormalNeuron(unsigned char _function, unsigned int _amountOfAxons)
+		FormalNeuron(unsigned char _function = TanH, unsigned int _amountOfAxons = 1)
 		{
 			this->function = _function;
-			this->output = 0;
-			this->threshold = 1;
+			formAxons(_amountOfAxons);
+		}
+		~FormalNeuron()
+		{
+			free(this->axonArray);
+			free(this->weightArray);
+		}
+
+		void formAxons(unsigned int _amountOfAxons)
+		{
 			this->amountOfAxons = _amountOfAxons;
 
-			this->weightArray = NULL;
-			this->axonArray = NULL;
+			this->axonArray = (FormalNeuron**)realloc(this->axonArray, sizeof(FormalNeuron*) * _amountOfAxons);
+			this->weightArray = (float*)realloc(this->weightArray, sizeof(float) * _amountOfAxons);
 
-			this->weightArray = (float*)malloc(sizeof(float) * _amountOfAxons);
+			setWeights();
+		}
+
+		void setWeights(float value)
+		{
 			for (unsigned int a = 0; a < this->amountOfAxons; a++)
 			{
-				this->weightArray[a] = (float)(rand() % 201 - 100) / 1000;
+				this->weightArray[a] = value;
 			}
-			this->axonArray = (FormalNeuron**)malloc(sizeof(FormalNeuron*) * _amountOfAxons);
+		}
+		void setWeights()
+		{
+			for (unsigned int a = 0; a < this->amountOfAxons; a++)
+			{
+				this->weightArray[a] = (rand()%20 - 10) / (float)1000;
+			}
 		}
 
 		float weightedSum()
@@ -53,16 +61,14 @@ namespace aimods
 			return wSum;
 		}
 
+		float computeOutput()
+		{
+			return activationFunction(weightedSum(), this->function);
+		}
 		float propagate()
 		{
 			this->output = activationFunction(weightedSum(), this->function);
 			return this->output;
-		}
-
-		void deleteFormalNeuron()
-		{
-			free(this->axonArray);
-			free(this->weightArray);
 		}
 	};
 }

@@ -2,7 +2,7 @@
 #include "NN_headers.h"
 
 
-void main()
+/*void main()
 {
 	showTitle();
 	srand((unsigned int)time(NULL));
@@ -32,4 +32,4 @@ void main()
 	printf("\n\tValidation(testNet)  = %.3f", testNet->Validate(testData, 1));
 
 	getchar();
-}
+}*/

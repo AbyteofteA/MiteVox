@@ -67,7 +67,7 @@ namespace aimods
 			return newHyperData;
 		}
 
-		void loadFromImage(char* filename)
+		/*void loadFromImage(char* filename)
 		{
 			dataType = FLOAT_HYPERDATA;
 
@@ -92,7 +92,7 @@ namespace aimods
 			}
 
 			delete img;
-		}
+		}*/
 
 		void* readFrom_IDX(char* filename)
 		{

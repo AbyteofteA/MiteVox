@@ -310,8 +310,8 @@ void** inputFromTxt(char* filename)
 						sizeOfPattern = 0;
 						amountOfPatterns++;
 						inputData = (void** )realloc(inputData, sizeof(void**) * (amountOfPatterns + 1));
-						inputData[amountOfPatterns - 1] = NULL;
-						inputData[amountOfPatterns] = '\0';
+						((char**)inputData)[amountOfPatterns - 1] = NULL;
+						((char**)inputData)[amountOfPatterns] = '\0';
 
 						tmpChar = getc(newFile);
 						char * tmpStr = NULL;
