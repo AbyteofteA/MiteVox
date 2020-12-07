@@ -9,10 +9,10 @@ void PointLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPO
 		return;
 
 	mathem::Transform* transform =
-		_ecs->getComponent<mathem::Transform>(entityID, TRANSFORM_COMPONENT);
+		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
 
 	render::PointLight* pointLight =
-		_ecs->getComponent<render::PointLight>(entityID, POINTLIGHT_COMPONENT);
+		(render::PointLight*)_ecs->getComponent(entityID, POINTLIGHT_COMPONENT);
 	render::standardShaders[shaderIndex]->setInt("amountOfPointLights", index + 1);
 
 	std::string pointLights = "pointLights[";

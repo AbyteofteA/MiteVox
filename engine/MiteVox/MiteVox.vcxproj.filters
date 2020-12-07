@@ -36,9 +36,6 @@
     <ClInclude Include="src\callbacks\Transform_Callbacks.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="src\callbacks\AmbientLight_Callbacks.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="src\callbacks\PointLight_Callbacks.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -51,9 +48,12 @@
     <ClInclude Include="src\MiteVox.h">
       <Filter>Заголовочные файлы\GameEngine</Filter>
     </ClInclude>
+    <ClInclude Include="src\MiteVox_Engine.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.h">
+    <ClCompile Include="src\MiteVox_entry.h">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>

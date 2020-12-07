@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ECS.cpp">
+    <ClCompile Include="src\ECS.h">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

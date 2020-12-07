@@ -9,10 +9,10 @@ void SpotLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPON
 		return;
 
 	mathem::Transform* transform =
-		_ecs->getComponent<mathem::Transform>(entityID, TRANSFORM_COMPONENT);
+		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
 
 	render::SpotLight* spotLight =
-		_ecs->getComponent<render::SpotLight>(entityID, SPOTLIGHT_COMPONENT);
+		(render::SpotLight*)_ecs->getComponent(entityID, SPOTLIGHT_COMPONENT);
 	render::standardShaders[shaderIndex]->setInt("amountOfSpotLights", index + 1);
 
 	std::string spotLights = "spotLights[";

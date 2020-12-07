@@ -9,7 +9,7 @@ void DirectedLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, CO
 		return;
 
 	render::DirectedLight* directedLight =
-		_ecs->getComponent<render::DirectedLight>(entityID, DIRECTEDLIGHT_COMPONENT);
+		(render::DirectedLight*)_ecs->getComponent(entityID, DIRECTEDLIGHT_COMPONENT);
 	render::standardShaders[shaderIndex]->setInt("amountOfDirectionalLights", index + 1);
 
 	std::string directedLights = "directionalLights[";

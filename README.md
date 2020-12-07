@@ -35,7 +35,7 @@ Once the OpenGL Renderer implementation is ready the Renderer API will be freeze
 
 ### ECSManager
 - Entity Component System
-- :warning: Prefabs
+- Prefabs
 - :warning: Hierarchy
 ### FileIO
 - Asynchronous file loader & parser
@@ -91,9 +91,11 @@ Once the OpenGL Renderer implementation is ready the Renderer API will be freeze
 ### AIModels
 - MLModels:
   - FFNN (Feedforward Neural Networks)
-  - FFNN + Backpropagation
+    - FFNN + Backpropagation
+  - RNN (Recurrent Neural Networks)
+    - Hopfield network
   - CNN (Convolutional Neural Networks)
-  - :warning: CNN + Backpropagation
+    - :warning: CNN + Backpropagation
   - :warning: CompositeNN
 - Pathfinding:
   - :warning: A*
