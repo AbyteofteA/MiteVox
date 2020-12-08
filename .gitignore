@@ -15,6 +15,7 @@
 *.pdb
 *.res
 *.tlog
+*.filters
 
 *.sai2
 *.odt
