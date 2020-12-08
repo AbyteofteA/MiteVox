@@ -22,7 +22,6 @@
 
 namespace ecs
 {
-
 	/*****************************************************************************************
 	Entity is just an unique ID + component flag.
 	*****************************************************************************************/
@@ -52,6 +51,15 @@ namespace ecs
 		COMPONENT_TYPE amountOfInstances = 0;
 
 		ComponentManager() {}
+		ComponentManager(std::string _name, COMPONENT_SIZE_TYPE _sizeOfComponent)
+		{
+			init(_name, _sizeOfComponent);
+		}
+		~ComponentManager()
+		{
+			wipe();
+		}
+
 		void init(std::string _name, COMPONENT_SIZE_TYPE _sizeOfComponent)
 		{
 			name = _name;
@@ -66,18 +74,9 @@ namespace ecs
 			free(componentToID);
 			free(data);
 		}
-		ComponentManager(std::string _name, COMPONENT_SIZE_TYPE _sizeOfComponent)
-		{
-			init(_name, _sizeOfComponent);
-		}
-		~ComponentManager()
-		{
-			wipe();
-		}
 
 		// Utility methods //
 
-		
 		/*****************************************************************************************
 		Checks if an entity with the ID exists.
 		*****************************************************************************************/
@@ -101,7 +100,6 @@ namespace ecs
 			}
 			return nullptr;
 		}
-
 		
 		/*****************************************************************************************
 		Reserves memory to reduce allocations.
@@ -111,7 +109,6 @@ namespace ecs
 			resizeIDtoComponent(_maxID);
 			resizeData(_dataLength);
 		}
-
 		
 		/*****************************************************************************************
 		Reallocates arrays to fit useful data.
@@ -187,6 +184,7 @@ namespace ecs
 			}
 			return ID;
 		}
+
 		void swapComponents(COMPONENT_TYPE index1, COMPONENT_TYPE index2)
 		{
 			char tmp = 0;
@@ -214,6 +212,7 @@ namespace ecs
 
 			return true;
 		}
+
 		bool resizeData(COMPONENT_TYPE newDataLength)
 		{
 			if ((dataLength == newDataLength) || (amountOfInstances > newDataLength))
@@ -251,6 +250,7 @@ namespace ecs
 		{
 			wipe();
 		}
+
 		void init(COMPONENT_TYPE ID)
 		{
 			entity.ID = ID;
@@ -347,25 +347,27 @@ namespace ecs
 
 		Entity* entities = nullptr;
 		COMPONENT_TYPE amountOfEntities = 0;
+		COMPONENT_TYPE entitiesArraySize = 0;
 		std::queue<COMPONENT_TYPE> availableIDs;
 
 		std::vector<Prefab*> prefabs;
 
-		ECS()
+		ECS(COMPONENT_TYPE amount)
 		{
-			init();
+			init(amount);
 		}
 		~ECS()
 		{
 			wipe();
 		}
 
-		void init()
+		void init(COMPONENT_TYPE amount)
 		{
 			for (COMPONENT_TYPE i = 0; i < ENTITY_PACK; i++)
 			{
 				availableIDs.push(i);
 			}
+			reserveEntities(amount);
 		}
 		void wipe()
 		{
@@ -383,6 +385,27 @@ namespace ecs
 		}
 
 		// Entity methods //
+
+		/*****************************************************************************************
+		Reserves memory for entities to reduce allocations.
+		*****************************************************************************************/
+		void reserveEntities(COMPONENT_TYPE amount)
+		{
+			if (amount > amountOfEntities)
+			{
+				entitiesArraySize = amount;
+				entities = (Entity*)realloc(entities, sizeof(Entity) * entitiesArraySize);
+			}
+		}
+
+		/*****************************************************************************************
+		Reallocates arrays to fit useful entities.
+		*****************************************************************************************/
+		void fitEntities()
+		{
+			entitiesArraySize = amountOfEntities;
+			entities = (Entity*)realloc(entities, sizeof(Entity) * entitiesArraySize);
+		}
 
 		void swapEntities(COMPONENT_TYPE index1, COMPONENT_TYPE index2)
 		{
@@ -411,7 +434,13 @@ namespace ecs
 
 			COMPONENT_TYPE entityIndex = amountOfEntities;
 			amountOfEntities++;
-			entities = (Entity*)realloc(entities, sizeof(Entity) * amountOfEntities);
+
+			// Realloc entities if the buffer is not big enough.
+			if (amountOfEntities > entitiesArraySize)
+			{
+				entitiesArraySize = amountOfEntities;
+				entities = (Entity*)realloc(entities, sizeof(Entity) * entitiesArraySize);
+			}
 
 			entities[entityIndex].ID = ID;
 			entities[entityIndex].components = 0;
@@ -429,7 +458,13 @@ namespace ecs
 
 			COMPONENT_TYPE entityIndex = amountOfEntities;
 			amountOfEntities++;
-			entities = (Entity*)realloc(entities, sizeof(Entity) * amountOfEntities);
+			
+			// Realloc entities if the buffer is not big enough.
+			if (amountOfEntities > entitiesArraySize)
+			{
+				entitiesArraySize = amountOfEntities;
+				entities = (Entity*)realloc(entities, sizeof(Entity) * entitiesArraySize);
+			}
 
 			entities[entityIndex].ID = ID;
 			entities[entityIndex].components = 0;
@@ -449,7 +484,11 @@ namespace ecs
 		void deleteEntity(COMPONENT_TYPE entityID)
 		{
 			COMPONENT_TYPE entityIndex = getEntityIndex(entityID);
-			
+			deleteEntityByIndex(entityIndex);
+		}
+
+		void deleteEntityByIndex(COMPONENT_TYPE entityIndex)
+		{
 			// Detach all entity's components.
 			for (MANAGER_INDEX_TYPE i = 0; i < MAX_COMPONENTS; i++)
 			{
@@ -465,7 +504,14 @@ namespace ecs
 			swapEntities(entityIndex, maxIndex);
 
 			amountOfEntities--;
-			entities = (Entity*)realloc(entities, sizeof(Entity) * maxIndex);
+		}
+
+		void deleteAllEntities()
+		{
+			for (COMPONENT_TYPE i = 0; i < amountOfEntities; i++)
+			{
+				deleteEntityByIndex(i);
+			}
 		}
 
 		// Component methods //

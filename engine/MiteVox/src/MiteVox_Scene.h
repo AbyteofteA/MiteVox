@@ -4,6 +4,10 @@
 
 #include <vector>
 
+#ifndef INITIAL_ENTITY_BUFFER_SIZE
+#define INITIAL_ENTITY_BUFFER_SIZE 1024
+#endif
+
 // Default components indeces
 #define CAMERA_COMPONENT 0
 #define MODEL3D_COMPONENT 1
@@ -84,18 +88,18 @@ namespace mitevox
 		// Temporary time storage.
 		double tmpTime = 0.0;
 
-		MiteVox_Scene()
+		MiteVox_Scene(COMPONENT_TYPE initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE)
 		{
-			init();
+			init(initialEntitiesBufferSize);
 		}
 		~MiteVox_Scene()
 		{
 			wipe();
 		}
 
-		void init()
+		void init(COMPONENT_TYPE initialEntitiesBufferSize)
 		{
-			ECS = new ecs::ECS();
+			ECS = new ecs::ECS(initialEntitiesBufferSize);
 
 			// Renderer components
 
