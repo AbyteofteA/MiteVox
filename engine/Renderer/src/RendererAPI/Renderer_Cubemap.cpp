@@ -72,13 +72,13 @@ namespace render
 			fileio::Image* right;
 			fileio::Image* left;
 
-			char flags[6];
-			fileio::loadImage(frontPath, (void**)&front, flags);
-			fileio::loadImage(backPath, (void**)&back, flags + 1);
-			fileio::loadImage(upPath, (void**)&up, flags + 2);
-			fileio::loadImage(downPath, (void**)&down, flags + 3);
-			fileio::loadImage(rightPath, (void**)&right, flags + 4);
-			fileio::loadImage(leftPath, (void**)&left, flags + 5);
+			fileio::fileLoader.loadAndParseAsync(frontPath, (void**)&front, fileio::loadImage);
+			fileio::fileLoader.loadAndParseAsync(backPath, (void**)&back, fileio::loadImage);
+			fileio::fileLoader.loadAndParseAsync(upPath, (void**)&up, fileio::loadImage);
+			fileio::fileLoader.loadAndParseAsync(downPath, (void**)&down, fileio::loadImage);
+			fileio::fileLoader.loadAndParseAsync(rightPath, (void**)&right, fileio::loadImage);
+			fileio::fileLoader.loadAndParseAsync(leftPath, (void**)&left, fileio::loadImage);
+			fileio::fileLoader.awaitAll();
 
 			tmpCubemap->textures[0] = *right;
 			tmpCubemap->textures[1] = *left;

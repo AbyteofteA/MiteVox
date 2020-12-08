@@ -15,8 +15,6 @@ namespace fs = std::filesystem;
 
 namespace render
 {
-    extern RendererSettings RendererSettingsDebug;
-
     class ShaderOpenGL
     {
 
@@ -199,7 +197,7 @@ namespace render
         return shader;
     }
 
-    inline void loadShaders(std::string dirName, std::vector<ShaderOpenGL*>* shaders)
+    inline void loadShaders(RendererSettings* renderer, std::string dirName, std::vector<ShaderOpenGL*>* shaders)
     {
         /*fs::path currentPath = fs::path(dirName);
 
@@ -222,32 +220,13 @@ namespace render
         char* vertexSourceP = nullptr;
         char* fragmentSourceP = nullptr;
 
-        std::string path1;
-        std::string path2;
-        std::string path3;
-        std::string path4;
-        std::string path5;
-        std::string path6;
-
-        if (RendererSettingsDebug.debug)
-        {
-            path1 = "../Renderer/shaders/basic/basicShader.vert";
-            path2 = "../Renderer/shaders/basic/basicShader.frag";
-            path3 = "../Renderer/shaders/skybox/skyboxShader.vert";
-            path4 = "../Renderer/shaders/skybox/skyboxShader.frag";
-            path5 = "../Renderer/shaders/primitive/primitiveShader.vert";
-            path6 = "../Renderer/shaders/primitive/primitiveShader.frag";
-        }
-        else
-        {
-            path1 = "../../../engine/Renderer/shaders/basic/basicShader.vert";
-            path2 = "../../../engine/Renderer/shaders/basic/basicShader.frag";
-            path3 = "../../../engine/Renderer/shaders/skybox/skyboxShader.vert";
-            path4 = "../../../engine/Renderer/shaders/skybox/skyboxShader.frag";
-            path5 = "../../../engine/Renderer/shaders/primitive/primitiveShader.vert";
-            path6 = "../../../engine/Renderer/shaders/primitive/primitiveShader.frag";
-        }
-
+        std::string path1 = dirName + "/basic/basicShader.vert";
+        std::string path2 = dirName + "/basic/basicShader.frag";
+        std::string path3 = dirName + "/skybox/skyboxShader.vert";
+        std::string path4 = dirName + "/skybox/skyboxShader.frag";
+        std::string path5 = dirName + "/primitive/primitiveShader.vert";
+        std::string path6 = dirName + "/primitive/primitiveShader.frag";
+        
         fileio::fileLoader.loadAndParseAsync(path1, (void**)&vertexSourceB);
         fileio::fileLoader.loadAndParseAsync(path2, (void**)&fragmentSourceB);
         fileio::fileLoader.loadAndParseAsync(path3, (void**)&vertexSourceS);

@@ -4,6 +4,4 @@
 namespace render
 {
 	std::vector<ShaderOpenGL*> standardShaders;
-
-	RendererSettings RendererSettingsDebug;
 }

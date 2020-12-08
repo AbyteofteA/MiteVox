@@ -6,17 +6,17 @@
 
 namespace render
 {
-	int initRenderer()
+	int initRenderer(RendererSettings* renderer)
 	{
 		if (!glfwInit())
 		{
 			return -1;
 		}
 
-		RendererSettingsDebug.screenWidth = SCREEN_WIDTH;
-		RendererSettingsDebug.screenHeight = SCREEN_HEIGHT;
-		RendererSettingsDebug.debug = 0;
-		RendererSettingsDebug.backfaceCulling = 1;
+		renderer->screenWidth = SCREEN_WIDTH;
+		renderer->screenHeight = SCREEN_HEIGHT;
+		renderer->debug = 0;
+		renderer->backfaceCulling = 1;
 
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -27,22 +27,22 @@ namespace render
 		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-		glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+		//glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
 		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
-		glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
+		
 
 		glfwWindowHint(GLFW_SAMPLES, 2);
 
-		RendererSettingsDebug.setWindow(
+		renderer->setWindow(
 			glfwCreateWindow(mode->width, mode->height, "MiteVox", monitor, NULL));
-		if (RendererSettingsDebug.getWindow() == NULL)
+		if (renderer->getWindow() == NULL)
 		{
 			std::cout << "Failed to create GLFW window" << std::endl;
 			glfwTerminate();
 			return -1;
 		}
 		
-		glfwMakeContextCurrent(RendererSettingsDebug.getWindow());
+		glfwMakeContextCurrent(renderer->getWindow());
 
 
 		glewExperimental = GL_TRUE;
@@ -56,14 +56,14 @@ namespace render
 		glEnable(GL_MULTISAMPLE);
 		glClearColor((GLclampf)0.05, (GLclampf)0.05, (GLclampf)0.05, (GLclampf)1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glfwSwapBuffers(RendererSettingsDebug.getWindow());
+		glfwSwapBuffers(renderer->getWindow());
 
 		glDepthFunc(GL_LEQUAL);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 
-		if (RendererSettingsDebug.backfaceCulling)
+		if (renderer->backfaceCulling)
 		{
 			glEnable(GL_CULL_FACE);
 		}
@@ -75,20 +75,20 @@ namespace render
 		// Load standard shaders.
 
 		std::string shadersDir;
-		if (RendererSettingsDebug.debug)
+		if (renderer->debug)
 		{
-			shadersDir = "../Renderer/shaders";
+			shadersDir = "../../engine/Renderer/shaders";
 		}
 		else
 		{
-			shadersDir = "../../../engine/Renderer/shaders";
+			shadersDir = "../../../../../engine/Renderer/shaders";
 		}
-		loadShaders(shadersDir, &standardShaders);
+		loadShaders(renderer, shadersDir, &standardShaders);
 		
 
-		RendererSettingsDebug.points.resize(PRIMITIVE_BUFFER_SIZE);
-		RendererSettingsDebug.lines.resize(PRIMITIVE_BUFFER_SIZE * 2);
-		RendererSettingsDebug.triangles.resize(PRIMITIVE_BUFFER_SIZE * 3);
+		renderer->points.resize(PRIMITIVE_BUFFER_SIZE);
+		renderer->lines.resize(PRIMITIVE_BUFFER_SIZE * 2);
+		renderer->triangles.resize(PRIMITIVE_BUFFER_SIZE * 3);
 
 		return 1;
 	}
@@ -104,10 +104,16 @@ namespace render
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
-	void display()
+	void display(RendererSettings* renderer)
 	{
 		glfwSwapInterval(1);
-		glfwSwapBuffers(RendererSettingsDebug.getWindow());
+		glfwSwapBuffers(renderer->getWindow());
+	}
+
+	void closeRenderer(RendererSettings* renderer)
+	{
+		glfwWindowShouldClose(renderer->getWindow());
+		delete renderer;
 	}
 }
 

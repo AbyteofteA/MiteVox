@@ -27,6 +27,18 @@ namespace render
 		int screenHeight = SCREEN_HEIGHT;
 		unsigned char backfaceCulling = 1;
 
+		RendererSettings(){}
+		RendererSettings(GLFWwindow* _window)
+		{
+			setWindow(_window);
+		}
+		~RendererSettings()
+		{
+			points.wipe();
+			lines.wipe();
+			triangles.wipe();
+		}
+
 		GLFWwindow* getWindow()
 		{
 			return window;

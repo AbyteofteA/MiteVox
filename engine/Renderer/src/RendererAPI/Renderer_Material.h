@@ -16,13 +16,13 @@ namespace render
 		char isUploaded = 0;
 
 			// Color and shading
-		ColorRGBAf ambient;			// (0.0 - 1.0)
-		ColorRGBAf diffuse;			// (0.0 - 1.0)
-		ColorRGBAf specular;		// (0.0 - 1.0)
-		float specularExponent;		// (0.0 - 1000.0)
+		ColorRGBAf albedo = { 0.0f, 0.0f, 0.0f };		// (0.0 - 1.0)
+		ColorRGBAf roughness = { 1.0f, 1.0f, 1.0f };	// (0.0 - 1.0)
+		ColorRGBAf metallicity = { 1.0f, 1.0f, 1.0f };	// (0.0 - 1.0)
+		float specularExponent = 8;						// (0.0 - 1000.0)
 			// Transparancy
-		ColorRGBAf filter;
-		float transparency;			// (0.0 - 1.0)
+		ColorRGBAf filter = { 1.0f, 1.0f, 1.0f };
+		float transparency = 0;		// (0.0 - 1.0)
 		float opticalDensity;		// (0.001 - 10.0)
 		float reflectionSharpness;	// (0.0 - 1000.0)
 
@@ -51,8 +51,6 @@ namespace render
 
 		fileio::Image glowMap;
 		unsigned int glowMapID;
-
-		Cubemap reflectionMap;
 	};
 
 

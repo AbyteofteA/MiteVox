@@ -28,7 +28,7 @@ namespace render
     struct SpotLight
     {
         mathem::Point3D position;
-        mathem::Point3D direction;
+        mathem::Vector3D direction;
         float angle;
         ColorRGBAf color;
 

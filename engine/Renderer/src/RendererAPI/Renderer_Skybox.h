@@ -28,7 +28,6 @@ namespace render
 		unsigned int vertexID;
 
 		Cubemap* cubemap;
-		unsigned int textureID;
 	};
 
 	void loadSkybox(std::string dirname, void** skybox, char* flag);

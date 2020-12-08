@@ -8,9 +8,9 @@ out vec4 outColor;
 
 struct Material
 {
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
+	vec3 albedo;
+	vec3 roughness;
+	vec3 metallicity;
 	float specularExponent;
 };
 
@@ -18,13 +18,16 @@ uniform vec3 viewPos;
 
 uniform Material material;
 
-int hasAlbedoMap;
+uniform int hasReflectionMap = 0;
+uniform samplerCube reflectionMap;
+
+uniform int hasAlbedoMap = 0;
 uniform sampler2D albedoMap;
 
-int hasRoughnessMap;
+uniform int hasRoughnessMap = 0;
 uniform sampler2D roughnessMap;
 
-int hasMetallicMap;
+uniform int hasMetallicMap = 0;
 uniform sampler2D metallicMap;
 
 
@@ -72,7 +75,7 @@ uniform int amountOfSpotLights;
 uniform SpotLight spotLights[MAX_OF_SPOT_LIGHTS];
 
 
-vec3 calculate_DirectionalLight(vec3 norm, vec3 viewDir, vec3 textureFragment, vec3 specularFragment)
+vec3 calculate_DirectionalLight(vec3 norm, vec3 viewDir, vec3 roughnessFragment, vec3 metallicFragment)
 {
 	vec3 result = vec3(0.0, 0.0, 0.0);
 
@@ -83,21 +86,21 @@ vec3 calculate_DirectionalLight(vec3 norm, vec3 viewDir, vec3 textureFragment, v
 		float dotNormLightdir = dot(norm, lightDir);
 
 		float diff = max(dotNormLightdir, 0.0);
-		vec3 diffuse = material.diffuse * diff * directionalLights[i].color * textureFragment;
+		vec3 diffuse = material.roughness * diff * directionalLights[i].color * roughnessFragment;
 
 		vec3 specular = vec3(0.0, 0.0, 0.0);
 		vec3 reflectDir = reflect(-lightDir, norm);  
 		if(dotNormLightdir > 0)
 		{
 			float spec = pow(max(dot(lightDir, reflectDir), 0.0), material.specularExponent);
-			specular = material.specular * spec * directionalLights[i].color * specularFragment;
+			specular = material.metallicity * spec * directionalLights[i].color * metallicFragment;
 		}
 		result += diffuse + specular;
 	}
 	return result;
 }
 
-vec3 calculate_PointLight(vec3 norm, vec3 viewDir, vec3 textureFragment, vec3 specularFragment)
+vec3 calculate_PointLight(vec3 norm, vec3 viewDir, vec3 roughnessFragment, vec3 metallicFragment)
 {
 	vec3 result = vec3(0.0, 0.0, 0.0);
 
@@ -114,21 +117,21 @@ vec3 calculate_PointLight(vec3 norm, vec3 viewDir, vec3 textureFragment, vec3 sp
 		float dotNormLightdir = dot(norm, lightDir);
 
 		float diff = max(dotNormLightdir, 0.0);
-		vec3 diffuse = material.diffuse * diff * pointLights[i].color * textureFragment;
+		vec3 diffuse = material.roughness * diff * pointLights[i].color * roughnessFragment;
 
 		vec3 specular = vec3(0.0, 0.0, 0.0);
 		vec3 reflectDir = reflect(-lightDir, norm);  
 		if(dotNormLightdir > 0)
 		{
 			float spec = pow(max(dot(lightDir, reflectDir), 0.0), material.specularExponent);
-			specular = material.specular * spec * pointLights[i].color * specularFragment;
+			specular = material.metallicity * spec * pointLights[i].color * metallicFragment;
 		}
 		result += attenuation * (diffuse + specular);
 	}
 	return result;
 }
 
-vec3 calculate_SpotLight(vec3 norm, vec3 viewDir, vec3 textureFragment, vec3 specularFragment)
+vec3 calculate_SpotLight(vec3 norm, vec3 viewDir, vec3 roughnessFragment, vec3 metallicFragment)
 {
 	vec3 result = vec3(0.0, 0.0, 0.0);
 
@@ -145,7 +148,7 @@ vec3 calculate_SpotLight(vec3 norm, vec3 viewDir, vec3 textureFragment, vec3 spe
 		// Angle calculations.
 		float cutOff = cos(radians(spotLights[i].angle * 0.5));
 		float outerCutOff = cos(radians(spotLights[i].angle));
-		float theta = dot(lightDir, normalize(-spotLights[i].direction));
+		float theta = dot(lightDir, -normalize(spotLights[i].direction));
 		float epsilon = cutOff - outerCutOff;
 		float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
 
@@ -153,14 +156,14 @@ vec3 calculate_SpotLight(vec3 norm, vec3 viewDir, vec3 textureFragment, vec3 spe
 		float dotNormLightdir = dot(norm, lightDir);
 
 		float diff = max(dotNormLightdir, 0.0);
-		vec3 diffuse = material.diffuse * diff * spotLights[i].color * textureFragment;
+		vec3 diffuse = material.roughness * diff * spotLights[i].color * roughnessFragment;
 
 		vec3 specular = vec3(0.0, 0.0, 0.0);
 		vec3 reflectDir = reflect(-lightDir, norm);  
 		if(dotNormLightdir > 0)
 		{
 			float spec = pow(max(dot(lightDir, reflectDir), 0.0), material.specularExponent);
-			specular = material.specular * spec * spotLights[i].color * specularFragment;
+			specular = material.metallicity * spec * spotLights[i].color * metallicFragment;
 		}
 		result += intensity * attenuation * (diffuse + specular);
 		
@@ -174,13 +177,21 @@ void main()
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - Position);
 
-	vec3 textureFragment = vec3(texture(albedoMap, Texcoord));
-	vec3 specularFragment = vec3(texture(metallicMap, Texcoord));
+	vec3 albedoFragment = vec3(texture(albedoMap, Texcoord));
+	vec3 roughnessFragment = vec3(texture(roughnessMap, Texcoord));
+	vec3 metallicFragment = vec3(texture(metallicMap, Texcoord));
 
-	vec3 result = material.ambient +
-				calculate_DirectionalLight(norm, viewDir, textureFragment, specularFragment) +
-				calculate_PointLight(norm, viewDir, textureFragment, specularFragment) + 
-				calculate_SpotLight(norm, viewDir, textureFragment, specularFragment);
+	vec4 reflectionMapFragment = vec4(0, 0, 0, 1);
+	if(hasReflectionMap != 0)
+	{
+		vec3 reflectionDir = reflect(-viewDir, norm);
+		//reflectionMapFragment = texture(reflectionMap, reflectionDir);
+	}
+
+	vec3 result = material.albedo * albedoFragment +
+				calculate_DirectionalLight(norm, viewDir, roughnessFragment, metallicFragment) +
+				calculate_PointLight(norm, viewDir, roughnessFragment, metallicFragment) + 
+				calculate_SpotLight(norm, viewDir, roughnessFragment, metallicFragment);
 	outColor = vec4(result, 1.0);
 }
 

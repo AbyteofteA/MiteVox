@@ -37,24 +37,6 @@ namespace render
 		Graphics_Polygon* f = nullptr;
 		long amOfFaces = 0;
 	};
-
-
-	double* readFloats3(char* str, int& indx);
-
-	mathem::Point3D readPoint3D(char* str, int& indx);
-
-	mathem::Vector3D readNormal(char* str, int& indx);
-
-	Graphics_Polygon readPolygon(char* str, int& indx, Mesh3D** md);
-
-	/************************************************************************************
-	Parse .obj
-	-----------------------------------------------------------------------------------
-	Application:
-	Description:
-	************************************************************************************/
-	void parseMesh_OBJ(std::string filename, void** mesh, char* flag);
-
 }
 
 #endif

@@ -8,29 +8,29 @@
 namespace render
 {
 	
-	void drawPoint(Point point)
+	void drawPoint(RendererSettings* renderer, Point point)
 	{
-		unsigned int size = RendererSettingsDebug.points.getSizeData();
-		RendererSettingsDebug.points.setSizeData(size + 1);
-		RendererSettingsDebug.points.data[size] = point;
+		unsigned int size = renderer->points.getSizeData();
+		renderer->points.setSizeData(size + 1);
+		renderer->points.data[size] = point;
 	}
-	void drawLine(Point point1, Point point2)
+	void drawLine(RendererSettings* renderer, Point point1, Point point2)
 	{
-		unsigned int size = RendererSettingsDebug.lines.getSizeData();
-		RendererSettingsDebug.lines.setSizeData(size + 2);
-		RendererSettingsDebug.lines.data[size] = point1;
-		RendererSettingsDebug.lines.data[size + 1] = point2;
+		unsigned int size = renderer->lines.getSizeData();
+		renderer->lines.setSizeData(size + 2);
+		renderer->lines.data[size] = point1;
+		renderer->lines.data[size + 1] = point2;
 	}
-	void drawTriangle(Point point1, Point point2, Point point3)
+	void drawTriangle(RendererSettings* renderer, Point point1, Point point2, Point point3)
 	{
-		unsigned int size = RendererSettingsDebug.triangles.getSizeData();
-		RendererSettingsDebug.triangles.setSizeData(size + 3);
-		RendererSettingsDebug.triangles.data[size] = point1;
-		RendererSettingsDebug.triangles.data[size + 1] = point2;
-		RendererSettingsDebug.triangles.data[size + 2] = point3;
+		unsigned int size = renderer->triangles.getSizeData();
+		renderer->triangles.setSizeData(size + 3);
+		renderer->triangles.data[size] = point1;
+		renderer->triangles.data[size + 1] = point2;
+		renderer->triangles.data[size + 2] = point3;
 	}
 
-	void drawCross(Point point, float size)
+	void drawCross(RendererSettings* renderer, Point point, float size)
 	{
 		render::Point point1 = point;
 		render::Point point2 = point;
@@ -46,15 +46,13 @@ namespace render
 		point5.pos.y += -size;
 		point6.pos.z += -size;
 
-		render::drawLine(point1, point4);
-		render::drawLine(point2, point5);
-		render::drawLine(point3, point6);
+		render::drawLine(renderer, point1, point4);
+		render::drawLine(renderer, point2, point5);
+		render::drawLine(renderer, point3, point6);
 	}
-
-
-	void drawSnowflake(Point point, float size)
+	void drawSnowflake(RendererSettings* renderer, Point point, float size)
 	{
-		drawCross(point, size);
+		drawCross(renderer, point, size);
 
 		size /= 2;
 
@@ -67,20 +65,19 @@ namespace render
 		render::Point point7 = { {-size + point.pos.x, -size + point.pos.y, size + point.pos.z},  point.color };
 		render::Point point8 = { {-size + point.pos.x, size + point.pos.y, size + point.pos.z},  point.color };
 
-		render::drawLine(point1, point6);
-		render::drawLine(point2, point5);
-		render::drawLine(point3, point8);
-		render::drawLine(point4, point7);
+		render::drawLine(renderer, point1, point6);
+		render::drawLine(renderer, point2, point5);
+		render::drawLine(renderer, point3, point8);
+		render::drawLine(renderer, point4, point7);
 	}
 
-
-	void renderPoints(render::Camera* camera, mathem::Transform* cameraTransform)
+	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
 		unsigned int shaderIndex = 2;
 		if (!standardShaders[shaderIndex]->use())
 			return;
 
-		unsigned int amountOfPoints = RendererSettingsDebug.points.getSizeData();
+		unsigned int amountOfPoints = renderer->points.getSizeData();
 		if (amountOfPoints <= 0)
 			return;
 
@@ -107,7 +104,7 @@ namespace render
 		glBindVertexArray(pointsArrayID);
 		glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfPoints,
-			RendererSettingsDebug.points.data, GL_STATIC_DRAW);
+			renderer->points.data, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
@@ -117,15 +114,15 @@ namespace render
 		glDrawArrays(GL_POINTS, 0, amountOfPoints * 7);
 
 		glDeleteBuffers(1, &pointsArrayID);
-		RendererSettingsDebug.points.setSizeData(0);
+		renderer->points.setSizeData(0);
 	}
-	void renderLines(render::Camera* camera, mathem::Transform* cameraTransform)
+	void renderLines(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
 		unsigned int shaderIndex = 2;
 		if (!standardShaders[shaderIndex]->use())
 			return;
 
-		unsigned int amountOfLines = RendererSettingsDebug.lines.getSizeData();
+		unsigned int amountOfLines = renderer->lines.getSizeData();
 		if (amountOfLines <= 0)
 			return;
 
@@ -152,7 +149,7 @@ namespace render
 		glBindVertexArray(linesArrayID);
 		glBindBuffer(GL_ARRAY_BUFFER, linesVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfLines,
-			RendererSettingsDebug.lines.data, GL_STATIC_DRAW);
+			renderer->lines.data, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
@@ -162,15 +159,15 @@ namespace render
 		glDrawArrays(GL_LINES, 0, amountOfLines * 14);
 
 		glDeleteBuffers(1, &linesArrayID);
-		RendererSettingsDebug.lines.setSizeData(0);
+		renderer->lines.setSizeData(0);
 	}
-	void renderTriangles(render::Camera* camera, mathem::Transform* cameraTransform)
+	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
 		unsigned int shaderIndex = 2;
 		if (!standardShaders[shaderIndex]->use())
 			return;
 
-		unsigned int amountOfTriangles = RendererSettingsDebug.triangles.getSizeData();
+		unsigned int amountOfTriangles = renderer->triangles.getSizeData();
 		if (amountOfTriangles <= 0)
 			return;
 
@@ -197,7 +194,7 @@ namespace render
 		glBindVertexArray(trianglesArrayID);
 		glBindBuffer(GL_ARRAY_BUFFER, trianglesVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfTriangles,
-			RendererSettingsDebug.triangles.data, GL_STATIC_DRAW);
+			renderer->triangles.data, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
@@ -206,7 +203,7 @@ namespace render
 
 		glDisable(GL_CULL_FACE);
 		glDrawArrays(GL_TRIANGLES, 0, amountOfTriangles * 21);
-		if (RendererSettingsDebug.backfaceCulling)
+		if (renderer->backfaceCulling)
 		{
 			glEnable(GL_CULL_FACE);
 		}
@@ -216,6 +213,6 @@ namespace render
 		}
 
 		glDeleteBuffers(1, &trianglesArrayID);
-		RendererSettingsDebug.triangles.setSizeData(0);
+		renderer->triangles.setSizeData(0);
 	}
 }

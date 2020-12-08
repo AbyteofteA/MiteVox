@@ -15,6 +15,7 @@
 #include "Renderer_Camera.h"
 #include "Renderer_Mesh3D.h"
 #include "Renderer_Model3D.h"
+#include "parseModel_OBJ.h"
 #include "Renderer_Light.h"
 #include "Effects.h"
 #include "Renderer_Settings.h"
@@ -29,33 +30,34 @@ namespace render
 
 	// <General>
 
-	inline int initRenderer();
+	inline int initRenderer(RendererSettings* renderer);
 	inline void clearBufferXY(float R, float G, float B);
 	inline void clearBufferZ();
-	inline void display();
+	inline void display(RendererSettings* renderer);
+	inline void closeRenderer(RendererSettings* renderer);
 
 	// Primitives
 
-	void drawPoint(Point point);
-	void drawLine(Point point1, Point point2);
-	void drawTriangle(Point point1, Point point2, Point point3);
+	void drawPoint(RendererSettings* renderer, Point point);
+	void drawLine(RendererSettings* renderer, Point point1, Point point2);
+	void drawTriangle(RendererSettings* renderer, Point point1, Point point2, Point point3);
 
-	void drawCross(Point point, float size);
-	void drawSnowflake(Point point, float size);
+	void drawCross(RendererSettings* renderer, Point point, float size);
+	void drawSnowflake(RendererSettings* renderer, Point point, float size);
 
-	void renderPoints(Camera* camera, mathem::Transform* cameraTransform);
-	void renderLines(Camera* camera, mathem::Transform* cameraTransform);
-	void renderTriangles(Camera* camera, mathem::Transform* cameraTransform);
+	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform);
+	void renderLines(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform);
+	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform);
 
 	// Models
 
 	void uploadModel3D(Model3D* model3D);
 	void removeModel3D(Model3D* model3D);
-	void renderModel3D(Model3D* model3D, mathem::Transform* transform, render::Camera* camera, mathem::Transform* cameraTransform);
+	void renderModel3D(Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
 	
 	inline void uploadSkybox(Skybox* skybox);
 	inline void removeSkybox(Skybox* skybox);
-	inline void renderSkybox(Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform);
+	inline void renderSkybox(Skybox* skybox, Camera* camera, mathem::Transform* cameraTransform);
 }
 
 //==================================================================

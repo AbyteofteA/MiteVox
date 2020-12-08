@@ -9,33 +9,33 @@
 
 namespace render
 {
-	float* modelToXYZUVIJK(Mesh3D* model)
+	float* modelToXYZUVIJK(Mesh3D* mesh)
 	{
-		unsigned long long size = (unsigned long long)sizeof(float) * model->amOfFaces * 24;
+		unsigned long long size = (unsigned long long)sizeof(float) * mesh->amOfFaces * 24;
 		float* result = (float*)malloc((size_t)size);
 
-		for (unsigned long long i = 0; i < model->amOfFaces; i++)
+		for (unsigned long long i = 0; i < mesh->amOfFaces; i++)
 		{
 			for (unsigned long long j = 0; j < 3; j++)
 			{
 				// X Y Z
-				result[i * 24 + j * 8 + 0] = model->v[model->f[i].p[j] - 1].x;
-				result[i * 24 + j * 8 + 1] = model->v[model->f[i].p[j] - 1].y;
-				result[i * 24 + j * 8 + 2] = model->v[model->f[i].p[j] - 1].z;
+				result[i * 24 + j * 8 + 0] = mesh->v[mesh->f[i].p[j] - 1].x;
+				result[i * 24 + j * 8 + 1] = mesh->v[mesh->f[i].p[j] - 1].y;
+				result[i * 24 + j * 8 + 2] = mesh->v[mesh->f[i].p[j] - 1].z;
 
 				// U V
-				if (model->f[i].t != nullptr)
+				if (mesh->f[i].t != nullptr)
 				{
-					result[i * 24 + j * 8 + 3] = model->vt[model->f[i].t[j] - 1].x;
-					result[i * 24 + j * 8 + 4] = model->vt[model->f[i].t[j] - 1].y;
+					result[i * 24 + j * 8 + 3] = mesh->vt[mesh->f[i].t[j] - 1].x;
+					result[i * 24 + j * 8 + 4] = mesh->vt[mesh->f[i].t[j] - 1].y;
 				}
 
 				// I J K
-				if (model->vn != nullptr)
+				if (mesh->vn != nullptr)
 				{
-					result[i * 24 + j * 8 + 5] = model->vn[model->f[i].n[j] - 1].i;
-					result[i * 24 + j * 8 + 6] = model->vn[model->f[i].n[j] - 1].j;
-					result[i * 24 + j * 8 + 7] = model->vn[model->f[i].n[j] - 1].k;
+					result[i * 24 + j * 8 + 5] = mesh->vn[mesh->f[i].n[j] - 1].i;
+					result[i * 24 + j * 8 + 6] = mesh->vn[mesh->f[i].n[j] - 1].j;
+					result[i * 24 + j * 8 + 7] = mesh->vn[mesh->f[i].n[j] - 1].k;
 				}
 			}
 		}
@@ -50,21 +50,21 @@ namespace render
 		if (!standardShaders[model3D->shaderID]->use())
 			return;
 
-		if (model3D->model->isUploaded == 0)
+		if (model3D->mesh->isUploaded == 0)
 		{
-			float* modelData = modelToXYZUVIJK(model3D->model);
+			float* modelData = modelToXYZUVIJK(model3D->mesh);
 
 			GLint posAttrib = glGetAttribLocation(standardShaders[model3D->shaderID]->textureID, "position");
 			GLint texAttrib = glGetAttribLocation(standardShaders[model3D->shaderID]->textureID, "texcoord");
 			GLint normalAttrib = glGetAttribLocation(standardShaders[model3D->shaderID]->textureID, "normal");
-			//GLint colAttrib = glGetAttribLocation(shaderProgram, "colors");
+			
 
 			unsigned int modelVBO;
-			glGenVertexArrays(1, &model3D->model->vertexBufferID);
+			glGenVertexArrays(1, &model3D->mesh->vertexBufferID);
 			glGenBuffers(1, &modelVBO);
-			glBindVertexArray(model3D->model->vertexBufferID);
+			glBindVertexArray(model3D->mesh->vertexBufferID);
 			glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * model3D->model->amOfFaces, modelData, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * model3D->mesh->amOfFaces, modelData, GL_STATIC_DRAW);
 
 			glEnableVertexAttribArray(posAttrib);
 			glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
@@ -73,7 +73,7 @@ namespace render
 			glEnableVertexAttribArray(normalAttrib);
 			glVertexAttribPointer(normalAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
 
-			model3D->model->isUploaded = 1;
+			model3D->mesh->isUploaded = 1;
 
 			free(modelData);
 		}
@@ -85,8 +85,8 @@ namespace render
 			glGenTextures(1, &model3D->material->ambientMapID);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, model3D->material->ambientMapID);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->albedoMap.width, model3D->material->albedoMap.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
@@ -96,8 +96,8 @@ namespace render
 			glGenTextures(1, &model3D->material->specularMapID);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, model3D->material->specularMapID);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->metallicMap.width, model3D->material->metallicMap.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
@@ -106,11 +106,10 @@ namespace render
 
 			model3D->material->isUploaded = 1;
 		}
-
 	}
 	void selectModel3D(Model3D* model3D, ShaderOpenGL* shader)
 	{
-		glBindVertexArray(model3D->model->vertexBufferID);
+		glBindVertexArray(model3D->mesh->vertexBufferID);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, model3D->material->ambientMapID);
@@ -120,11 +119,11 @@ namespace render
 	}
 	void removeModel3D(Model3D* model3D)
 	{
-		glDeleteBuffers(1, &model3D->model->vertexBufferID);
+		glDeleteBuffers(1, &model3D->mesh->vertexBufferID);
 		glDeleteTextures(1, &model3D->material->ambientMapID);
 		glDeleteTextures(1, &model3D->material->specularMapID);
 
-		model3D->model->isUploaded = 0;
+		model3D->mesh->isUploaded = 0;
 		model3D->material->isUploaded = 0;
 	}
 
@@ -146,13 +145,13 @@ namespace render
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
-		glGenTextures(1, &skybox->textureID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
+		glGenTextures(1, &skybox->cubemap->textureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemap->textureID);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
 
 		for (int i = 0; i < 6; i++)
 		{
@@ -167,12 +166,12 @@ namespace render
 	{
 		glBindVertexArray(skybox->vertexID);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemap->textureID);
 	}
 	void removeSkybox(Skybox* skybox)
 	{
 		glDeleteBuffers(1, &skybox->vertexID);
-		glDeleteTextures(1, &skybox->textureID);
+		glDeleteTextures(1, &skybox->cubemap->textureID);
 	}
 
 
@@ -185,6 +184,7 @@ namespace render
 
 		selectModel3D(model3D, standardShaders[model3D->shaderID]);
 
+		standardShaders[model3D->shaderID]->setInt("hasCubemap", 0);
 		standardShaders[model3D->shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
 
 		glm::mat4 global = glm::mat4(1.0f);
@@ -195,11 +195,11 @@ namespace render
 		global = glm::rotate(global, glm::radians(transform->angleZ), glm::vec3(0.0, 0.0, 1.0));
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(model3D->transform->x, model3D->transform->y, model3D->transform->z));
-		model = glm::scale(model, glm::vec3(model3D->transform->scaleX, model3D->transform->scaleY, model3D->transform->scaleZ));
-		model = glm::rotate(model, glm::radians(model3D->transform->angleX), glm::vec3(1.0, 0.0, 0.0));
-		model = glm::rotate(model, glm::radians(model3D->transform->angleY), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::rotate(model, glm::radians(model3D->transform->angleZ), glm::vec3(0.0, 0.0, 1.0));
+		model = glm::translate(model, glm::vec3(model3D->transform.x, model3D->transform.y, model3D->transform.z));
+		model = glm::scale(model, glm::vec3(model3D->transform.scaleX, model3D->transform.scaleY, model3D->transform.scaleZ));
+		model = glm::rotate(model, glm::radians(model3D->transform.angleX), glm::vec3(1.0, 0.0, 0.0));
+		model = glm::rotate(model, glm::radians(model3D->transform.angleY), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::rotate(model, glm::radians(model3D->transform.angleZ), glm::vec3(0.0, 0.0, 1.0));
 
 		glm::mat4 modelTransform = glm::mat4(1.0f);
 		modelTransform = global * model;
@@ -219,15 +219,15 @@ namespace render
 		standardShaders[model3D->shaderID]->setMat4("positionTransform", positionTransform);
 
 		// Pass the material to a shader.
-		glm::vec3 tmp = { model3D->material->ambient.r, model3D->material->ambient.g, model3D->material->ambient.b };
-		standardShaders[model3D->shaderID]->setVec3("material.ambient", tmp);
-		tmp = { model3D->material->diffuse.r, model3D->material->diffuse.g, model3D->material->diffuse.b };
-		standardShaders[model3D->shaderID]->setVec3("material.diffuse", tmp);
-		tmp = { model3D->material->specular.r, model3D->material->specular.g, model3D->material->specular.b };
-		standardShaders[model3D->shaderID]->setVec3("material.specular", tmp);
+		glm::vec3 tmp = { model3D->material->albedo.r, model3D->material->albedo.g, model3D->material->albedo.b };
+		standardShaders[model3D->shaderID]->setVec3("material.albedo", tmp);
+		tmp = { model3D->material->roughness.r, model3D->material->roughness.g, model3D->material->roughness.b };
+		standardShaders[model3D->shaderID]->setVec3("material.roughness", tmp);
+		tmp = { model3D->material->metallicity.r, model3D->material->metallicity.g, model3D->material->metallicity.b };
+		standardShaders[model3D->shaderID]->setVec3("material.metallicity", tmp);
 		standardShaders[model3D->shaderID]->setFloat("material.specularExponent", model3D->material->specularExponent);
 
-		glDrawArrays(GL_TRIANGLES, 0, model3D->model->amOfFaces * 24);
+		glDrawArrays(GL_TRIANGLES, 0, model3D->mesh->amOfFaces * 24);
 	}
 
 	void renderSkybox(Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform)

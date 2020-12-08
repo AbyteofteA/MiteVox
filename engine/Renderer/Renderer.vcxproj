@@ -26,6 +26,7 @@
     <ClInclude Include="src\implementations\RendererOpenGL\PrimitiveFunctions.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\RendererOpenGL.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\ShaderOpenGL.h" />
+    <ClInclude Include="src\RendererAPI\parseModel_OBJ.h" />
     <ClInclude Include="src\RendererAPI\Renderer_API.h" />
     <ClInclude Include="src\RendererAPI\Renderer_Camera.h" />
     <ClInclude Include="src\RendererAPI\Renderer_ColorRGBA.h" />
@@ -60,7 +61,6 @@
     <ClCompile Include="src\implementations\RendererOpenGL\ModelFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\PrimitiveFunctions.cpp" />
     <ClCompile Include="src\RendererAPI\Renderer_Cubemap.cpp" />
-    <ClCompile Include="src\RendererAPI\Renderer_Mesh3D.cpp" />
     <ClCompile Include="src\RendererAPI\Renderer_Skybox.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -134,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glm;$(SolutionDir)engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glm;$(SolutionDir)engine;$(SolutionDir)dependencies\Simple OpenGL Image Library\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

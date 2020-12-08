@@ -7,27 +7,20 @@ namespace render
 	class Model3D
 	{
 	public:
-		Mesh3D* model = nullptr;
-
-		mathem::Transform* transform = nullptr;
-
+		Mesh3D* mesh = nullptr;
 		Material* material = nullptr;
+		mathem::Transform transform;
+		Cubemap* reflectionMap = nullptr;
 
 		int shaderID = 0;
 
-		Model3D(Mesh3D* m)
+		Model3D(Mesh3D* _mesh, Material* _material, 
+				mathem::Transform _transform = mathem::Transform())
 		{
-			model = m;
-			transform = new mathem::Transform();
-			material = nullptr;
-		}
-		Model3D(Mesh3D* m, float scaleX, float scaleY, float scaleZ,
-							float angleX, float angleY, float angleZ,
-								float x, float y, float z)
-		{
-			model = m;
-			transform = new mathem::Transform(scaleX, scaleY, scaleZ, angleX, angleY, angleZ, x, y, z);
-			material = nullptr;
+			mesh = _mesh;
+			material = _material;
+			transform = _transform;
+			reflectionMap = nullptr;
 		}
 	};
 }

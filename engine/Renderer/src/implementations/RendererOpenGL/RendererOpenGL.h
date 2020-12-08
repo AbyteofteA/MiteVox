@@ -12,8 +12,6 @@
 namespace render
 {
 	extern std::vector<ShaderOpenGL*> standardShaders;
-
-	extern RendererSettings RendererSettingsDebug;
 }
 #include "GlobalData.h"
 

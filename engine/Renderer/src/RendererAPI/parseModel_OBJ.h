@@ -1,4 +1,8 @@
 
+#ifndef PARSEMODEL_OBJ_H
+#define PARSEMODEL_OBJ_H
+
+#include <regex>
 #include "FileIO/src/FileIO_Headers.h"
 #include "Math/src/Math_Headers.h"
 
@@ -7,7 +11,14 @@
 
 namespace render
 {
-	double* readFloats3(char* str, int& indx)
+
+#define COMMENTS		"(\n+ *#)*"
+#define USE_MATERIAL	"(\n+ *usemtl +[a-zA-z0-9_]+)*"
+
+	
+
+
+	inline double* readFloats3(char* str, int& indx)
 	{
 		double resultFloats[3] = { 0 };
 
@@ -32,7 +43,7 @@ namespace render
 	}
 
 
-	mathem::Point3D readPoint3D(char* str, int& indx)
+	inline mathem::Point3D readPoint3D(char* str, int& indx)
 	{
 		mathem::Point3D v;
 		double* tmpFloats = readFloats3(str, indx);
@@ -43,7 +54,7 @@ namespace render
 		return v;
 	}
 
-	mathem::Vector3D readNormal(char* str, int& indx)
+	inline mathem::Vector3D readNormal(char* str, int& indx)
 	{
 		mathem::Vector3D v;
 		double* tmpFloats = readFloats3(str, indx);
@@ -56,7 +67,7 @@ namespace render
 
 
 
-	Graphics_Polygon readPolygon(char* str, int& indx, Mesh3D** md)
+	inline Graphics_Polygon readPolygon(char* str, int& indx, Mesh3D** md)
 	{
 		Graphics_Polygon poly;
 
@@ -154,7 +165,7 @@ namespace render
 	Application:
 	Description:
 	************************************************************************************/
-	void parseMesh_OBJ(std::string filename, void** mesh, char* flag)
+	inline void parseModel_OBJ(std::string filename, void** mesh, char* flag)
 	{
 		*mesh = nullptr;
 		*flag = 0;
@@ -163,6 +174,45 @@ namespace render
 		char tmpFlag = 0;
 		fileio::loadBytes(filename, (void**)&fileData, &tmpFlag);
 
+
+		std::string obj_regex =
+			COMMENTS
+			"(\n+ *mtllib( +[a-zA-z0-9_]+)+)*"
+			COMMENTS
+			"("
+				USE_MATERIAL
+				COMMENTS
+				"(\n+ *vt( +-?[[:digit:]]+.?[[:digit:]]*){3})*"
+				COMMENTS
+				"(\n+ *vn( +-?[[:digit:]]+.?[[:digit:]]*){3})*"
+				COMMENTS
+				"(\n+ *p( +-?[[:digit:]]+){1,})*"
+				COMMENTS
+				"("
+					USE_MATERIAL
+					COMMENTS
+					"(\n+ *l( +-?[[:digit:]]+/-?[[:digit:]]*){2,})*"
+					COMMENTS
+				")*"
+				"("
+					USE_MATERIAL
+					COMMENTS
+					"(\n+ *f( +-?[[:digit:]]+/-?[[:digit:]]*/-?[[:digit:]]*){3,})*"
+					COMMENTS
+				")*"
+				COMMENTS
+			")*";
+		auto const regex = std::regex(obj_regex);
+		bool const myTextContainsRegex = std::regex_search(std::string(fileData), regex);
+		if (myTextContainsRegex)
+		{
+			//printf("\nOBJ is correct.\n");
+		}
+		else
+		{
+			//printf("\nOBJ error.\n");
+		}
+		
 		Mesh3D* meshTmp = new Mesh3D();
 
 		bool hasNormals = false;
@@ -456,3 +506,5 @@ namespace render
 
 }
 
+
+#endif
