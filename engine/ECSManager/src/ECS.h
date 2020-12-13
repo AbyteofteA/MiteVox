@@ -367,6 +367,12 @@ namespace ecs
 			{
 				availableIDs.push(i);
 			}
+			for (MANAGER_INDEX_TYPE i = 0; i < MAX_COMPONENTS; i++)
+			{
+				onCreate[i] = nullptr;
+				onUpdate[i] = nullptr;
+				onDestroy[i] = nullptr;
+			}
 			reserveEntities(amount);
 		}
 		void wipe()
@@ -518,9 +524,9 @@ namespace ecs
 
 		template <typename T>
 		MANAGER_INDEX_TYPE registerComponent(std::string name,
-			void (*_onCreate)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index),
-			void (*_onUpdate)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index),
-			void (*_onDestroy)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index))
+			void (*_onCreate)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = nullptr,
+			void (*_onUpdate)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = nullptr,
+			void (*_onDestroy)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = nullptr)
 		{
 			if (componentIDs == (~(COMPONENT_TYPE)0))
 			{
@@ -591,7 +597,10 @@ namespace ecs
 			}
 			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityID];
 
-			onCreate[componentIndex](this, componentIndex, entityID, initializer, componentLocation);
+			if (onCreate[componentIndex])
+			{
+				onCreate[componentIndex](this, componentIndex, entityID, initializer, componentLocation);
+			}
 
 			return true;
 		}
@@ -606,7 +615,10 @@ namespace ecs
 			COMPONENT_TYPE entityID = entities[entityIndex].ID;
 			COMPONENT_TYPE componentLocation = componentManagers[componentIndex].IDtoComponent[entityID];
 
-			onDestroy[componentIndex](this, componentIndex, entityID, nullptr, componentLocation);
+			if (onDestroy[componentIndex])
+			{
+				onDestroy[componentIndex](this, componentIndex, entityID, nullptr, componentLocation);
+			}
 
 			entities[entityIndex].components &= ~componentManagers[componentIndex].ID;
 
@@ -672,8 +684,11 @@ namespace ecs
 		{
 			for (COMPONENT_TYPE c = 0; c < componentManagers[componentIndex].amountOfInstances; c++)
 			{
-				onUpdate[componentIndex](
+				if (onUpdate[componentIndex])
+				{
+					onUpdate[componentIndex](
 						this, componentIndex, componentManagers[componentIndex].componentToID[c], data, c);
+				}
 			}
 		}
 	};

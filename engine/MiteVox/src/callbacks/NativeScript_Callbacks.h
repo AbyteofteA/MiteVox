@@ -12,23 +12,32 @@ void NativeScript_onCreate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COM
 	}
 	else
 	{
-		*script = { doNothing, doNothing, doNothing, doNothing };
+		*script = { nullptr };
 	}
-	script->onCreate(_ecs, _managerIndex, entityID, data);
+	if (script->onCreate)
+	{
+		script->onCreate(_ecs, _managerIndex, entityID, data);
+	}
 }
 
 void NativeScript_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
 {
 	NativeScript_ECS* script =
 		(NativeScript_ECS*)_ecs->getComponent(entityID, NATIVE_SCRIPT_COMPONENT);
-	script->onUpdate(_ecs, _managerIndex, entityID, data);
+	if (script->onUpdate)
+	{
+		script->onUpdate(_ecs, _managerIndex, entityID, data);
+	}
 }
 
 void NativeScript_onDestroy(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
 {
 	NativeScript_ECS* script =
 		(NativeScript_ECS*)_ecs->getComponent(entityID, NATIVE_SCRIPT_COMPONENT);
-	script->onDestroy(_ecs, _managerIndex, entityID, data);
+	if (script->onDestroy)
+	{
+		script->onDestroy(_ecs, _managerIndex, entityID, data);
+	}
 }
 
 #endif

@@ -26,6 +26,7 @@ void mitevox::MiteVox_Engine::onCreate()
 	fileio::fileLoader.loadAndParseAsync(
 		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\cube.obj", (void**)&mCube, render::parseModel_OBJ);
 #endif
+	fileio::fileLoader.awaitAll();
 
 	// Load images (textures).
 	fileio::Image* white = nullptr;
@@ -77,9 +78,9 @@ void mitevox::MiteVox_Engine::onCreate()
 	darkSomething->albedoMap = *SPECchecker0;
 	darkSomething->metallicMap = *white;
 
-	NativeScript_ECS waveScript = { doNothing, waveModel_Script, doNothing };
-	NativeScript_ECS rotateScript = { doNothing, rotateModel_Script, doNothing };
-	NativeScript_ECS rotateLightScript = { doNothing, rotateLight_Script, doNothing };
+	NativeScript_ECS waveScript = { nullptr, waveModel_Script, nullptr };
+	NativeScript_ECS rotateScript = { nullptr, rotateModel_Script, nullptr };
+	NativeScript_ECS rotateLightScript = { nullptr, rotateLight_Script, nullptr };
 
 	//----------------------------------------------------------------------------------------
 
@@ -91,7 +92,7 @@ void mitevox::MiteVox_Engine::onCreate()
 	myScene->activeCamera = subject0;
 	mathem::Transform tmpTransform = { 1, 1, 1, 0, 0, 0, 0, 0, -700 };
 	myECS->attachComponent(subject0, myScene->Transform_Component, &tmpTransform);
-	NativeScript_ECS tmpNativeScript = { doNothing, processInput_Script, doNothing };
+	NativeScript_ECS tmpNativeScript = { nullptr, processInput_Script, nullptr };
 	myECS->attachComponent(subject0, myScene->NativeScript_Component, &tmpNativeScript);
 	/*render::SpotLight tmpSpotLight = { { 0, 0, 0 }, { 0, 1, 0 }, 10,
 									{ 1, 1, 1, 1 }, 1, 0.0007, 0.00002 };

@@ -103,21 +103,24 @@ namespace mitevox
 
 			// Renderer components
 
-			Camera_Component = ECS->registerComponent<render::Camera>(
-				"Camera", doNothing, doNothing, doNothing);
+			Camera_Component = ECS->registerComponent<render::Camera>("Camera");
+
 			Model3D_Component = ECS->registerComponent<render::Model3D>(
 				"Model3D", Model3D_onCreate, Model3D_onUpdate, Model3D_onDestroy);
+
 			PointLight_Component = ECS->registerComponent<render::PointLight>(
-				"PointLight", doNothing, PointLight_onUpdate, PointLight_onDelete);
+				"PointLight", nullptr, PointLight_onUpdate, PointLight_onDelete);
+
 			DirectedLight_Component = ECS->registerComponent<render::DirectedLight>(
-				"DirectedLight", doNothing, DirectedLight_onUpdate, DirectedLight_onDelete);
+				"DirectedLight", nullptr, DirectedLight_onUpdate, DirectedLight_onDelete);
+
 			SpotLight_Component = ECS->registerComponent<render::SpotLight>(
-				"SpotLight", doNothing, SpotLight_onUpdate, SpotLight_onDelete);
+				"SpotLight", nullptr, SpotLight_onUpdate, SpotLight_onDelete);
 
 			// Math components
 
 			Transform_Component = ECS->registerComponent<mathem::Transform>(
-				"Transform", Transform_onCreate, doNothing, doNothing);
+				"Transform", Transform_onCreate);
 
 			// Script components
 
@@ -126,15 +129,13 @@ namespace mitevox
 
 			// Physics components
 
-			PrimitiveCollider_Component = ECS->registerComponent<physcs::PrimitiveCollider>(
-				"PrimitiveCollider", doNothing, doNothing, doNothing);
-			RigidBody_Component = ECS->registerComponent<physcs::RigidBody>(
-				"RigidBody", doNothing, doNothing, doNothing);
+			PrimitiveCollider_Component = ECS->registerComponent<physcs::PrimitiveCollider>("PrimitiveCollider");
+
+			RigidBody_Component = ECS->registerComponent<physcs::RigidBody>("RigidBody");
 
 			// Other components
 
-			Tag_Component = ECS->registerComponent<std::string>(
-				"Tag", doNothing, doNothing, doNothing);
+			Tag_Component = ECS->registerComponent<std::string>("Tag");
 
 			// Initialize timers.
 
