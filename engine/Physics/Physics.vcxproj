@@ -152,9 +152,6 @@
     <ClInclude Include="src\Physics_RigidBody.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Math\Math.vcxproj">
       <Project>{c5ceff57-33a2-424b-bbce-600ae5a992e4}</Project>
     </ProjectReference>

@@ -6,18 +6,33 @@
 |_|  |_|_|\__\___| \_/ \___/_/\_\
 
 ```
-----------------------------------
+
+----
+
 MiteVox is an **Entity-Component-System**-based game engine. 
 The engine is a result of experiments in Computer Graghics, Machine Learning and Computer Science in general. 
 
-**Renderer** module currently supports only **OpenGL**, and the Renderer API is changing now.
-Once the OpenGL Renderer implementation is ready the Renderer API will be freezed in order to preserve compatibility with other implementations. 
+It consists of 8 modules:
 
-**FileIO** module contains the implementation of an object that reads and parses files **asynchronously**.
+- `MiteVox` is the core of the engine. It defines the entry point.
 
-**AIModels** module was created in order to learn Machine Learning. At this point it has an implementation of 
-**Feedforward Neural Networks** with **Backpropagation** learning algorithm for them. Also it has an implementation of 
-**Convolutional layer**, but Backpropagation is not implemented for it yet. 
+- `ECSManager` is a custom Entity-Component-System. It's minimalistic.
+
+- `Renderer` currently supports only **OpenGL**.
+
+- `FileIO` contains the implementation of an object that reads and parses files **asynchronously**.
+
+- `AIModels` implements **Perceptron + Backprop**, **Convolutional layer**, **Hopfield network**. 
+
+- `Physics` has an implementation of AABB collisions and defines rigid body.
+
+- `Math` contains a little bit mathematics.
+
+- `UIEventHandler` has a basic user I/O setup. It definitely needs redesign...
+
+The solution contains another project, that is not a part of the engine:
+
+- `Sandbox_0x00` is an example project.
 
 ## Potential use cases
 :video_game: Sandbox games
@@ -30,7 +45,6 @@ Once the OpenGL Renderer implementation is ready the Renderer API will be freeze
 ![mitevox_demo](docs/mitevox_demo.png)
 
 ## :card_file_box: Features & TODO
-
 :warning: - TODO
 
 ### ECSManager

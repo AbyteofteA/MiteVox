@@ -101,9 +101,6 @@
     <ClInclude Include="src\Service.h" />
     <ClInclude Include="src\FFNN\FormalNeuron.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

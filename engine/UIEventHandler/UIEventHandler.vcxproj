@@ -28,9 +28,6 @@
       <Project>{499c1c31-bd61-455f-b75c-23b6c245c5f4}</Project>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{AF75D88C-E82C-41A2-AB87-AD411282E876}</ProjectGuid>
