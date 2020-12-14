@@ -28,13 +28,29 @@ namespace render
 //   RendererAPI interface declaration  |  ! under construction !  |
 //==================================================================
 
-	// <General>
+	// General
 
 	inline int initRenderer(RendererSettings* renderer);
+	inline void closeRenderer(RendererSettings* renderer);
+
+	// Shaders
+
+	/*****************************************************************************************
+	Creates and compiles a shader.
+	\param name - shader name.
+	\param filename - files path without extension.
+					  Filenames must be the same for all types of shaders.
+					  Expected extensions are: .vert.shader and .frag.shader
+	*****************************************************************************************/
+	inline int createShader(std::string name, std::string filename);
+	inline void useShader(int shaderID);
+	inline void deleteShader(int shaderID);
+
+	// Buffers
+
 	inline void clearBufferXY(float R, float G, float B);
 	inline void clearBufferZ();
 	inline void display(RendererSettings* renderer);
-	inline void closeRenderer(RendererSettings* renderer);
 
 	// Primitives
 
@@ -52,10 +68,12 @@ namespace render
 	// Models
 
 	void uploadModel3D(Model3D* model3D);
+	void selectModel3D(Model3D* model3D);
 	void removeModel3D(Model3D* model3D);
 	void renderModel3D(Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
 	
 	inline void uploadSkybox(Skybox* skybox);
+	inline void selectSkybox(Skybox* skybox);
 	inline void removeSkybox(Skybox* skybox);
 	inline void renderSkybox(Skybox* skybox, Camera* camera, mathem::Transform* cameraTransform);
 }

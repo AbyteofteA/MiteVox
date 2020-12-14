@@ -28,7 +28,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiteVox", "engine\MiteVox\M
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ECSManager", "engine\ECSManager\ECSManager.vcxproj", "{AC93C233-F934-4322-BDED-77FED1051079}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox_0x00", "sandbox\Sandbox_0x00\Sandbox_0x00.vcxproj", "{BB677B66-73CB-4E5D-BF4A-1B4519EBBBF3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoProject", "sandbox\DemoProject\DemoProject.vcxproj", "{BB677B66-73CB-4E5D-BF4A-1B4519EBBBF3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{332C0094-8A1F-4E98-87E1-5EE1DC285D4E} = {332C0094-8A1F-4E98-87E1-5EE1DC285D4E}
 	EndProjectSection

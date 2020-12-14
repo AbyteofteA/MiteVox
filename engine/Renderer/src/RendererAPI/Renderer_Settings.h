@@ -2,8 +2,15 @@
 #ifndef RENDERER_SETTINGS_H
 #define RENDERER_SETTINGS_H
 
+#ifndef SCREEN_WIDTH
 #define SCREEN_WIDTH 1280
+#endif
+#ifndef SCREEN_HEIGHT
 #define SCREEN_HEIGHT 720
+#endif
+#ifndef MAX_SHADERS
+#define MAX_SHADERS 128
+#endif
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -22,10 +29,11 @@ namespace render
 
 		// Renderer Settings
 
-		char debug = 1;
 		int screenWidth = SCREEN_WIDTH;
 		int screenHeight = SCREEN_HEIGHT;
 		unsigned char backfaceCulling = 1;
+
+		int primitiveShaderID = -1;
 
 		RendererSettings(){}
 		RendererSettings(GLFWwindow* _window)

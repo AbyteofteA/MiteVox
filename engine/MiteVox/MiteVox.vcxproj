@@ -89,7 +89,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\MiteVox_entry.h" />
+    <ClCompile Include="src\MiteVox_main.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\callbacks\DirectedLight_Callbacks.h" />

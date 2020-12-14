@@ -43,9 +43,12 @@ namespace render
 
     public:
 
-        ShaderOpenGL(std::string _name)
+        ShaderOpenGL(char* vertexSource, char* fragmentSource, std::string shaderName)
         {
-            name = _name;
+            name = shaderName;
+            loadVertexShader(vertexSource);
+            loadFragmentShader(fragmentSource);
+            compileAndLink();
         }
         ~ShaderOpenGL()
         {
@@ -186,67 +189,6 @@ namespace render
             glUniformMatrix4fv(glGetUniformLocation(textureID, name), 1, GL_FALSE, glm::value_ptr(mat));
         }
     };
-
-    inline ShaderOpenGL* compileShader(char* vertexSource, char* fragmentSource, std::string shaderName)
-    {
-        ShaderOpenGL* shader = new ShaderOpenGL(shaderName);
-        shader->loadVertexShader(vertexSource);
-        shader->loadFragmentShader(fragmentSource);
-        shader->compileAndLink();
-
-        return shader;
-    }
-
-    inline void loadShaders(RendererSettings* renderer, std::string dirName, std::vector<ShaderOpenGL*>* shaders)
-    {
-        /*fs::path currentPath = fs::path(dirName);
-
-        for (fs::directory_entry de : fs::directory_iterator(currentPath))
-        {
-            for (fs::directory_entry de : fs::directory_iterator(currentPath))
-            {
-            std::string filename = de.path().filename().replace_extension("").string();
-            std::string path = de.path().string();
-
-            char* vertexSource = nullptr;
-            char* fragmentSource = nullptr;
-        }*/
-
-
-        char* vertexSourceB = nullptr;
-        char* fragmentSourceB = nullptr;
-        char* vertexSourceS = nullptr;
-        char* fragmentSourceS = nullptr;
-        char* vertexSourceP = nullptr;
-        char* fragmentSourceP = nullptr;
-
-        std::string path1 = dirName + "/basic/basicShader.vert";
-        std::string path2 = dirName + "/basic/basicShader.frag";
-        std::string path3 = dirName + "/skybox/skyboxShader.vert";
-        std::string path4 = dirName + "/skybox/skyboxShader.frag";
-        std::string path5 = dirName + "/primitive/primitiveShader.vert";
-        std::string path6 = dirName + "/primitive/primitiveShader.frag";
-        
-        fileio::fileLoader.loadAndParseAsync(path1, (void**)&vertexSourceB);
-        fileio::fileLoader.loadAndParseAsync(path2, (void**)&fragmentSourceB);
-        fileio::fileLoader.loadAndParseAsync(path3, (void**)&vertexSourceS);
-        fileio::fileLoader.loadAndParseAsync(path4, (void**)&fragmentSourceS);
-        fileio::fileLoader.loadAndParseAsync(path5, (void**)&vertexSourceP);
-        fileio::fileLoader.loadAndParseAsync(path6, (void**)&fragmentSourceP);
-
-        fileio::fileLoader.awaitAll();
-
-        // Setting up shaders
-        ShaderOpenGL* basicShader = compileShader(vertexSourceB, fragmentSourceB, "Basic Shader");
-        shaders->push_back(basicShader);
-
-        ShaderOpenGL* skyboxShader = compileShader(vertexSourceS, fragmentSourceS, "Skybox Shader");
-        shaders->push_back(skyboxShader);
-
-        ShaderOpenGL* primitiveShader = compileShader(vertexSourceP, fragmentSourceP, "Primitive Shader");
-        shaders->push_back(primitiveShader);
-    }
-
 }
 
 #endif

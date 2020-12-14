@@ -15,9 +15,9 @@ namespace mitevox
 		InputHandler* inputHandler = nullptr;
 		render::RendererSettings* renderer = nullptr;
 
-		MiteVox_Engine()
+		MiteVox_Engine(int argc, char* argv[])
 		{
-			init();
+			init(argc, argv);
 			onCreate();
 		}
 		~MiteVox_Engine()
@@ -26,7 +26,7 @@ namespace mitevox
 			wipe();
 		}
 
-		void init()
+		void init(int argc, char* argv[])
 		{
 			renderer = new render::RendererSettings();
 			render::initRenderer(renderer);

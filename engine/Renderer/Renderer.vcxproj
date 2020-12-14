@@ -19,12 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\implementations\RendererOpenGL\GeneralFunctions.h" />
+    <ClInclude Include="src\implementations\RendererOpenGL\API_GeneralFunctions.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\getErrorOpenGL.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\GlobalData.h" />
-    <ClInclude Include="src\implementations\RendererOpenGL\ModelFunctions.h" />
-    <ClInclude Include="src\implementations\RendererOpenGL\PrimitiveFunctions.h" />
+    <ClInclude Include="src\implementations\RendererOpenGL\API_ModelFunctions.h" />
+    <ClInclude Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\RendererOpenGL.h" />
+    <ClInclude Include="src\implementations\RendererOpenGL\API_ShaderFunctions.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\ShaderOpenGL.h" />
     <ClInclude Include="src\RendererAPI\parseModel_OBJ.h" />
     <ClInclude Include="src\RendererAPI\Renderer_API.h" />
@@ -49,17 +50,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\basic\basicShader.frag" />
-    <None Include="shaders\basic\basicShader.vert" />
-    <None Include="shaders\primitive\primitiveShader.frag" />
-    <None Include="shaders\primitive\primitiveShader.vert" />
-    <None Include="shaders\skybox\skyboxShader.frag" />
-    <None Include="shaders\skybox\skyboxShader.vert" />
+    <None Include="shaders\basic\basic.frag.shader" />
+    <None Include="shaders\basic\basic.vert.shader" />
+    <None Include="shaders\primitive\primitive.frag.shader" />
+    <None Include="shaders\primitive\primitive.vert.shader" />
+    <None Include="shaders\skybox\skybox.frag.shader" />
+    <None Include="shaders\skybox\skybox.vert.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\implementations\RendererOpenGL\GlobalData.cpp" />
-    <ClCompile Include="src\implementations\RendererOpenGL\ModelFunctions.cpp" />
-    <ClCompile Include="src\implementations\RendererOpenGL\PrimitiveFunctions.cpp" />
+    <ClCompile Include="src\implementations\RendererOpenGL\API_ModelFunctions.cpp" />
+    <ClCompile Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.cpp" />
     <ClCompile Include="src\RendererAPI\Renderer_Cubemap.cpp" />
     <ClCompile Include="src\RendererAPI\Renderer_Skybox.cpp" />
   </ItemGroup>

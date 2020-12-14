@@ -3,12 +3,17 @@
 #define SCREEN_WIDTH		1280
 #define SCREEN_HEIGHT		720
 
-//#define DEBUG_ON
+#define DEBUG 0
 //----------------------------------------------------------------------------------------
 
 #include "MiteVox/src/MiteVox.h"
 
 #include "scripts.h"
+
+
+int basicShader = -1;
+int primitiveShader = -1;
+int skyboxShader = -1;
 
 
 void mitevox::MiteVox_Engine::onCreate() 
@@ -17,9 +22,24 @@ void mitevox::MiteVox_Engine::onCreate()
 	mitevox::MiteVox_Scene* myScene = this->getActiveScene();
 	ecs::ECS* myECS = this->getActiveScene()->ECS;
 
-	// Create 3D-model objects.
+	// Compile shaders.
+
+	std::string shadersDir;
+#if DEBUG == 1
+		shadersDir = "../../engine/Renderer/shaders";
+#else
+		shadersDir = "../../../../../engine/Renderer/shaders";
+#endif
+	basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
+	skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
+	primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
+
+	this->renderer->primitiveShaderID = primitiveShader;
+
+	// Create 3D-model object.
+
 	render::Mesh3D* mCube = nullptr;
-#ifdef DEBUG_ON
+#if DEBUG == 1
 	fileio::fileLoader.loadAndParseAsync(
 		"..\\..\\engine\\Renderer\\assets\\cube.obj", (void**)&mCube, render::parseModel_OBJ);
 #else
@@ -29,6 +49,7 @@ void mitevox::MiteVox_Engine::onCreate()
 	fileio::fileLoader.awaitAll();
 
 	// Load images (textures).
+
 	fileio::Image* white = nullptr;
 	fileio::Image* white_rough = nullptr;
 	fileio::Image* light_grey = nullptr;
@@ -37,7 +58,7 @@ void mitevox::MiteVox_Engine::onCreate()
 	fileio::Image* UVchecker1 = nullptr;
 	fileio::Image* SPECchecker0 = nullptr;
 
-#ifdef DEBUG_ON
+#if DEBUG == 1
 	fileio::fileLoader.loadAndParseAsync(
 		"..\\..\\engine\\Renderer\\assets\\textures\\UVchecker0.png", (void**)&UVchecker0, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
@@ -108,7 +129,7 @@ void mitevox::MiteVox_Engine::onCreate()
 
 	render::Model3D* cube = new render::Model3D(
 		mCube, darkSomething, mathem::Transform(25, 25, 25, 0, 90, 0, 0, 0, 0));
-	cube->shaderID = 0;
+	cube->shaderID = basicShader;
 	myECS->getPrefab(Cube)->attachComponent(
 		&myECS->componentManagers[myScene->Model3D_Component], cube);
 
@@ -128,7 +149,7 @@ void mitevox::MiteVox_Engine::onCreate()
 	light->albedoMap = *white;
 	light->metallicMap = *white;
 	render::Model3D* cubeLight = new render::Model3D(mCube, light, { 3, 3, 3, 0, 0, 0, 0, 0, 0 });
-	cubeLight->shaderID = 0;
+	cubeLight->shaderID = basicShader;
 	myECS->getPrefab(Light)->attachComponent(
 		&myECS->componentManagers[myScene->Model3D_Component], cubeLight);
 	render::PointLight tmpPointLight = { { 0 }, { 1, 1, 1, 1 },  1, 0.0014f, 0.000007f };
@@ -137,8 +158,7 @@ void mitevox::MiteVox_Engine::onCreate()
 	myECS->getPrefab(Light)->attachComponent(
 		&myECS->componentManagers[myScene->NativeScript_Component]);
 
-	md = (render::Model3D*)myECS->getPrefab(Cube)->components[MODEL3D_COMPONENT];
-	md->shaderID = md->shaderID;
+	// Spawn 9x9 grid of cubes.
 
 	int maxX = 3;
 	int maxY = 3;
@@ -151,6 +171,9 @@ void mitevox::MiteVox_Engine::onCreate()
 			*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
 		}
 	}
+
+	// Spawn lights.
+
 	float lightPos = 450;
 
 	tmpTransform = { 1, 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -222,4 +245,4 @@ void mitevox::MiteVox_Engine::onUpdate()
 void mitevox::MiteVox_Engine::onDestroy() {}
 
 
-#include "MiteVox/src/MiteVox_entry.h"
+#include "MiteVox/src/MiteVox_main.h"

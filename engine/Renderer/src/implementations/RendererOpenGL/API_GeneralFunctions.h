@@ -15,7 +15,6 @@ namespace render
 
 		renderer->screenWidth = SCREEN_WIDTH;
 		renderer->screenHeight = SCREEN_HEIGHT;
-		renderer->debug = 0;
 		renderer->backfaceCulling = 1;
 
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -71,20 +70,6 @@ namespace render
 		{
 			glDisable(GL_CULL_FACE);
 		}
-
-		// Load standard shaders.
-
-		std::string shadersDir;
-		if (renderer->debug)
-		{
-			shadersDir = "../../engine/Renderer/shaders";
-		}
-		else
-		{
-			shadersDir = "../../../../../engine/Renderer/shaders";
-		}
-		loadShaders(renderer, shadersDir, &standardShaders);
-		
 
 		renderer->points.resize(PRIMITIVE_BUFFER_SIZE);
 		renderer->lines.resize(PRIMITIVE_BUFFER_SIZE * 2);

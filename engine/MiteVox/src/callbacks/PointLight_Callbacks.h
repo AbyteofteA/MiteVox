@@ -5,7 +5,7 @@
 void PointLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
 {
 	unsigned int shaderIndex = 0;
-	if (!render::standardShaders[shaderIndex]->use())
+	if (!render::shaders[shaderIndex]->use())
 		return;
 
 	mathem::Transform* transform =
@@ -13,7 +13,7 @@ void PointLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPO
 
 	render::PointLight* pointLight =
 		(render::PointLight*)_ecs->getComponent(entityID, POINTLIGHT_COMPONENT);
-	render::standardShaders[shaderIndex]->setInt("amountOfPointLights", index + 1);
+	render::shaders[shaderIndex]->setInt("amountOfPointLights", index + 1);
 
 	std::string pointLights = "pointLights[";
 	std::string indexStr = std::to_string(index);
@@ -34,20 +34,20 @@ void PointLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPO
 	tmpPos.x = transform->x + pointLight->position.x;
 	tmpPos.y = transform->y + pointLight->position.y;
 	tmpPos.z = transform->z + pointLight->position.z;
-	render::standardShaders[shaderIndex]->setVec3(posResult.c_str(), tmpPos.x, tmpPos.y, tmpPos.z);
-	render::standardShaders[shaderIndex]->setVec3(colorResult.c_str(), pointLight->color.r, pointLight->color.g, pointLight->color.b);
+	render::shaders[shaderIndex]->setVec3(posResult.c_str(), tmpPos.x, tmpPos.y, tmpPos.z);
+	render::shaders[shaderIndex]->setVec3(colorResult.c_str(), pointLight->color.r, pointLight->color.g, pointLight->color.b);
 
-	render::standardShaders[shaderIndex]->setFloat(constantResult.c_str(), pointLight->constant);
-	render::standardShaders[shaderIndex]->setFloat(linearResult.c_str(), pointLight->linear);
-	render::standardShaders[shaderIndex]->setFloat(quadraticResult.c_str(), pointLight->quadratic);
+	render::shaders[shaderIndex]->setFloat(constantResult.c_str(), pointLight->constant);
+	render::shaders[shaderIndex]->setFloat(linearResult.c_str(), pointLight->linear);
+	render::shaders[shaderIndex]->setFloat(quadraticResult.c_str(), pointLight->quadratic);
 }
 
 void PointLight_onDelete(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
 {
 	unsigned int shaderIndex = 0;
-	if (!render::standardShaders[shaderIndex]->use())
+	if (!render::shaders[shaderIndex]->use())
 		return;
-	render::standardShaders[shaderIndex]->setInt("amountOfPointLights", 0);
+	render::shaders[shaderIndex]->setInt("amountOfPointLights", 0);
 }
 
 #endif

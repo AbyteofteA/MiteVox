@@ -3,5 +3,5 @@
 
 namespace render
 {
-	std::vector<ShaderOpenGL*> standardShaders;
+	ShaderOpenGL* shaders[MAX_SHADERS];
 }

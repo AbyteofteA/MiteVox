@@ -11,14 +11,15 @@
 #include "ShaderOpenGL.h"
 namespace render
 {
-	extern std::vector<ShaderOpenGL*> standardShaders;
+	extern ShaderOpenGL* shaders[MAX_SHADERS];
 }
 #include "GlobalData.h"
 
 #include "getErrorOpenGL.h"
-#include "GeneralFunctions.h"
-#include "PrimitiveFunctions.h"
-#include "ModelFunctions.h"
+#include "API_ShaderFunctions.h"
+#include "API_GeneralFunctions.h"
+#include "API_PrimitiveFunctions.h"
+#include "API_ModelFunctions.h"
 
 
 #endif

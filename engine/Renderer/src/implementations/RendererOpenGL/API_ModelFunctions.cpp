@@ -5,7 +5,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
-#include "ModelFunctions.h"
+#include "API_ModelFunctions.h"
 
 namespace render
 {
@@ -47,16 +47,16 @@ namespace render
 
 	void uploadModel3D(Model3D* model3D)
 	{
-		if (!standardShaders[model3D->shaderID]->use())
+		if (!shaders[model3D->shaderID]->use())
 			return;
 
 		if (model3D->mesh->isUploaded == 0)
 		{
 			float* modelData = modelToXYZUVIJK(model3D->mesh);
 
-			GLint posAttrib = glGetAttribLocation(standardShaders[model3D->shaderID]->textureID, "position");
-			GLint texAttrib = glGetAttribLocation(standardShaders[model3D->shaderID]->textureID, "texcoord");
-			GLint normalAttrib = glGetAttribLocation(standardShaders[model3D->shaderID]->textureID, "normal");
+			GLint posAttrib = glGetAttribLocation(shaders[model3D->shaderID]->textureID, "position");
+			GLint texAttrib = glGetAttribLocation(shaders[model3D->shaderID]->textureID, "texcoord");
+			GLint normalAttrib = glGetAttribLocation(shaders[model3D->shaderID]->textureID, "normal");
 			
 
 			unsigned int modelVBO;
@@ -90,7 +90,7 @@ namespace render
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->albedoMap.width, model3D->material->albedoMap.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-			glUniform1i(glGetUniformLocation(standardShaders[model3D->shaderID]->textureID, "albedoMap"), 0);
+			glUniform1i(glGetUniformLocation(shaders[model3D->shaderID]->textureID, "albedoMap"), 0);
 			
 			image = (unsigned char*)model3D->material->metallicMap.imageData;
 			glGenTextures(1, &model3D->material->specularMapID);
@@ -101,13 +101,13 @@ namespace render
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->metallicMap.width, model3D->material->metallicMap.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-			glUniform1i(glGetUniformLocation(standardShaders[model3D->shaderID]->textureID, "metallicMap"), 1);
+			glUniform1i(glGetUniformLocation(shaders[model3D->shaderID]->textureID, "metallicMap"), 1);
 			
 
 			model3D->material->isUploaded = 1;
 		}
 	}
-	void selectModel3D(Model3D* model3D, ShaderOpenGL* shader)
+	void selectModel3D(Model3D* model3D)
 	{
 		glBindVertexArray(model3D->mesh->vertexBufferID);
 
@@ -134,7 +134,7 @@ namespace render
 
 	void uploadSkybox(Skybox* skybox)
 	{
-		GLint posAttrib = glGetAttribLocation(standardShaders[1]->textureID, "position");
+		GLint posAttrib = glGetAttribLocation(shaders[1]->textureID, "position");
 
 		unsigned int skyboxVBO;
 		glGenVertexArrays(1, &skybox->vertexID);
@@ -179,13 +179,13 @@ namespace render
 
 	void renderModel3D(Model3D* model3D, mathem::Transform* transform, render::Camera* camera, mathem::Transform* cameraTransform)
 	{
-		if (!standardShaders[model3D->shaderID]->use())
+		if (!shaders[model3D->shaderID]->use())
 			return;
 
-		selectModel3D(model3D, standardShaders[model3D->shaderID]);
+		selectModel3D(model3D);
 
-		standardShaders[model3D->shaderID]->setInt("hasCubemap", 0);
-		standardShaders[model3D->shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
+		shaders[model3D->shaderID]->setInt("hasCubemap", 0);
+		shaders[model3D->shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
 
 		glm::mat4 global = glm::mat4(1.0f);
 		global = glm::translate(global, glm::vec3(transform->x, transform->y, transform->z));
@@ -203,7 +203,7 @@ namespace render
 
 		glm::mat4 modelTransform = glm::mat4(1.0f);
 		modelTransform = global * model;
-		standardShaders[model3D->shaderID]->setMat4("model", modelTransform);
+		shaders[model3D->shaderID]->setMat4("model", modelTransform);
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -216,23 +216,23 @@ namespace render
 
 		glm::mat4 positionTransform = glm::mat4(1.0f);
 		positionTransform = proj * view * modelTransform;
-		standardShaders[model3D->shaderID]->setMat4("positionTransform", positionTransform);
+		shaders[model3D->shaderID]->setMat4("positionTransform", positionTransform);
 
 		// Pass the material to a shader.
 		glm::vec3 tmp = { model3D->material->albedo.r, model3D->material->albedo.g, model3D->material->albedo.b };
-		standardShaders[model3D->shaderID]->setVec3("material.albedo", tmp);
+		shaders[model3D->shaderID]->setVec3("material.albedo", tmp);
 		tmp = { model3D->material->roughness.r, model3D->material->roughness.g, model3D->material->roughness.b };
-		standardShaders[model3D->shaderID]->setVec3("material.roughness", tmp);
+		shaders[model3D->shaderID]->setVec3("material.roughness", tmp);
 		tmp = { model3D->material->metallicity.r, model3D->material->metallicity.g, model3D->material->metallicity.b };
-		standardShaders[model3D->shaderID]->setVec3("material.metallicity", tmp);
-		standardShaders[model3D->shaderID]->setFloat("material.specularExponent", model3D->material->specularExponent);
+		shaders[model3D->shaderID]->setVec3("material.metallicity", tmp);
+		shaders[model3D->shaderID]->setFloat("material.specularExponent", model3D->material->specularExponent);
 
 		glDrawArrays(GL_TRIANGLES, 0, model3D->mesh->amOfFaces * 24);
 	}
 
 	void renderSkybox(Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform)
 	{
-		if (!standardShaders[skybox->shaderID]->use())
+		if (!shaders[skybox->shaderID]->use())
 			return;
 
 		selectSkybox(skybox);
@@ -252,7 +252,7 @@ namespace render
 		glm::mat4 positionTransform = glm::mat4(1.0f);
 		positionTransform = proj * view;
 
-		standardShaders[skybox->shaderID]->setMat4("positionTransform", positionTransform);
+		shaders[skybox->shaderID]->setMat4("positionTransform", positionTransform);
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}

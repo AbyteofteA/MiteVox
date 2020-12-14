@@ -3,7 +3,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
-#include "PrimitiveFunctions.h"
+#include "API_PrimitiveFunctions.h"
 
 namespace render
 {
@@ -73,8 +73,8 @@ namespace render
 
 	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
-		unsigned int shaderIndex = 2;
-		if (!standardShaders[shaderIndex]->use())
+		unsigned int shaderIndex = renderer->primitiveShaderID;
+		if (!shaders[shaderIndex]->use())
 			return;
 
 		unsigned int amountOfPoints = renderer->points.getSizeData();
@@ -92,10 +92,10 @@ namespace render
 
 		glm::mat4 positionTransform = glm::mat4(1.0f);
 		positionTransform = proj * view;
-		standardShaders[shaderIndex]->setMat4("positionTransform", positionTransform);
+		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
-		GLint posAttrib = glGetAttribLocation(standardShaders[shaderIndex]->textureID, "position");
-		GLint colorAttrib = glGetAttribLocation(standardShaders[shaderIndex]->textureID, "color");
+		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "position");
+		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "color");
 
 		unsigned int pointsVBO;
 		unsigned int pointsArrayID;
@@ -118,8 +118,8 @@ namespace render
 	}
 	void renderLines(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
-		unsigned int shaderIndex = 2;
-		if (!standardShaders[shaderIndex]->use())
+		unsigned int shaderIndex = renderer->primitiveShaderID;
+		if (!shaders[shaderIndex]->use())
 			return;
 
 		unsigned int amountOfLines = renderer->lines.getSizeData();
@@ -137,10 +137,10 @@ namespace render
 
 		glm::mat4 positionTransform = glm::mat4(1.0f);
 		positionTransform = proj * view;
-		standardShaders[shaderIndex]->setMat4("positionTransform", positionTransform);
+		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
-		GLint posAttrib = glGetAttribLocation(standardShaders[shaderIndex]->textureID, "position");
-		GLint colorAttrib = glGetAttribLocation(standardShaders[shaderIndex]->textureID, "color");
+		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "position");
+		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "color");
 
 		unsigned int linesVBO;
 		unsigned int linesArrayID;
@@ -163,8 +163,8 @@ namespace render
 	}
 	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
-		unsigned int shaderIndex = 2;
-		if (!standardShaders[shaderIndex]->use())
+		unsigned int shaderIndex = renderer->primitiveShaderID;
+		if (!shaders[shaderIndex]->use())
 			return;
 
 		unsigned int amountOfTriangles = renderer->triangles.getSizeData();
@@ -182,10 +182,10 @@ namespace render
 
 		glm::mat4 positionTransform = glm::mat4(1.0f);
 		positionTransform = proj * view;
-		standardShaders[shaderIndex]->setMat4("positionTransform", positionTransform);
+		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
-		GLint posAttrib = glGetAttribLocation(standardShaders[shaderIndex]->textureID, "position");
-		GLint colorAttrib = glGetAttribLocation(standardShaders[shaderIndex]->textureID, "color");
+		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "position");
+		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "color");
 
 		unsigned int trianglesVBO;
 		unsigned int trianglesArrayID;
