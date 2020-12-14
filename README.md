@@ -14,25 +14,25 @@ The engine is a result of experiments in Computer Graghics, Machine Learning and
 
 It consists of 8 modules:
 
-- `MiteVox` is the core of the engine. It defines the entry point.
+- `engine/MiteVox` is the core of the engine. It defines the **entry point**.
 
-- `ECSManager` is a custom Entity-Component-System. It's minimalistic.
+- `engine/ECSManager` is a custom Entity-Component-System. It's minimalistic.
 
-- `Renderer` currently supports only **OpenGL**.
+- `engine/Renderer` currently supports only **OpenGL**.
 
-- `FileIO` contains the implementation of an object that reads and parses files **asynchronously**.
+- `engine/FileIO` contains the implementation of an object that reads and parses files **asynchronously**.
 
-- `AIModels` implements **Perceptron + Backprop**, **Convolutional layer**, **Hopfield network**. 
+- `engine/AIModels` implements **Perceptron + Backprop**, **Convolutional layer**, **Hopfield network**. 
 
-- `Physics` has an implementation of AABB collisions and defines rigid body.
+- `engine/Physics` has an implementation of AABB collisions and defines rigid body.
 
-- `Math` contains a little bit mathematics.
+- `engine/Math` contains a little bit mathematics.
 
-- `UIEventHandler` has a basic user I/O setup. It definitely needs redesign...
+- `engine/UIEventHandler` has a basic user I/O setup. It definitely needs redesign...
 
 The solution contains another project, that is not a part of the engine:
 
-- `Sandbox_0x00` is an example project.
+- `sandbox/DemoProject` is an example project.
 
 ## Potential use cases
 :video_game: Sandbox games

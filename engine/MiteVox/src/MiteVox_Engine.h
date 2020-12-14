@@ -3,12 +3,16 @@
 #define MITEVOX_ENGINE_H
 
 #include <vector>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 namespace mitevox
 {
 	class MiteVox_Engine
 	{
 	public:
+		std::string executionPath = "";
+
 		std::vector<MiteVox_Scene*> scenes;
 		long activeScene = -1;
 
@@ -28,6 +32,9 @@ namespace mitevox
 
 		void init(int argc, char* argv[])
 		{
+			fs::path currentPath = fs::path(argv[0]);
+			executionPath = currentPath.parent_path().string();
+
 			renderer = new render::RendererSettings();
 			render::initRenderer(renderer);
 
