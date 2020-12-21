@@ -103,7 +103,7 @@ The solution contains another project, that is not a part of the engine:
 - Multiple lights
 - :warning: PBR
 ### AIModels
-- MLModels:
+- ML-models:
   - FFNN (Feedforward Neural Networks)
     - Perceptron
     - Backpropagation for Perceptron
@@ -112,6 +112,7 @@ The solution contains another project, that is not a part of the engine:
   - RNN (Recurrent Neural Networks)
     - Hopfield network
   - :warning: CompositeNN
+  - :warning: NeuroPlayer
 - Pathfinding:
   - :warning: A*
 - :warning: StateMachine
@@ -134,6 +135,8 @@ The solution contains another project, that is not a part of the engine:
 - [ ] .obj parser doesn't support polygon grouping by smoothing.
 - [ ] Binary search tree has global variables.
 - [ ] Transform::getDirectionVector() + SpotLight doesn't work as expected.
+- [ ] The project requires switching between release and debug via a flag.
+- [ ] The project should be built with CMake.
 
 ## :hammer_and_wrench: External dependencies (included)
 - [GLEW - The OpenGL Extension Wrangler Library]( https://github.com/nigels-com/glew )
