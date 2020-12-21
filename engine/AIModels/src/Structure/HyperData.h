@@ -1,4 +1,10 @@
-#pragma once
+
+#ifndef HYPERDATA_H
+#define HYPERDATA_H
+
+#include "AIModels/src/Structure/LearningBatch.h"
+
+#include <iostream>
 
 namespace aimods
 {
@@ -400,3 +406,5 @@ namespace aimods
 	}
 
 }
+
+#endif

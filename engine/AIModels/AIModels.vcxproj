@@ -56,8 +56,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>
       </PreprocessorDefinitions>
     </ClCompile>
@@ -66,6 +65,12 @@
       <AdditionalLibraryDirectories>K:\Arthur\DifferentFiles\SFML (C++ liblary)\SFML-2.5.1\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;opengl32.lib;winmm.lib;gdi32.lib;freetype.lib;sfml-system-d.lib</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -85,21 +90,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\FFNN\FFNN_BackPropagation.h" />
-    <ClInclude Include="src\FFNN\BackPropagationWizard.h" />
-    <ClInclude Include="src\FFNN\FFNN_Validation.h" />
-    <ClInclude Include="src\CNN\Filter_2D.h" />
-    <ClInclude Include="src\CNN\Convolution_layer.h" />
+    <ClInclude Include="src\FFNN\Perceptron\Perceptron_BackPropagation.h" />
+    <ClInclude Include="src\FFNN\Perceptron\BackPropagationWizard.h" />
+    <ClInclude Include="src\FFNN\Perceptron\Perceptron_Validation.h" />
+    <ClInclude Include="src\FFNN\CNN\Filter_2D.h" />
+    <ClInclude Include="src\FFNN\CNN\Convolution_layer.h" />
     <ClInclude Include="src\RNN\HopfieldNN.h" />
     <ClInclude Include="src\Structure\Functions.h" />
     <ClInclude Include="src\GZ_File_IO.h" />
     <ClInclude Include="src\Structure\HyperData.h" />
     <ClInclude Include="src\Structure\LearningBatch.h" />
-    <ClInclude Include="src\FFNN\FFNN_File_IO.h" />
-    <ClInclude Include="src\FFNN\FFNN.h" />
-    <ClInclude Include="src\NN_headers.h" />
+    <ClInclude Include="src\FFNN\Perceptron\Perceptron_File_IO.h" />
+    <ClInclude Include="src\FFNN\Perceptron\Perceptron.h" />
+    <ClInclude Include="src\AIModels.h" />
     <ClInclude Include="src\Service.h" />
-    <ClInclude Include="src\FFNN\FormalNeuron.h" />
+    <ClInclude Include="src\Structure\FormalNeuron.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\a.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

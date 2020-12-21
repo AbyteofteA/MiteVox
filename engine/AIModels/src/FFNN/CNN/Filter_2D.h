@@ -1,5 +1,8 @@
-#pragma once
 
+#ifndef FILTER_2D_H
+#define FILTER_2D_H
+
+#include "AIModels/src/Structure/HyperData.h"
 
 namespace aimods
 {
@@ -284,3 +287,5 @@ namespace aimods
 	};
 
 }
+
+#endif

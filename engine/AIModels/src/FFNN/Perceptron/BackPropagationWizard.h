@@ -1,10 +1,14 @@
-#pragma once
 
+#ifndef BACKPROPAGATIONWIZARD_H
+#define BACKPROPAGATIONWIZARD_H
+
+#include "AIModels/src/Structure/LearningBatch.h"
+#include "AIModels/src/FFNN/Perceptron/Perceptron.h"
 
 namespace aimods
 {
 
-	void BackPropagationWizard(Feedforward_NN* net, LearningBatch** learningData, unsigned int learningDataSize, LearningBatch** testData, unsigned int testDataSize, float acceptableError = 0.1)
+	void BackPropagationWizard(Perceptron* net, LearningBatch** learningData, unsigned int learningDataSize, LearningBatch** testData, unsigned int testDataSize, float acceptableError = 0.1)
 	{
 		float currentError = 0;
 		unsigned int batch = 0;
@@ -40,3 +44,5 @@ namespace aimods
 		}
 	}
 }
+
+#endif

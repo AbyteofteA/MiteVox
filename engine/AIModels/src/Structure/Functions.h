@@ -1,5 +1,10 @@
-#pragma once
 
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <conio.h>
 
 namespace aimods
 {
@@ -10,10 +15,6 @@ namespace aimods
 #define ReLU 3
 #define SIGMOID 4
 #define TanH 5
-
-#define UNDEF_STR -1
-#define INT_STR 0
-#define CHAR_STR 1
 
 	float activationFunction(float weightedSum, unsigned int function)
 	{
@@ -48,7 +49,7 @@ namespace aimods
 			break;
 
 		case SIGMOID:
-			f = 1 / (float)(1 + pow(M_E, (double)-weightedSum));
+			f = 1 / (1 + pow((float)M_E, -weightedSum));
 			break;
 
 		case TanH:
@@ -97,7 +98,7 @@ namespace aimods
 			break;
 
 		case TanH:
-			der = 1 - pow(tanh(weightedSum), 2);
+			der = 1 - pow(tanh(weightedSum), 2.0f);
 			break;
 		}
 
@@ -105,3 +106,5 @@ namespace aimods
 	}
 
 }
+
+#endif

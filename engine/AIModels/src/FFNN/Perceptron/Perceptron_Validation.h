@@ -1,10 +1,13 @@
-#pragma once
 
+#ifndef PERCEPTRON_VALIDATION_H
+#define PERCEPTRON_VALIDATION_H
+
+#include "AIModels/src/FFNN/Perceptron/Perceptron.h"
 
 namespace aimods
 {
 
-	float Feedforward_NN::Validate(LearningBatch** testBatch, unsigned int batchSize)
+	float Perceptron::Validate(LearningBatch** testBatch, unsigned int batchSize)
 	{
 		if (this->amountOfLayers == 0)
 			return -1;
@@ -38,3 +41,5 @@ namespace aimods
 	}
 
 }
+
+#endif

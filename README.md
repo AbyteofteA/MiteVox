@@ -22,11 +22,11 @@ It consists of 8 modules:
 
 - `engine/FileIO` contains the implementation of an object that reads and parses files **asynchronously**.
 
-- `engine/AIModels` implements **Perceptron + Backprop**, **Convolutional layer**, **Hopfield network**. 
+- `engine/AIModels` implements **Perceptron + Backpropagation**, **Convolutional layer**, **Hopfield network**. 
 
 - `engine/Physics` has an implementation of AABB collisions and defines rigid body.
 
-- `engine/Math` contains a little bit mathematics.
+- `engine/Math` contains a little bit of mathematics.
 
 - `engine/UIEventHandler` has a basic user I/O setup. It definitely needs redesign...
 
@@ -105,11 +105,12 @@ The solution contains another project, that is not a part of the engine:
 ### AIModels
 - MLModels:
   - FFNN (Feedforward Neural Networks)
-    - FFNN + Backpropagation
+    - Perceptron
+    - Backpropagation for Perceptron
+    - CNN (Convolutional Neural Networks)
+    - :warning: Backpropagation for CNN
   - RNN (Recurrent Neural Networks)
     - Hopfield network
-  - CNN (Convolutional Neural Networks)
-    - :warning: CNN + Backpropagation
   - :warning: CompositeNN
 - Pathfinding:
   - :warning: A*

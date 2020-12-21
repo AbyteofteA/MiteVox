@@ -1,4 +1,8 @@
-#pragma once
+
+#ifndef LEARNINGBATCH_H
+#define LEARNINGBATCH_H
+
+#include <iostream>
 
 namespace aimods
 {
@@ -85,3 +89,5 @@ namespace aimods
 	};
 
 }
+
+#endif

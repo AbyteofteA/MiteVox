@@ -1,9 +1,13 @@
-#pragma once
+
+#ifndef PERCEPTRON_BACKPROPAGATION_H
+#define PERCEPTRON_BACKPROPAGATION_H
+
+#include "AIModels/src/FFNN/Perceptron/Perceptron.h"
 
 namespace aimods
 {
 
-	float Feedforward_NN::BackPropagation_STEP(LearningBatch* batch, float learningRate)
+	float Perceptron::BackPropagation_STEP(LearningBatch* batch, float learningRate)
 	{
 		float* localError = (float*)calloc(amountOfLayerNeurons[amountOfLayers - 1], sizeof(float));
 		float resultError = 0;
@@ -85,3 +89,5 @@ namespace aimods
 		return resultError;
 	}
 }
+
+#endif

@@ -1,4 +1,9 @@
-#pragma once
+
+#ifndef CONVOLUTION_LAYER_H
+#define CONVOLUTION_LAYER_H
+
+#include "AIModels/src/Structure/HyperData.h"
+#include "AIModels/src/FFNN/CNN/Filter_2D.h"
 
 namespace aimods
 {
@@ -63,3 +68,5 @@ namespace aimods
 		}
 	};
 }
+
+#endif

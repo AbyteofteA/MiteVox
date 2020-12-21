@@ -1,4 +1,10 @@
 
+#ifndef FORMALNEURON_H
+#define FORMALNEURON_H
+
+#include "AIModels/src/Structure/Functions.h"
+
+#include <iostream>
 
 namespace aimods
 {
@@ -15,18 +21,19 @@ namespace aimods
 		FormalNeuron** axonArray = NULL;
 		unsigned int amountOfAxons = 0;
 
-		FormalNeuron(unsigned char _function = TanH, unsigned int _amountOfAxons = 1)
+		inline FormalNeuron() {}
+		inline FormalNeuron(unsigned char _function, unsigned int _amountOfAxons)
 		{
 			this->function = _function;
 			formAxons(_amountOfAxons);
 		}
-		~FormalNeuron()
+		inline ~FormalNeuron()
 		{
 			free(this->axonArray);
 			free(this->weightArray);
 		}
 
-		void formAxons(unsigned int _amountOfAxons)
+		inline void formAxons(unsigned int _amountOfAxons)
 		{
 			this->amountOfAxons = _amountOfAxons;
 
@@ -36,22 +43,22 @@ namespace aimods
 			setWeights();
 		}
 
-		void setWeights(float value)
+		inline void setWeights(float value)
 		{
 			for (unsigned int a = 0; a < this->amountOfAxons; a++)
 			{
 				this->weightArray[a] = value;
 			}
 		}
-		void setWeights()
+		inline void setWeights()
 		{
 			for (unsigned int a = 0; a < this->amountOfAxons; a++)
 			{
-				this->weightArray[a] = (rand()%20 - 10) / (float)1000;
+				this->weightArray[a] = (rand() % 20 - 10) / (float)1000;
 			}
 		}
 
-		float weightedSum()
+		inline float weightedSum()
 		{
 			float wSum = 0;
 			for (unsigned int k = 0; k < this->amountOfAxons; k++)
@@ -61,14 +68,16 @@ namespace aimods
 			return wSum;
 		}
 
-		float computeOutput()
+		inline float computeOutput()
 		{
 			return activationFunction(weightedSum(), this->function);
 		}
-		float propagate()
+		inline float propagate()
 		{
 			this->output = activationFunction(weightedSum(), this->function);
 			return this->output;
 		}
 	};
 }
+
+#endif

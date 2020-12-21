@@ -52,7 +52,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glm;$(SolutionDir)engine;$(SolutionDir)dependencies\Simple OpenGL Image Library\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glm;$(SolutionDir)dependencies\Simple OpenGL Image Library\src;$(SolutionDir)engine</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>SFML_STATIC;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>

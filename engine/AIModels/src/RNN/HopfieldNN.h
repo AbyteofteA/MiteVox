@@ -1,5 +1,8 @@
-#pragma once
 
+#ifndef HOPFIELDNN_H
+#define HOPFIELDNN_H
+
+#include "AIModels/src/Structure/FormalNeuron.h"
 
 namespace aimods
 {
@@ -182,3 +185,5 @@ namespace aimods
 
 	};
 }
+
+#endif

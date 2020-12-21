@@ -1,8 +1,14 @@
 
+#ifndef PERCEPTRON_H
+#define PERCEPTRON_H
+
+#include "AIModels/src/Structure/FormalNeuron.h"
+#include "AIModels/src/Structure/LearningBatch.h"
+
 namespace aimods
 {
 
-	class Feedforward_NN
+	class Perceptron
 	{
 	public:
 
@@ -21,7 +27,7 @@ namespace aimods
 		float** dE_dz = NULL;
 		float*** errors = NULL;
 
-		Feedforward_NN()
+		Perceptron()
 		{
 			this->fileSize = sizeof(unsigned int);
 
@@ -240,8 +246,8 @@ namespace aimods
 		char* nameAFile();
 		void writeTo_NNSH(char* filename);
 		void readFrom_NNSH(char* filename);
-		char* Feedforward_NN::writeTo_CHAR();
-		void Feedforward_NN::readFrom_CHAR(char* bytes);
+		char* writeTo_CHAR();
+		void readFrom_CHAR(char* bytes);
 
 		float BackPropagation_STEP(LearningBatch* batch, float learningRate);
 		float Validate(LearningBatch** testBatch, unsigned int batchSize);
@@ -284,10 +290,12 @@ namespace aimods
 			this->errors = NULL;
 		}
 		//	TO IMPLEMENT
-		void joinNetworks(Feedforward_NN* secondNet)
+		void joinNetworks(Perceptron* secondNet)
 		{
 			
 		}
 	};
 
 }
+
+#endif
