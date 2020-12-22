@@ -10,7 +10,7 @@
 *.lib
 *.log
 *.manifest
-*.obj
+
 *.pch
 *.pdb
 *.res
@@ -23,7 +23,7 @@
 Backup/
 bin/
 ipch/
-engine/Renderer/assets_hidden/
+assets_hidden/
 .git/
 .vs/
 

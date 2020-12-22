@@ -130,12 +130,12 @@ The solution contains another project, that is not a part of the engine:
 - :warning: Material editor
 
 ## :bug: Known bugs & limitations
+- [X] ~~The project requires switching between release and debug via a flag~~.
 - [ ] If you assign light position to a camera position, z-component needs to be negated (why?).
 - [ ] .obj parser doesn't support polygon grouping by material.
 - [ ] .obj parser doesn't support polygon grouping by smoothing.
 - [ ] Binary search tree has global variables.
 - [ ] Transform::getDirectionVector() + SpotLight doesn't work as expected.
-- [ ] The project requires switching between release and debug via a flag.
 - [ ] The project should be built with CMake.
 
 ## :hammer_and_wrench: External dependencies (included)

@@ -2,13 +2,14 @@
 //----------------------------------------------------------------------------------------
 #define SCREEN_WIDTH		1280
 #define SCREEN_HEIGHT		720
-
-#define DEBUG 0
 //----------------------------------------------------------------------------------------
 
 #include "MiteVox/src/MiteVox.h"
 
 #include "scripts.h"
+
+#include <filesystem>
+namespace fs = std::filesystem;
 
 
 int basicShader = -1;
@@ -22,14 +23,13 @@ void mitevox::MiteVox_Engine::onCreate()
 	mitevox::MiteVox_Scene* myScene = this->getActiveScene();
 	ecs::ECS* myECS = this->getActiveScene()->ECS;
 
+	fs::path exePath = fs::path(this->executionPath);
+	std::string resourcePath = exePath.parent_path().parent_path().parent_path().string();
+	resourcePath += "/resources";
+
 	// Compile shaders.
 
-	std::string shadersDir;
-#if DEBUG == 1
-		shadersDir = "../../engine/Renderer/shaders";
-#else
-		shadersDir = "../../../../../engine/Renderer/shaders";
-#endif
+	std::string shadersDir = resourcePath + "/shaders";
 	basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
 	skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
 	primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
@@ -39,13 +39,8 @@ void mitevox::MiteVox_Engine::onCreate()
 	// Create 3D-model object.
 
 	render::Mesh3D* mCube = nullptr;
-#if DEBUG == 1
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\cube.obj", (void**)&mCube, render::parseModel_OBJ);
-#else
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\cube.obj", (void**)&mCube, render::parseModel_OBJ);
-#endif
+	std::string cubeDir = resourcePath + "/assets/cube.obj";
+	fileio::fileLoader.loadAndParseAsync(cubeDir, (void**)&mCube, render::parseModel_OBJ);
 	fileio::fileLoader.awaitAll();
 
 	// Load images (textures).
@@ -58,37 +53,21 @@ void mitevox::MiteVox_Engine::onCreate()
 	fileio::Image* UVchecker1 = nullptr;
 	fileio::Image* SPECchecker0 = nullptr;
 
-#if DEBUG == 1
+	std::string texturesDir = resourcePath + "/assets/textures";
 	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\textures\\UVchecker0.png", (void**)&UVchecker0, fileio::loadImage);
+		texturesDir + "/UVchecker0.png", (void**)&UVchecker0, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\textures\\UVchecker1.png", (void**)&UVchecker1, fileio::loadImage);
+		texturesDir + "/UVchecker1.png", (void**)&UVchecker1, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\textures\\SPECchecker0.png", (void**)&SPECchecker0, fileio::loadImage);
+		texturesDir + "/SPECchecker0.png", (void**)&SPECchecker0, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\textures\\white.png", (void**)&white, fileio::loadImage);
+		texturesDir + "/white.png", (void**)&white, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\textures\\white_rough.png", (void**)&white_rough, fileio::loadImage);
+		texturesDir + "/white_rough.png", (void**)&white_rough, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\textures\\light_grey.png", (void**)&light_grey, fileio::loadImage);
+		texturesDir + "/light_grey.png", (void**)&light_grey, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\engine\\Renderer\\assets\\textures\\black.png", (void**)&black, fileio::loadImage);
-#else
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\textures\\UVchecker0.png", (void**)&UVchecker0, fileio::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\textures\\UVchecker1.png", (void**)&UVchecker1, fileio::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\textures\\SPECchecker0.png", (void**)&SPECchecker0, fileio::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\textures\\white.png", (void**)&white, fileio::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\textures\\white_rough.png", (void**)&white_rough, fileio::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\textures\\light_grey.png", (void**)&light_grey, fileio::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		"..\\..\\..\\..\\..\\engine\\Renderer\\assets\\textures\\black.png", (void**)&black, fileio::loadImage);
-#endif
+		texturesDir + "/black.png", (void**)&black, fileio::loadImage);
 	fileio::fileLoader.awaitAll();
 
 	render::Material* darkSomething = new render::Material();
