@@ -14,6 +14,7 @@
 #define ENTITY_PACK 100000
 // Restricts maximum amount of components.
 #define COMPONENT_TYPE unsigned long
+#define ENTITY_ID_TYPE COMPONENT_TYPE
 // Restricts maximum component size.
 #define COMPONENT_SIZE_TYPE unsigned long
 // Restricts maximum ComponentManager amount.
@@ -639,11 +640,11 @@ namespace ecs
 
 		Prefab* getPrefab(COMPONENT_TYPE ID)
 		{
-			for (COMPONENT_TYPE i = 0; i < prefabs.size(); i++)
+			for (auto prefab : prefabs)
 			{
-				if (prefabs[i]->entity.ID == ID)
+				if (prefab->entity.ID == ID)
 				{
-					return prefabs[i];
+					return prefab;
 				}
 			}
 			return nullptr;

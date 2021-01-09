@@ -67,9 +67,9 @@ namespace render
 
 
 
-	inline Graphics_Polygon readPolygon(char* str, int& indx, Mesh3D** md)
+	inline Polygon readPolygon(char* str, int& indx, Mesh3D** md)
 	{
-		Graphics_Polygon poly;
+		Polygon poly;
 
 		//============== Allocating memory for the string after 'f' ==============
 
@@ -368,8 +368,8 @@ namespace render
 					{
 						i += 2;
 						meshTmp->amOfFaces += 1;
-						meshTmp->f = (Graphics_Polygon*)realloc(meshTmp->f, sizeof(Graphics_Polygon) * meshTmp->amOfFaces);
-						Graphics_Polygon poligon = readPolygon(fileData, i, &meshTmp);
+						meshTmp->f = (Polygon*)realloc(meshTmp->f, sizeof(Polygon) * meshTmp->amOfFaces);
+						Polygon poligon = readPolygon(fileData, i, &meshTmp);
 
 						if (!hasNormals)
 						{
@@ -414,7 +414,7 @@ namespace render
 							int kMax = poligon.amOfVertices;
 							for (int k = 1; k < kMax - 1; k++)
 							{
-								Graphics_Polygon pTmp = { nullptr, nullptr, nullptr, nullptr, 3 };
+								Polygon pTmp = { nullptr, nullptr, nullptr, nullptr, 3 };
 
 								if (meshTmp->v != nullptr)
 								{
@@ -442,7 +442,7 @@ namespace render
 								if (k != 1)
 								{
 									meshTmp->amOfFaces += 1;
-									meshTmp->f = (Graphics_Polygon*)realloc(meshTmp->f, sizeof(Graphics_Polygon) * meshTmp->amOfFaces);
+									meshTmp->f = (Polygon*)realloc(meshTmp->f, sizeof(Polygon) * meshTmp->amOfFaces);
 									meshTmp->f[meshTmp->amOfFaces - 1] = pTmp;
 								}
 								else

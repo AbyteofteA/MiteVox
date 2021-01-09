@@ -4,7 +4,7 @@
 
 void rotateLight_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
 {
-	mitevox::MiteVox_Scene* scene = (mitevox::MiteVox_Scene*)data;
+	mitevox::Scene* scene = (mitevox::Scene*)data;
 	render::DirectedLight* light =
 		(render::DirectedLight*)_ecs->getComponent(entityID, DIRECTEDLIGHT_COMPONENT);
 
@@ -16,7 +16,7 @@ void rotateLight_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPON
 
 void waveModel_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
 {
-	mitevox::MiteVox_Scene* scene = (mitevox::MiteVox_Scene*)data;
+	mitevox::Scene* scene = (mitevox::Scene*)data;
 	mathem::Transform* transform =
 		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
 
@@ -27,7 +27,7 @@ void waveModel_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONEN
 
 void rotateModel_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
 {
-	mitevox::MiteVox_Scene* scene = (mitevox::MiteVox_Scene*)data;
+	mitevox::Scene* scene = (mitevox::Scene*)data;
 	mathem::Transform* transform =
 		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
 
@@ -42,7 +42,7 @@ void processInput_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPO
 	float cameraSensitivity = 0.1f;
 	float speed = 450;
 
-	mitevox::MiteVox_Scene* scene = (mitevox::MiteVox_Scene*)data;
+	mitevox::Scene* scene = (mitevox::Scene*)data;
 
 	InputHandler* inputHandler = scene->inputHandler;
 
@@ -98,7 +98,7 @@ void processInput_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPO
 
 void rotateCamera_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
 {
-	mitevox::MiteVox_Scene* scene = (mitevox::MiteVox_Scene*)data;
+	mitevox::Scene* scene = (mitevox::Scene*)data;
 	mathem::Transform* transform =
 		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
 

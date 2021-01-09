@@ -2,29 +2,37 @@
 #ifndef MITEVOX_ENGINE_H
 #define MITEVOX_ENGINE_H
 
+#include "MiteVox_Settings.h"
+
 #include <vector>
 #include <filesystem>
 namespace fs = std::filesystem;
 
 namespace mitevox
 {
-	class MiteVox_Engine
+	class Engine
 	{
-	public:
-		std::string executionPath = "";
 
-		std::vector<MiteVox_Scene*> scenes;
-		long activeScene = -1;
+	private:
 
 		InputHandler* inputHandler = nullptr;
+
+		std::vector<Scene*> scenes;
+
+	public:
+
+		long activeScene = -1;
+		
 		render::RendererSettings* renderer = nullptr;
 
-		MiteVox_Engine(int argc, char* argv[])
+		EngineSettings settings;
+
+		Engine(int argc, char* argv[])
 		{
 			init(argc, argv);
 			onCreate();
 		}
-		~MiteVox_Engine()
+		~Engine()
 		{
 			onDestroy();
 			wipe();
@@ -33,7 +41,11 @@ namespace mitevox
 		void init(int argc, char* argv[])
 		{
 			fs::path currentPath = fs::path(argv[0]);
-			executionPath = currentPath.parent_path().string();
+			settings.executionPath = currentPath.parent_path().string();
+			settings.resourcePath = currentPath.parent_path().parent_path().parent_path().parent_path().string();
+			settings.resourcePath += "/resources";
+			settings.configPath = currentPath.parent_path().parent_path().parent_path().parent_path().string();
+			settings.configPath += "/config";
 
 			renderer = new render::RendererSettings();
 			render::initRenderer(renderer);
@@ -44,9 +56,9 @@ namespace mitevox
 		}
 		void wipe()
 		{
-			for (long i = 0; i < (long)scenes.size(); i++)
+			for (auto scene : scenes)
 			{
-				scenes[i]->wipe();
+				scene->wipe();
 			}
 			delete inputHandler;
 			render::closeRenderer(renderer);
@@ -59,7 +71,7 @@ namespace mitevox
 		long createScene(std::string name = "Untitled")
 		{
 			long index = scenes.size();
-			scenes.push_back(new MiteVox_Scene());
+			scenes.push_back(new Scene());
 			scenes[index]->name = name;
 			scenes[index]->renderer = renderer;
 			scenes[index]->inputHandler = inputHandler;
@@ -71,7 +83,7 @@ namespace mitevox
 			scenes[index]->wipe();
 		}
 
-		MiteVox_Scene* getActiveScene()
+		Scene* getActiveScene()
 		{
 			return scenes[activeScene];
 		}
@@ -83,7 +95,7 @@ namespace mitevox
 			inputHandler->update();
 			if ((activeScene > -1) && (activeScene < (long)scenes.size()))
 			{
-				scenes[activeScene]->update();
+				scenes[activeScene]->update(settings);
 			}
 		}
 	};

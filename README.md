@@ -47,6 +47,12 @@ The solution contains another project, that is not a part of the engine:
 ## :card_file_box: Features & TODO
 :warning: - TODO
 
+### Custom project(s)
+- :warning: engine_config.json
+### MiteVox
+- Engine
+- Scene
+  - :warning: Serialization via JSON
 ### ECSManager
 - Entity Component System
 - Prefabs
@@ -54,8 +60,10 @@ The solution contains another project, that is not a part of the engine:
 ### FileIO
 - Asynchronous file loader & parser
 - Binary files
-- Images (png, jpg)
-- :warning: Audio files (ogg, mp3)
+- Images (PNG)
+- :warning: Audio files (MP3)
+- :warning: JSON
+- :warning: Container formats (Ogg, ZIP)
 ### Scripting
 - Native (C/C++)
 - :warning: Lua
@@ -122,12 +130,13 @@ The solution contains another project, that is not a part of the engine:
     - AABB intersection
     - :warning: SAT intersection
   - :warning: Mesh collider
-- Rigid body
-- :warning: Atoms
-### Editors
-- :warning: Color picker
-- :warning: Function editor
-- :warning: Material editor
+- Structures
+  - Rigid body
+  - :warning: Atoms
+- Classical mechanics
+  - Kinematics
+  - :warning: Dynamics
+  - :warning: Statics
 
 ## :bug: Known bugs & limitations
 - [X] ~~The project requires switching between release and debug via a flag~~.

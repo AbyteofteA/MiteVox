@@ -3,7 +3,7 @@
 
 int main(int argc, char* argv[])
 {
-	mitevox::MiteVox_Engine* MiteVox = new mitevox::MiteVox_Engine(argc, argv);
+	mitevox::Engine* MiteVox = new mitevox::Engine(argc, argv);
 	
 	while (!glfwWindowShouldClose(MiteVox->renderer->getWindow()))
 	{

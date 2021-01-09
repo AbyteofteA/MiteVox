@@ -97,9 +97,9 @@ namespace fileio
 		*****************************************************************************************/
 		inline bool exists(void** object)
 		{
-			for (int i = 0; i < (int)fileRecords.size(); i++)
+			for (auto fileRecord : fileRecords)
 			{
-				if (fileRecords[i]->destination == object)
+				if (fileRecord->destination == object)
 				{
 					return true;
 				}

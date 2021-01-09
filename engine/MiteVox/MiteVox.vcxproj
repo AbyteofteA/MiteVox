@@ -101,6 +101,7 @@
     <ClInclude Include="src\MiteVox.h" />
     <ClInclude Include="src\MiteVox_Engine.h" />
     <ClInclude Include="src\MiteVox_Scene.h" />
+    <ClInclude Include="src\MiteVox_Settings.h" />
     <ClInclude Include="src\NativeScript.h" />
   </ItemGroup>
   <ItemGroup>

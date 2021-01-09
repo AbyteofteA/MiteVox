@@ -7,7 +7,7 @@
 
 namespace render
 {
-	struct Graphics_Polygon
+	struct Polygon
 	{
 		long* p = nullptr;
 		long* t = nullptr;
@@ -34,7 +34,7 @@ namespace render
 		mathem::Point3D* vt = nullptr;
 		long amOfTextureCoords = 0;
 
-		Graphics_Polygon* f = nullptr;
+		Polygon* f = nullptr;
 		long amOfFaces = 0;
 	};
 }

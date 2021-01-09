@@ -20,6 +20,8 @@
 #define RIGIDBODY_COMPONENT 8
 #define TAG_COMPONENT 9
 
+#include "MiteVox_Settings.h"
+
 #include "callbacks/NativeScript_Callbacks.h"
 #include "callbacks/Model3D_Callbacks.h"
 #include "callbacks/Transform_Callbacks.h"
@@ -29,15 +31,16 @@
 
 namespace mitevox
 {
-	class MiteVox_Scene
+	class Scene
 	{
+
 	public:
 
 		std::string name = "Untitled";
 		ecs::ECS* ECS = nullptr;
 		std::vector<render::Skybox> skyboxes;
 		long activeSkybox = -1;
-		long activeCamera = -1;
+		ENTITY_ID_TYPE activeCamera = -1;
 
 		InputHandler* inputHandler = nullptr;
 		render::RendererSettings* renderer = nullptr;
@@ -71,11 +74,6 @@ namespace mitevox
 
 		//*************************************** Time ********************************************
 
-		// Default period settings.
-
-		double physicsPeriod = 0.06;
-		double rendererPeriod = 0.0;
-
 		// Time points.
 
 		std::chrono::high_resolution_clock::time_point prevCycleTime;
@@ -88,11 +86,12 @@ namespace mitevox
 		// Temporary time storage.
 		double tmpTime = 0.0;
 
-		MiteVox_Scene(COMPONENT_TYPE initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE)
+
+		Scene(COMPONENT_TYPE initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE)
 		{
 			init(initialEntitiesBufferSize);
 		}
-		~MiteVox_Scene()
+		~Scene()
 		{
 			wipe();
 		}
@@ -149,7 +148,7 @@ namespace mitevox
 			ECS->wipe();
 		}
 
-		void update()
+		void update(EngineSettings settings)
 		{
 			now = std::chrono::high_resolution_clock::now();
 			dt = std::chrono::duration_cast<std::chrono::duration<double>>(now - prevCycleTime).count();
@@ -162,7 +161,7 @@ namespace mitevox
 			// Physics and Transform
 			now = std::chrono::high_resolution_clock::now();
 			tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - physicsTime).count();
-			if (tmpTime > physicsPeriod)
+			if (tmpTime > settings.physicsPeriod)
 			{
 				physicsTime = std::chrono::high_resolution_clock::now();
 			}
@@ -170,7 +169,7 @@ namespace mitevox
 			// Renderer
 			now = std::chrono::high_resolution_clock::now();
 			tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - rendererTime).count();
-			if (tmpTime > rendererPeriod)
+			if (tmpTime > settings.rendererPeriod)
 			{
 				render::clearBufferXY(0.05f, 0.05f, 0.05f);
 				render::clearBufferZ();

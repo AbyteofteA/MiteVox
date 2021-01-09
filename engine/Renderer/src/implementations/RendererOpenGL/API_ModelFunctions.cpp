@@ -11,31 +11,37 @@ namespace render
 {
 	float* modelToXYZUVIJK(Mesh3D* mesh)
 	{
-		unsigned long long size = (unsigned long long)sizeof(float) * mesh->amOfFaces * 24;
-		float* result = (float*)malloc((size_t)size);
+		// Amount of floats to store a vertex (XYZ + UV + IJK)
+		const size_t vertexSize = 8;
+		const size_t triangleSize = vertexSize * 3;
 
-		for (unsigned long long i = 0; i < mesh->amOfFaces; i++)
+		size_t modelDumpSize = (size_t)sizeof(float) * mesh->amOfFaces * triangleSize;
+		float* result = (float*)malloc((size_t)modelDumpSize);
+
+		for (size_t i = 0; i < mesh->amOfFaces; i++)
 		{
-			for (unsigned long long j = 0; j < 3; j++)
+			for (size_t j = 0; j < 3; j++)
 			{
+				size_t offset = i * triangleSize + j * vertexSize;
+
 				// X Y Z
-				result[i * 24 + j * 8 + 0] = mesh->v[mesh->f[i].p[j] - 1].x;
-				result[i * 24 + j * 8 + 1] = mesh->v[mesh->f[i].p[j] - 1].y;
-				result[i * 24 + j * 8 + 2] = mesh->v[mesh->f[i].p[j] - 1].z;
+				result[offset + 0] = mesh->v[mesh->f[i].p[j] - 1].x;
+				result[offset + 1] = mesh->v[mesh->f[i].p[j] - 1].y;
+				result[offset + 2] = mesh->v[mesh->f[i].p[j] - 1].z;
 
 				// U V
 				if (mesh->f[i].t != nullptr)
 				{
-					result[i * 24 + j * 8 + 3] = mesh->vt[mesh->f[i].t[j] - 1].x;
-					result[i * 24 + j * 8 + 4] = mesh->vt[mesh->f[i].t[j] - 1].y;
+					result[offset + 3] = mesh->vt[mesh->f[i].t[j] - 1].x;
+					result[offset + 4] = mesh->vt[mesh->f[i].t[j] - 1].y;
 				}
 
 				// I J K
 				if (mesh->vn != nullptr)
 				{
-					result[i * 24 + j * 8 + 5] = mesh->vn[mesh->f[i].n[j] - 1].i;
-					result[i * 24 + j * 8 + 6] = mesh->vn[mesh->f[i].n[j] - 1].j;
-					result[i * 24 + j * 8 + 7] = mesh->vn[mesh->f[i].n[j] - 1].k;
+					result[offset + 5] = mesh->vn[mesh->f[i].n[j] - 1].i;
+					result[offset + 6] = mesh->vn[mesh->f[i].n[j] - 1].j;
+					result[offset + 7] = mesh->vn[mesh->f[i].n[j] - 1].k;
 				}
 			}
 		}

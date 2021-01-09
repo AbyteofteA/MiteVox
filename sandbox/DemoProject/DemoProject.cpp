@@ -17,19 +17,15 @@ int primitiveShader = -1;
 int skyboxShader = -1;
 
 
-void mitevox::MiteVox_Engine::onCreate() 
+void mitevox::Engine::onCreate() 
 {
 	this->activeScene = this->createScene();
-	mitevox::MiteVox_Scene* myScene = this->getActiveScene();
+	mitevox::Scene* myScene = this->getActiveScene();
 	ecs::ECS* myECS = this->getActiveScene()->ECS;
-
-	fs::path exePath = fs::path(this->executionPath);
-	std::string resourcePath = exePath.parent_path().parent_path().parent_path().string();
-	resourcePath += "/resources";
 
 	// Compile shaders.
 
-	std::string shadersDir = resourcePath + "/shaders";
+	std::string shadersDir = settings.resourcePath + "/shaders";
 	basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
 	skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
 	primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
@@ -39,9 +35,8 @@ void mitevox::MiteVox_Engine::onCreate()
 	// Create 3D-model object.
 
 	render::Mesh3D* mCube = nullptr;
-	std::string cubeDir = resourcePath + "/assets/cube.obj";
+	std::string cubeDir = settings.resourcePath + "/assets/cube.obj";
 	fileio::fileLoader.loadAndParseAsync(cubeDir, (void**)&mCube, render::parseModel_OBJ);
-	fileio::fileLoader.awaitAll();
 
 	// Load images (textures).
 
@@ -53,7 +48,7 @@ void mitevox::MiteVox_Engine::onCreate()
 	fileio::Image* UVchecker1 = nullptr;
 	fileio::Image* SPECchecker0 = nullptr;
 
-	std::string texturesDir = resourcePath + "/assets/textures";
+	std::string texturesDir = settings.resourcePath + "/assets/textures";
 	fileio::fileLoader.loadAndParseAsync(
 		texturesDir + "/UVchecker0.png", (void**)&UVchecker0, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
@@ -86,7 +81,7 @@ void mitevox::MiteVox_Engine::onCreate()
 
 	// Create subject entity.
 
-	unsigned long subject0 = myECS->createEntity();
+	ENTITY_ID_TYPE subject0 = myECS->createEntity();
 	render::Camera tmpCamera = { 50, SCREEN_WIDTH, SCREEN_HEIGHT, 1, 100000 };
 	myECS->attachComponent(subject0, myScene->Camera_Component, &tmpCamera);
 	myScene->activeCamera = subject0;
@@ -189,7 +184,7 @@ void mitevox::MiteVox_Engine::onCreate()
 }
 
 
-void mitevox::MiteVox_Engine::onUpdate() 
+void mitevox::Engine::onUpdate() 
 {
 	float cubeSize = 1000;
 	render::ColorRGBAf grey = { 0.3f, 0.3f, 0.3f, 1 };
@@ -221,7 +216,7 @@ void mitevox::MiteVox_Engine::onUpdate()
 	render::drawLine(this->renderer, point2, point7);
 }
 
-void mitevox::MiteVox_Engine::onDestroy() {}
+void mitevox::Engine::onDestroy() {}
 
 
 #include "MiteVox/src/MiteVox_main.h"
