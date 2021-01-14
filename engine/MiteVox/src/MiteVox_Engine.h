@@ -42,10 +42,15 @@ namespace mitevox
 		{
 			fs::path currentPath = fs::path(argv[0]);
 			settings.executionPath = currentPath.parent_path().string();
-			settings.resourcePath = currentPath.parent_path().parent_path().parent_path().parent_path().string();
-			settings.resourcePath += "\\resources";
-			settings.configPath = currentPath.parent_path().parent_path().parent_path().parent_path().string();
-			settings.configPath += "\\config";
+
+			fileio::JSON* engine_config = new fileio::JSON();
+			engine_config->parse_file(settings.executionPath + "\\engine_config.json");
+
+			settings.debug = (int)engine_config->get_number("debug");
+			settings.resourcePath = fs::path(engine_config->get_string("resource_path")).string();
+			settings.configPath = fs::path(engine_config->get_string("config_path")).string();
+			settings.physicsPeriod = engine_config->get_number("physics_period");
+			settings.rendererPeriod = engine_config->get_number("renderer_period");
 
 			renderer = new render::RendererSettings();
 			render::initRenderer(renderer);

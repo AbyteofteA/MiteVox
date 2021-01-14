@@ -1,0 +1,7 @@
+{
+    "debug" : 0,
+    "config_path" : "..\\..\\..\\config",
+    "resource_path" : "..\\..\\..\\resources",
+    "physics_period" : 0.06,
+    "renderer_period" : 0.0
+}

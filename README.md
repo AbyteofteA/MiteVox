@@ -48,7 +48,7 @@ The solution contains another project, that is not a part of the engine:
 :warning: - TODO
 
 ### Custom project(s)
-- :warning: engine_config.json
+- engine_config.json
 ### MiteVox
 - Engine
 - Scene

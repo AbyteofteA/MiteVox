@@ -8,6 +8,8 @@ namespace mitevox
 {
 	struct EngineSettings
 	{
+		int debug = 0;
+
 		std::string executionPath = "";
 		std::string resourcePath = "";
 		std::string configPath = "";
@@ -16,8 +18,6 @@ namespace mitevox
 
 		double physicsPeriod = 0.06;
 		double rendererPeriod = 0.0;
-
-
 	};
 
 

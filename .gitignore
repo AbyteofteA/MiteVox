@@ -10,6 +10,7 @@
 *.lib
 *.log
 *.manifest
+*.ilk
 
 *.pch
 *.pdb
@@ -21,7 +22,8 @@
 *.odt
 
 Backup/
-bin/
+
+**/bin/intermediates/**
 ipch/
 assets_hidden/
 .git/
@@ -29,3 +31,5 @@ assets_hidden/
 
 !dependencies/**
 !engine/Renderer/assets/**
+
+!sandbox/DemoProject/bin/Win32/Debug/engine_config.json

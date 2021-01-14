@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <iostream>
+#include <fstream>
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -597,7 +599,29 @@ namespace fileio
 			return "ok";
 		}
 		int to_file(std::string filename);
-		int parse_file(std::string filename);
+		int parse_file(std::string filename)
+		{
+			std::string json_data;
+
+			std::fstream file;
+			file.open(filename, std::ios::in);
+			if (file.is_open())
+			{
+				std::string tmp_str;
+				while (std::getline(file, tmp_str))
+				{
+					json_data += tmp_str + "\n";
+				}
+				file.close();
+			}
+			else
+			{
+				return -1;
+			}
+
+			parse_str(json_data);
+			return 1;
+		}
 		void wipe();
 
 	private:
