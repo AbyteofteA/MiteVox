@@ -43,9 +43,9 @@ namespace mitevox
 			fs::path currentPath = fs::path(argv[0]);
 			settings.executionPath = currentPath.parent_path().string();
 			settings.resourcePath = currentPath.parent_path().parent_path().parent_path().parent_path().string();
-			settings.resourcePath += "/resources";
+			settings.resourcePath += "\\resources";
 			settings.configPath = currentPath.parent_path().parent_path().parent_path().parent_path().string();
-			settings.configPath += "/config";
+			settings.configPath += "\\config";
 
 			renderer = new render::RendererSettings();
 			render::initRenderer(renderer);

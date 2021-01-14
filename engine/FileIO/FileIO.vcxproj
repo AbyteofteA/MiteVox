@@ -154,7 +154,9 @@
     <ClInclude Include="src\FileIO_Headers.h" />
     <ClInclude Include="src\FileLoaderAsync.h" />
     <ClInclude Include="src\Image.h" />
+    <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\loadBytes.h" />
+    <ClInclude Include="src\OBJ.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FileLoaderAsync.cpp" />

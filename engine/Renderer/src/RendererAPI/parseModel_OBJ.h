@@ -12,12 +12,6 @@
 namespace render
 {
 
-#define COMMENTS		"(\n+ *#)*"
-#define USE_MATERIAL	"(\n+ *usemtl +[a-zA-z0-9_]+)*"
-
-	
-
-
 	inline double* readFloats3(char* str, int& indx)
 	{
 		double resultFloats[3] = { 0 };
@@ -174,35 +168,7 @@ namespace render
 		char tmpFlag = 0;
 		fileio::loadBytes(filename, (void**)&fileData, &tmpFlag);
 
-
-		std::string obj_regex =
-			COMMENTS
-			"(\n+ *mtllib( +[a-zA-z0-9_]+)+)*"
-			COMMENTS
-			"("
-				USE_MATERIAL
-				COMMENTS
-				"(\n+ *vt( +-?[[:digit:]]+.?[[:digit:]]*){3})*"
-				COMMENTS
-				"(\n+ *vn( +-?[[:digit:]]+.?[[:digit:]]*){3})*"
-				COMMENTS
-				"(\n+ *p( +-?[[:digit:]]+){1,})*"
-				COMMENTS
-				"("
-					USE_MATERIAL
-					COMMENTS
-					"(\n+ *l( +-?[[:digit:]]+/-?[[:digit:]]*){2,})*"
-					COMMENTS
-				")*"
-				"("
-					USE_MATERIAL
-					COMMENTS
-					"(\n+ *f( +-?[[:digit:]]+/-?[[:digit:]]*/-?[[:digit:]]*){3,})*"
-					COMMENTS
-				")*"
-				COMMENTS
-			")*";
-		auto const regex = std::regex(obj_regex);
+		auto const regex = std::regex(fileio::OBJ_regex);
 		bool const myTextContainsRegex = std::regex_search(std::string(fileData), regex);
 		if (myTextContainsRegex)
 		{

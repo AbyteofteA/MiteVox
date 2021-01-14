@@ -9,5 +9,7 @@
 #include "loadBytes.h"
 #include "Image.h"
 #include "FileLoaderAsync.h"
+#include "JSON.h"
+#include "OBJ.h"
 
 #endif

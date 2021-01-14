@@ -61,8 +61,8 @@ The solution contains another project, that is not a part of the engine:
 - Asynchronous file loader & parser
 - Binary files
 - Images (PNG)
+- JSON
 - :warning: Audio files (MP3)
-- :warning: JSON
 - :warning: Container formats (Ogg, ZIP)
 ### Scripting
 - Native (C/C++)
