@@ -50,7 +50,6 @@ The solution contains another project, that is not a part of the engine:
 ### Custom project(s)
 - engine_config.json
 ### MiteVox
-- Engine
 - Scene
   - :warning: Serialization via JSON
 ### ECSManager
@@ -60,65 +59,45 @@ The solution contains another project, that is not a part of the engine:
 ### FileIO
 - Asynchronous file loader & parser
 - Binary files
-- Images (PNG)
+- Images: PNG
 - JSON
-- :warning: Audio files (MP3)
-- :warning: Container formats (Ogg, ZIP)
+- :warning: Audio files: MP3
+- :warning: Container formats: Ogg, ZIP
 ### Scripting
 - Native (C/C++)
 - :warning: Lua
 ### Math
-- Data structures:
-  - Buffer
-  - Half-table
-- Linear algebra:
-  - Point3D
-  - Vector3D
-  - :warning: Matrices
+- Data structures: Buffer, Half-table
+- Linear algebra: Point3D, Vector3D, :warning: Matrices
 - Numerical analysis:
-  - Linear interpolation
+  - Interpolation: Linear
 - Graphs:
   - Trees:
-    - Binary search tree
-    - :warning: Quad tree
-    - :warning: Octree
-- Noise:
-  - :warning: Perlin noise
-  - :warning: OpenSimplex noise
+    - Binary search tree, :warning: Quad tree, :warning: Octree
+- Noise: :warning: Perlin, :warning: OpenSimplex
 ### Renderer
-- Primitives:
-  - Point
-  - Line
-  - Triangle
+- Primitives: Point, Line, Triangle
 - :warning: Sprites
 - Skybox
 - Model3D (+ .obj parser)
 - Material:
-  - Albedo map
-  - Roughness map
-  - Metallic map
-  - :warning: Normal map
-  - :warning: Glow map
+  - Texture maps: Albedo, Roughness, Metallic, :warning: Normal, :warning: Glow
   - :warning: .mtl parser
 - Camera:
   - :warning: Focal length
 - :warning: Multiple cameras
-- Light:
-  - Ambient light
-  - Directional light
-  - Point light
-  - :warning: Spot light
+- Lights: Ambient, Directional, Point light, :warning: Spot light
 - Multiple lights
 - :warning: PBR
 ### AIModels
 - ML-models:
   - FFNN (Feedforward Neural Networks)
-    - Perceptron
-    - Backpropagation for Perceptron
-    - CNN (Convolutional Neural Networks)
-    - :warning: Backpropagation for CNN
+    - FullyConnectedLayer
+    - Backpropagation for FullyConnectedLayer
+    - ConvolutionalLayer
+    - :warning: Backpropagation for ConvolutionalLayer
   - RNN (Recurrent Neural Networks)
-    - Hopfield network
+    - HopfieldNetwork
   - :warning: NeuralNetwork (class that joins different types of NNs)
 - Pathfinding:
   - :warning: A*
@@ -129,13 +108,8 @@ The solution contains another project, that is not a part of the engine:
     - AABB intersection
     - :warning: SAT intersection
   - :warning: Mesh collider
-- Structures
-  - Rigid body
-  - :warning: Atoms
-- Classical mechanics
-  - Kinematics
-  - :warning: Dynamics
-  - :warning: Statics
+- Structures: Rigid body, :warning: Atoms
+- Classical mechanics: Kinematics, :warning: Dynamics, :warning: Statics
 
 ## :bug: Known bugs & limitations
 - [X] ~~The project requires switching between release and debug via a flag~~.

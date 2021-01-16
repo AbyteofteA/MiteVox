@@ -92,9 +92,6 @@
   <ItemGroup>
     <ClInclude Include="src\FFNN\CNN\ConvolutionalLayer.h" />
     <ClInclude Include="src\FFNN\FullyConnectedLayer.h" />
-    <ClInclude Include="src\FFNN\Perceptron\Perceptron_BackPropagation.h" />
-    <ClInclude Include="src\FFNN\Perceptron\BackPropagationWizard.h" />
-    <ClInclude Include="src\FFNN\Perceptron\Perceptron_Validation.h" />
     <ClInclude Include="src\FFNN\CNN\Filter2D.h" />
     <ClInclude Include="src\FFNN\CNN\SubsamplingLayer.h" />
     <ClInclude Include="src\RNN\HopfieldNetwork.h" />
@@ -102,8 +99,7 @@
     <ClInclude Include="src\GZ_File_IO.h" />
     <ClInclude Include="src\Structure\HyperData.h" />
     <ClInclude Include="src\Structure\LearningBatch.h" />
-    <ClInclude Include="src\FFNN\Perceptron\Perceptron_File_IO.h" />
-    <ClInclude Include="src\FFNN\Perceptron\Perceptron.h" />
+    <ClInclude Include="src\Structure\nameAFile.h" />
     <ClInclude Include="src\AIModels.h" />
     <ClInclude Include="src\Service.h" />
     <ClInclude Include="src\Structure\FormalNeuron.h" />
