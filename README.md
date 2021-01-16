@@ -119,8 +119,7 @@ The solution contains another project, that is not a part of the engine:
     - :warning: Backpropagation for CNN
   - RNN (Recurrent Neural Networks)
     - Hopfield network
-  - :warning: CompositeNN
-  - :warning: NeuroPlayer
+  - :warning: NeuralNetwork (class that joins different types of NNs)
 - Pathfinding:
   - :warning: A*
 - :warning: StateMachine

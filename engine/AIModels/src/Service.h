@@ -11,7 +11,7 @@ Add character to a string.
 ************************************************************************************/
 char* addChar2Str(char* str, char ch)
 {
-	if (str == NULL)
+	if (str == nullptr)
 	{
 		str = (char*)malloc(sizeof(char) * 2);
 		str[0] = ch;

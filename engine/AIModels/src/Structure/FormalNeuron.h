@@ -12,17 +12,17 @@ namespace aimods
 	{
 	public:
 
-		unsigned char function = TanH;
+		activation function = activation::RELU;
 
 		float output = 0;
 		float threshold = 0;
 
-		float* weightArray = NULL;
-		FormalNeuron** axonArray = NULL;
+		float* weightArray = nullptr;
+		FormalNeuron** axonArray = nullptr;
 		unsigned int amountOfAxons = 0;
 
 		inline FormalNeuron() {}
-		inline FormalNeuron(unsigned char _function, unsigned int _amountOfAxons)
+		inline FormalNeuron(activation _function, unsigned int _amountOfAxons)
 		{
 			this->function = _function;
 			formAxons(_amountOfAxons);
@@ -58,7 +58,7 @@ namespace aimods
 			}
 		}
 
-		inline float weightedSum()
+		inline float weighSum()
 		{
 			float wSum = 0;
 			for (unsigned int k = 0; k < this->amountOfAxons; k++)
@@ -67,14 +67,13 @@ namespace aimods
 
 			return wSum;
 		}
-
 		inline float computeOutput()
 		{
-			return activationFunction(weightedSum(), this->function);
+			return activationFunction(weighSum(), this->function);
 		}
 		inline float propagate()
 		{
-			this->output = activationFunction(weightedSum(), this->function);
+			this->output = activationFunction(weighSum(), this->function);
 			return this->output;
 		}
 	};

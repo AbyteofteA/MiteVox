@@ -1,45 +1,45 @@
 
-#ifndef CONVOLUTION_LAYER_H
-#define CONVOLUTION_LAYER_H
+#ifndef CONVOLUTIONALLAYER_H
+#define CONVOLUTIONALLAYER_H
 
 #include "AIModels/src/Structure/HyperData.h"
-#include "AIModels/src/FFNN/CNN/Filter_2D.h"
+#include "AIModels/src/FFNN/CNN/Filter2D.h"
 
 namespace aimods
 {
-
-	class Convolution_layer
+	template <typename T>
+	class ConvolutionalLayer
 	{
 	public:
 
 		unsigned int amountOfInputs = 0;
-		aimods::HyperData<float>** inputs = NULL;
+		aimods::HyperData<float>** inputs = nullptr;
 
 		unsigned int amountOfOutputs = 0;
-		aimods::HyperData<float>** outputs = NULL;
+		aimods::HyperData<float>** outputs = nullptr;
 
 		unsigned int amountOfilters = 0;
-		Filter_2D** filters = NULL;
+		Filter2D** filters = nullptr;
 
-		Convolution_layer()
+		ConvolutionalLayer()
 		{
 			amountOfilters = 0;
-			filters = NULL;
+			filters = nullptr;
 		}
 
 		void addFilter(unsigned int _amountOfChannels, unsigned int _size, unsigned int _stride, unsigned char _padding)
 		{
 			amountOfilters++;
 
-			filters = (Filter_2D**)realloc(filters, sizeof(Filter_2D*) * amountOfilters);
-			filters[amountOfilters - 1] = new Filter_2D(_amountOfChannels, _size, _stride, _padding);
+			filters = (Filter2D**)realloc(filters, sizeof(Filter2D*) * amountOfilters);
+			filters[amountOfilters - 1] = new Filter2D(_amountOfChannels, _size, _stride, _padding);
 		}
 
-		void addFilter(Filter_2D* filter)
+		void addFilter(Filter2D* filter)
 		{
 			amountOfilters++;
 
-			filters = (Filter_2D**)realloc(filters, sizeof(Filter_2D*) * amountOfilters);
+			filters = (Filter2D**)realloc(filters, sizeof(Filter2D*) * amountOfilters);
 			filters[amountOfilters - 1] = filter;
 		}
 
@@ -62,7 +62,7 @@ namespace aimods
 
 		}
 
-		~Convolution_layer()
+		~ConvolutionalLayer()
 		{
 			delete[] filters;
 		}

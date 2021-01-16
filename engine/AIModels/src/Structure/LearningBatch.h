@@ -13,19 +13,19 @@ namespace aimods
 
 		unsigned int batchSize = 0;
 
-		float** input = NULL;
+		float** input = nullptr;
 		unsigned int sizeOfInput = 0;
 
-		float** output = NULL;
+		float** output = nullptr;
 		unsigned int sizeOfOutput = 0;
 
 
 		LearningBatch()
 		{
 			batchSize = 0;
-			input = NULL;
+			input = nullptr;
 			sizeOfInput = 0;
-			output = NULL;
+			output = nullptr;
 			sizeOfOutput = 0;
 		}
 

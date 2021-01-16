@@ -6,33 +6,36 @@
 
 namespace aimods
 {
-	// Types of padding
-#define VALID_PADDING		0
-#define SAME_PADDING		1
-#define MAX_POOLING			2
+	enum struct padding_type { VALID = 0, SAME };
 
 #define SQUASHED_OUTPUT		0
 #define RGB_OUTPUT			1
 
 
-	class Filter_2D
+	class Filter2D
 	{
 	public:
 
 		unsigned int size = 0;
 		unsigned int stride = 1;
-		unsigned char padding = SAME_PADDING;
+		padding_type padding = padding_type::SAME;
 		unsigned char squashChannels = 0;
 
 		unsigned int amountOfChannels = 0;
 
-		aimods::HyperData<float>* input = NULL;
-		aimods::HyperData<float>* output = NULL;
-		float** filters = NULL;
+		aimods::HyperData<float>* input = nullptr;
+		aimods::HyperData<float>* output = nullptr;
+		float** filters = nullptr;
 
-		Filter_2D(unsigned int _amountOfChannels, unsigned int _size, unsigned int _stride, unsigned char _padding)
+		Filter2D(unsigned int _amountOfChannels, unsigned int _size, unsigned int _stride, padding_type _padding)
 		{
 			tuneFilter(_amountOfChannels, _size, _stride, _padding);
+		}
+		~Filter2D()
+		{
+			deleteFilter();
+			delete input;
+			delete output;
 		}
 
 		void setFilter(float num)
@@ -66,9 +69,9 @@ namespace aimods
 		/*****************************************************************************************
 		Resizes filters and applies settings according to the parameters 
 		*****************************************************************************************/
-		void tuneFilter(unsigned int _amountOfChannels, unsigned int _size, unsigned int _stride, unsigned char _padding)
+		void tuneFilter(unsigned int _amountOfChannels, unsigned int _size, unsigned int _stride, padding_type _padding)
 		{
-			if (filters != NULL)
+			if (filters != nullptr)
 				deleteFilter();
 
 			amountOfChannels = _amountOfChannels;
@@ -93,29 +96,32 @@ namespace aimods
 
 			unsigned int newX = 0;
 			unsigned int newY = 0;
-			if (padding == VALID_PADDING || padding == MAX_POOLING)
+			if (padding == padding_type::VALID)
 			{
 				newX = (unsigned int)(floor(input->getDimention(2) - size) / stride + 1);
 				newY = (unsigned int)(floor(input->getDimention(1) - size) / stride + 1);
 			}
-			else if (padding == SAME_PADDING)
+			else if (padding == padding_type::SAME)
 			{
 				newX = (unsigned int)(floor(input->getDimention(2) / stride));
 				newY = (unsigned int)(floor(input->getDimention(1) / stride));
 			}
 
-			unsigned int* dims = (unsigned int*)malloc(sizeof(unsigned int) * 3);
-			if (squashChannels == SQUASHED_OUTPUT)
-				dims[0] = 1;
-			else if (squashChannels == RGB_OUTPUT)
-				dims[0] = input->getDimention(0);
-			dims[1] = newY;
-			dims[2] = newX;
-			float* dat = (float*)malloc(sizeof(float) * dims[0] * newX * newY);
-
-			if (output != NULL)
+			if (output != nullptr)
 				delete output;
-			output = new aimods::HyperData<float>(FLOAT_HYPERDATA, 3, dims, dat);
+			float* dat = nullptr;
+			output = new aimods::HyperData<float>(hyperdataType::FLOAT);
+			if (squashChannels == SQUASHED_OUTPUT)
+			{
+				output->resize(3, 1, newY, newX);
+				dat = (float*)malloc(sizeof(float) * newX * newY);
+			}
+			else if (squashChannels == RGB_OUTPUT)
+			{
+				output->resize(3, 3, newY, newX);
+				dat = (float*)malloc(sizeof(float) * 3 * newX * newY);
+			}
+			output->data = dat;
 		}
 
 		void attachInput(aimods::HyperData<float>* _input)
@@ -140,49 +146,24 @@ namespace aimods
 			{
 				for (unsigned int i = 0; i < outputDimention_2; i += 1)
 				{
-					if (padding == MAX_POOLING)
+					unsigned char cTmp = 0;
+					output->data[i + j * outputDimention_2] = 0;
+
+					for (unsigned int c = 0; c < amountOfChannels; c++)
 					{
 						if (squashChannels == SQUASHED_OUTPUT)
 						{
-							output->data[i + j * outputDimention_2] = maxim(i * stride, j * stride, 0);
-							if (amountOfChannels == 1) continue;
-
-							for (unsigned int c = 1; c < amountOfChannels; c++)
-							{
-								if (maxim(i * stride, j * stride, c) > output->data[i + j * outputDimention_2])
-									output->data[i + j * outputDimention_2] = maxim(i * stride, j * stride, c);
-							}
+							output->data[i + j * outputDimention_2 + cTmp * outputDimention_1 * outputDimention_2]
+								+= weightedSum(i * stride, j * stride, c);
 						}
 						else if (squashChannels == RGB_OUTPUT)
 						{
-							for (unsigned int c = 0; c < amountOfChannels; c++)
-							{
-								output->data[i + j * outputDimention_2 + c * outputDimention_1 * outputDimention_2]
-									= maxim(i * stride, j * stride, c);
-							}
+							output->data[i + j * outputDimention_2 + cTmp * outputDimention_1 * outputDimention_2]
+								= weightedSum(i * stride, j * stride, c);
+							cTmp++;
 						}
 					}
-					else
-					{
-						unsigned char cTmp = 0;
-						output->data[i + j * outputDimention_2] = 0;
-
-						for (unsigned int c = 0; c < amountOfChannels; c++)
-						{
-							if (squashChannels == SQUASHED_OUTPUT)
-							{
-								output->data[i + j * outputDimention_2 + cTmp * outputDimention_1 * outputDimention_2]
-									+= weightedSum(i * stride, j * stride, c);
-							}
-							else if (squashChannels == RGB_OUTPUT)
-							{
-								output->data[i + j * outputDimention_2 + cTmp * outputDimention_1 * outputDimention_2]
-									= weightedSum(i * stride, j * stride, c);
-								cTmp++;
-							}
-						}
-						//output->data[i + j * outputDimention_2] /= amountOfChannels;
-					}
+					//output->data[i + j * outputDimention_2] /= amountOfChannels;
 				}
 			}
 
@@ -194,12 +175,12 @@ namespace aimods
 			float filterSum = 0;
 			unsigned int offsetX = 0;
 			unsigned int offsetY = 0;
-			if (padding == VALID_PADDING)
+			if (padding == padding_type::VALID)
 			{
 				offsetX = 0;
 				offsetY = 0;
 			}
-			else if (padding == SAME_PADDING)
+			else if (padding == padding_type::SAME)
 			{
 				offsetX = (unsigned int)(floor(size / 2));
 				offsetY = (unsigned int)(floor(size / 2));
@@ -275,15 +256,9 @@ namespace aimods
 				delete[] filters[c];
 			}
 			delete[] filters;
-			filters = NULL;
+			filters = nullptr;
 		}
 
-		~Filter_2D()
-		{
-			deleteFilter();
-			delete input;
-			delete output;
-		}
 	};
 
 }

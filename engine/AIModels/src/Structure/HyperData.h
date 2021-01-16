@@ -5,63 +5,57 @@
 #include "AIModels/src/Structure/LearningBatch.h"
 
 #include <iostream>
+#include <cstdarg>
 
 namespace aimods
 {
-	/*				dataType's possible values:
-	**************************************************************************/
-#define UNSIGNED_BYTE_HYPERDATA		0x08	// unsigned byte	| 1 byte
-#define SIGNED_BYTE_HYPERDATA		0x09	// signed byte		| 1 byte
-#define SHORT_HYPERDATA				0x0B	// short			| 2 bytes
-#define INT_HYPERDATA				0x0C	// int				| 4 bytes
-#define FLOAT_HYPERDATA				0x0D	// float			| 4 bytes
-#define DOUBLE_HYPERDATA			0x0E	// double			| 8 bytes
+	enum struct hyperdataType { BYTE = 0, SBYTE, SHORT, INT, FLOAT, DOUBLE };
 
-
-	template <typename Type>
+	template <typename T>
 	class HyperData
 	{
 	public:
 
-		unsigned char dataType = 0;
+		hyperdataType type = hyperdataType::BYTE;
 		unsigned char numOfDimentions = 0;
-		unsigned int* sizeOfDimentions = NULL;
+		size_t* sizeOfDimentions = nullptr;
 
-		Type* data = NULL;
+		T* data = nullptr;
 
-		HyperData()
+		HyperData(hyperdataType datType = hyperdataType::BYTE)
 		{
-			dataType = 0;
+			type = datType;
 			numOfDimentions = 0;
-			sizeOfDimentions = NULL;
-		}
-		HyperData(unsigned char datType, unsigned char numOfDims, unsigned int* sizeOfDims, Type* dat)
-		{
-			dataType = datType;
-			numOfDimentions = numOfDims;
-			sizeOfDimentions = sizeOfDims;
-			data = dat;
+			sizeOfDimentions = nullptr;
 		}
 
-		void resize(unsigned char numOfDims, unsigned int* _sizeOfDimentions)
+		void resize(unsigned char numOfDims, ...)
 		{
-			delete sizeOfDimentions;
-			sizeOfDimentions = NULL;
+			std::va_list args;
+			va_start(args, numOfDims);
 
 			numOfDimentions = numOfDims;
-			sizeOfDimentions = _sizeOfDimentions;
+			free(sizeOfDimentions);
+			sizeOfDimentions = (size_t*)realloc(
+				sizeOfDimentions, sizeof(size_t) * numOfDimentions);
 
-			unsigned long long volume = 1;
-			for (int i = 0; i < numOfDims; i++)
-				volume *= _sizeOfDimentions[i];
-			data = (Type*)realloc(data, sizeof(Type) * (size_t)volume);
+			size_t volume = 1;
+			for (int i = 0; i < numOfDimentions; i++)
+			{
+				size_t tmpArg = va_arg(args, size_t);
+				volume *= tmpArg;
+				sizeOfDimentions[i] = tmpArg;
+			}
+			va_end(args);
+
+			data = (T*)realloc(data, sizeof(T) * volume);
 		}
 
-		HyperData<Type>* copy()
+		HyperData<T>* copy()
 		{
-			HyperData<Type>* newHyperData = new HyperData<Type>(dataType, numOfDimentions, sizeOfDimentions, NULL);
-			unsigned int volume = getVolume();
-			Type* dat = (Type*)malloc(sizeof(Type) * volume);
+			HyperData<T>* newHyperData = new HyperData<T>(type, numOfDimentions, sizeOfDimentions, nullptr);
+			size_t volume = getVolume();
+			T* dat = (T*)malloc(sizeof(T) * volume);
 			for (int i = 0; i < volume; i++)
 			{
 				dat[i] = data[i];
@@ -73,45 +67,15 @@ namespace aimods
 			return newHyperData;
 		}
 
-		/*void loadFromImage(char* filename)
-		{
-			dataType = FLOAT_HYPERDATA;
-
-			sf::Image* img = new sf::Image();
-			img->loadFromFile(filename);
-
-			unsigned int* _sizeOfDims = (unsigned int*)malloc(sizeof(unsigned int) * 3);
-			_sizeOfDims[0] = 3;
-			_sizeOfDims[1] = img->getSize().y;
-			_sizeOfDims[2] = img->getSize().x;
-
-			resize(3, _sizeOfDims);
-
-			for (unsigned int j = 0; j < img->getSize().y; j++)
-			{
-				for (unsigned int i = 0; i < img->getSize().x; i++)
-				{
-					data[(i + j * img->getSize().x) + 0 * img->getSize().x * img->getSize().y] = img->getPixel(i, j).r;
-					data[(i + j * img->getSize().x) + 1 * img->getSize().x * img->getSize().y] = img->getPixel(i, j).g;
-					data[(i + j * img->getSize().x) + 2 * img->getSize().x * img->getSize().y] = img->getPixel(i, j).b;
-				}
-			}
-
-			delete img;
-		}*/
-
 		void* readFrom_IDX(char* filename)
 		{
-			//FILE* newFile;
-			//void* hyperData;
-
 			FILE* newFile = nullptr;
 			fopen_s(&newFile, filename, "rb");
 
-			if (newFile == NULL)
+			if (newFile == nullptr)
 			{
 				printf("\n ERROR! Cannot open .idx file.\n");
-				return NULL;
+				return nullptr;
 			}
 			else
 			{
@@ -120,9 +84,9 @@ namespace aimods
 
 				unsigned char type = 0;
 				fread(&type, sizeof(char), 1, newFile);	// Zero
-				if (type != 0) return NULL;
+				if (type != 0) return nullptr;
 				fread(&type, sizeof(char), 1, newFile);	// Zero
-				if (type != 0) return NULL;
+				if (type != 0) return nullptr;
 				fread(&type, sizeof(char), 1, newFile);	// Data type
 
 				unsigned char numOfDims = 0;
@@ -149,11 +113,11 @@ namespace aimods
 
 				resize(numOfDims, sizeOfDims);
 
-				Type tmp = 0;
+				T tmp = 0;
 				float progress = 0;
 				for (unsigned int i = 0; i < volume; i++)
 				{
-					fread(&tmp, sizeof(Type), 1, newFile);
+					fread(&tmp, sizeof(T), 1, newFile);
 					data[i] = tmp;
 
 					progress++;
@@ -170,115 +134,9 @@ namespace aimods
 			return this;
 		}
 
-		/*sf::Image* saveToImage(char* filename)
-		{
-			sf::Image* img = new sf::Image();
-
-			img->create(getDimention(2), getDimention(1), sf::Color(0, 0, 0, 0));
-
-			for (unsigned int j = 0; j < getDimention(1); j++)
-			{
-				for (unsigned int i = 0; i < getDimention(2); i++)
-				{
-					unsigned int R = 0;
-					unsigned int G = 0;
-					unsigned int B = 0;
-
-					if (getDimention(0) == 1)		// grayscale image
-					{
-						R = data[(i + j * img->getSize().x)];
-						G = R;
-						B = R;
-					}
-					else if (getDimention(0) == 2)	// 2 channels
-					{
-						R = data[(i + j * img->getSize().x) + 0 * img->getSize().x * img->getSize().y];
-						G = 0;
-						B = data[(i + j * img->getSize().x) + 1 * img->getSize().x * img->getSize().y];
-					}
-					else if (getDimention(0) == 3)	// RGB image
-					{
-						R = data[(i + j * img->getSize().x) + 0 * img->getSize().x * img->getSize().y];
-						G = data[(i + j * img->getSize().x) + 1 * img->getSize().x * img->getSize().y];
-						B = data[(i + j * img->getSize().x) + 2 * img->getSize().x * img->getSize().y];
-					}
-
-					sf::Color color = sf::Color(R, G, B, 255);
-					img->setPixel(i, j, color);
-				}
-			}
-
-			img->saveToFile(filename);
-			return img;
-		}*/
-
-		/*void slice(unsigned char dimIndx)
-		{
-			if (dimIndx >= numOfDimentions)
-				return;
-			if (dimIndx <= 1) // ???
-				return;
-
-
-			HyperData<Type>** result = (HyperData<Type>**)malloc(sizeof(HyperData<Type>*) * sizeOfDimentions[dimIndx]);
-			for (int i = 0; i < numOfDimentions; i++)
-			{
-				result[i] = new HyperData<Type>();
-				result[i]->resize(numOfDimentions - 1, );
-			}
-
-			unsigned char last = dimIndx;
-			unsigned char first = 0;
-			if (last != numOfDimentions - 1)
-				first = numOfDimentions - 1;
-			else
-				first = numOfDimentions - 2;
-			unsigned int offset = 1;
-			for (int i = 0; i < numOfDimentions; i++)
-			{
-				if (i != last)
-					offset *= sizeOfDimentions[i];
-			}
-
-
-			unsigned int* indeces = (unsigned int*)calloc(numOfDimentions, sizeof(unsigned int));
-			for (int k = 0; k < sizeOfDimentions[dimIndx]; k++)
-			{
-
-
-				unsigned int index = 0;
-
-				if (numOfDimentions > 1)
-				{
-					index += k * offset;
-					unsigned int sizeIndex = 1;
-					unsigned int indexIndex = 0;
-					for (int i = 0; i < numOfDimentions - 1; i++)
-					{
-						while (sizeIndex == first || sizeIndex == last)
-							sizeIndex++;
-						if (i != first && i != last)
-						{
-							tmp *= sizeOfDimentions[sizeIndex];
-							index += tmp * indeces[indexIndex];
-							sizeIndex++;
-						}
-						indexIndex++;
-					}
-					index += indeces[last];
-				}
-				else
-					index = indeces[0];
-
-
-
-			}
-
-		}*/
-
 		unsigned char getDataType()
 		{
-			return dataType;
+			return type;
 		}
 
 		unsigned char getNumOfDimentions()
@@ -303,10 +161,10 @@ namespace aimods
 			}
 		}
 
-		unsigned long long getVolume()
+		size_t getVolume()
 		{
-			unsigned long long volume = 1;
-			for (int i = 0; i < numOfDimentions; i++)
+			size_t volume = 1;
+			for (size_t i = 0; i < numOfDimentions; i++)
 				volume *= sizeOfDimentions[i];
 			return volume;
 		}
@@ -317,7 +175,7 @@ namespace aimods
 			3 dims:	(k * sizeJ * sizeI) + (j * sizeI) + i
 			4 dims:	(l * sizeK * sizeJ * sizeI) + (k * sizeJ * sizeI) + (j * sizeI) + i
 		*******************************************************************************/
-		Type get(unsigned int* indeces)
+		T get(unsigned int* indeces)
 		{
 			unsigned int index = 0;
 			unsigned int tmp = 1;
@@ -337,7 +195,7 @@ namespace aimods
 			return data[index];
 		}
 
-		void set(unsigned int* indeces, Type value)
+		void set(unsigned int* indeces, T value)
 		{
 			unsigned int index = 0;
 			unsigned int tmp = 1;
@@ -362,19 +220,19 @@ namespace aimods
 		~HyperData()
 		{
 			delete sizeOfDimentions;
-			sizeOfDimentions = NULL;
+			sizeOfDimentions = nullptr;
 			delete data;
-			data = NULL;
+			data = nullptr;
 		}
 	};
 
 
-	template <typename Type>
-	LearningBatch** divideIntoBatches(HyperData<Type>* dataInputs, HyperData<Type>* dataOutputs, unsigned int batchSize, unsigned int amOfBatches, unsigned int sizeOfOutput)
+	template <typename T>
+	LearningBatch** divideIntoBatches(HyperData<T>* dataInputs, HyperData<T>* dataOutputs, unsigned int batchSize, unsigned int amOfBatches, unsigned int sizeOfOutput)
 	{
 
 		if ((dataInputs->getNumOfDimentions() != 3) && (dataOutputs->getNumOfDimentions() != 3))
-			return NULL;
+			return nullptr;
 
 		if ((dataInputs->getDimention(0) / batchSize) < amOfBatches)
 			amOfBatches = (dataInputs->getDimention(2) / batchSize);

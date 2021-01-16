@@ -7,20 +7,20 @@
 namespace aimods
 {
 
-	class Hopfield_NN
+	class HopfieldNetwork
 	{
 	public:
 
-		FormalNeuron** neuronArray = NULL;
+		FormalNeuron** neuronArray = nullptr;
 		unsigned int amountOfNeurons = 0;
-		float* previousOutput = NULL;
-		float* output = NULL;
+		float* previousOutput = nullptr;
+		float* output = nullptr;
 
-		Hopfield_NN(unsigned int size)
+		HopfieldNetwork(unsigned int size)
 		{
 			init(size);
 		}
-		~Hopfield_NN()
+		~HopfieldNetwork()
 		{
 			wipe();
 		}
@@ -34,7 +34,7 @@ namespace aimods
 
 			for (unsigned int i = 0; i < this->amountOfNeurons; i++)
 			{
-				this->neuronArray[i] = new FormalNeuron(BIPOLAR, size - 1);
+				this->neuronArray[i] = new FormalNeuron(activation::BIPOLAR, size - 1);
 			}
 			for (unsigned int i = 0; i < this->amountOfNeurons; i++)
 			{
@@ -117,7 +117,7 @@ namespace aimods
 				this->neuronArray[i]->propagate();
 			}
 		}
-		void propagate_instant()
+		void propagateInstantly()
 		{
 			updateOutput();
 

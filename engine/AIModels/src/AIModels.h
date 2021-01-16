@@ -3,28 +3,24 @@
 #define AIMODELS_H
 
 // Structure
-#include "Structure\Functions.h"
-#include "Structure\LearningBatch.h"
-#include "Structure\HyperData.h"
-#include "Structure\FormalNeuron.h"
+#include "AIModels/src/Structure/Functions.h"
+#include "AIModels/src/Structure/LearningBatch.h"
+#include "AIModels/src/Structure/HyperData.h"
+#include "AIModels/src/Structure/FormalNeuron.h"
 
-// Perceptron
-#include "FFNN\Perceptron\Perceptron.h"
-#include "FFNN\Perceptron\Perceptron_Validation.h"
-#include "FFNN\Perceptron\Perceptron_BackPropagation.h"
-#include "FFNN\Perceptron\BackPropagationWizard.h"
+// FFNN
+#include "AIModels/src/FFNN/FullyConnectedLayer.h"
 
 // CNN
-#include "FFNN\CNN\Filter_2D.h"
-#include "FFNN\CNN\Convolution_layer.h"
+#include "AIModels/src/FFNN/CNN/ConvolutionalLayer.h"
 
-// Hopfield network
-#include "RNN\HopfieldNN.h"
+// RNN
+#include "AIModels/src/RNN/HopfieldNetwork.h"
 
-#include "Service.h"
+#include "AIModels/src/Service.h"
 
 // Files
-#include "FFNN\Perceptron\Perceptron_File_IO.h"
-#include "GZ_File_IO.h"
+#include "AIModels/src/Structure/nameAFile.h"
+#include "AIModels/src/GZ_File_IO.h"
 
 #endif

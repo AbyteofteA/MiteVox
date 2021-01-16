@@ -8,52 +8,46 @@
 
 namespace aimods
 {
-	// Activation functions
-#define LINEAR 0
-#define BINARY_STEP 1
-#define BIPOLAR 2
-#define ReLU 3
-#define SIGMOID 4
-#define TanH 5
+	enum struct activation { LINEAR = 0, BINARY, BIPOLAR, RELU, SIGMOID, TANH };
 
-	float activationFunction(float weightedSum, unsigned int function)
+	float activationFunction(float weightedSum, activation function)
 	{
 		float f = 0;
 
 		switch (function)
 		{
 
-		case LINEAR:
+		case activation::LINEAR:
 			f = weightedSum;
 			break;
 
-		case BINARY_STEP:
+		case activation::BINARY:
 			if (weightedSum > 0)
 				f = 1;
 			else
 				f = 0;
 			break;
 
-		case BIPOLAR:
+		case activation::BIPOLAR:
 			if (weightedSum > 0)
 				f = 1;
 			else
 				f = -1;
 			break;
 
-		case ReLU:
+		case activation::RELU:
 			if (weightedSum >= 0)
 				f = weightedSum;
 			else
 				f = weightedSum * 0.05f;
 			break;
 
-		case SIGMOID:
-			f = 1 / (1 + pow((float)M_E, -weightedSum));
+		case activation::SIGMOID:
+			f = 1.0f / (1.0f + (float)pow((float)M_E, -weightedSum));
 			break;
 
-		case TanH:
-			f = tanh(weightedSum);
+		case activation::TANH:
+			f = (float)tanh(weightedSum);
 			break;
 		}
 
@@ -61,44 +55,45 @@ namespace aimods
 	}
 
 
-	float activationDerivative(float weightedSum, unsigned int function)
+	float activationDerivative(float weightedSum, activation function)
 	{
 		float der = 0;
 
 		switch (function)
 		{
 
-		case LINEAR:
+		case activation::LINEAR:
 			der = 1;
 			break;
 
-		case BINARY_STEP:
+		case activation::BINARY:
 			if (weightedSum != 0)
 				der = 0;
 			else
 				der = 0;	// ??? clarify
 			break;
 
-		case BIPOLAR:	// ??? clarify
+		case activation::BIPOLAR:	// ??? clarify
 			if (weightedSum != 0)
 				der = 0;
 			else
 				der = 0;
 			break;
 
-		case ReLU:
+		case activation::RELU:
 			if (weightedSum >= 0)
 				der = 1;
 			else
 				der = 0.05f;
 			break;
 
-		case SIGMOID:
-			der = (1 - 1 / (1 + pow((float)M_E, -weightedSum))) / (1 + pow((float)M_E, -weightedSum));
+		case activation::SIGMOID:
+			der = (1.0f - 1.0f / (1.0f + (float)pow((float)M_E, -weightedSum))) / 
+				(1.0f + (float)pow((float)M_E, -weightedSum));
 			break;
 
-		case TanH:
-			der = 1 - pow(tanh(weightedSum), 2.0f);
+		case activation::TANH:
+			der = 1.0f - (float)pow(tanh(weightedSum), 2.0f);
 			break;
 		}
 
