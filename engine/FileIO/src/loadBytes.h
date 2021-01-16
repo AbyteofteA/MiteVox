@@ -13,13 +13,13 @@ namespace fileio
 	*****************************************************************************************/
 	inline void loadBytes(std::string filename, void** result, char* flag)
 	{
-		*result = NULL;
+		*result = nullptr;
 		*flag = 0;
-		char* fileData = NULL;
+		char* fileData = nullptr;
 
 		FILE* file;
 		fopen_s(&file, filename.c_str(), "r");
-		if (file == NULL)
+		if (file == nullptr)
 		{
 			printf("\n ERROR! Cannot open the file.\n");
 			printf("File: %s\n", filename.c_str());

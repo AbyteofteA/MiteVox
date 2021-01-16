@@ -33,8 +33,8 @@ namespace render
 		glfwWindowHint(GLFW_SAMPLES, 2);
 
 		renderer->setWindow(
-			glfwCreateWindow(mode->width, mode->height, "MiteVox", monitor, NULL));
-		if (renderer->getWindow() == NULL)
+			glfwCreateWindow(mode->width, mode->height, "MiteVox", monitor, nullptr));
+		if (renderer->getWindow() == nullptr)
 		{
 			std::cout << "Failed to create GLFW window" << std::endl;
 			glfwTerminate();

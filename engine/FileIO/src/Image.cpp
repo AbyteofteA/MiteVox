@@ -10,7 +10,7 @@ fileio::Image::~Image()
 
 void fileio::loadImage(std::string filename, void** image, char* flag)
 {
-	*image = NULL;
+	*image = nullptr;
 	*flag = 0;
 
 	Image* tmpImage = new Image();

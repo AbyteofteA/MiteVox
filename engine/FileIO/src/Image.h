@@ -12,7 +12,7 @@ namespace fileio
 
 	public:
 
-		void* imageData = NULL;
+		void* imageData = nullptr;
 		int width = 0;
 		int height = 0;
 		int format = 0;
@@ -26,7 +26,7 @@ namespace fileio
 
 	inline void loadImage(std::string filename, void** image, char* flag)
 	{
-		*image = NULL;
+		*image = nullptr;
 		*flag = 0;
 
 		Image* tmpImage = new Image();
