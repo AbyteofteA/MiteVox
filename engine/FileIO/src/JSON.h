@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 
 namespace fileio
 {
-	enum struct JSON_type { null = 0, number, string, boolean, array, object };
+	enum struct JSONtype { NIL = 0, NUMBER, STRING, BOOLEAN, ARRAY, OBJECT };
 	
 #define JSON_TAB_STR			"    "
 
@@ -62,7 +62,7 @@ namespace fileio
 	JSON_REGEX_SPACE
 
 	// regex that matches any JSON key-value pair.
-	const std::string JSON_regex_pair =
+	const std::string JSON_REGEX_PAIR =
 		JSON_REGEX_FIELD_NULL
 		"|"
 		JSON_REGEX_FIELD_NUMBER
@@ -76,7 +76,7 @@ namespace fileio
 		JSON_REGEX_FIELD_OBJECT;
 
 	// regex that matches any JSON value.
-	const std::string JSON_regex_value =
+	const std::string JSON_REGEX_VALUE =
 		JSON_REGEX_NULL
 		"|"
 		JSON_REGEX_NUMBER
@@ -93,9 +93,9 @@ namespace fileio
 	class JSON
 	{
 		std::string name = "";
-		bool is_nameless = true;
+		bool isNameless = true;
 
-		JSON_type type = JSON_type::object;
+		JSONtype type = JSONtype::OBJECT;
 
 		double number = 0.0;
 		std::string string = "";
@@ -107,61 +107,61 @@ namespace fileio
 
 		JSON()
 		{
-			type = JSON_type::object;
-			is_nameless = true;
+			type = JSONtype::OBJECT;
+			isNameless = true;
 		}
 		JSON(std::string str)
 		{
-			parse_str(str);
+			parseStr(str);
 		}
 		~JSON()
 		{
 			fields.clear();
 		}
 
-		bool is_null()
+		bool isNull()
 		{
-			if (type == JSON_type::null)
+			if (type == JSONtype::NIL)
 			{
 				return true;
 			}
 			return false;
 		}
-		bool is_number()
+		bool isNumber()
 		{
-			if (type == JSON_type::number)
+			if (type == JSONtype::NUMBER)
 			{
 				return true;
 			}
 			return false;
 		}
-		bool is_string()
+		bool isString()
 		{
-			if (type == JSON_type::string)
+			if (type == JSONtype::STRING)
 			{
 				return true;
 			}
 			return false;
 		}
-		bool is_boolean()
+		bool isBoolean()
 		{
-			if (type == JSON_type::boolean)
+			if (type == JSONtype::BOOLEAN)
 			{
 				return true;
 			}
 			return false;
 		}
-		bool is_array()
+		bool isArray()
 		{
-			if (type == JSON_type::array)
+			if (type == JSONtype::ARRAY)
 			{
 				return true;
 			}
 			return false;
 		}
-		bool is_object()
+		bool isObject()
 		{
-			if (type == JSON_type::object)
+			if (type == JSONtype::OBJECT)
 			{
 				return true;
 			}
@@ -170,71 +170,71 @@ namespace fileio
 
 		// field GET methods //
 		
-		JSON* get_field(std::string field_name)
+		JSON* getField(std::string fieldName)
 		{
 			for (auto field : fields)
 			{
-				if (field->name == field_name)
+				if (field->name == fieldName)
 				{
 					return field;
 				}
 			}
 			return nullptr;
 		}
-		double get_number(std::string field_name)
+		double getNumber(std::string fieldName)
 		{
-			JSON* field = get_field(field_name);
+			JSON* field = getField(fieldName);
 			if (field)
 			{
-				if (field->is_number())
+				if (field->isNumber())
 				{
 					return field->number;
 				}
 			}
 			return -0.0;
 		}
-		std::string get_string(std::string field_name)
+		std::string getString(std::string fieldName)
 		{
-			JSON* field = get_field(field_name);
+			JSON* field = getField(fieldName);
 			if (field)
 			{
-				if (field->is_string())
+				if (field->isString())
 				{
 					return field->string;
 				}
 			}
 			return "";
 		}
-		bool get_boolean(std::string field_name)
+		bool getBoolean(std::string fieldName)
 		{
-			JSON* field = get_field(field_name);
+			JSON* field = getField(fieldName);
 			if (field)
 			{
-				if (field->is_boolean())
+				if (field->isBoolean())
 				{
 					return field->boolean;
 				}
 			}
 			return false;
 		}
-		JSON* get_array(std::string field_name)
+		JSON* getArray(std::string fieldName)
 		{
-			JSON* field = get_field(field_name);
+			JSON* field = getField(fieldName);
 			if (field)
 			{
-				if (field->is_array())
+				if (field->isArray())
 				{
 					return field;
 				}
 			}
 			return nullptr;
 		}
-		JSON* get_object(std::string field_name)
+		JSON* getObject(std::string fieldName)
 		{
-			JSON* field = get_field(field_name);
+			JSON* field = getField(fieldName);
 			if (field)
 			{
-				if (field->is_object())
+				if (field->isObject())
 				{
 					return field;
 				}
@@ -244,15 +244,15 @@ namespace fileio
 
 		// field SET methods //
 
-		JSON* set_field(std::string field_name, JSON_type type = JSON_type::null)
+		JSON* setField(std::string fieldName, JSONtype type = JSONtype::NIL)
 		{
-			JSON* field = get_field(field_name);
+			JSON* field = getField(fieldName);
 
 			if (field == nullptr)
 			{
 				field = new JSON();
 				fields.push_back(field);
-				field->name = field_name;
+				field->name = fieldName;
 			}
 			else
 			{
@@ -262,61 +262,61 @@ namespace fileio
 				field->fields.clear();
 			}
 			field->type = type;
-			field->is_nameless = false;
+			field->isNameless = false;
 
 			return field;
 		}
-		JSON* set_field(std::string field_name, double value)
+		JSON* setField(std::string fieldName, double value)
 		{
-			JSON* field = set_field(field_name, JSON_type::number);
+			JSON* field = setField(fieldName, JSONtype::NUMBER);
 			field->number = value;
 			return field;
 		}
-		JSON* set_field(std::string field_name, std::string value)
+		JSON* setField(std::string fieldName, std::string value)
 		{
-			JSON* field = set_field(field_name, JSON_type::string);
+			JSON* field = setField(fieldName, JSONtype::STRING);
 			field->string = value;
 			return field;
 		}
-		JSON* set_field(std::string field_name, bool value)
+		JSON* setField(std::string fieldName, bool value)
 		{
-			JSON* field = set_field(field_name, JSON_type::boolean);
+			JSON* field = setField(fieldName, JSONtype::BOOLEAN);
 			field->boolean = value;
 			return field;
 		}
 
 		// array methods //
 
-		size_t add_array_item(std::string field_name, JSON_type type = JSON_type::null)
+		size_t addArrayItem(std::string fieldName, JSONtype type = JSONtype::NIL)
 		{
-			JSON* the_array = get_field(field_name);
+			JSON* theArray = getField(fieldName);
 
-			if (the_array)
+			if (theArray)
 			{
-				JSON* new_item = new JSON();
-				new_item->type = type;
-				new_item->is_nameless = true;
-				size_t index = the_array->fields.size();
-				the_array->fields.push_back(new_item);
+				JSON* newItem = new JSON();
+				newItem->type = type;
+				newItem->isNameless = true;
+				size_t index = theArray->fields.size();
+				theArray->fields.push_back(newItem);
 				return index;
 			}
 			return -1;
 		}
-		size_t add_array_item(JSON* the_array, JSON_type type = JSON_type::null)
+		size_t addArrayItem(JSON* theArray, JSONtype type = JSONtype::NIL)
 		{
-			if (the_array)
+			if (theArray)
 			{
-				JSON* new_item = new JSON();
-				new_item->type = type;
-				new_item->is_nameless = true;
-				size_t index = the_array->fields.size();
-				the_array->fields.push_back(new_item);
+				JSON* newItem = new JSON();
+				newItem->type = type;
+				newItem->isNameless = true;
+				size_t index = theArray->fields.size();
+				theArray->fields.push_back(newItem);
 				return index;
 			}
 			return -1;
 		}
 
-		std::string to_str(unsigned int level = 0)
+		std::string toStr(unsigned int level = 0)
 		{
 			std::string quote = "\"";
 			std::string tabs = "";
@@ -324,44 +324,44 @@ namespace fileio
 			{
 				tabs += JSON_TAB_STR;
 			}
-			std::string name_str = tabs + quote + name + quote + ": ";
+			std::string nameStr = tabs + quote + name + quote + ": ";
 			std::string result;
 
-			size_t amount_of_fields = fields.size();
+			size_t amountOfFields = fields.size();
 
 			switch (type)
 			{
-			case JSON_type::number:
-				if (is_nameless)
+			case JSONtype::NUMBER:
+				if (isNameless)
 				{
 					result = tabs + std::to_string(number);
 				}
 				else
 				{
-					result = name_str + std::to_string(number);
+					result = nameStr + std::to_string(number);
 				}
 				
 				break;
 
-			case JSON_type::string:
-				if (is_nameless)
+			case JSONtype::STRING:
+				if (isNameless)
 				{
 					result = tabs + quote + string + quote;;
 				}
 				else
 				{
-					result = name_str + quote + string + quote;
+					result = nameStr + quote + string + quote;
 				}
 				break;
 
-			case JSON_type::boolean:
-				if (is_nameless)
+			case JSONtype::BOOLEAN:
+				if (isNameless)
 				{
 					result = tabs;
 				}
 				else
 				{
-					result = name_str;
+					result = nameStr;
 				}
 				if (boolean == true)
 				{
@@ -373,20 +373,20 @@ namespace fileio
 				}
 				break;
 
-			case JSON_type::array:
-				if (is_nameless)
+			case JSONtype::ARRAY:
+				if (isNameless)
 				{
 					result = tabs + "[\n";
 				}
 				else
 				{
-					result = name_str + "\n" + tabs + "[\n";
+					result = nameStr + "\n" + tabs + "[\n";
 				}
 
-				for (size_t i = 0; i < amount_of_fields; i++)
+				for (size_t i = 0; i < amountOfFields; i++)
 				{
-					result += fields[i]->to_str(level + 1);
-					if (i != (amount_of_fields - 1))
+					result += fields[i]->toStr(level + 1);
+					if (i != (amountOfFields - 1))
 					{
 						result += ",\n";
 					}
@@ -394,21 +394,21 @@ namespace fileio
 				result += "\n" + tabs + "]";
 				break;
 
-			case JSON_type::object:
-				if ((level == 0) || is_nameless)
+			case JSONtype::OBJECT:
+				if ((level == 0) || isNameless)
 				{
 					result = tabs + "{\n";
 				}
 				else
 				{
-					result = name_str + "\n" + tabs + "{\n";
+					result = nameStr + "\n" + tabs + "{\n";
 				}
 
-				amount_of_fields = fields.size();
-				for (size_t i = 0; i < amount_of_fields; i++)
+				amountOfFields = fields.size();
+				for (size_t i = 0; i < amountOfFields; i++)
 				{
-					result += fields[i]->to_str(level + 1);
-					if (i != (amount_of_fields - 1))
+					result += fields[i]->toStr(level + 1);
+					if (i != (amountOfFields - 1))
 					{
 						result += ",\n";
 					}
@@ -417,27 +417,27 @@ namespace fileio
 				break;
 
 			default:
-				if (is_nameless)
+				if (isNameless)
 				{
 					result = tabs + "null";
 				}
 				else
 				{
-					result = name_str + "null";
+					result = nameStr + "null";
 				}
 				break;
 			}
 
 			return result;
 		}
-		std::string parse_str(std::string str, JSON* obj = nullptr, unsigned int level = 0)
+		std::string parseStr(std::string str, JSON* obj = nullptr, unsigned int level = 0)
 		{
 			if (level == 0)
 			{
 				std::smatch match;
 				std::regex_search(str, match, std::regex("[\\s]*\\{[\\s]*"));
 				str = match.suffix().str();
-				return parse_str(str, this, level + 1);
+				return parseStr(str, this, level + 1);
 			}
 
 			int null_regex_pos = 0;
@@ -448,16 +448,16 @@ namespace fileio
 			int object_regex_pos = 0;
 
 			std::smatch match;
-			std::regex regexp_field = std::regex(JSON_regex_pair);
-			std::regex regexp_nameless = std::regex(JSON_regex_value);
+			std::regex regexp_field = std::regex(JSON_REGEX_PAIR);
+			std::regex regexp_nameless = std::regex(JSON_REGEX_VALUE);
 			std::regex regexp_space = std::regex(JSON_REGEX_SPACE);
 			std::regex regexp_end_of_object_or_array = std::regex("[\\s]*\\]|[\\s]*\\}");
 
-			if (try_exit_object(str, regexp_space, match))
+			if (tryExitObject(str, regexp_space, match))
 			{
 				return str;
 			}
-			if (obj->type == JSON_type::array)
+			if (obj->type == JSONtype::ARRAY)
 			{
 				std::regex_search(str, match, regexp_nameless);
 				null_regex_pos = 1;
@@ -483,11 +483,11 @@ namespace fileio
 				// null mached.
 				if (match[null_regex_pos].length() != 0)
 				{
-					JSON* new_item = obj->set_field(
-						match[null_regex_pos].str(), JSON_type::null);
-					if (obj->type == JSON_type::array)
+					JSON* new_item = obj->setField(
+						match[null_regex_pos].str(), JSONtype::NIL);
+					if (obj->type == JSONtype::ARRAY)
 					{
-						new_item->is_nameless = true;
+						new_item->isNameless = true;
 						new_item->name.clear();
 					}
 					str = match.suffix().str();
@@ -496,17 +496,17 @@ namespace fileio
 				else if (match[number_regex_pos].length() != 0)
 				{
 					char* end_ptr;
-					if (obj->type == JSON_type::array)
+					if (obj->type == JSONtype::ARRAY)
 					{
 						double num = std::strtod(match[number_regex_pos].str().c_str(), &end_ptr);
-						JSON* new_item = obj->set_field("", num);
-						new_item->is_nameless = true;
+						JSON* new_item = obj->setField("", num);
+						new_item->isNameless = true;
 						new_item->name.clear();
 					}
 					else
 					{
 						double num = std::strtod(match[number_regex_pos + 1].str().c_str(), &end_ptr);
-						JSON* new_item = obj->set_field(
+						JSON* new_item = obj->setField(
 							match[number_regex_pos].str(), num);
 					}
 					str = match.suffix().str();
@@ -514,15 +514,15 @@ namespace fileio
 				// string mached.
 				else if (match[string_regex_pos].length() != 0)
 				{
-					if (obj->type == JSON_type::array)
+					if (obj->type == JSONtype::ARRAY)
 					{
-						JSON* new_item = obj->set_field("", match[string_regex_pos].str());
-						new_item->is_nameless = true;
+						JSON* new_item = obj->setField("", match[string_regex_pos].str());
+						new_item->isNameless = true;
 						new_item->name.clear();
 					}
 					else
 					{
-						JSON* new_item = obj->set_field(
+						JSON* new_item = obj->setField(
 							match[string_regex_pos].str(), match[string_regex_pos + 1].str());
 					}
 					str = match.suffix().str();
@@ -531,28 +531,28 @@ namespace fileio
 				else if (match[boolean_regex_pos].length() != 0)
 				{
 					JSON* new_item = nullptr;
-					if (obj->type == JSON_type::array)
+					if (obj->type == JSONtype::ARRAY)
 					{
 						if (match[boolean_regex_pos].str() == "true")
 						{
-							new_item = obj->set_field("", true);
+							new_item = obj->setField("", true);
 						}
 						else
 						{
-							new_item = obj->set_field("", false);
+							new_item = obj->setField("", false);
 						}
-						new_item->is_nameless = true;
+						new_item->isNameless = true;
 						new_item->name.clear();
 					}
 					else
 					{
 						if (match[boolean_regex_pos + 1].str() == "true")
 						{
-							new_item = obj->set_field(match[boolean_regex_pos].str(), true);
+							new_item = obj->setField(match[boolean_regex_pos].str(), true);
 						}
 						else
 						{
-							new_item = obj->set_field(match[boolean_regex_pos].str(), false);
+							new_item = obj->setField(match[boolean_regex_pos].str(), false);
 						}
 					}
 					str = match.suffix().str();
@@ -560,33 +560,33 @@ namespace fileio
 				// array mached.
 				else if (match[array_regex_pos].length() != 0)
 				{
-					JSON* new_arr = obj->set_field(
-						match[array_regex_pos].str(), JSON_type::array);
-					if (obj->type == JSON_type::array)
+					JSON* new_arr = obj->setField(
+						match[array_regex_pos].str(), JSONtype::ARRAY);
+					if (obj->type == JSONtype::ARRAY)
 					{
-						new_arr->is_nameless = true;
+						new_arr->isNameless = true;
 						new_arr->name.clear();
 					}
-					str = parse_str(match.suffix().str(), new_arr, level + 1);
+					str = parseStr(match.suffix().str(), new_arr, level + 1);
 				}
 				// object mached.
 				else if (match[object_regex_pos].length() != 0)
 				{
-					JSON* new_obj = obj->set_field(
-						match[object_regex_pos].str(), JSON_type::object);
-					if (obj->type == JSON_type::array)
+					JSON* new_obj = obj->setField(
+						match[object_regex_pos].str(), JSONtype::OBJECT);
+					if (obj->type == JSONtype::ARRAY)
 					{
-						new_obj->is_nameless = true;
+						new_obj->isNameless = true;
 						new_obj->name.clear();
 					}
-					str = parse_str(match.suffix().str(), new_obj, level + 1);
+					str = parseStr(match.suffix().str(), new_obj, level + 1);
 				}
 
-				if (try_exit_object(str, regexp_space, match))
+				if (tryExitObject(str, regexp_space, match))
 				{
 					return str;
 				}
-				if (obj->type == JSON_type::array)
+				if (obj->type == JSONtype::ARRAY)
 				{
 					std::regex_search(str, match, regexp_nameless);
 				}
@@ -598,10 +598,10 @@ namespace fileio
 
 			return "ok";
 		}
-		int to_file(std::string filename);
-		int parse_file(std::string filename)
+		int toFile(std::string filename);
+		int parseFile(std::string filename)
 		{
-			std::string json_data;
+			std::string jsonData;
 
 			std::fstream file;
 			file.open(filename, std::ios::in);
@@ -610,7 +610,7 @@ namespace fileio
 				std::string tmp_str;
 				while (std::getline(file, tmp_str))
 				{
-					json_data += tmp_str + "\n";
+					jsonData += tmp_str + "\n";
 				}
 				file.close();
 			}
@@ -619,16 +619,16 @@ namespace fileio
 				return -1;
 			}
 
-			parse_str(json_data);
+			parseStr(jsonData);
 			return 1;
 		}
 		void wipe();
 
 	private:
 
-		bool try_exit_object(std::string& str, std::regex& regexp_space, std::smatch& match)
+		bool tryExitObject(std::string& str, std::regex& regexpSpace, std::smatch& match)
 		{
-			std::regex_search(str, match, regexp_space);
+			std::regex_search(str, match, regexpSpace);
 			str = match.suffix().str();
 
 			if ((str[0] == ']') || (str[0] == '}'))
