@@ -28,17 +28,17 @@
     <ClInclude Include="src\implementations\RendererOpenGL\API_ShaderFunctions.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\ShaderOpenGL.h" />
     <ClInclude Include="src\RendererAPI\parseModel_OBJ.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_API.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Camera.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_ColorRGBA.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Cubemap.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Light.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Material.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Mesh3D.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Model3D.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Primitives.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Settings.h" />
-    <ClInclude Include="src\RendererAPI\Renderer_Skybox.h" />
+    <ClInclude Include="src\RendererAPI\RendererAPI.h" />
+    <ClInclude Include="src\RendererAPI\Camera.h" />
+    <ClInclude Include="src\RendererAPI\ColorRGBA.h" />
+    <ClInclude Include="src\RendererAPI\Cubemap.h" />
+    <ClInclude Include="src\RendererAPI\Light.h" />
+    <ClInclude Include="src\RendererAPI\Material.h" />
+    <ClInclude Include="src\RendererAPI\Mesh3D.h" />
+    <ClInclude Include="src\RendererAPI\Model3D.h" />
+    <ClInclude Include="src\RendererAPI\Primitives.h" />
+    <ClInclude Include="src\RendererAPI\RendererSettings.h" />
+    <ClInclude Include="src\RendererAPI\Skybox.h" />
     <ClInclude Include="src\RendererImplementations\RendererCPU\PrimitivesCPU.h" />
     <ClInclude Include="src\RendererImplementations\RendererCPU\RendererCPU.h" />
     <ClInclude Include="src\RendererImplementations\RendererOpenGL\RendererOpenGL.h" />
@@ -61,8 +61,8 @@
     <ClCompile Include="src\implementations\RendererOpenGL\GlobalData.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_ModelFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.cpp" />
-    <ClCompile Include="src\RendererAPI\Renderer_Cubemap.cpp" />
-    <ClCompile Include="src\RendererAPI\Renderer_Skybox.cpp" />
+    <ClCompile Include="src\RendererAPI\Cubemap.cpp" />
+    <ClCompile Include="src\RendererAPI\Skybox.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

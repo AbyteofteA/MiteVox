@@ -6,8 +6,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "FileIO/src/FileIO_Headers.h"
-#include "Renderer/src/RendererAPI/Renderer_API.h"
+#include "FileIO/src/FileIO.h"
+#include "Renderer/src/RendererAPI/RendererAPI.h"
 #include "ShaderOpenGL.h"
 namespace render
 {

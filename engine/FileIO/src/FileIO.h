@@ -6,10 +6,11 @@
 #include <thread>
 #include <vector>
 
+#include "FileStatus.h"
 #include "loadBytes.h"
 #include "Image.h"
 #include "FileLoaderAsync.h"
-#include "JSON.h"
-#include "OBJ.h"
+#include "Formats/JSON.h"
+#include "Formats/OBJ.h"
 
 #endif

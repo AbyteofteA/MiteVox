@@ -2,15 +2,12 @@
 #ifndef PHYSICS_PRIMITIVES_H
 #define PHYSICS_PRIMITIVES_H
 
-#include "Math/src/Math_Headers.h"
-
-#define NONE				0
-#define PARALLELEPIPED		1
-#define SPHERE				2
-#define CYLINDER			3
+#include "Math/src/Math.h"
 
 namespace physcs
 {
+	enum struct PrimitiveType { NONE = 0, PARALLELEPIPED, SPHERE, CYLINDER };
+
 	struct Block
 	{
 		mathem::Point3D pos = { 0.f };

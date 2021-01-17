@@ -3,11 +3,11 @@
 #define PARSEMODEL_OBJ_H
 
 #include <regex>
-#include "FileIO/src/FileIO_Headers.h"
-#include "Math/src/Math_Headers.h"
+#include "FileIO/src/FileIO.h"
+#include "Math/src/Math.h"
 
-#include "Renderer_ColorRGBA.h"
-#include "Renderer_Mesh3D.h"
+#include "ColorRGBA.h"
+#include "Mesh3D.h"
 
 namespace render
 {
@@ -159,13 +159,13 @@ namespace render
 	Application:
 	Description:
 	************************************************************************************/
-	inline void parseModel_OBJ(std::string filename, void** mesh, char* flag)
+	inline void parseModel_OBJ(std::string filename, void** mesh, fileio::FileStatus* flag)
 	{
 		*mesh = nullptr;
-		*flag = 0;
+		*flag = fileio::FileStatus::LOADING;
 		char* fileData = nullptr;
 
-		char tmpFlag = 0;
+		fileio::FileStatus tmpFlag = fileio::FileStatus::LOADING;
 		fileio::loadBytes(filename, (void**)&fileData, &tmpFlag);
 
 		auto const regex = std::regex(fileio::OBJ_regex);
@@ -466,7 +466,7 @@ namespace render
 		free(fileData);
 		(*mesh) = (void*)meshTmp;
 
-		*flag = 1;
+		*flag = fileio::FileStatus::READY;
 		return;
 	}
 

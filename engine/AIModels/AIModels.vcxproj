@@ -94,6 +94,7 @@
     <ClInclude Include="src\FFNN\FullyConnectedLayer.h" />
     <ClInclude Include="src\FFNN\CNN\Filter2D.h" />
     <ClInclude Include="src\FFNN\CNN\SubsamplingLayer.h" />
+    <ClInclude Include="src\Structure\NeuralNetwork.h" />
     <ClInclude Include="src\RNN\HopfieldNetwork.h" />
     <ClInclude Include="src\Structure\Functions.h" />
     <ClInclude Include="src\GZ_File_IO.h" />

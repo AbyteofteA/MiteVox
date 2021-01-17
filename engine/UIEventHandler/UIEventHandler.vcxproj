@@ -19,9 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\InputHandler.h" />
     <ClInclude Include="src\UIEventHandler.h" />
-    <ClInclude Include="src\UIEventHandler_Callbacks.h" />
-    <ClInclude Include="src\UIEventHandler_Headers.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Renderer\Renderer.vcxproj">

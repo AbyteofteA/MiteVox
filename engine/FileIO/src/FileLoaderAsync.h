@@ -2,6 +2,7 @@
 #ifndef FILELOADERASYNC_H
 #define FILELOADERASYNC_H
 
+#include "FileStatus.h"
 #include "loadBytes.h"
 
 #include <filesystem>
@@ -15,15 +16,10 @@ namespace fileio
 	struct FileLoaderAsyncInfo
 	{
 		std::string filename;
-
-#define ERR -1
-#define LOADING 0
-#define READY 1
-		char fileStatus = LOADING;
-
+		FileStatus fileStatus = FileStatus::LOADING;
 		std::thread loaderThread;
 
-		void (*parseFunction)(std::string filename, void** objectDestination, char* flag);
+		void (*parseFunction)(std::string filename, void** objectDestination, FileStatus* flag);
 
 		// Temporary storage for the parsed object.
 		void* objectData;
@@ -44,7 +40,7 @@ namespace fileio
 			b) if _parseFunction == nullptr, assigns objectDestination with the pointer
 		to the read file.
 		*****************************************************************************************/
-		inline void loadAndParseAsync(std::string _filename, void** _destination, void (*_parseFunction)(std::string filename, void** objectDestination, char* flag) = nullptr)
+		inline void loadAndParseAsync(std::string _filename, void** _destination, void (*_parseFunction)(std::string filename, void** objectDestination, FileStatus* flag) = nullptr)
 		{
 			if (exists(_destination))
 			{
@@ -82,7 +78,7 @@ namespace fileio
 		{
 			for (int i = 0; i < (int)fileRecords.size(); i++)
 			{
-				if (fileRecords[i]->fileStatus == READY)
+				if (fileRecords[i]->fileStatus == FileStatus::READY)
 				{
 					fileRecords[i]->loaderThread.join();
 					*fileRecords[i]->destination = fileRecords[i]->objectData;

@@ -2,6 +2,9 @@
 #ifndef PHYSICS_INTERSECTAABB_H
 #define PHYSICS_INTERSECTAABB_H
 
+#include "Physics/src/Colliders/Primitives.h"
+#include "Physics/src/Colliders/PrimitiveCollider.h"
+
 namespace physcs
 {
 	// TODO: calculate collisPoint.
@@ -162,21 +165,21 @@ namespace physcs
 			{
 				if (intersectAABB(collider1.blocks.data[i], collider2.blocks.data[j], collisPoint))
 				{
-					goto Intersection_Found;
+					return true;
 				}
 			}
 			for (unsigned int j = 0; j < amountOfSpheres2; j++)
 			{
 				if (intersectAABB(collider1.blocks.data[i], collider2.spheres.data[j], collisPoint))
 				{
-					goto Intersection_Found;
+					return true;
 				}
 			}
 			for (unsigned int j = 0; j < amountOfCylinders2; j++)
 			{
 				if (intersectAABB(collider1.blocks.data[i], collider2.cylinders.data[j], collisPoint))
 				{
-					goto Intersection_Found;
+					return true;
 				}
 			}
 		}
@@ -186,14 +189,14 @@ namespace physcs
 			{
 				if (intersectAABB(collider1.spheres.data[i], collider2.spheres.data[j], collisPoint))
 				{
-					goto Intersection_Found;
+					return true;
 				}
 			}
 			for (unsigned int j = 0; j < amountOfCylinders2; j++)
 			{
 				if (intersectAABB(collider1.spheres.data[i], collider2.cylinders.data[j], collisPoint))
 				{
-					goto Intersection_Found;
+					return true;
 				}
 			}
 		}
@@ -203,14 +206,12 @@ namespace physcs
 			{
 				if (intersectAABB(collider1.cylinders.data[i], collider2.cylinders.data[j], collisPoint))
 				{
-					goto Intersection_Found;
+					return true;
 				}
 			}
 		}
-		return false;
 
-		Intersection_Found:
-		return true;
+		return false;
 	}
 }
 

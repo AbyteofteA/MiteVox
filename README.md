@@ -61,32 +61,31 @@ The solution contains another project, that is not a part of the engine:
 - Binary files
 - Images: PNG
 - JSON
-- :warning: Audio files: MP3
-- :warning: Container formats: Ogg, ZIP
+- Audio files: :warning:MP3
+- Container formats: :warning:Ogg, :warning:ZIP
 ### Scripting
 - Native (C/C++)
 - :warning: Lua
 ### Math
 - Data structures: Buffer, Half-table
-- Linear algebra: Point3D, Vector3D, :warning: Matrices
+- Linear algebra: Point3D, Vector3D, :warning:Matrices
 - Numerical analysis:
   - Interpolation: Linear
 - Graphs:
-  - Trees:
-    - Binary search tree, :warning: Quad tree, :warning: Octree
-- Noise: :warning: Perlin, :warning: OpenSimplex
+  - Trees: Binary search tree, :warning:Quad tree, :warning:Octree
+- Noise: :warning:Perlin, :warning:OpenSimplex
 ### Renderer
 - Primitives: Point, Line, Triangle
 - :warning: Sprites
 - Skybox
 - Model3D (+ .obj parser)
 - Material:
-  - Texture maps: Albedo, Roughness, Metallic, :warning: Normal, :warning: Glow
+  - Texture maps: Albedo, Roughness, Metallic, :warning:Normal, :warning:Glow
   - :warning: .mtl parser
 - Camera:
   - :warning: Focal length
 - :warning: Multiple cameras
-- Lights: Ambient, Directional, Point light, :warning: Spot light
+- Lights: Ambient, Directional, Point light, :warning:Spot light
 - Multiple lights
 - :warning: PBR
 ### AIModels
@@ -108,8 +107,8 @@ The solution contains another project, that is not a part of the engine:
     - AABB intersection
     - :warning: SAT intersection
   - :warning: Mesh collider
-- Structures: Rigid body, :warning: Atoms
-- Classical mechanics: Kinematics, :warning: Dynamics, :warning: Statics
+- Structures: Rigid body, :warning:Atoms
+- Classical mechanics: Kinematics, :warning:Dynamics, :warning:Statics
 
 ## :bug: Known bugs & limitations
 - [X] ~~The project requires switching between release and debug via a flag~~.

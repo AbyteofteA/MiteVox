@@ -2,7 +2,7 @@
 #ifndef MITEVOX_ENGINE_H
 #define MITEVOX_ENGINE_H
 
-#include "MiteVox_Settings.h"
+#include "EngineSettings.h"
 
 #include <vector>
 #include <filesystem>
@@ -16,15 +16,12 @@ namespace mitevox
 	private:
 
 		InputHandler* inputHandler = nullptr;
-
 		std::vector<Scene*> scenes;
 
 	public:
 
 		long activeScene = -1;
-		
 		render::RendererSettings* renderer = nullptr;
-
 		EngineSettings settings;
 
 		Engine(int argc, char* argv[])
@@ -45,12 +42,8 @@ namespace mitevox
 
 			fileio::JSON* engineConfig = new fileio::JSON();
 			engineConfig->parseFile(settings.executionPath + "\\engine_config.json");
-
-			settings.debug = (int)engineConfig->getNumber("debug");
-			settings.resourcePath = fs::path(engineConfig->getString("resource_path")).string();
-			settings.configPath = fs::path(engineConfig->getString("config_path")).string();
-			settings.physicsPeriod = engineConfig->getNumber("physics_period");
-			settings.rendererPeriod = engineConfig->getNumber("renderer_period");
+			settings.fromJSON(engineConfig);
+			delete engineConfig;
 
 			renderer = new render::RendererSettings();
 			render::initRenderer(renderer);

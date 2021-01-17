@@ -20,7 +20,7 @@
 #define RIGIDBODY_COMPONENT 8
 #define TAG_COMPONENT 9
 
-#include "MiteVox_Settings.h"
+#include "EngineSettings.h"
 
 #include "callbacks/NativeScript_Callbacks.h"
 #include "callbacks/Model3D_Callbacks.h"

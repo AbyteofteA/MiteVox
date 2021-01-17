@@ -142,14 +142,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\ClassicalMechanics\Physics_Dynamics.h" />
-    <ClInclude Include="src\ClassicalMechanics\Physics_Kinematics.h" />
-    <ClInclude Include="src\Colliders\Physics_PrimitiveCollider.h" />
-    <ClInclude Include="src\Physics_Headers.h" />
-    <ClInclude Include="src\Colliders\Physics_intersectAABB.h" />
-    <ClInclude Include="src\Physics_MovementProps.h" />
-    <ClInclude Include="src\Colliders\Physics_Primitives.h" />
-    <ClInclude Include="src\Physics_RigidBody.h" />
+    <ClInclude Include="src\ClassicalMechanics\Dynamics.h" />
+    <ClInclude Include="src\ClassicalMechanics\Kinematics.h" />
+    <ClInclude Include="src\Colliders\PrimitiveCollider.h" />
+    <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\Colliders\intersectAABB.h" />
+    <ClInclude Include="src\MovementProps.h" />
+    <ClInclude Include="src\Colliders\Primitives.h" />
+    <ClInclude Include="src\RigidBody.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Math\Math.vcxproj">

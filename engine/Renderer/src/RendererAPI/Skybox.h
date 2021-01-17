@@ -2,7 +2,7 @@
 #ifndef RENDERER_SKYBOX_H
 #define RENDERER_SKYBOX_H
 
-#include "Renderer_Cubemap.h"
+#include "Cubemap.h"
 #include <string>
 
 namespace render

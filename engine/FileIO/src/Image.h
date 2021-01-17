@@ -24,10 +24,10 @@ namespace fileio
 	};
 
 
-	inline void loadImage(std::string filename, void** image, char* flag)
+	inline void loadImage(std::string filename, void** image, FileStatus* flag)
 	{
 		*image = nullptr;
-		*flag = 0;
+		*flag = FileStatus::LOADING;
 
 		Image* tmpImage = new Image();
 
@@ -36,7 +36,7 @@ namespace fileio
 
 		*image = (void*)tmpImage;
 
-		*flag = 1;
+		*flag = FileStatus::READY;
 		return;
 	}
 }

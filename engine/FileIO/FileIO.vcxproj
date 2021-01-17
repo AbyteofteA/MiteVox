@@ -151,12 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\FileIO_Headers.h" />
+    <ClInclude Include="src\FileIO.h" />
     <ClInclude Include="src\FileLoaderAsync.h" />
+    <ClInclude Include="src\FileStatus.h" />
     <ClInclude Include="src\Image.h" />
-    <ClInclude Include="src\JSON.h" />
+    <ClInclude Include="src\Formats\JSON.h" />
     <ClInclude Include="src\loadBytes.h" />
-    <ClInclude Include="src\OBJ.h" />
+    <ClInclude Include="src\Formats\OBJ.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FileLoaderAsync.cpp" />

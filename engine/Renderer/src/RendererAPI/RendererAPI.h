@@ -4,21 +4,21 @@
 
 #define HEXAGON_CONST 0.866025403
 
-#include "Math/src/Math_Headers.h"
-#include "FileIO/src/FileIO_Headers.h"
+#include "Math/src/Math.h"
+#include "FileIO/src/FileIO.h"
 
-#include "Renderer_Cubemap.h"
-#include "Renderer_ColorRGBA.h"
-#include "Renderer_Primitives.h"
-#include "Renderer_Skybox.h"
-#include "Renderer_Material.h"
-#include "Renderer_Camera.h"
-#include "Renderer_Mesh3D.h"
-#include "Renderer_Model3D.h"
+#include "Cubemap.h"
+#include "ColorRGBA.h"
+#include "Primitives.h"
+#include "Skybox.h"
+#include "Material.h"
+#include "Camera.h"
+#include "Mesh3D.h"
+#include "Model3D.h"
 #include "parseModel_OBJ.h"
-#include "Renderer_Light.h"
+#include "Light.h"
 #include "Effects.h"
-#include "Renderer_Settings.h"
+#include "RendererSettings.h"
 
 
 namespace render

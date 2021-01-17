@@ -99,9 +99,9 @@
     <ClInclude Include="src\callbacks\SpotLight_Callbacks.h" />
     <ClInclude Include="src\callbacks\Transform_Callbacks.h" />
     <ClInclude Include="src\MiteVox.h" />
-    <ClInclude Include="src\MiteVox_Engine.h" />
-    <ClInclude Include="src\MiteVox_Scene.h" />
-    <ClInclude Include="src\MiteVox_Settings.h" />
+    <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\EngineSettings.h" />
     <ClInclude Include="src\NativeScript.h" />
   </ItemGroup>
   <ItemGroup>

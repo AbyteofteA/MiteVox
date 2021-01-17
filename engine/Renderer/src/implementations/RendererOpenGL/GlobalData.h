@@ -2,7 +2,7 @@
 #ifndef PRIMITIVEFUNCTIONS_H
 #define PRIMITIVEFUNCTIONS_H
 
-#include "Renderer/src/RendererAPI/Renderer_API.h"
+#include "Renderer/src/RendererAPI/RendererAPI.h"
 
 
 #endif

@@ -19,19 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Graphs\Math_BinarySearchTree.cpp" />
+    <ClCompile Include="src\Graphs\BinarySearchTree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Calculus\Sequences.h" />
     <ClInclude Include="src\DataStructures\Buffer.h" />
     <ClInclude Include="src\Convertations.h" />
     <ClInclude Include="src\DataStructures\HalfTable.h" />
-    <ClInclude Include="src\Graphs\Math_BinarySearchTree.h" />
-    <ClInclude Include="src\LinearAlgebra\Math_Point3D.h" />
-    <ClInclude Include="src\LinearAlgebra\Math_Transform.h" />
-    <ClInclude Include="src\LinearAlgebra\Math_Vector3D.h" />
-    <ClInclude Include="src\Math_Headers.h" />
-    <ClInclude Include="src\NumericalAnalysis\Math_Intertolation.h" />
+    <ClInclude Include="src\Graphs\BinarySearchTree.h" />
+    <ClInclude Include="src\LinearAlgebra\Point3D.h" />
+    <ClInclude Include="src\LinearAlgebra\Transform.h" />
+    <ClInclude Include="src\LinearAlgebra\Vector3D.h" />
+    <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\NumericalAnalysis\Intertolation.h" />
     <ClInclude Include="src\RandomNumberGenerators\CongruentialGenerator.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

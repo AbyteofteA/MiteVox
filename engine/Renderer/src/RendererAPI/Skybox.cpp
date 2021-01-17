@@ -1,9 +1,9 @@
 
-#include "FileIO/src/FileIO_Headers.h"
+#include "FileIO/src/FileIO.h"
 #include <filesystem>
 namespace fs = std::filesystem;
 
-#include "Renderer_Skybox.h"
+#include "Skybox.h"
 
 namespace render
 {

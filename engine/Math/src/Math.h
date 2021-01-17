@@ -11,11 +11,11 @@
 #include "DataStructures/HalfTable.h"
 #include "Convertations.h"
 
-#include "LinearAlgebra/Math_Point3D.h"
-#include "LinearAlgebra/Math_Vector3D.h"
-#include "LinearAlgebra/Math_Transform.h"
+#include "LinearAlgebra/Point3D.h"
+#include "LinearAlgebra/Vector3D.h"
+#include "LinearAlgebra/Transform.h"
 
-#include "NumericalAnalysis/Math_Intertolation.h"
+#include "NumericalAnalysis/Intertolation.h"
 
 //#include "Graphs/Math_BinarySearchTree.h"
 #include "RandomNumberGenerators/CongruentialGenerator.h"

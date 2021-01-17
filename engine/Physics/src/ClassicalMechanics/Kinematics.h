@@ -2,7 +2,7 @@
 #ifndef PHYSICS_KINEMATICS_H
 #define PHYSICS_KINEMATICS_H
 
-#include "Physics/src/Physics_MovementProps.h"
+#include "Physics/src/MovementProps.h"
 
 namespace physcs
 {

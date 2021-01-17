@@ -1,5 +1,5 @@
 
-#include "Math_BinarySearchTree.h"
+#include "BinarySearchTree.h"
 
 namespace mathem
 {

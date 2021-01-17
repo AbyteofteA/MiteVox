@@ -2,6 +2,7 @@
 #ifndef LOADBYTES_H
 #define LOADBYTES_H
 
+#include "FileStatus.h"
 #include <string>
 
 namespace fileio
@@ -11,10 +12,10 @@ namespace fileio
 	Assignes the flag with 1 when the file is loaded.
 	\return Size of the file if success, -1 otherwise.
 	*****************************************************************************************/
-	inline void loadBytes(std::string filename, void** result, char* flag)
+	inline void loadBytes(std::string filename, void** result, FileStatus* flag)
 	{
 		*result = nullptr;
-		*flag = 0;
+		*flag = FileStatus::LOADING;
 		char* fileData = nullptr;
 
 		FILE* file;
@@ -23,7 +24,7 @@ namespace fileio
 		{
 			printf("\n ERROR! Cannot open the file.\n");
 			printf("File: %s\n", filename.c_str());
-			*flag = -1;
+			*flag = FileStatus::ERROR;
 			return;
 		}
 		else // read the file
@@ -48,7 +49,7 @@ namespace fileio
 			fclose(file);
 			(*result) = (void*)fileData;
 
-			*flag = 1;
+			*flag = FileStatus::READY;
 			return;
 		}
 	}

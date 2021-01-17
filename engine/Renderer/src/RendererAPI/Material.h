@@ -60,13 +60,13 @@ namespace render
 	Application: 
 	Description:
 	************************************************************************************/
-	inline void loadMaterial_MTL(std::string filename, void** material, char* flag)
+	inline void loadMaterial_MTL(std::string filename, void** material, fileio::FileStatus* flag)
 	{
 		*material = nullptr;
-		*flag = 0;
+		*flag = fileio::FileStatus::LOADING;
 		char* fileData = nullptr;
 
-		char tmpFlag = 0;
+		fileio::FileStatus tmpFlag = fileio::FileStatus::LOADING;
 		fileio::loadBytes(filename, (void**)&fileData, &tmpFlag);
 
 		//Material* materialTmp = new Material();
@@ -75,7 +75,7 @@ namespace render
 
 		free(fileData);
 		//(*material) = (void*)materialTmp;
-		*flag = 1;
+		*flag = fileio::FileStatus::READY;
 		return;
 	}
 }
