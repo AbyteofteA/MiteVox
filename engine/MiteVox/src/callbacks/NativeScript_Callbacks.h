@@ -20,13 +20,21 @@ void NativeScript_onCreate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COM
 	}
 }
 
-void NativeScript_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
+void NativeScript_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
-	NativeScript_ECS* script =
-		(NativeScript_ECS*)_ecs->getComponent(entityID, NATIVE_SCRIPT_COMPONENT);
-	if (script->onUpdate)
+	for (COMPONENT_TYPE entityIndex = 0;
+		entityIndex < _ecs->componentManagers[_managerIndex].amountOfInstances;
+		entityIndex++)
 	{
-		script->onUpdate(_ecs, _managerIndex, entityID, data);
+		COMPONENT_TYPE entityID =
+			_ecs->componentManagers[_managerIndex].componentToID[entityIndex];
+
+		NativeScript_ECS* script =
+			(NativeScript_ECS*)_ecs->getComponent(entityID, NATIVE_SCRIPT_COMPONENT);
+		if (script->onUpdate)
+		{
+			script->onUpdate(_ecs, _managerIndex, entityID, data);
+		}
 	}
 }
 

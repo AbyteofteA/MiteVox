@@ -343,7 +343,7 @@ namespace ecs
 		COMPONENT_TYPE componentIDs = 0;
 
 		void (*onCreate[MAX_COMPONENTS])(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = { nullptr };
-		void (*onUpdate[MAX_COMPONENTS])(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = { nullptr };
+		void (*onUpdateAll[MAX_COMPONENTS])(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data) = { nullptr };
 		void (*onDestroy[MAX_COMPONENTS])(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = { nullptr };
 
 		Entity* entities = nullptr;
@@ -371,7 +371,7 @@ namespace ecs
 			for (MANAGER_INDEX_TYPE i = 0; i < MAX_COMPONENTS; i++)
 			{
 				onCreate[i] = nullptr;
-				onUpdate[i] = nullptr;
+				onUpdateAll[i] = nullptr;
 				onDestroy[i] = nullptr;
 			}
 			reserveEntities(amount);
@@ -526,7 +526,7 @@ namespace ecs
 		template <typename T>
 		MANAGER_INDEX_TYPE registerComponent(std::string name,
 			void (*_onCreate)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = nullptr,
-			void (*_onUpdate)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = nullptr,
+			void (*_onUpdateAll)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data) = nullptr,
 			void (*_onDestroy)(ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index) = nullptr)
 		{
 			if (componentIDs == (~(COMPONENT_TYPE)0))
@@ -549,7 +549,7 @@ namespace ecs
 
 			componentManagers[managerIndex].init(name, sizeof(T));
 			onCreate[managerIndex] = _onCreate;
-			onUpdate[managerIndex] = _onUpdate;
+			onUpdateAll[managerIndex] = _onUpdateAll;
 			onDestroy[managerIndex] = _onDestroy;
 
 			return managerIndex;
@@ -568,7 +568,7 @@ namespace ecs
 
 				componentManagers[managerIndex].wipe();
 				onCreate[managerIndex] = nullptr;
-				onUpdate[managerIndex] = nullptr;
+				onUpdateAll[managerIndex] = nullptr;
 				onDestroy[managerIndex] = nullptr;
 
 				return true;
@@ -683,14 +683,7 @@ namespace ecs
 
 		void updateComponent(MANAGER_INDEX_TYPE componentIndex, void* data)
 		{
-			for (COMPONENT_TYPE c = 0; c < componentManagers[componentIndex].amountOfInstances; c++)
-			{
-				if (onUpdate[componentIndex])
-				{
-					onUpdate[componentIndex](
-						this, componentIndex, componentManagers[componentIndex].componentToID[c], data, c);
-				}
-			}
+			onUpdateAll[componentIndex](this, componentIndex, data);
 		}
 	};
 }

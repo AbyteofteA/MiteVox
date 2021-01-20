@@ -2,52 +2,60 @@
 #ifndef SPOTLIGHT_CALLBACKS_H
 #define SPOTLIGHT_CALLBACKS_H
 
-void SpotLight_onUpdate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
+void SpotLight_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
-	unsigned int shaderIndex = 0;
-	if (!render::shaders[shaderIndex]->use())
-		return;
+	for (COMPONENT_TYPE entityIndex = 0;
+		entityIndex < _ecs->componentManagers[_managerIndex].amountOfInstances;
+		entityIndex++)
+	{
+		COMPONENT_TYPE entityID =
+			_ecs->componentManagers[_managerIndex].componentToID[entityIndex];
 
-	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
+		unsigned int shaderIndex = 0;
+		if (!render::shaders[shaderIndex]->use())
+			return;
 
-	render::SpotLight* spotLight =
-		(render::SpotLight*)_ecs->getComponent(entityID, SPOTLIGHT_COMPONENT);
-	render::shaders[shaderIndex]->setInt("amountOfSpotLights", index + 1);
+		mathem::Transform* transform =
+			(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
 
-	std::string spotLights = "spotLights[";
-	std::string indexStr = std::to_string(index);
-	std::string pos = "].pos";
-	std::string direction = "].direction";
-	std::string angle = "].angle";
-	std::string color = "].color";
-	std::string constant = "].constant";
-	std::string linear = "].linear";
-	std::string quadratic = "].quadratic";
+		render::SpotLight* spotLight =
+			(render::SpotLight*)_ecs->getComponent(entityID, SPOTLIGHT_COMPONENT);
+		render::shaders[shaderIndex]->setInt("amountOfSpotLights", entityIndex + 1);
 
-	std::string posResult = spotLights + indexStr + pos;
-	std::string directionResult = spotLights + indexStr + direction;
-	std::string angleResult = spotLights + indexStr + angle;
-	std::string colorResult = spotLights + indexStr + color;
-	std::string constantResult = spotLights + indexStr + constant;
-	std::string linearResult = spotLights + indexStr + linear;
-	std::string quadraticResult = spotLights + indexStr + quadratic;
+		std::string spotLights = "spotLights[";
+		std::string indexStr = std::to_string(entityIndex);
+		std::string pos = "].pos";
+		std::string direction = "].direction";
+		std::string angle = "].angle";
+		std::string color = "].color";
+		std::string constant = "].constant";
+		std::string linear = "].linear";
+		std::string quadratic = "].quadratic";
 
-	glm::vec3 tmpPos;
-	
-	tmpPos.x = spotLight->position.x + transform->x;
-	tmpPos.y = spotLight->position.y + transform->y;
-	tmpPos.z = spotLight->position.z + transform->z;
-	render::shaders[shaderIndex]->setVec3(posResult.c_str(), tmpPos.x, tmpPos.y, tmpPos.z);
-	render::shaders[shaderIndex]->setVec3(directionResult.c_str(),
-		spotLight->direction.i, spotLight->direction.j, spotLight->direction.k);
-	render::shaders[shaderIndex]->setFloat(angleResult.c_str(), spotLight->angle);
+		std::string posResult = spotLights + indexStr + pos;
+		std::string directionResult = spotLights + indexStr + direction;
+		std::string angleResult = spotLights + indexStr + angle;
+		std::string colorResult = spotLights + indexStr + color;
+		std::string constantResult = spotLights + indexStr + constant;
+		std::string linearResult = spotLights + indexStr + linear;
+		std::string quadraticResult = spotLights + indexStr + quadratic;
 
-	render::shaders[shaderIndex]->setVec3(colorResult.c_str(), spotLight->color.r, spotLight->color.g, spotLight->color.b);
+		glm::vec3 tmpPos;
 
-	render::shaders[shaderIndex]->setFloat(constantResult.c_str(), spotLight->constant);
-	render::shaders[shaderIndex]->setFloat(linearResult.c_str(), spotLight->linear);
-	render::shaders[shaderIndex]->setFloat(quadraticResult.c_str(), spotLight->quadratic);
+		tmpPos.x = spotLight->position.x + transform->x;
+		tmpPos.y = spotLight->position.y + transform->y;
+		tmpPos.z = spotLight->position.z + transform->z;
+		render::shaders[shaderIndex]->setVec3(posResult.c_str(), tmpPos.x, tmpPos.y, tmpPos.z);
+		render::shaders[shaderIndex]->setVec3(directionResult.c_str(),
+			spotLight->direction.i, spotLight->direction.j, spotLight->direction.k);
+		render::shaders[shaderIndex]->setFloat(angleResult.c_str(), spotLight->angle);
+
+		render::shaders[shaderIndex]->setVec3(colorResult.c_str(), spotLight->color.r, spotLight->color.g, spotLight->color.b);
+
+		render::shaders[shaderIndex]->setFloat(constantResult.c_str(), spotLight->constant);
+		render::shaders[shaderIndex]->setFloat(linearResult.c_str(), spotLight->linear);
+		render::shaders[shaderIndex]->setFloat(quadraticResult.c_str(), spotLight->quadratic);
+	}
 }
 
 void SpotLight_onDelete(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)

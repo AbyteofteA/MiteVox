@@ -105,16 +105,16 @@ namespace mitevox
 			Camera_Component = ECS->registerComponent<render::Camera>("Camera");
 
 			Model3D_Component = ECS->registerComponent<render::Model3D>(
-				"Model3D", Model3D_onCreate, Model3D_onUpdate, Model3D_onDestroy);
+				"Model3D", Model3D_onCreate, Model3D_onUpdateAll, Model3D_onDestroy);
 
 			PointLight_Component = ECS->registerComponent<render::PointLight>(
-				"PointLight", nullptr, PointLight_onUpdate, PointLight_onDelete);
+				"PointLight", nullptr, PointLight_onUpdateAll, PointLight_onDelete);
 
 			DirectedLight_Component = ECS->registerComponent<render::DirectedLight>(
-				"DirectedLight", nullptr, DirectedLight_onUpdate, DirectedLight_onDelete);
+				"DirectedLight", nullptr, DirectedLight_onUpdateAll, DirectedLight_onDelete);
 
 			SpotLight_Component = ECS->registerComponent<render::SpotLight>(
-				"SpotLight", nullptr, SpotLight_onUpdate, SpotLight_onDelete);
+				"SpotLight", nullptr, SpotLight_onUpdateAll, SpotLight_onDelete);
 
 			// Math components
 
@@ -124,7 +124,7 @@ namespace mitevox
 			// Script components
 
 			NativeScript_Component = ECS->registerComponent<NativeScript_ECS>(
-				"NativeScript_ECS", NativeScript_onCreate, NativeScript_onUpdate, NativeScript_onDestroy);
+				"NativeScript_ECS", NativeScript_onCreate, NativeScript_onUpdateAll, NativeScript_onDestroy);
 
 			// Physics components
 
