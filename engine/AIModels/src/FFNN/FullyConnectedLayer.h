@@ -73,6 +73,9 @@ namespace aimods
 			free(weights);
 			outputs = nullptr;
 			weights = nullptr;
+			size = 0;
+			prevSize = 0;
+			weightsSize = 0;
 		}
 
 		inline void setOutputs(T* values)
@@ -91,11 +94,10 @@ namespace aimods
 		}
 
 		/// <summary>
-		/// Calculates weighted sum taking outputs from the prevLayer as inputs, 
-		/// then stores the results in outputs of this layer.
+		/// Calculates weighted sum, then stores the results in outputs.
 		/// </summary>
-		/// <param name="prevLayer"> - pointer to the previous layer</param>
-		inline void weighSum(FullyConnectedLayer<T>* prevLayer)
+		/// <param name="inputs"> - array, must be of size "prevSize"</param>
+		inline void weighSum(T* inputs)
 		{
 			for (size_t i = 0; i < size; i++)
 			{
@@ -104,7 +106,7 @@ namespace aimods
 
 				for (size_t j = 0; j < prevSize; j++)
 				{
-					sum += prevLayer->outputs[j] * weights[j + weightsOffset];
+					sum += inputs[j] * weights[j + weightsOffset];
 				}
 				sum -= thresholds[i];
 				outputs[i] = sum;
@@ -113,7 +115,7 @@ namespace aimods
 
 		/// <summary>
 		/// Applies activation function to weighted sum stored in outputs (therefore
-		/// weighSum(prevLayer) must be called first), then stores the results in outputs.
+		/// weighSum(inputs) must be called first), then stores the results in outputs.
 		/// </summary>
 		inline void computeOutput()
 		{
@@ -124,12 +126,12 @@ namespace aimods
 		}
 
 		/// <summary>
-		/// Propagates signals taking outputs from the prevLayer as inputs.
+		/// Propagates signals through the layer, then stores the results in outputs.
 		/// </summary>
-		/// <param name="prevLayer"> - pointer to the previous layer</param>
-		inline void propagate(FullyConnectedLayer<T>* prevLayer)
+		/// <param name="inputs"> - array, must be of size "prevSize"</param>
+		inline void propagate(T* inputs)
 		{
-			weighSum(prevLayer);
+			weighSum(inputs);
 			computeOutput();
 		}
 	};

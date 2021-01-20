@@ -10,6 +10,7 @@
 
 // FFNN
 #include "AIModels/src/FFNN/FullyConnectedLayer.h"
+#include "AIModels/src/FFNN/SoftmaxLayer.h"
 
 // CNN
 #include "AIModels/src/FFNN/CNN/ConvolutionalLayer.h"

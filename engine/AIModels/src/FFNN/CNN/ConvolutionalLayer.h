@@ -10,6 +10,7 @@ namespace aimods
 	template <typename T>
 	class ConvolutionalLayer
 	{
+
 	public:
 
 		unsigned int amountOfInputs = 0;
