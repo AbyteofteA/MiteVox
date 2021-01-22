@@ -8,7 +8,7 @@
 #include "FileIO/src/FileIO.h"
 
 #include "Cubemap.h"
-#include "ColorRGBA.h"
+#include "Color.h"
 #include "Primitives.h"
 #include "Skybox.h"
 #include "Material.h"
@@ -32,6 +32,10 @@ namespace render
 
 	inline int initRenderer(RendererSettings* renderer);
 	inline void closeRenderer(RendererSettings* renderer);
+	inline std::string getVendorName();
+	inline std::string getRendererName();
+	inline std::string getVersion();
+	inline std::string getLanguageVersion();
 
 	// Shaders
 
@@ -48,7 +52,7 @@ namespace render
 
 	// Buffers
 
-	inline void clearBufferXY(float R, float G, float B);
+	inline void clearBufferXY(ColorRGBf color);
 	inline void clearBufferZ();
 	inline void display(RendererSettings* renderer);
 
@@ -72,6 +76,8 @@ namespace render
 	void removeModel3D(Model3D* model3D);
 	void renderModel3D(Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
 	
+	void renderWireframe(Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
+
 	inline void uploadSkybox(Skybox* skybox);
 	inline void selectSkybox(Skybox* skybox);
 	inline void removeSkybox(Skybox* skybox);

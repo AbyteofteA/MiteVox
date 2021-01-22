@@ -1,9 +1,23 @@
 
-#ifndef RENDERER_COLORRGBA_H
-#define RENDERER_COLORRGBA_H
+#ifndef RENDERER_COLOR_H
+#define RENDERER_COLOR_H
 
 namespace render
 {
+	struct ColorRGB
+	{
+		unsigned char r;
+		unsigned char g;
+		unsigned char b;
+	};
+
+	struct ColorRGBf
+	{
+		float r;
+		float g;
+		float b;
+	};
+
 	struct ColorRGBA
 	{
 		unsigned char r;

@@ -13,10 +13,6 @@ namespace render
 			return -1;
 		}
 
-		renderer->screenWidth = SCREEN_WIDTH;
-		renderer->screenHeight = SCREEN_HEIGHT;
-		renderer->backfaceCulling = 1;
-
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
@@ -52,6 +48,9 @@ namespace render
 			fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		}
 
+		
+
+
 		glEnable(GL_MULTISAMPLE);
 		glClearColor((GLclampf)0.05, (GLclampf)0.05, (GLclampf)0.05, (GLclampf)1);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -77,13 +76,34 @@ namespace render
 
 		return 1;
 	}
-
-	void clearBufferXY(float R = 0.f, float G = 0.f, float B = 0.f)
+	void closeRenderer(RendererSettings* renderer)
 	{
-		glClearColor(R, G, B, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glfwWindowShouldClose(renderer->getWindow());
+		glfwTerminate();
 	}
 
+	inline std::string getVendorName()
+	{
+		return std::string((const char*)glGetString(GL_VENDOR));
+	}
+	inline std::string getRendererName()
+	{
+		return std::string((const char*)glGetString(GL_RENDERER));
+	}
+	inline std::string getVersion()
+	{
+		return std::string((const char*)glGetString(GL_VERSION));
+	}
+	inline std::string getLanguageVersion()
+	{
+		return std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+	}
+
+	void clearBufferXY(ColorRGBf color = { 0 })
+	{
+		glClearColor(color.r, color.g, color.b, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
 	void clearBufferZ()
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -93,12 +113,6 @@ namespace render
 	{
 		glfwSwapInterval(1);
 		glfwSwapBuffers(renderer->getWindow());
-	}
-
-	void closeRenderer(RendererSettings* renderer)
-	{
-		glfwWindowShouldClose(renderer->getWindow());
-		delete renderer;
 	}
 }
 

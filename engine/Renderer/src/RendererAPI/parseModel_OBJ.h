@@ -6,7 +6,7 @@
 #include "FileIO/src/FileIO.h"
 #include "Math/src/Math.h"
 
-#include "ColorRGBA.h"
+#include "Color.h"
 #include "Mesh3D.h"
 
 namespace render

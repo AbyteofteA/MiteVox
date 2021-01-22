@@ -30,7 +30,7 @@
     <ClInclude Include="src\RendererAPI\parseModel_OBJ.h" />
     <ClInclude Include="src\RendererAPI\RendererAPI.h" />
     <ClInclude Include="src\RendererAPI\Camera.h" />
-    <ClInclude Include="src\RendererAPI\ColorRGBA.h" />
+    <ClInclude Include="src\RendererAPI\Color.h" />
     <ClInclude Include="src\RendererAPI\Cubemap.h" />
     <ClInclude Include="src\RendererAPI\Light.h" />
     <ClInclude Include="src\RendererAPI\Material.h" />
