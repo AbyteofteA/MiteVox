@@ -7,11 +7,28 @@ namespace mathem
 
 	struct Point3D
 	{
-		float x = 0;
-		float y = 0;
-		float z = 0;
-	};
+		float x = 0.f;
+		float y = 0.f;
+		float z = 0.f;
 
+		inline int compareWith(const Point3D& other)
+		{
+			int result = 0;
+			if (x > other.x)
+			{
+				result += 1;
+			}
+			if (y > other.y)
+			{
+				result += 2;
+			}
+			if (z > other.z)
+			{
+				result += 4;
+			}
+			return result;
+		}
+	};
 
 	//===================================//
    //		Point3D transformations		//

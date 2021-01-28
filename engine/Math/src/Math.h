@@ -9,6 +9,7 @@
 
 #include "DataStructures/Buffer.h"
 #include "DataStructures/HalfTable.h"
+#include "DataStructures/UniqueIDGenerator.h"
 #include "Convertations.h"
 
 #include "LinearAlgebra/Point3D.h"
