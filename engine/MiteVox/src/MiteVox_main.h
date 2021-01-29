@@ -5,9 +5,9 @@ int main(int argc, char* argv[])
 {
 	mitevox::Engine* MiteVox = new mitevox::Engine(argc, argv);
 	
-	while (!glfwWindowShouldClose(MiteVox->renderer->getWindow()))
+	while (!glfwWindowShouldClose(MiteVox->settings->renderer->getWindow()))
 	{
-		GLFWwindow* window = MiteVox->renderer->getWindow();
+		GLFWwindow* window = MiteVox->settings->renderer->getWindow();
 		glfwPollEvents();
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		{
@@ -19,8 +19,6 @@ int main(int argc, char* argv[])
 
 		MiteVox->update();
 	}
-	glfwTerminate();
-
 	delete MiteVox;
 
 	return 0;

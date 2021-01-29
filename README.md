@@ -51,62 +51,62 @@ The solution contains another project, that is not a part of the engine:
 - engine_config.json
 ### MiteVox
 - Scene
-  - :warning: Serialization via JSON
+- Scene serialization: :warning:JSON, :warning:CBOR
 ### ECSManager
 - Entity Component System
 - Prefabs
-- :warning: Hierarchy
+- :warning:Hierarchy
 ### FileIO
 - Asynchronous file loader & parser
-- Binary files
-- Images: PNG
-- JSON
+- Graphics: PNG, OBJ, :warning:MTL
+- Data interchange formats: JSON, :warning:CBOR
 - Audio files: :warning:MP3
 - Container formats: :warning:Ogg, :warning:ZIP
 ### Scripting
-- Native (C/C++)
-- :warning: Lua
+- Native (C++)
+- :warning:Lua
 ### Math
 - Data structures: Buffer, Half-table
 - Linear algebra: Point3D, Vector3D, :warning:Matrices
 - Numerical analysis:
   - Interpolation: Linear
 - Graphs:
-  - Trees: Binary search tree, :warning:Quad tree, :warning:Octree
+  - Trees: Binary search tree, Octree, :warning:Quad tree
 - Noise: :warning:Perlin, :warning:OpenSimplex
 ### Renderer
 - Primitives: Point, Line, Triangle
-- :warning: Sprites
+- :warning:Sprites
 - Skybox
-- Model3D (+ .obj parser)
+- Model3D
 - Material:
   - Texture maps: Albedo, Roughness, Metallic, :warning:Normal, :warning:Glow
-  - :warning: .mtl parser
+  - :warning:.mtl parser
 - Camera:
-  - :warning: Focal length
-- :warning: Multiple cameras
+  - :warning:Focal length
+- :warning:Multiple cameras
 - Lights: Ambient, Directional, Point light, :warning:Spot light
 - Multiple lights
-- :warning: PBR
+- :warning:PBR
 ### AIModels
 - ML-models:
-  - FFNN (Feedforward Neural Networks)
+  - Feedforward Neural Networks
     - FullyConnectedLayer
     - Backpropagation for FullyConnectedLayer
     - ConvolutionalLayer
-    - :warning: Backpropagation for ConvolutionalLayer
-  - RNN (Recurrent Neural Networks)
+    - :warning:Backpropagation for ConvolutionalLayer
+    - SoftmaxLayer
+  - Recurrent Neural Networks
     - HopfieldNetwork
-  - :warning: NeuralNetwork (class that joins different types of NNs)
+  - :warning:NeuralNetwork (class that joins different types of NNs)
 - Pathfinding:
-  - :warning: A*
-- :warning: StateMachine
+  - :warning:A*
+- :warning:StateMachine
 ### Physics
 - Colliders:
   - Primitive collider
     - AABB intersection
-    - :warning: SAT intersection
-  - :warning: Mesh collider
+    - :warning:SAT intersection
+  - :warning:Mesh collider
 - Structures: Rigid body, :warning:Atoms
 - Classical mechanics: Kinematics, :warning:Dynamics, :warning:Statics
 

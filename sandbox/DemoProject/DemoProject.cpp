@@ -25,17 +25,17 @@ void mitevox::Engine::onCreate()
 
 	// Compile shaders.
 
-	std::string shadersDir = settings.resourcePath + "/shaders";
+	std::string shadersDir = settings->resourceDir + "/shaders";
 	basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
 	skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
 	primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
 
-	this->renderer->primitiveShaderID = primitiveShader;
+	this->settings->renderer->primitiveShaderID = primitiveShader;
 
 	// Create 3D-model object.
 
 	render::Mesh3D* mCube = nullptr;
-	std::string cubeDir = settings.resourcePath + "/assets/cube.obj";
+	std::string cubeDir = settings->resourceDir + "/assets/cube.obj";
 	fileio::fileLoader.loadAndParseAsync(cubeDir, (void**)&mCube, render::parseModel_OBJ);
 
 	// Load images (textures).
@@ -48,7 +48,7 @@ void mitevox::Engine::onCreate()
 	fileio::Image* UVchecker1 = nullptr;
 	fileio::Image* SPECchecker0 = nullptr;
 
-	std::string texturesDir = settings.resourcePath + "/assets/textures";
+	std::string texturesDir = settings->resourceDir + "/assets/textures";
 	fileio::fileLoader.loadAndParseAsync(
 		texturesDir + "/UVchecker0.png", (void**)&UVchecker0, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
@@ -201,19 +201,19 @@ void mitevox::Engine::onUpdate()
 	render::Point point7 = { {-cubeSize, -cubeSize, cubeSize}, grey };
 	render::Point point8 = { {-cubeSize, cubeSize, cubeSize}, grey };
 
-	render::drawLine(this->renderer, point1, point2);
-	render::drawLine(this->renderer, point2, point3);
-	render::drawLine(this->renderer, point3, point4);
-	render::drawLine(this->renderer, point4, point5);
-	render::drawLine(this->renderer, point5, point6);
-	render::drawLine(this->renderer, point6, point7);
-	render::drawLine(this->renderer, point7, point8);
-	render::drawLine(this->renderer, point8, point1);
+	render::drawLine(this->settings->renderer, point1, point2);
+	render::drawLine(this->settings->renderer, point2, point3);
+	render::drawLine(this->settings->renderer, point3, point4);
+	render::drawLine(this->settings->renderer, point4, point5);
+	render::drawLine(this->settings->renderer, point5, point6);
+	render::drawLine(this->settings->renderer, point6, point7);
+	render::drawLine(this->settings->renderer, point7, point8);
+	render::drawLine(this->settings->renderer, point8, point1);
 
-	render::drawLine(this->renderer, point1, point4);
-	render::drawLine(this->renderer, point3, point6);
-	render::drawLine(this->renderer, point5, point8);
-	render::drawLine(this->renderer, point2, point7);
+	render::drawLine(this->settings->renderer, point1, point4);
+	render::drawLine(this->settings->renderer, point3, point6);
+	render::drawLine(this->settings->renderer, point5, point8);
+	render::drawLine(this->settings->renderer, point2, point7);
 }
 
 void mitevox::Engine::onDestroy() {}

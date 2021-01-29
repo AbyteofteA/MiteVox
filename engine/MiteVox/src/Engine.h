@@ -21,8 +21,7 @@ namespace mitevox
 	public:
 
 		long activeScene = -1;
-		render::RendererSettings* renderer = nullptr;
-		EngineSettings settings;
+		EngineSettings* settings;
 
 		Engine(int argc, char* argv[])
 		{
@@ -33,22 +32,15 @@ namespace mitevox
 		{
 			onDestroy();
 			wipe();
+			delete settings;
 		}
 
 		void init(int argc, char* argv[])
 		{
-			fs::path currentPath = fs::path(argv[0]);
-			settings.executionPath = currentPath.parent_path().string();
+			std::string executionDir = fs::path(argv[0]).parent_path().string();
+			settings = new EngineSettings(executionDir);
 
-			fileio::JSON* engineConfig = new fileio::JSON();
-			engineConfig->parseFile(settings.executionPath + "\\engine_config.json");
-			settings.fromJSON(engineConfig);
-			delete engineConfig;
-
-			renderer = new render::RendererSettings();
-			render::initRenderer(renderer);
-
-			inputHandler = new InputHandler(renderer->getWindow());
+			inputHandler = new InputHandler(settings->renderer->getWindow());
 			inputHandler->attach();
 			inputHandler->update();
 		}
@@ -59,7 +51,7 @@ namespace mitevox
 				scene->wipe();
 			}
 			delete inputHandler;
-			render::closeRenderer(renderer);
+			
 		}
 
 		void onCreate();
@@ -71,7 +63,7 @@ namespace mitevox
 			long index = scenes.size();
 			scenes.push_back(new Scene());
 			scenes[index]->name = name;
-			scenes[index]->renderer = renderer;
+			scenes[index]->renderer = settings->renderer;
 			scenes[index]->inputHandler = inputHandler;
 
 			return index;

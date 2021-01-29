@@ -77,6 +77,7 @@ namespace mitevox
 		// Time points.
 
 		std::chrono::high_resolution_clock::time_point prevCycleTime;
+		std::chrono::high_resolution_clock::time_point cleanupTime;
 		std::chrono::high_resolution_clock::time_point physicsTime;
 		std::chrono::high_resolution_clock::time_point rendererTime;
 		std::chrono::high_resolution_clock::time_point now;
@@ -140,6 +141,7 @@ namespace mitevox
 
 			prevCycleTime = std::chrono::high_resolution_clock::now();
 			now = std::chrono::high_resolution_clock::now();
+			cleanupTime = std::chrono::high_resolution_clock::now();
 			physicsTime = std::chrono::high_resolution_clock::now();
 			rendererTime = std::chrono::high_resolution_clock::now();
 		}
@@ -148,7 +150,7 @@ namespace mitevox
 			ECS->wipe();
 		}
 
-		void update(EngineSettings settings)
+		void update(EngineSettings* settings)
 		{
 			now = std::chrono::high_resolution_clock::now();
 			dt = std::chrono::duration_cast<std::chrono::duration<double>>(now - prevCycleTime).count();
@@ -158,10 +160,18 @@ namespace mitevox
 			// Execute scripts
 			ECS->updateComponent(NativeScript_Component, (void*)this);
 
+			// Cleanup
+			now = std::chrono::high_resolution_clock::now();
+			tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - cleanupTime).count();
+			if (tmpTime > settings->cleanupPeriod)
+			{
+				cleanupTime = std::chrono::high_resolution_clock::now();
+			}
+
 			// Physics and Transform
 			now = std::chrono::high_resolution_clock::now();
 			tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - physicsTime).count();
-			if (tmpTime > settings.physicsPeriod)
+			if (tmpTime > settings->physicsPeriod)
 			{
 				physicsTime = std::chrono::high_resolution_clock::now();
 			}
@@ -169,9 +179,10 @@ namespace mitevox
 			// Renderer
 			now = std::chrono::high_resolution_clock::now();
 			tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - rendererTime).count();
-			if (tmpTime > settings.rendererPeriod)
+			if (tmpTime > settings->rendererPeriod)
 			{
-				render::clearBufferXY(0.05f, 0.05f, 0.05f);
+				render::ColorRGBf clearColor = { 0.05f, 0.05f, 0.05f };
+				render::clearBufferXY(clearColor);
 				render::clearBufferZ();
 
 				// Update lights.
@@ -184,9 +195,9 @@ namespace mitevox
 
 				// Render primitives.
 				render::Camera* camera =
-					(render::Camera*)ECS->getComponent(this->activeCamera, CAMERA_COMPONENT);
+					(render::Camera*)ECS->getComponent(this->activeCamera, Camera_Component);
 				mathem::Transform* cameraTransform =
-					(mathem::Transform*)ECS->getComponent(this->activeCamera, TRANSFORM_COMPONENT);
+					(mathem::Transform*)ECS->getComponent(this->activeCamera, Transform_Component);
 
 				render::renderPoints(renderer, camera, cameraTransform);
 				render::renderLines(renderer, camera, cameraTransform);
