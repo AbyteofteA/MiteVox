@@ -28,9 +28,22 @@ namespace mathem
 				return tmpID;
 			}
 		}
+
 		void returnID(T ID)
 		{
-			returnedIDs.push(ID);
+			if (ID <= maxID)
+			{
+				returnedIDs.push(ID);
+			}
+		}
+
+		void reset()
+		{
+			maxID = 0;
+			while (!returnedIDs.empty())
+			{
+				returnedIDs.pop();
+			}
 		}
 	};
 }

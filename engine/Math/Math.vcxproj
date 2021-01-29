@@ -28,6 +28,7 @@
     <ClInclude Include="src\DataStructures\HalfTable.h" />
     <ClInclude Include="src\DataStructures\UniqueIDGenerator.h" />
     <ClInclude Include="src\Graphs\BinarySearchTree.h" />
+    <ClInclude Include="src\Graphs\Octree.h" />
     <ClInclude Include="src\LinearAlgebra\Point3D.h" />
     <ClInclude Include="src\LinearAlgebra\Transform.h" />
     <ClInclude Include="src\LinearAlgebra\Vector3D.h" />

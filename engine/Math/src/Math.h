@@ -19,6 +19,8 @@
 #include "NumericalAnalysis/Intertolation.h"
 
 //#include "Graphs/Math_BinarySearchTree.h"
+#include "Graphs/Octree.h"
+
 #include "RandomNumberGenerators/CongruentialGenerator.h"
 
 #endif
