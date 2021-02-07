@@ -343,14 +343,13 @@ namespace mathem
 
 		OctreeNode<T>* getNearestNode(mathem::Point3D point)
 		{
-			if (isLeaf)
+			if (origin->isLeaf)
 			{
 				return this;
-				dataPoints.push_back(point);
 			}
 			else
 			{
-				return suggestSubnode(point)->getNearestNode(point);
+				return origin->suggestSubnode(point)->getNearestNode(point);
 			}
 		}
 

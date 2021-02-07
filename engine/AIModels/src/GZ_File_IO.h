@@ -6,7 +6,7 @@
 /*-----------------------------------------------------------------------------------
 	GZ(.gz) LABEL file structure:
 -------------------------------------------------------------------------------------
-		bytes		|		type		|			description
+		bytes		|		paddingType		|			description
 --------------------+-------------------+--------------------------------------------
 		  4			|		int			|	magic number (2049)
 		  4			|		int			|	number of items
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------------
 	GZ(.gz) IMAGE file structure:
 -------------------------------------------------------------------------------------
-		bytes		|		type		|			description
+		bytes		|		paddingType		|			description
 --------------------+-------------------+--------------------------------------------
 		  4			|		int			|	magic number (2051)
 		  4			|		int			|	number of images
@@ -30,10 +30,10 @@
 /*-----------------------------------------------------------------------------------
 	"IDX" file structure :
 -------------------------------------------------------------------------------------
-		bytes		|		type		|			description
+		bytes		|		paddingType		|			description
 --------------------+-------------------+--------------------------------------------
 		  2			|	unsigned byte	|	(zeros)
-		  1			|	unsigned byte	|	X = the type of the data
+		  1			|	unsigned byte	|	X = the paddingType of the data
 		  1			|	unsigned byte	|	N = the number of dimensions
 		  4			|		int			|	size in dimension 0
 		  4			|		int			|	size in dimension 1

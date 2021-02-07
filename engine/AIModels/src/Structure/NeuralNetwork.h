@@ -4,7 +4,11 @@
 
 namespace aimods
 {
+	template <typename T>
+	class NeuralNetwork
+	{
 
+	};
 }
 
 #endif

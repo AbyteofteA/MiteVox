@@ -16,15 +16,6 @@ namespace aimods
 
 		SoftmaxLayer(size_t _size)
 		{
-			init(_size);
-		}
-		~SoftmaxLayer()
-		{
-			wipe();
-		}
-
-		inline void init(size_t _size)
-		{
 			size = _size;
 			sizeInBytes = sizeof(T) * size;
 
@@ -33,17 +24,10 @@ namespace aimods
 				outputs = (T*)realloc(outputs, sizeInBytes);
 				resetOutputs();
 			}
-			else
-			{
-				wipe();
-			}
 		}
-		inline void wipe()
+		~SoftmaxLayer()
 		{
 			free(outputs);
-			outputs = nullptr;
-			size = 0;
-			sizeInBytes = 0;
 		}
 
 		inline void resetOutputs()

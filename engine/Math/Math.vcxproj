@@ -26,6 +26,7 @@
     <ClInclude Include="src\DataStructures\Buffer.h" />
     <ClInclude Include="src\Convertations.h" />
     <ClInclude Include="src\DataStructures\HalfTable.h" />
+    <ClInclude Include="src\DataStructures\HyperData.h" />
     <ClInclude Include="src\DataStructures\UniqueIDGenerator.h" />
     <ClInclude Include="src\Graphs\BinarySearchTree.h" />
     <ClInclude Include="src\Graphs\Octree.h" />

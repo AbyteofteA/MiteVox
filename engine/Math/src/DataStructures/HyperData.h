@@ -2,21 +2,20 @@
 #ifndef HYPERDATA_H
 #define HYPERDATA_H
 
-#include "AIModels/src/Structure/LearningBatch.h"
-
 #include <iostream>
 #include <cstdarg>
 
-namespace aimods
+namespace mathem
 {
 	enum struct hyperdataType { BYTE = 0, SBYTE, SHORT, INT, FLOAT, DOUBLE };
 
 	template <typename T>
 	class HyperData
 	{
+
 	public:
 
-		hyperdataType type = hyperdataType::BYTE;
+		hyperdataType paddingType = hyperdataType::BYTE;
 		unsigned char numOfDimentions = 0;
 		size_t* sizeOfDimentions = nullptr;
 
@@ -24,9 +23,16 @@ namespace aimods
 
 		HyperData(hyperdataType datType = hyperdataType::BYTE)
 		{
-			type = datType;
+			paddingType = datType;
 			numOfDimentions = 0;
 			sizeOfDimentions = nullptr;
+		}
+		~HyperData()
+		{
+			delete sizeOfDimentions;
+			sizeOfDimentions = nullptr;
+			delete data;
+			data = nullptr;
 		}
 
 		void resize(unsigned char numOfDims, ...)
@@ -53,7 +59,7 @@ namespace aimods
 
 		HyperData<T>* copy()
 		{
-			HyperData<T>* newHyperData = new HyperData<T>(type, numOfDimentions, sizeOfDimentions, nullptr);
+			HyperData<T>* newHyperData = new HyperData<T>(paddingType, numOfDimentions, sizeOfDimentions, nullptr);
 			size_t volume = getVolume();
 			T* dat = (T*)malloc(sizeof(T) * volume);
 			for (int i = 0; i < volume; i++)
@@ -82,12 +88,12 @@ namespace aimods
 				printf("\n Reading .idx file..");
 				printf("\n %s\n [", filename);
 
-				unsigned char type = 0;
-				fread(&type, sizeof(char), 1, newFile);	// Zero
-				if (type != 0) return nullptr;
-				fread(&type, sizeof(char), 1, newFile);	// Zero
-				if (type != 0) return nullptr;
-				fread(&type, sizeof(char), 1, newFile);	// Data type
+				unsigned char paddingType = 0;
+				fread(&paddingType, sizeof(char), 1, newFile);	// Zero
+				if (paddingType != 0) return nullptr;
+				fread(&paddingType, sizeof(char), 1, newFile);	// Zero
+				if (paddingType != 0) return nullptr;
+				fread(&paddingType, sizeof(char), 1, newFile);	// Data paddingType
 
 				unsigned char numOfDims = 0;
 				fread(&numOfDims, sizeof(char), 1, newFile);	// Number of dimension
@@ -136,7 +142,7 @@ namespace aimods
 
 		unsigned char getDataType()
 		{
-			return type;
+			return paddingType;
 		}
 
 		unsigned char getNumOfDimentions()
@@ -214,55 +220,7 @@ namespace aimods
 
 			data[index] = value;
 		}
-
-
-
-		~HyperData()
-		{
-			delete sizeOfDimentions;
-			sizeOfDimentions = nullptr;
-			delete data;
-			data = nullptr;
-		}
 	};
-
-
-	template <typename T>
-	LearningBatch** divideIntoBatches(HyperData<T>* dataInputs, HyperData<T>* dataOutputs, unsigned int batchSize, unsigned int amOfBatches, unsigned int sizeOfOutput)
-	{
-
-		if ((dataInputs->getNumOfDimentions() != 3) && (dataOutputs->getNumOfDimentions() != 3))
-			return nullptr;
-
-		if ((dataInputs->getDimention(0) / batchSize) < amOfBatches)
-			amOfBatches = (dataInputs->getDimention(2) / batchSize);
-
-
-		LearningBatch** batchArray = (LearningBatch**)malloc(sizeof(LearningBatch*) * amOfBatches);
-		for (unsigned int b = 0; b < amOfBatches; b++)
-		{
-			unsigned int sizeOfInput = dataInputs->getDimention(1) * dataInputs->getDimention(2);
-			batchArray[b] = new LearningBatch(batchSize, sizeOfInput, sizeOfOutput);
-
-			for (unsigned int j = 0; j < batchArray[b]->batchSize; j++)
-			{
-				for (unsigned int i = 0; i < batchArray[b]->sizeOfInput; i++)
-				{
-					unsigned char tmpGet = dataInputs->data[i + j * batchArray[b]->sizeOfInput + b * batchArray[b]->batchSize * batchArray[b]->sizeOfInput];
-					if (tmpGet != 0)
-						batchArray[b]->input[j][i] = tmpGet / (float)255;
-					else
-						batchArray[b]->input[j][i] = 0;
-					/*else
-						batchArray[b]->input[j][i] = (rand() % 1000) /(float)5000;*/
-				}
-				batchArray[b]->output[j][dataOutputs->data[j + b * batchArray[b]->batchSize]] = 1.;
-			}
-		}
-
-		return batchArray;
-	}
-
 }
 
 #endif

@@ -25,15 +25,6 @@ namespace aimods
 
 		FullyConnectedLayer(activation _function, size_t _size, size_t _prevSize = 0)
 		{
-			init(_function, _size, _prevSize);
-		}
-		~FullyConnectedLayer()
-		{
-			wipe();
-		}
-
-		inline void init(activation _function, size_t _size, size_t _prevSize = 0)
-		{
 			size = _size;
 			prevSize = _prevSize;
 			weightsSize = size * prevSize;
@@ -62,20 +53,11 @@ namespace aimods
 					weights = nullptr;
 				}
 			}
-			else
-			{
-				wipe();
-			}
 		}
-		inline void wipe()
+		~FullyConnectedLayer()
 		{
 			free(outputs);
 			free(weights);
-			outputs = nullptr;
-			weights = nullptr;
-			size = 0;
-			prevSize = 0;
-			weightsSize = 0;
 		}
 
 		inline void setOutputs(T* values)
