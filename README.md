@@ -7,10 +7,12 @@
 
 ```
 
-----
+[![](https://img.shields.io/badge/License-MIT-brightgreen?style=flat)](LICENSE)
 
 MiteVox is an **Entity-Component-System**-based game engine. 
 The engine is a result of experiments in Computer Graghics, Machine Learning and Computer Science in general. 
+
+----
 
 It consists of 8 modules:
 
@@ -44,7 +46,7 @@ The solution contains another project, that is not a part of the engine:
 ## Screenshot
 ![mitevox_demo](docs/mitevox_demo.png)
 
-## :card_file_box: Features & TODO
+## Features & TODO
 :warning: - TODO
 
 ### Custom project(s)
@@ -92,8 +94,10 @@ The solution contains another project, that is not a part of the engine:
   - Feedforward Neural Networks
     - FullyConnectedLayer
     - Backpropagation for FullyConnectedLayer
-    - ConvolutionalLayer
-    - :warning:Backpropagation for ConvolutionalLayer
+    - :warning:ConvoLayer2D
+    - :warning:Backpropagation for ConvoLayer2D
+    - :warning:SubsampLayer2D
+    - :warning:Backpropagation for SubsampLayer2D
     - SoftmaxLayer
   - Recurrent Neural Networks
     - HopfieldNetwork
@@ -110,7 +114,7 @@ The solution contains another project, that is not a part of the engine:
 - Structures: Rigid body, :warning:Atoms
 - Classical mechanics: Kinematics, :warning:Dynamics, :warning:Statics
 
-## :bug: Known bugs & limitations
+## :bug: Known bugs & limitations :bug:
 - [X] ~~The project requires switching between release and debug via a flag~~.
 - [ ] If you assign light position to a camera position, z-component needs to be negated (why?).
 - [ ] .obj parser doesn't support polygon grouping by material.
@@ -119,19 +123,17 @@ The solution contains another project, that is not a part of the engine:
 - [ ] Transform::getDirectionVector() + SpotLight doesn't work as expected.
 - [ ] The project should be built with CMake.
 
-## :hammer_and_wrench: External dependencies (included)
-- [GLEW - The OpenGL Extension Wrangler Library]( https://github.com/nigels-com/glew )
-- [GLFW - A multi-platform library for OpenGL, OpenGL ES, Vulkan, window and input]( https://github.com/glfw/glfw )
-- [GLM - is a header only C++ mathematics library for graphics software]( https://github.com/g-truc/glm )
-- SOIL - Simple OpenGL Image Library
+## External dependencies (included)
+- [![](https://img.shields.io/badge/-GLEW%20(The%20OpenGL%20Extension%20Wrangler%20Library)-grey?style=flat&logo=github&logoColor=ffffff)](https://github.com/nigels-com/glew)
+- [![](https://img.shields.io/badge/-GLFW%20(A%20multiplatform%20library%20for%20OpenGL,%20OpenGL%20ES,%20Vulkan,%20window%20and%20input)-grey?style=flat&logo=github&logoColor=ffffff)](https://github.com/glfw/glfw)
+- [![](https://img.shields.io/badge/-GLM%20(A%20header%20only%20C++%20mathematics%20library%20for%20graphics%20software)-grey?style=flat&logo=github&logoColor=ffffff)](https://github.com/g-truc/glm)
+- [![](https://img.shields.io/badge/-SOIL%20(Simple%20OpenGL%20Image%20Library)-lightgrey?style=flat)]()
 
-## :information_source: References
-- [Learn OpenGL]( https://learnopengl.com )
-- [Some materials]( http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html )
-- [McGuire Computer Graphics Archive]( https://casual-effects.com/g3d/data10/index.html )
-- [A Simple Entity Component System. Austin Morlan]( https://austinmorlan.com/posts/entity_component_system )
-- [Neural networks. 3Blue1Brown]( https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi )
-
-## :page_facing_up: License & copyright
-This project is released under The MIT [License](LICENSE).
+## References
+- [![](https://img.shields.io/badge/-Learn%20OpenGL-5586a4?style=flat&logo=opengl&logoColor=white)](https://learnopengl.com)
+- [![](https://img.shields.io/badge/-Some%20materials-white?style=flat)](http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html)
+- [![](https://img.shields.io/badge/-McGuire%20Computer%20Graphics%20Archive-white?style=flat)](https://casual-effects.com/g3d/data10/index.html)
+- [![](https://img.shields.io/badge/-A%20Simple%20Entity%20Component%20System.%20Austin%20Morlan-00599c?style=flat&logo=c%2b%2b&logoColor=white)](https://austinmorlan.com/posts/entity_component_system)
+- [![](https://img.shields.io/badge/-JSON%20Standard%20(ECMA%20404)-white?style=flat&logo=json&logoColor=000000)](https://www.ecma-international.org/publications-and-standards/standards/ecma-404/)
+- [![](https://img.shields.io/badge/-Neural%20networks.%203Blue1Brown-ff0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
 
