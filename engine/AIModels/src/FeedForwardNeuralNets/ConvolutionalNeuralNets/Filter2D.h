@@ -42,8 +42,8 @@ namespace aimods
 
 		~Filter2D();
 
-		inline void setFilter(T value);
 		inline void setFilter();
+		inline void setFilter(T value);
 
 		// Getters //
 
@@ -136,22 +136,6 @@ namespace aimods
 	}
 
 	template <typename T>
-	inline void Filter2D<T>::setFilter(T value)
-	{
-		size_t kernelOffset = size * size;
-		for (size_t j = 0; j < size; j++)
-		{
-			for (size_t i = 0; i < size; i++)
-			{
-				for (size_t k = 0; k < amountOfKernels; k++)
-				{
-					kernels[i + j * size + k * kernelOffset] = value;
-				}
-			}
-		}
-	}
-
-	template <typename T>
 	inline void Filter2D<T>::setFilter()
 	{
 		size_t kernelOffset = size * size;
@@ -163,6 +147,22 @@ namespace aimods
 				{
 					kernels[i + j * size + k * kernelOffset] =
 						(float)(rand() % 200 - 100) / 50;
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	inline void Filter2D<T>::setFilter(T value)
+	{
+		size_t kernelOffset = size * size;
+		for (size_t j = 0; j < size; j++)
+		{
+			for (size_t i = 0; i < size; i++)
+			{
+				for (size_t k = 0; k < amountOfKernels; k++)
+				{
+					kernels[i + j * size + k * kernelOffset] = value;
 				}
 			}
 		}

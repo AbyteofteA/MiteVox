@@ -90,15 +90,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\FFNN\CNN\ConvolutionalLayer2D.h" />
-    <ClInclude Include="src\FFNN\CNN\FilterLayer2DBase.h" />
-    <ClInclude Include="src\FFNN\FullyConnectedLayer.h" />
-    <ClInclude Include="src\FFNN\CNN\Filter2D.h" />
-    <ClInclude Include="src\FFNN\CNN\SubsamplingLayer2D.h" />
-    <ClInclude Include="src\FFNN\SoftmaxLayer.h" />
+    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\ConvolutionalLayer2D.h" />
+    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\FilterLayer2DBase.h" />
+    <ClInclude Include="src\FeedForwardNeuralNets\FullyConnectedLayer.h" />
+    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\Filter2D.h" />
+    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\SubsamplingLayer2D.h" />
+    <ClInclude Include="src\FeedForwardNeuralNets\SoftmaxLayer.h" />
     <ClInclude Include="src\Structure\LayerType.h" />
     <ClInclude Include="src\Structure\NeuralNetwork.h" />
-    <ClInclude Include="src\RNN\HopfieldNetwork.h" />
+    <ClInclude Include="src\RecurrentNeuralNets\HopfieldNetwork.h" />
     <ClInclude Include="src\Structure\Functions.h" />
     <ClInclude Include="src\GZ_File_IO.h" />
     <ClInclude Include="src\Structure\LearningBatch.h" />

@@ -2,7 +2,7 @@
 # MiteVox
 
 <a href="LICENSE" >
-    <p align="center" >
+    <p align="left" >
         <img src="https://img.shields.io/badge/License-MIT-brightgreen?style=flat" />
     </p>
 </a>
@@ -127,8 +127,8 @@ The solution contains another project, that is not a part of the engine:
 
 ## References
 - [![](https://img.shields.io/badge/-Learn%20OpenGL-5586a4?style=flat&logo=opengl&logoColor=white)](https://learnopengl.com)
-- [![](https://img.shields.io/badge/-Some%20materials-white?style=flat)](http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html)
-- [![](https://img.shields.io/badge/-McGuire%20Computer%20Graphics%20Archive-white?style=flat)](https://casual-effects.com/g3d/data10/index.html)
+- [![](https://img.shields.io/badge/-Some%20materials-5586a4?style=flat)](http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html)
+- [![](https://img.shields.io/badge/-McGuire%20Computer%20Graphics%20Archive-5586a4?style=flat)](https://casual-effects.com/g3d/data10/index.html)
 - [![](https://img.shields.io/badge/-A%20Simple%20Entity%20Component%20System.%20Austin%20Morlan-00599c?style=flat&logo=c%2b%2b&logoColor=white)](https://austinmorlan.com/posts/entity_component_system)
 - [![](https://img.shields.io/badge/-JSON%20Standard%20(ECMA%20404)-white?style=flat&logo=json&logoColor=000000)](https://www.ecma-international.org/publications-and-standards/standards/ecma-404/)
 - [![](https://img.shields.io/badge/-Neural%20networks.%203Blue1Brown-ff0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)

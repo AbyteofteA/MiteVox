@@ -2,7 +2,7 @@
 #ifndef FILTERLAYER2DBASE_H
 #define FILTERLAYER2DBASE_H
 
-#include "AIModels/src/FFNN/CNN/Filter2D.h"
+#include "AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/Filter2D.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -18,32 +18,35 @@ namespace aimods
 		T* outputs;
 
 		inline FilterLayer2DBase(
-			size_t _amountOfInputs,
+			size_t _amountOfInputMaps,
 			size_t _inputWidth,
 			size_t _inputHeight,
 			Filter2D<T>* _filter);
 		inline ~FilterLayer2DBase();
 
-		// Input getters //
+		inline void setOutputs(T value);
 
-		inline size_t getAmountOfInputs();
+		// Getters //
+
+		inline size_t getInputsSize();
+		inline size_t getAmountOfInputMaps();
 		inline size_t getInputWidth();
 		inline size_t getInputHeight();
 
-		// Output getters //
-
-		inline size_t getAmountOfOutputs();
+		inline size_t getOutputsSize();
+		inline size_t getAmountOfOutputMaps();
 		inline size_t getOutputWidth();
 		inline size_t getOutputHeight();
 
 	private:
 
-		size_t amountOfInputs;
+		size_t inputsSize;
+		size_t amountOfInputMaps;
 		size_t inputWidth;
 		size_t inputHeight;
 
-		size_t outputsSizeInBytes;
-		size_t amountOfOutputs;
+		size_t outputsSize;
+		size_t amountOfOutputMaps;
 		size_t outputWidth;
 		size_t outputHeight;
 
@@ -56,14 +59,15 @@ namespace aimods
 
 	template <typename T>
 	inline FilterLayer2DBase<T>::FilterLayer2DBase(
-		size_t _amountOfInputs,
+		size_t _amountOfInputMaps,
 		size_t _inputWidth,
 		size_t _inputHeight,
 		Filter2D<T>* _filter)
 	{
-		amountOfInputs = _amountOfInputs;
+		amountOfInputMaps = _amountOfInputMaps;
 		inputWidth = _inputWidth;
 		inputHeight = _inputHeight;
+		inputsSize = amountOfInputMaps * inputWidth * inputHeight;
 
 		filter = _filter;
 
@@ -77,9 +81,24 @@ namespace aimods
 	}
 
 	template <typename T>
-	inline size_t FilterLayer2DBase<T>::getAmountOfInputs()
+	inline void FilterLayer2DBase<T>::setOutputs(T value)
 	{
-		return amountOfInputs;
+		for (size_t i = 0; i < outputsSize; i++)
+		{
+			outputs[i] = value;
+		}
+	}
+
+	template <typename T>
+	inline size_t FilterLayer2DBase<T>::getInputsSize()
+	{
+		return inputsSize;
+	}
+
+	template <typename T>
+	inline size_t FilterLayer2DBase<T>::getAmountOfInputMaps()
+	{
+		return amountOfInputMaps;
 	}
 
 	template <typename T>
@@ -95,9 +114,15 @@ namespace aimods
 	}
 
 	template <typename T>
-	inline size_t FilterLayer2DBase<T>::getAmountOfOutputs()
+	inline size_t FilterLayer2DBase<T>::getOutputsSize()
 	{
-		return amountOfOutputs;
+		return outputsSize;
+	}
+
+	template <typename T>
+	inline size_t FilterLayer2DBase<T>::getAmountOfOutputMaps()
+	{
+		return amountOfOutputMaps;
 	}
 
 	template <typename T>
@@ -161,12 +186,11 @@ namespace aimods
 			break;
 		}
 
-		amountOfOutputs = amountOfInputs * filter->amountOfKernels;
+		amountOfOutputMaps = amountOfInputMaps * filter->amountOfKernels;
+		outputsSize = amountOfOutputMaps * outputWidth * outputHeight;
 
-		outputsSizeInBytes =
-			outputWidth * outputHeight * amountOfOutputs * sizeof(T);
-		outputs = (T*)realloc(outputs, outputsSizeInBytes);
-		memset(outputs, 0, outputsSizeInBytes);
+		outputs = (T*)realloc(outputs, outputsSize * sizeof(T));
+		setOutputs(0);
 	}
 }
 
