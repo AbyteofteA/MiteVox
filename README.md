@@ -1,18 +1,14 @@
-```
- __  __ _ _     __     __        
-|  \/  (_) |_ __\ \   / /____  __
-| |\/| | | __/ _ \ \ / / _ \ \/ /
-| |  | | | ||  __/\ V / (_) >  < 
-|_|  |_|_|\__\___| \_/ \___/_/\_\
 
-```
+# MiteVox
 
-[![](https://img.shields.io/badge/License-MIT-brightgreen?style=flat)](LICENSE)
+<a href="LICENSE" >
+    <p align="center" >
+        <img src="https://img.shields.io/badge/License-MIT-brightgreen?style=flat" />
+    </p>
+</a>
 
 MiteVox is an **Entity-Component-System**-based game engine. 
 The engine is a result of experiments in Computer Graghics, Machine Learning and Computer Science in general. 
-
-----
 
 It consists of 8 modules:
 
@@ -94,10 +90,10 @@ The solution contains another project, that is not a part of the engine:
   - Feedforward Neural Networks
     - FullyConnectedLayer
     - Backpropagation for FullyConnectedLayer
-    - :warning:ConvoLayer2D
-    - :warning:Backpropagation for ConvoLayer2D
-    - :warning:SubsampLayer2D
-    - :warning:Backpropagation for SubsampLayer2D
+    - :warning:ConvolutionalLayer2D
+    - :warning:Backpropagation for ConvolutionalLayer2D
+    - :warning:SubsamplingLayer2D
+    - :warning:Backpropagation for SubsamplingLayer2D
     - SoftmaxLayer
   - Recurrent Neural Networks
     - HopfieldNetwork
@@ -127,7 +123,7 @@ The solution contains another project, that is not a part of the engine:
 - [![](https://img.shields.io/badge/-GLEW%20(The%20OpenGL%20Extension%20Wrangler%20Library)-grey?style=flat&logo=github&logoColor=ffffff)](https://github.com/nigels-com/glew)
 - [![](https://img.shields.io/badge/-GLFW%20(A%20multiplatform%20library%20for%20OpenGL,%20OpenGL%20ES,%20Vulkan,%20window%20and%20input)-grey?style=flat&logo=github&logoColor=ffffff)](https://github.com/glfw/glfw)
 - [![](https://img.shields.io/badge/-GLM%20(A%20header%20only%20C++%20mathematics%20library%20for%20graphics%20software)-grey?style=flat&logo=github&logoColor=ffffff)](https://github.com/g-truc/glm)
-- [![](https://img.shields.io/badge/-SOIL%20(Simple%20OpenGL%20Image%20Library)-lightgrey?style=flat)]()
+- SOIL (Simple OpenGL Image Library)
 
 ## References
 - [![](https://img.shields.io/badge/-Learn%20OpenGL-5586a4?style=flat&logo=opengl&logoColor=white)](https://learnopengl.com)

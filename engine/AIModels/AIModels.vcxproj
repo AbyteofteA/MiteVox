@@ -90,11 +90,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\FFNN\CNN\ConvoLayer2D.h" />
-    <ClInclude Include="src\FFNN\CNN\FilterLayer2D.h" />
+    <ClInclude Include="src\FFNN\CNN\ConvolutionalLayer2D.h" />
+    <ClInclude Include="src\FFNN\CNN\FilterLayer2DBase.h" />
     <ClInclude Include="src\FFNN\FullyConnectedLayer.h" />
     <ClInclude Include="src\FFNN\CNN\Filter2D.h" />
-    <ClInclude Include="src\FFNN\CNN\SubsampLayer2D.h" />
+    <ClInclude Include="src\FFNN\CNN\SubsamplingLayer2D.h" />
     <ClInclude Include="src\FFNN\SoftmaxLayer.h" />
     <ClInclude Include="src\Structure\LayerType.h" />
     <ClInclude Include="src\Structure\NeuralNetwork.h" />
@@ -105,9 +105,6 @@
     <ClInclude Include="src\AIModels.h" />
     <ClInclude Include="src\Service.h" />
     <ClInclude Include="src\Structure\FormalNeuron.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\a.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

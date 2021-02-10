@@ -12,9 +12,9 @@
 #include "AIModels/src/FFNN/SoftmaxLayer.h"
 
 // CNN
-#include "AIModels/src/FFNN/CNN/FilterLayer2D.h"
-#include "AIModels/src/FFNN/CNN/ConvoLayer2D.h"
-#include "AIModels/src/FFNN/CNN/SubsampLayer2D.h"
+#include "AIModels/src/FFNN/CNN/FilterLayer2DBase.h"
+#include "AIModels/src/FFNN/CNN/ConvolutionalLayer2D.h"
+#include "AIModels/src/FFNN/CNN/SubsamplingLayer2D.h"
 
 // RNN
 #include "AIModels/src/RNN/HopfieldNetwork.h"
