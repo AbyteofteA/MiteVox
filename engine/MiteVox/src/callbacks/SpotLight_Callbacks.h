@@ -2,24 +2,24 @@
 #ifndef SPOTLIGHT_CALLBACKS_H
 #define SPOTLIGHT_CALLBACKS_H
 
-void SpotLight_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
+void SpotLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
-	for (COMPONENT_TYPE entityIndex = 0;
-		entityIndex < _ecs->componentManagers[_managerIndex].amountOfInstances;
+	for (entityID entityIndex = 0;
+		entityIndex < _ecs->componentManagers[_managerIndex]->amountOfInstances;
 		entityIndex++)
 	{
-		COMPONENT_TYPE entityID =
-			_ecs->componentManagers[_managerIndex].componentToID[entityIndex];
+		entityID ID =
+			_ecs->componentManagers[_managerIndex]->componentToID[entityIndex];
 
 		unsigned int shaderIndex = 0;
 		if (!render::shaders[shaderIndex]->use())
 			return;
 
 		mathem::Transform* transform =
-			(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
+			(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 		render::SpotLight* spotLight =
-			(render::SpotLight*)_ecs->getComponent(entityID, SPOTLIGHT_COMPONENT);
+			(render::SpotLight*)_ecs->getComponent(ID, SPOTLIGHT_COMPONENT);
 		render::shaders[shaderIndex]->setInt("amountOfSpotLights", entityIndex + 1);
 
 		std::string spotLights = "spotLights[";
@@ -58,7 +58,7 @@ void SpotLight_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, voi
 	}
 }
 
-void SpotLight_onDelete(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
+void SpotLight_onDelete(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
 {
 	unsigned int shaderIndex = 0;
 	if (!render::shaders[shaderIndex]->use())

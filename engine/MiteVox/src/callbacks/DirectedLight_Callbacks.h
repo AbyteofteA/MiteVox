@@ -2,21 +2,21 @@
 #ifndef DIRECTEDLIGHT_CALLBACKS_H
 #define DIRECTEDLIGHT_CALLBACKS_H
 
-void DirectedLight_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
+void DirectedLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
-	for (COMPONENT_TYPE entityIndex = 0;
-		entityIndex < _ecs->componentManagers[_managerIndex].amountOfInstances;
+	for (entityID entityIndex = 0;
+		entityIndex < _ecs->componentManagers[_managerIndex]->amountOfInstances;
 		entityIndex++)
 	{
-		COMPONENT_TYPE entityID =
-			_ecs->componentManagers[_managerIndex].componentToID[entityIndex];
+		entityID ID =
+			_ecs->componentManagers[_managerIndex]->componentToID[entityIndex];
 
 		unsigned int shaderIndex = 0;
 		if (!render::shaders[shaderIndex]->use())
 			return;
 
 		render::DirectedLight* directedLight =
-			(render::DirectedLight*)_ecs->getComponent(entityID, DIRECTEDLIGHT_COMPONENT);
+			(render::DirectedLight*)_ecs->getComponent(ID, DIRECTEDLIGHT_COMPONENT);
 		render::shaders[shaderIndex]->setInt("amountOfDirectionalLights", entityIndex + 1);
 
 		std::string directedLights = "directionalLights[";
@@ -34,7 +34,7 @@ void DirectedLight_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex,
 	}
 }
 
-void DirectedLight_onDelete(ecs::ECS* _ecs, unsigned char _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
+void DirectedLight_onDelete(ecs::EntityComponentSystem<entityID>* _ecs, unsigned char _managerIndex, entityID ID, void* data, entityID index)
 {
 	unsigned int shaderIndex = 0;
 	if (!render::shaders[shaderIndex]->use())

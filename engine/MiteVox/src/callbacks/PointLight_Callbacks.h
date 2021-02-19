@@ -2,24 +2,24 @@
 #ifndef POINTLIGHT_CALLBACKS_H
 #define POINTLIGHT_CALLBACKS_H
 
-void PointLight_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
+void PointLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
-	for (COMPONENT_TYPE entityIndex = 0; 
-		entityIndex < _ecs->componentManagers[_managerIndex].amountOfInstances; 
+	for (entityID entityIndex = 0; 
+		entityIndex < _ecs->componentManagers[_managerIndex]->amountOfInstances;
 		entityIndex++)
 	{
-		COMPONENT_TYPE entityID = 
-			_ecs->componentManagers[_managerIndex].componentToID[entityIndex];
+		entityID ID = 
+			_ecs->componentManagers[_managerIndex]->componentToID[entityIndex];
 
 		unsigned int shaderIndex = 0;
 		if (!render::shaders[shaderIndex]->use())
 			return;
 
 		mathem::Transform* transform =
-			(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
+			(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 		render::PointLight* pointLight =
-			(render::PointLight*)_ecs->getComponent(entityID, POINTLIGHT_COMPONENT);
+			(render::PointLight*)_ecs->getComponent(ID, POINTLIGHT_COMPONENT);
 		render::shaders[shaderIndex]->setInt("amountOfPointLights", entityIndex + 1);
 
 		std::string pointLights = "pointLights[";
@@ -50,7 +50,7 @@ void PointLight_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, vo
 	}
 }
 
-void PointLight_onDelete(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
+void PointLight_onDelete(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
 {
 	unsigned int shaderIndex = 0;
 	if (!render::shaders[shaderIndex]->use())

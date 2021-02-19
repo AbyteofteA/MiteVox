@@ -2,11 +2,11 @@
 
 #include "MiteVox/src/MiteVox.h"
 
-void rotateLight_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
+void rotateLight_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	mitevox::Scene* scene = (mitevox::Scene*)data;
 	render::DirectedLight* light =
-		(render::DirectedLight*)_ecs->getComponent(entityID, DIRECTEDLIGHT_COMPONENT);
+		(render::DirectedLight*)_ecs->getComponent(ID, DIRECTEDLIGHT_COMPONENT);
 
 	light->direction.i = (float)sin(scene->currentTime);
 	light->direction.j = -0.5f;
@@ -14,22 +14,22 @@ void rotateLight_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPON
 	light->direction.normalize();
 }
 
-void waveModel_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
+void waveModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	mitevox::Scene* scene = (mitevox::Scene*)data;
 	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
+		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 	//transform->angleX += 30 * scene->dt;
 	//transform->angleY += 60 * scene->dt;
 	transform->y = 50 * (float)sin(scene->currentTime * 4 + transform->x + transform->z);
 }
 
-void rotateModel_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
+void rotateModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	mitevox::Scene* scene = (mitevox::Scene*)data;
 	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
+		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 	transform->x = 200 * (float)sin(scene->currentTime * 2);
 	transform->y = 200 * (float)cos(scene->currentTime * 2);
@@ -37,7 +37,7 @@ void rotateModel_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPON
 }
 
 
-void processInput_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
+void processInput_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	float cameraSensitivity = 0.1f;
 	float speed = 450;
@@ -47,7 +47,7 @@ void processInput_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPO
 	InputHandler* inputHandler = scene->inputHandler;
 
 	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
+		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 	render::Camera* camera = (render::Camera*)_ecs->getComponent(scene->activeCamera, CAMERA_COMPONENT);
 	camera->FOV += inputHandler->mouseDeltaScroll;
@@ -96,11 +96,11 @@ void processInput_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPO
 	spotLight->direction = transform->getDirectionVector();*/
 }
 
-void rotateCamera_Script(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data)
+void rotateCamera_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	mitevox::Scene* scene = (mitevox::Scene*)data;
 	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(entityID, TRANSFORM_COMPONENT);
+		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 	float angle = (float)scene->currentTime * 50 + 180;
 

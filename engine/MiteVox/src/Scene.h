@@ -37,10 +37,10 @@ namespace mitevox
 	public:
 
 		std::string name = "Untitled";
-		ecs::ECS* ECS = nullptr;
+		ecs::EntityComponentSystem<entityID>* ECS = nullptr;
 		std::vector<render::Skybox> skyboxes;
 		long activeSkybox = -1;
-		ENTITY_ID_TYPE activeCamera = -1;
+		entityID activeCamera = -1;
 
 		InputHandler* inputHandler = nullptr;
 		render::RendererSettings* renderer = nullptr;
@@ -88,7 +88,7 @@ namespace mitevox
 		double tmpTime = 0.0;
 
 
-		Scene(COMPONENT_TYPE initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE)
+		Scene(entityID initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE)
 		{
 			init(initialEntitiesBufferSize);
 		}
@@ -97,45 +97,45 @@ namespace mitevox
 			wipe();
 		}
 
-		void init(COMPONENT_TYPE initialEntitiesBufferSize)
+		void init(entityID initialEntitiesBufferSize)
 		{
-			ECS = new ecs::ECS(initialEntitiesBufferSize);
+			ECS = new ecs::EntityComponentSystem(initialEntitiesBufferSize);
 
 			// Renderer components
 
-			Camera_Component = ECS->registerComponent<render::Camera>("Camera");
+			Camera_Component = ECS->registerComponent("Camera", sizeof(render::Camera));
 
-			Model3D_Component = ECS->registerComponent<render::Model3D>(
-				"Model3D", Model3D_onCreate, Model3D_onUpdateAll, Model3D_onDestroy);
+			Model3D_Component = ECS->registerComponent("Model3D", sizeof(render::Model3D),
+				Model3D_onCreate, Model3D_onUpdateAll, Model3D_onDestroy);
 
-			PointLight_Component = ECS->registerComponent<render::PointLight>(
-				"PointLight", nullptr, PointLight_onUpdateAll, PointLight_onDelete);
+			PointLight_Component = ECS->registerComponent("PointLight", sizeof(render::PointLight),
+				nullptr, PointLight_onUpdateAll, PointLight_onDelete);
 
-			DirectedLight_Component = ECS->registerComponent<render::DirectedLight>(
-				"DirectedLight", nullptr, DirectedLight_onUpdateAll, DirectedLight_onDelete);
+			DirectedLight_Component = ECS->registerComponent("DirectedLight", sizeof(render::DirectedLight), 
+				nullptr, DirectedLight_onUpdateAll, DirectedLight_onDelete);
 
-			SpotLight_Component = ECS->registerComponent<render::SpotLight>(
-				"SpotLight", nullptr, SpotLight_onUpdateAll, SpotLight_onDelete);
+			SpotLight_Component = ECS->registerComponent("SpotLight", sizeof(render::SpotLight), 
+				nullptr, SpotLight_onUpdateAll, SpotLight_onDelete);
 
 			// Math components
 
-			Transform_Component = ECS->registerComponent<mathem::Transform>(
-				"Transform", Transform_onCreate);
+			Transform_Component = ECS->registerComponent("Transform", sizeof(mathem::Transform), 
+				Transform_onCreate);
 
 			// Script components
 
-			NativeScript_Component = ECS->registerComponent<NativeScript_ECS>(
-				"NativeScript_ECS", NativeScript_onCreate, NativeScript_onUpdateAll, NativeScript_onDestroy);
+			NativeScript_Component = ECS->registerComponent("NativeScript_ECS", sizeof(NativeScript_ECS), 
+				NativeScript_onCreate, NativeScript_onUpdateAll, NativeScript_onDestroy);
 
 			// Physics components
 
-			PrimitiveCollider_Component = ECS->registerComponent<physcs::PrimitiveCollider>("PrimitiveCollider");
+			PrimitiveCollider_Component = ECS->registerComponent("PrimitiveCollider", sizeof(physcs::PrimitiveCollider));
 
-			RigidBody_Component = ECS->registerComponent<physcs::RigidBody>("RigidBody");
+			RigidBody_Component = ECS->registerComponent("RigidBody", sizeof(physcs::RigidBody));
 
 			// Other components
 
-			Tag_Component = ECS->registerComponent<std::string>("Tag");
+			Tag_Component = ECS->registerComponent("Tag", sizeof(std::string));
 
 			// Initialize timers.
 
@@ -147,7 +147,7 @@ namespace mitevox
 		}
 		void wipe()
 		{
-			ECS->wipe();
+			delete ECS;
 		}
 
 		void update(EngineSettings* settings)

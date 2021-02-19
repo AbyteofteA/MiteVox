@@ -2,10 +2,10 @@
 #ifndef NATIVESCRIPT_CALLBACKS_H
 #define NATIVESCRIPT_CALLBACKS_H
 
-void NativeScript_onCreate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
+void NativeScript_onCreate(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
 {
 	NativeScript_ECS* script =
-		(NativeScript_ECS*)_ecs->getComponent(entityID, NATIVE_SCRIPT_COMPONENT);
+		(NativeScript_ECS*)_ecs->getComponent(ID, NATIVE_SCRIPT_COMPONENT);
 	if (data)
 	{
 		*script = *(NativeScript_ECS*)data;
@@ -16,35 +16,35 @@ void NativeScript_onCreate(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COM
 	}
 	if (script->onCreate)
 	{
-		script->onCreate(_ecs, _managerIndex, entityID, data);
+		script->onCreate(_ecs, _managerIndex, ID, data);
 	}
 }
 
-void NativeScript_onUpdateAll(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
+void NativeScript_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
-	for (COMPONENT_TYPE entityIndex = 0;
-		entityIndex < _ecs->componentManagers[_managerIndex].amountOfInstances;
+	for (entityID entityIndex = 0;
+		entityIndex < _ecs->componentManagers[_managerIndex]->amountOfInstances;
 		entityIndex++)
 	{
-		COMPONENT_TYPE entityID =
-			_ecs->componentManagers[_managerIndex].componentToID[entityIndex];
+		entityID ID =
+			_ecs->componentManagers[_managerIndex]->componentToID[entityIndex];
 
 		NativeScript_ECS* script =
-			(NativeScript_ECS*)_ecs->getComponent(entityID, NATIVE_SCRIPT_COMPONENT);
+			(NativeScript_ECS*)_ecs->getComponent(ID, NATIVE_SCRIPT_COMPONENT);
 		if (script->onUpdate)
 		{
-			script->onUpdate(_ecs, _managerIndex, entityID, data);
+			script->onUpdate(_ecs, _managerIndex, ID, data);
 		}
 	}
 }
 
-void NativeScript_onDestroy(ecs::ECS* _ecs, MANAGER_INDEX_TYPE _managerIndex, COMPONENT_TYPE entityID, void* data, COMPONENT_TYPE index)
+void NativeScript_onDestroy(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
 {
 	NativeScript_ECS* script =
-		(NativeScript_ECS*)_ecs->getComponent(entityID, NATIVE_SCRIPT_COMPONENT);
+		(NativeScript_ECS*)_ecs->getComponent(ID, NATIVE_SCRIPT_COMPONENT);
 	if (script->onDestroy)
 	{
-		script->onDestroy(_ecs, _managerIndex, entityID, data);
+		script->onDestroy(_ecs, _managerIndex, ID, data);
 	}
 }
 

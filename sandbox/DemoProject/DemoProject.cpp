@@ -21,7 +21,7 @@ void mitevox::Engine::onCreate()
 {
 	this->activeScene = this->createScene();
 	mitevox::Scene* myScene = this->getActiveScene();
-	ecs::ECS* myECS = this->getActiveScene()->ECS;
+	ecs::EntityComponentSystem<entityID>* myECS = this->getActiveScene()->ECS;
 
 	// Compile shaders.
 
@@ -81,7 +81,7 @@ void mitevox::Engine::onCreate()
 
 	// Create subject entity.
 
-	ENTITY_ID_TYPE subject0 = myECS->createEntity();
+	entityID subject0 = myECS->createEntity();
 	render::Camera tmpCamera = { 50, SCREEN_WIDTH, SCREEN_HEIGHT, 1, 100000 };
 	myECS->attachComponent(subject0, myScene->Camera_Component, &tmpCamera);
 	myScene->activeCamera = subject0;
@@ -95,26 +95,26 @@ void mitevox::Engine::onCreate()
 
 	// Create Cube prefab.
 
-	COMPONENT_TYPE Cube = myECS->createPrefab("Cube");
+	entityID Cube = myECS->createPrefab("Cube");
 	myECS->getPrefab(Cube)->attachComponent(
-		&myECS->componentManagers[myScene->Transform_Component]);
+		myECS->componentManagers[myScene->Transform_Component]);
 	myECS->getPrefab(Cube)->attachComponent(
-		&myECS->componentManagers[myScene->NativeScript_Component], &waveScript);
+		myECS->componentManagers[myScene->NativeScript_Component], &waveScript);
 
 	render::Model3D* cube = new render::Model3D(
 		mCube, darkSomething, mathem::Transform(25, 25, 25, 0, 90, 0, 0, 0, 0));
 	cube->shaderID = basicShader;
 	myECS->getPrefab(Cube)->attachComponent(
-		&myECS->componentManagers[myScene->Model3D_Component], cube);
+		myECS->componentManagers[myScene->Model3D_Component], cube);
 
 	render::Model3D* md = (render::Model3D*)myECS->getPrefab(Cube)->components[MODEL3D_COMPONENT];
 	md->shaderID = md->shaderID;
 
 	// Create Light prefab.
 
-	COMPONENT_TYPE Light = myECS->createPrefab("Light");
+	entityID Light = myECS->createPrefab("Light");
 	myECS->getPrefab(Light)->attachComponent(
-		&myECS->componentManagers[myScene->Transform_Component]);
+		myECS->componentManagers[myScene->Transform_Component]);
 	render::Material* light = new render::Material();
 	light->albedo = { 1, 1, 1 };
 	light->roughness = { 0, 0, 0 };
@@ -125,12 +125,12 @@ void mitevox::Engine::onCreate()
 	render::Model3D* cubeLight = new render::Model3D(mCube, light, { 3, 3, 3, 0, 0, 0, 0, 0, 0 });
 	cubeLight->shaderID = basicShader;
 	myECS->getPrefab(Light)->attachComponent(
-		&myECS->componentManagers[myScene->Model3D_Component], cubeLight);
+		myECS->componentManagers[myScene->Model3D_Component], cubeLight);
 	render::PointLight tmpPointLight = { { 0 }, { 1, 1, 1, 1 },  1, 0.0014f, 0.000007f };
 	myECS->getPrefab(Light)->attachComponent(
-		&myECS->componentManagers[myScene->PointLight_Component], &tmpPointLight);
+		myECS->componentManagers[myScene->PointLight_Component], &tmpPointLight);
 	myECS->getPrefab(Light)->attachComponent(
-		&myECS->componentManagers[myScene->NativeScript_Component]);
+		myECS->componentManagers[myScene->NativeScript_Component]);
 
 	// Spawn 9x9 grid of cubes.
 
@@ -140,7 +140,7 @@ void mitevox::Engine::onCreate()
 	{
 		for (int j = -maxY; j <= maxY; j++)
 		{
-			COMPONENT_TYPE tmpID = myECS->createEntity(Cube);
+			entityID tmpID = myECS->createEntity(Cube);
 			mathem::Transform tmpTransform = { 1, 1, 1, 0, 0, 0, (float)50 * i, 0, (float)50 * j };
 			*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
 		}
@@ -151,7 +151,7 @@ void mitevox::Engine::onCreate()
 	float lightPos = 450;
 
 	tmpTransform = { 1, 1, 1, 0, 0, 0, 0, 0, 0 };
-	COMPONENT_TYPE tmpID = myECS->createEntity(Light);
+	entityID tmpID = myECS->createEntity(Light);
 	tmpTransform.x = lightPos; tmpTransform.y = lightPos; tmpTransform.z = lightPos;
 	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
 	tmpID = myECS->createEntity(Light);

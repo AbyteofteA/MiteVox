@@ -9,43 +9,76 @@ namespace mathem
 	template <typename T>
 	class UniqueIDGenerator
 	{
-		T maxID = 0;
-		std::queue<T> returnedIDs;
-
 	public:
 
-		T getID()
-		{
-			if (returnedIDs.empty())
-			{
-				maxID += 1;
-				return maxID;
-			}
-			else
-			{
-				T tmpID = returnedIDs.front();
-				returnedIDs.pop();
-				return tmpID;
-			}
-		}
+		UniqueIDGenerator();
+		~UniqueIDGenerator();
 
-		void returnID(T ID)
-		{
-			if (ID <= maxID)
-			{
-				returnedIDs.push(ID);
-			}
-		}
+		T getID();
 
-		void reset()
-		{
-			maxID = 0;
-			while (!returnedIDs.empty())
-			{
-				returnedIDs.pop();
-			}
-		}
+		/// <summary>
+		/// BUG: it accepts repetitions !
+		/// </summary>
+		void returnID(T ID);
+
+		void reset();
+
+	private:
+
+		T maxID;
+		std::queue<T> returnedIDs;
 	};
+
+
+	// IMPLEMENTATION BELOW //
+
+
+	template <typename T>
+	UniqueIDGenerator<T>::UniqueIDGenerator()
+	{
+		maxID = 0;
+	}
+
+	template <typename T>
+	UniqueIDGenerator<T>::~UniqueIDGenerator()
+	{
+		reset();
+	}
+
+	template <typename T>
+	T UniqueIDGenerator<T>::getID()
+	{
+		if (returnedIDs.empty())
+		{
+			maxID += 1;
+			return maxID;
+		}
+		else
+		{
+			T tmpID = returnedIDs.front();
+			returnedIDs.pop();
+			return tmpID;
+		}
+	}
+
+	template <typename T>
+	void UniqueIDGenerator<T>::returnID(T ID)
+	{
+		if (ID <= maxID)
+		{
+			returnedIDs.push(ID);
+		}
+	}
+
+	template <typename T>
+	void UniqueIDGenerator<T>::reset()
+	{
+		maxID = 0;
+		while (!returnedIDs.empty())
+		{
+			returnedIDs.pop();
+		}
+	}
 }
 
 #endif

@@ -66,7 +66,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)engine\FileIO\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\ECSManager\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Math\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Physics\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Renderer\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\UIEventHandler\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\AIModels\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FileIO.lib;Renderer.lib;ECSManager.lib;AIModels.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>FileIO.lib;Renderer.lib;ECSManager.lib;AIModels.lib;Math.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
