@@ -4,7 +4,7 @@
 
 #include "AIModels/src/Structure/Functions.h"
 
-#include <iostream>
+#include <cmath>
 
 namespace aimods
 {
@@ -12,70 +12,31 @@ namespace aimods
 	{
 	public:
 
-		activation function = activation::RELU;
-
 		float output = 0;
 		float threshold = 0;
 
 		float* weightArray = nullptr;
 		FormalNeuron** axonArray = nullptr;
-		unsigned int amountOfAxons = 0;
+		
+		inline FormalNeuron(activation _function, unsigned int _amountOfAxons);
+		inline ~FormalNeuron();
 
-		inline FormalNeuron() {}
-		inline FormalNeuron(activation _function, unsigned int _amountOfAxons)
-		{
-			this->function = _function;
-			formAxons(_amountOfAxons);
-		}
-		inline ~FormalNeuron()
-		{
-			free(this->axonArray);
-			free(this->weightArray);
-		}
+		inline void setWeights(float value);
+		inline void setWeights();
 
-		inline void formAxons(unsigned int _amountOfAxons)
-		{
-			this->amountOfAxons = _amountOfAxons;
+		inline float weighSum();
+		inline float computeOutput();
+		inline float propagate();
 
-			this->axonArray = (FormalNeuron**)realloc(this->axonArray, sizeof(FormalNeuron*) * _amountOfAxons);
-			this->weightArray = (float*)realloc(this->weightArray, sizeof(float) * _amountOfAxons);
+		// Getters //
 
-			setWeights();
-		}
+		inline activation getFunction();
+		inline size_t getAmountOfAxons();
 
-		inline void setWeights(float value)
-		{
-			for (unsigned int a = 0; a < this->amountOfAxons; a++)
-			{
-				this->weightArray[a] = value;
-			}
-		}
-		inline void setWeights()
-		{
-			for (unsigned int a = 0; a < this->amountOfAxons; a++)
-			{
-				this->weightArray[a] = (rand() % 20 - 10) / (float)1000;
-			}
-		}
+	private:
 
-		inline float weighSum()
-		{
-			float wSum = 0;
-			for (unsigned int k = 0; k < this->amountOfAxons; k++)
-				wSum += this->axonArray[k]->output * this->weightArray[k];
-			wSum -= this->threshold;
-
-			return wSum;
-		}
-		inline float computeOutput()
-		{
-			return activationFunction(weighSum(), this->function);
-		}
-		inline float propagate()
-		{
-			this->output = activationFunction(weighSum(), this->function);
-			return this->output;
-		}
+		activation function = activation::RELU;
+		size_t amountOfAxons = 0;
 	};
 }
 

@@ -29,7 +29,6 @@ namespace aimods
 	private:
 
 		size_t size = 0;
-		size_t sizeInBytes = 0;
 	};
 
 
@@ -40,11 +39,10 @@ namespace aimods
 	SoftmaxLayer<T>::SoftmaxLayer(size_t _size)
 	{
 		size = _size;
-		sizeInBytes = sizeof(T) * size;
 
 		if (_size != 0)
 		{
-			outputs = (T*)realloc(outputs, sizeInBytes);
+			outputs = new T[size];
 			resetOutputs();
 		}
 	}
@@ -52,13 +50,13 @@ namespace aimods
 	template <typename T>
 	SoftmaxLayer<T>::~SoftmaxLayer()
 	{
-		free(outputs);
+		delete[] outputs;
 	}
 
 	template <typename T>
 	inline void SoftmaxLayer<T>::resetOutputs()
 	{
-		memset(outputs, 0, sizeInBytes);
+		memset(outputs, 0, size * sizeof(T));
 	}
 
 	template <typename T>

@@ -56,9 +56,9 @@ namespace aimods
 	inline HopfieldNetwork::HopfieldNetwork(size_t _size)
 	{
 		this->size = _size;
-		this->neuronArray = (FormalNeuron**)malloc(sizeof(FormalNeuron*) * this->size);
-		this->previousOutput = (float*)malloc(sizeof(float) * this->size);
-		this->output = (float*)malloc(sizeof(float) * this->size);
+		this->neuronArray = new FormalNeuron*[this->size];
+		this->previousOutput = new float[this->size];
+		this->output = new float[this->size];
 
 		for (size_t i = 0; i < this->size; i++)
 		{
@@ -84,10 +84,10 @@ namespace aimods
 		{
 			delete this->neuronArray[i];
 		}
-		free(this->neuronArray);
-		free(this->previousOutput);
-		free(this->output);
-		this->size = 0;
+
+		delete[] this->neuronArray;
+		delete[] this->previousOutput;
+		delete[] this->output;
 	}
 
 	inline void HopfieldNetwork::inputData(float* data)
@@ -166,7 +166,7 @@ namespace aimods
 	{
 		for (size_t i = 0; i < this->size; i++)
 		{
-			for (size_t j = 0; j < this->neuronArray[i]->amountOfAxons; j++)
+			for (size_t j = 0; j < this->neuronArray[i]->getAmountOfAxons(); j++)
 			{
 				float deltaWeight = this->neuronArray[i]->output * this->neuronArray[i]->axonArray[j]->output;
 				this->neuronArray[i]->weightArray[j] += deltaWeight;

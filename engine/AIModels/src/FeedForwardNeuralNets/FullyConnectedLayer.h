@@ -67,24 +67,20 @@ namespace aimods
 
 		if (_size != 0)
 		{
-			size_t sizeInBytes
-				= sizeof(T) * size;
+			outputs = new T[size];
+			thresholds = new T[size];
 
-			outputs = (T*)realloc(outputs, sizeInBytes);
-			thresholds = (T*)realloc(thresholds, sizeInBytes);
-
+			size_t sizeInBytes = size * sizeof(T);
 			memset(outputs, 0, sizeInBytes);
 			memset(thresholds, 0, sizeInBytes);
 
 			if (prevSize != 0)
 			{
-				size_t weightsSizeInBytes = sizeof(T) * weightsSize;
-				weights = (T*)realloc(weights, weightsSizeInBytes);
-				memset(weights, 0, weightsSizeInBytes);
+				weights = new T[weightsSize];
+				memset(weights, 0, weightsSize * sizeof(T));
 			}
 			else
 			{
-				free(weights);
 				weights = nullptr;
 			}
 		}
@@ -93,8 +89,8 @@ namespace aimods
 	template <typename T>
 	FullyConnectedLayer<T>::~FullyConnectedLayer()
 	{
-		free(outputs);
-		free(weights);
+		delete[] outputs;
+		delete[] weights;
 	}
 
 	template <typename T>

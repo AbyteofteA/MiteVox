@@ -63,7 +63,7 @@ namespace aimods
 		size_t padding;
 		FillType fillType;
 
-		size_t kernelsSizeInBytes;
+		size_t kernelsSizeInCells;
 		size_t amountOfKernels;
 	};
 
@@ -96,9 +96,9 @@ namespace aimods
 		fillType = _fillType;
 
 		amountOfKernels = _amountOfKernels;
-		kernelsSizeInBytes = amountOfKernels * size * size * sizeof(T);
-		kernels = (T*)realloc(kernels, kernelsSizeInBytes);
-		memset(kernels, 0, kernelsSizeInBytes);
+		kernelsSizeInCells = amountOfKernels * size * size;
+		kernels = new T[kernelsSizeInCells];
+		memset(kernels, 0, kernelsSizeInCells * sizeof(T));
 	}
 
 	template <typename T>
@@ -125,14 +125,14 @@ namespace aimods
 		fillType = _fillType;
 
 		kernels = nullptr;
-		kernelsSizeInBytes = 0;
+		kernelsSizeInCells = 0;
 		amountOfKernels = 1;
 	}
 
 	template <typename T>
 	inline Filter2D<T>::~Filter2D()
 	{
-		free(kernels);
+		delete[] kernels;
 	}
 
 	template <typename T>

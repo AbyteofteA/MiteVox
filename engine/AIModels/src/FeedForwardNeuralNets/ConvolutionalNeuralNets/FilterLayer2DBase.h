@@ -77,7 +77,7 @@ namespace aimods
 	template <typename T>
 	inline FilterLayer2DBase<T>::~FilterLayer2DBase()
 	{
-		free(outputs);
+		delete[] outputs;
 	}
 
 	template <typename T>
@@ -189,7 +189,7 @@ namespace aimods
 		amountOfOutputMaps = amountOfInputMaps * filter->amountOfKernels;
 		outputsSize = amountOfOutputMaps * outputWidth * outputHeight;
 
-		outputs = (T*)realloc(outputs, outputsSize * sizeof(T));
+		outputs = new T[outputsSize];
 		setOutputs(0);
 	}
 }
