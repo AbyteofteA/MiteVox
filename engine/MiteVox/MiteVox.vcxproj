@@ -52,7 +52,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glm;$(SolutionDir)dependencies\Simple OpenGL Image Library\src;$(SolutionDir)engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glm;$(SolutionDir)dependencies\Simple OpenGL Image Library\src;$(SolutionDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>SFML_STATIC;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -89,7 +89,10 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\EngineSettings.cpp" />
     <ClCompile Include="src\MiteVox_main.h" />
+    <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\callbacks\DirectedLight_Callbacks.h" />

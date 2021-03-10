@@ -10,11 +10,10 @@
 #include "Prefab.h"
 #include "ComponentManager.h"
 
-#include "Math/src/Math.h"
+#include "engine/Math/src/Math.h"
 
 #include <string>
-#include <vector>
-#include <queue>
+#include <unordered_map>
 
 namespace ecs
 {
@@ -68,7 +67,6 @@ namespace ecs
 		// Prefab methods //
 
 		Prefab<entityID>* getPrefab(entityID ID);
-		entityID getPrefabIndex(entityID ID);
 		entityID createPrefab(std::string name);
 		void deletePrefab(entityID ID);
 
@@ -88,7 +86,7 @@ namespace ecs
 		entityID amountOfEntities = 0;
 		entityID entitiesArraySize = 0;
 
-		std::vector<Prefab<entityID>*> prefabs;
+		std::unordered_map<entityID, Prefab<entityID>*> prefabs;
 
 		mathem::UniqueIDGenerator<entityID> IDGenerator;
 	};
@@ -380,34 +378,14 @@ namespace ecs
 	template <typename entityID>
 	Prefab<entityID>* EntityComponentSystem<entityID>::getPrefab(entityID ID)
 	{
-		for (auto prefab : prefabs)
-		{
-			if (prefab->entity.ID == ID)
-			{
-				return prefab;
-			}
-		}
-		return nullptr;
-	}
-
-	template <typename entityID>
-	entityID EntityComponentSystem<entityID>::getPrefabIndex(entityID ID)
-	{
-		for (entityID i = 0; i < prefabs.size(); i++)
-		{
-			if (prefabs[i]->entity.ID == ID)
-			{
-				return i;
-			}
-		}
-		return 0;
+		return prefabs[ID];
 	}
 
 	template <typename entityID>
 	entityID EntityComponentSystem<entityID>::createPrefab(std::string name)
 	{
 		entityID ID = IDGenerator.getID();
-		prefabs.push_back(new ecs::Prefab<entityID>(name, ID));
+		prefabs.insert( { ID, new ecs::Prefab<entityID>(name, ID) } );
 
 		return ID;
 	}
@@ -415,10 +393,9 @@ namespace ecs
 	template <typename entityID>
 	void EntityComponentSystem<entityID>::deletePrefab(entityID ID)
 	{
-		Prefab<entityID>* prefab = getPrefab(ID);
-		delete prefab;
-		IDGenerator.returnID(prefab->entity.ID);
-		prefabs.erase(prefabs.begin() + getPrefabIndex(ID));
+		delete prefabs[ID];
+		IDGenerator.returnID(ID);
+		prefabs.erase(ID);
 	}
 
 	template <typename entityID>

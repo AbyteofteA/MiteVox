@@ -2,7 +2,10 @@
 #ifndef DIRECTEDLIGHT_CALLBACKS_H
 #define DIRECTEDLIGHT_CALLBACKS_H
 
-void DirectedLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
+#include "engine/MiteVox/src/MiteVox.h"
+#include "engine/ECSManager/src/EntityComponentSystem.h"
+
+inline void DirectedLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
 	for (entityID entityIndex = 0;
 		entityIndex < _ecs->componentManagers[_managerIndex]->amountOfInstances;
@@ -34,7 +37,7 @@ void DirectedLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAG
 	}
 }
 
-void DirectedLight_onDelete(ecs::EntityComponentSystem<entityID>* _ecs, unsigned char _managerIndex, entityID ID, void* data, entityID index)
+inline void DirectedLight_onDelete(ecs::EntityComponentSystem<entityID>* _ecs, unsigned char _managerIndex, entityID ID, void* data, entityID index)
 {
 	unsigned int shaderIndex = 0;
 	if (!render::shaders[shaderIndex]->use())

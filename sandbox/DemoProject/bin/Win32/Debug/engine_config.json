@@ -12,11 +12,12 @@
         "log_file" : true,
         "log_dir" : "."
     },
-    "paths":
-    {
-        "config_dir" : "..\\..\\..\\config",
-        "resource_dir" : "..\\..\\..\\resources"
-    },
+  "paths": 
+  {
+      "config_dir": "..\\..\\..\\config",
+      "resource_dir": "..\\..\\..\\resources",
+      "saves_dir": "..\\..\\..\\saves"
+  },
     "renderer":
     {
         "screen_width" : 1280,

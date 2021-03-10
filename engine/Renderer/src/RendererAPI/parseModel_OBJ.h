@@ -3,10 +3,11 @@
 #define PARSEMODEL_OBJ_H
 
 #include <regex>
-#include "FileIO/src/FileIO.h"
-#include "Math/src/Math.h"
+#include "engine/FileIO/src/FileIO.h"
+#include "engine/Math/src/Math.h"
 
 #include "Color.h"
+#include "Primitives.h"
 #include "Mesh3D.h"
 
 namespace render
@@ -351,11 +352,11 @@ namespace render
 											vectB.i * vectA.k - vectA.i * vectB.k,
 											vectA.i * vectB.j - vectB.i * vectA.j };
 
-							vectN.length = sqrt(pow(vectN.i, 2) + pow(vectN.j, 2) + pow(vectN.k, 2));
+							vectN.length = sqrt(pow(vectN.i, (float)2) + pow(vectN.j, (float)2) + pow(vectN.k, (float)2));
 
 
 							poligon.n = (long*)malloc(sizeof(long) * poligon.amOfVertices);
-							for (int j = 0; j < poligon.amOfVertices; j++)
+							for (size_t j = 0; j < poligon.amOfVertices; j++)
 							{
 								poligon.n[j] = poligon.p[j];
 
@@ -364,9 +365,9 @@ namespace render
 								meshTmp->vn[poligon.n[j] - 1].k += vectN.k;
 
 								meshTmp->vn[poligon.n[j] - 1].length = sqrt(
-									pow(meshTmp->vn[poligon.n[j] - 1].i, 2) +
-									pow(meshTmp->vn[poligon.n[j] - 1].j, 2) +
-									pow(meshTmp->vn[poligon.n[j] - 1].k, 2));
+									pow(meshTmp->vn[poligon.n[j] - 1].i, (float)2) +
+									pow(meshTmp->vn[poligon.n[j] - 1].j, (float)2) +
+									pow(meshTmp->vn[poligon.n[j] - 1].k, (float)2));
 							}
 						}
 
@@ -433,7 +434,7 @@ namespace render
 		}
 
 		unsigned char r, g, b;
-		for (long i = 0; i < meshTmp->amOfFaces; i++)
+		for (size_t i = 0; i < meshTmp->amOfFaces; i++)
 		{
 			r = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[0] - 1].x - meshTmp->vMin.x) / (meshTmp->vMax.x - meshTmp->vMin.x)) * 255;
 			g = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[0] - 1].y - meshTmp->vMin.y) / (meshTmp->vMax.y - meshTmp->vMin.y)) * 255;
@@ -453,13 +454,13 @@ namespace render
 
 			meshTmp->f[i].color[2] = { r, g, b };
 
-			for (int j = 0; j < meshTmp->f[i].amOfVertices; j++)
+			for (size_t j = 0; j < meshTmp->f[i].amOfVertices; j++)
 			{
 				//meshTmp->f[i].n[j] = meshTmp->f[i].p[j];
 				meshTmp->vn[meshTmp->f[i].n[j] - 1].length = sqrt(
-					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].i, 2) +
-					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].j, 2) +
-					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].k, 2));
+					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].i, (float)2) +
+					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].j, (float)2) +
+					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].k, (float)2));
 			}
 		}
 

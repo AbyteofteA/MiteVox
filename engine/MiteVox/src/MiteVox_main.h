@@ -5,9 +5,9 @@ int main(int argc, char* argv[])
 {
 	mitevox::Engine* MiteVox = new mitevox::Engine(argc, argv);
 	
-	while (!glfwWindowShouldClose(MiteVox->settings->renderer->getWindow()))
+	while (!glfwWindowShouldClose(MiteVox->settings->getRendererSettings()->getWindow()))
 	{
-		GLFWwindow* window = MiteVox->settings->renderer->getWindow();
+		GLFWwindow* window = MiteVox->settings->getRendererSettings()->getWindow();
 		glfwPollEvents();
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		{

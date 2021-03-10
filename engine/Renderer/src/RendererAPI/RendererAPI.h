@@ -4,8 +4,8 @@
 
 #define HEXAGON_CONST 0.866025403
 
-#include "Math/src/Math.h"
-#include "FileIO/src/FileIO.h"
+#include "engine/Math/src/Math.h"
+#include "engine/FileIO/src/FileIO.h"
 
 #include "Cubemap.h"
 #include "Color.h"
@@ -87,7 +87,7 @@ namespace render
 //==================================================================
 //       Include your Renderer API implementation here             |
 //==================================================================
-#include "Renderer/src/implementations/RendererOpenGL/RendererOpenGL.h"
+#include "engine/Renderer/src/implementations/RendererOpenGL/RendererOpenGL.h"
 //==================================================================
 
 #endif

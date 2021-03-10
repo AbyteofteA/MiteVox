@@ -2,7 +2,10 @@
 #ifndef NATIVESCRIPT_CALLBACKS_H
 #define NATIVESCRIPT_CALLBACKS_H
 
-void NativeScript_onCreate(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
+#include "engine/MiteVox/src/MiteVox.h"
+#include "engine/ECSManager/src/EntityComponentSystem.h"
+
+inline void NativeScript_onCreate(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
 {
 	NativeScript_ECS* script =
 		(NativeScript_ECS*)_ecs->getComponent(ID, NATIVE_SCRIPT_COMPONENT);
@@ -20,7 +23,7 @@ void NativeScript_onCreate(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_I
 	}
 }
 
-void NativeScript_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
+inline void NativeScript_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
 	for (entityID entityIndex = 0;
 		entityIndex < _ecs->componentManagers[_managerIndex]->amountOfInstances;
@@ -38,7 +41,7 @@ void NativeScript_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGE
 	}
 }
 
-void NativeScript_onDestroy(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
+inline void NativeScript_onDestroy(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
 {
 	NativeScript_ECS* script =
 		(NativeScript_ECS*)_ecs->getComponent(ID, NATIVE_SCRIPT_COMPONENT);

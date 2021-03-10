@@ -2,8 +2,8 @@
 #ifndef SHADEROPENGL_H
 #define SHADEROPENGL_H
 
-#include "FileIO/src/FileIO.h"
-#include "Renderer/src/RendererAPI/RendererSettings.h"
+#include "engine/FileIO/src/FileIO.h"
+#include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>

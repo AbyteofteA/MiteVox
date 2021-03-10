@@ -108,7 +108,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\glew-2.1.0\lib\Release\Win32;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\lib-vc2019\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir); $(SolutionDir)dependencies\glew-2.1.0\lib\Release\Win32;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\lib-vc2019\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

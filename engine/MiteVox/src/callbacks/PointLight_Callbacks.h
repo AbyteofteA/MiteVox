@@ -2,7 +2,10 @@
 #ifndef POINTLIGHT_CALLBACKS_H
 #define POINTLIGHT_CALLBACKS_H
 
-void PointLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
+#include "engine/MiteVox/src/MiteVox.h"
+#include "engine/ECSManager/src/EntityComponentSystem.h"
+
+inline void PointLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, void* data)
 {
 	for (entityID entityIndex = 0; 
 		entityIndex < _ecs->componentManagers[_managerIndex]->amountOfInstances;
@@ -50,7 +53,7 @@ void PointLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_
 	}
 }
 
-void PointLight_onDelete(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
+inline void PointLight_onDelete(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
 {
 	unsigned int shaderIndex = 0;
 	if (!render::shaders[shaderIndex]->use())

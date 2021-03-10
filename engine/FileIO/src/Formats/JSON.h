@@ -92,34 +92,23 @@ namespace fileio
 
 	class JSON
 	{
-		std::string name = "";
-		bool isNameless = true;
-
-		JSONtype type = JSONtype::OBJECT;
-
-		double number = 0.0;
-		std::string string = "";
-		bool boolean = false;
-
-		std::vector<JSON*> fields;
-
 	public:
 
-		JSON()
+		inline JSON()
 		{
 			type = JSONtype::OBJECT;
 			isNameless = true;
 		}
-		JSON(std::string str)
+		inline JSON(std::string str)
 		{
 			parseStr(str);
 		}
-		~JSON()
+		inline ~JSON()
 		{
 			fields.clear();
 		}
 
-		bool isNull()
+		inline bool isNull()
 		{
 			if (type == JSONtype::NIL)
 			{
@@ -127,7 +116,7 @@ namespace fileio
 			}
 			return false;
 		}
-		bool isNumber()
+		inline bool isNumber()
 		{
 			if (type == JSONtype::NUMBER)
 			{
@@ -135,7 +124,7 @@ namespace fileio
 			}
 			return false;
 		}
-		bool isString()
+		inline bool isString()
 		{
 			if (type == JSONtype::STRING)
 			{
@@ -143,7 +132,7 @@ namespace fileio
 			}
 			return false;
 		}
-		bool isBoolean()
+		inline bool isBoolean()
 		{
 			if (type == JSONtype::BOOLEAN)
 			{
@@ -151,7 +140,7 @@ namespace fileio
 			}
 			return false;
 		}
-		bool isArray()
+		inline bool isArray()
 		{
 			if (type == JSONtype::ARRAY)
 			{
@@ -159,7 +148,7 @@ namespace fileio
 			}
 			return false;
 		}
-		bool isObject()
+		inline bool isObject()
 		{
 			if (type == JSONtype::OBJECT)
 			{
@@ -170,7 +159,7 @@ namespace fileio
 
 		// field GET methods //
 		
-		JSON* getField(std::string fieldName)
+		inline JSON* getField(std::string fieldName)
 		{
 			for (auto field : fields)
 			{
@@ -181,7 +170,7 @@ namespace fileio
 			}
 			return nullptr;
 		}
-		double getNumber(std::string fieldName)
+		inline double getNumber(std::string fieldName)
 		{
 			JSON* field = getField(fieldName);
 			if (field)
@@ -193,7 +182,7 @@ namespace fileio
 			}
 			return -0.0;
 		}
-		std::string getString(std::string fieldName)
+		inline std::string getString(std::string fieldName)
 		{
 			JSON* field = getField(fieldName);
 			if (field)
@@ -205,7 +194,7 @@ namespace fileio
 			}
 			return "";
 		}
-		bool getBoolean(std::string fieldName)
+		inline bool getBoolean(std::string fieldName)
 		{
 			JSON* field = getField(fieldName);
 			if (field)
@@ -217,7 +206,7 @@ namespace fileio
 			}
 			return false;
 		}
-		JSON* getArray(std::string fieldName)
+		inline JSON* getArray(std::string fieldName)
 		{
 			JSON* field = getField(fieldName);
 			if (field)
@@ -229,7 +218,7 @@ namespace fileio
 			}
 			return nullptr;
 		}
-		JSON* getObject(std::string fieldName)
+		inline JSON* getObject(std::string fieldName)
 		{
 			JSON* field = getField(fieldName);
 			if (field)
@@ -244,7 +233,7 @@ namespace fileio
 
 		// field SET methods //
 
-		JSON* setField(std::string fieldName, JSONtype type = JSONtype::NIL)
+		inline JSON* setField(std::string fieldName, JSONtype type = JSONtype::NIL)
 		{
 			JSON* field = getField(fieldName);
 
@@ -266,19 +255,19 @@ namespace fileio
 
 			return field;
 		}
-		JSON* setField(std::string fieldName, double value)
+		inline JSON* setField(std::string fieldName, double value)
 		{
 			JSON* field = setField(fieldName, JSONtype::NUMBER);
 			field->number = value;
 			return field;
 		}
-		JSON* setField(std::string fieldName, std::string value)
+		inline JSON* setField(std::string fieldName, std::string value)
 		{
 			JSON* field = setField(fieldName, JSONtype::STRING);
 			field->string = value;
 			return field;
 		}
-		JSON* setField(std::string fieldName, bool value)
+		inline JSON* setField(std::string fieldName, bool value)
 		{
 			JSON* field = setField(fieldName, JSONtype::BOOLEAN);
 			field->boolean = value;
@@ -287,7 +276,7 @@ namespace fileio
 
 		// array methods //
 
-		size_t addArrayItem(std::string fieldName, JSONtype type = JSONtype::NIL)
+		inline size_t addArrayItem(std::string fieldName, JSONtype type = JSONtype::NIL)
 		{
 			JSON* theArray = getField(fieldName);
 
@@ -302,7 +291,7 @@ namespace fileio
 			}
 			return -1;
 		}
-		size_t addArrayItem(JSON* theArray, JSONtype type = JSONtype::NIL)
+		inline size_t addArrayItem(JSON* theArray, JSONtype type = JSONtype::NIL)
 		{
 			if (theArray)
 			{
@@ -316,7 +305,7 @@ namespace fileio
 			return -1;
 		}
 
-		std::string toStr(unsigned int level = 0)
+		inline std::string toStr(unsigned int level = 0)
 		{
 			std::string quote = "\"";
 			std::string tabs = "";
@@ -430,7 +419,7 @@ namespace fileio
 
 			return result;
 		}
-		std::string parseStr(std::string str, JSON* obj = nullptr, unsigned int level = 0)
+		inline std::string parseStr(std::string str, JSON* obj = nullptr, unsigned int level = 0)
 		{
 			if (level == 0)
 			{
@@ -598,8 +587,8 @@ namespace fileio
 
 			return "ok";
 		}
-		int toFile(std::string filename);
-		int parseFile(std::string filename)
+		inline int toFile(std::string filename);
+		inline int parseFile(std::string filename)
 		{
 			std::string jsonData;
 
@@ -622,9 +611,19 @@ namespace fileio
 			parseStr(jsonData);
 			return 1;
 		}
-		void wipe();
 
 	private:
+
+		std::string name = "";
+		bool isNameless = true;
+
+		JSONtype type = JSONtype::OBJECT;
+
+		double number = 0.0;
+		std::string string = "";
+		bool boolean = false;
+
+		std::vector<JSON*> fields;
 
 		bool tryExitObject(std::string& str, std::regex& regexpSpace, std::smatch& match)
 		{
