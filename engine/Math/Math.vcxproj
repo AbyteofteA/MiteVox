@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Graphs\BinarySearchTree.cpp" />
+    <ClCompile Include="src\DataStructures\Graphs\BinarySearchTree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Calculus\Sequences.h" />
@@ -27,15 +27,17 @@
     <ClInclude Include="src\Convertations.h" />
     <ClInclude Include="src\DataStructures\HalfTable.h" />
     <ClInclude Include="src\DataStructures\HyperData.h" />
-    <ClInclude Include="src\DataStructures\UniqueIDGenerator.h" />
-    <ClInclude Include="src\Graphs\BinarySearchTree.h" />
-    <ClInclude Include="src\Graphs\Octree.h" />
+    <ClInclude Include="src\Generators\UniqueIDGenerator.h" />
+    <ClInclude Include="src\DataStructures\Graphs\BinarySearchTree.h" />
+    <ClInclude Include="src\DataStructures\Graphs\Octree.h" />
+    <ClInclude Include="src\DataStructures\Graphs\OctreeDataPoint.h" />
+    <ClInclude Include="src\DataStructures\Graphs\OctreeNode.h" />
     <ClInclude Include="src\LinearAlgebra\Point3D.h" />
     <ClInclude Include="src\LinearAlgebra\Transform.h" />
     <ClInclude Include="src\LinearAlgebra\Vector3D.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\NumericalAnalysis\Intertolation.h" />
-    <ClInclude Include="src\RandomNumberGenerators\CongruentialGenerator.h" />
+    <ClInclude Include="src\Generators\RandomNumberGenerators\CongruentialGenerator.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -108,6 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

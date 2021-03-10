@@ -2,6 +2,9 @@
 #ifndef MATH_POINT3D_H
 #define MATH_POINT3D_H
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 namespace mathem
 {
 

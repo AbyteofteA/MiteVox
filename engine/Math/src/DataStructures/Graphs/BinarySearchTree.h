@@ -6,13 +6,14 @@ namespace mathem
 {
 
 	long deleteCounter = 0;
-
 	long indexA = 0;
 	long indexD = 0;
 
 	template <typename T_key, typename T_data>
-	struct BinarySearchTree
+	class BinarySearchTree
 	{
+	public:
+
 		T_key key;
 		T_data data;
 
@@ -22,20 +23,13 @@ namespace mathem
 		BinarySearchTree* branchRight = nullptr;
 		BinarySearchTree* parent = nullptr;
 
+		BinarySearchTree(T_key key, T_data data);
 		~BinarySearchTree();
+
+		void insert(BinarySearchTree<T_key, T_data>* branchNode);
+		void insert(T_key key, T_data data);
+
 	};
-
-
-	template <typename T_key, typename T_data>
-	BinarySearchTree<T_key, T_data>* plantSearchTree(T_key key, T_data data);
-
-
-	template <typename T_key, typename T_data>
-	void insert(BinarySearchTree<T_key, T_data>* node, BinarySearchTree<T_key, T_data>* branchNode);
-
-	template <typename T_key, typename T_data>
-	void insert(BinarySearchTree<T_key, T_data>* node, T_key key, T_data data);
-
 
 	template <typename T_key, typename T_data>
 	BinarySearchTree<T_key, T_data>* search(BinarySearchTree<T_key, T_data>* root, T_key key);

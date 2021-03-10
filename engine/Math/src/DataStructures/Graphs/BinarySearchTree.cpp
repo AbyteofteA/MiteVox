@@ -4,14 +4,7 @@
 namespace mathem
 {
 	template <typename T_key, typename T_data>
-	BinarySearchTree<T_key, T_data>::~BinarySearchTree()
-	{
-		deleteCounter++;
-	}
-
-
-	template <typename T_key, typename T_data>
-	BinarySearchTree<T_key, T_data>* plantSearchTree(T_key key, T_data data)
+	BinarySearchTree<T_key, T_data>::BinarySearchTree(T_key key, T_data data)
 	{
 		BinarySearchTree<T_key, T_data>* tree = new BinarySearchTree<T_key, T_data>;
 		tree->parent = nullptr;
@@ -26,72 +19,74 @@ namespace mathem
 		return tree;
 	}
 
+	template <typename T_key, typename T_data>
+	BinarySearchTree<T_key, T_data>::~BinarySearchTree()
+	{
+		deleteCounter++;
+	}
 
 	template <typename T_key, typename T_data>
-	void insert(BinarySearchTree<T_key, T_data>* node, BinarySearchTree<T_key, T_data>* branchNode)
+	void BinarySearchTree<T_key, T_data>::insert(BinarySearchTree<T_key, T_data>* branchNode)
 	{
-		if (node == nullptr || branchNode == nullptr)
+		if (branchNode == nullptr) 
+		{ 
 			return;
+		}
 
-		branchNode->parent = node;
+		branchNode->parent = this;
 
-		if (branchNode->key < node->key)
+		if (branchNode->key < this->key)
 		{
-			if (node->branchLeft == nullptr)
-				node->branchLeft = branchNode;
+			if (this->branchLeft == nullptr)
+				this->branchLeft = branchNode;
 			else
-				insert<T_key, T_data>(node->branchLeft, branchNode);
+				insert<T_key, T_data>(this->branchLeft, branchNode);
 		}
 		else
 		{
-			if (node->branchRight == nullptr)
-				node->branchRight = branchNode;
+			if (this->branchRight == nullptr)
+				this->branchRight = branchNode;
 			else
-				insert<T_key, T_data>(node->branchRight, branchNode);
+				insert<T_key, T_data>(this->branchRight, branchNode);
 		}
 
-		node->amOfOffsprings++;
+		this->amOfOffsprings++;
 	}
 
-
 	template <typename T_key, typename T_data>
-	void insert(BinarySearchTree<T_key, T_data>* node, T_key key, T_data data)
+	void BinarySearchTree<T_key, T_data>::insert(T_key key, T_data data)
 	{
-		if (node == nullptr)
-			return;
-
 		BinarySearchTree<T_key, T_data>* branchNode = new BinarySearchTree<T_key, T_data>;
 		branchNode->branchLeft = nullptr;
 		branchNode->branchRight = nullptr;
-		branchNode->parent = node;
+		branchNode->parent = this;
 		branchNode->amOfOffsprings = 0;
 		branchNode->key = key;
 		branchNode->data = data;
 
-		if (branchNode->key < node->key)
+		if (branchNode->key < this->key)
 		{
-			if (node->branchLeft == nullptr)
-				node->branchLeft = branchNode;
+			if (this->branchLeft == nullptr)
+				this->branchLeft = branchNode;
 			else
 			{
 				delete branchNode;
-				insert<T_key, T_data>(node->branchLeft, key, data);
+				insert<T_key, T_data>(this->branchLeft, key, data);
 			}
 		}
 		else
 		{
-			if (node->branchRight == nullptr)
-				node->branchRight = branchNode;
+			if (this->branchRight == nullptr)
+				this->branchRight = branchNode;
 			else
 			{
 				delete branchNode;
-				insert<T_key, T_data>(node->branchRight, key, data);
+				insert<T_key, T_data>(this->branchRight, key, data);
 			}
 		}
 
-		node->amOfOffsprings++;
+		this->amOfOffsprings++;
 	}
-
 
 	template <typename T_key, typename T_data>
 	BinarySearchTree<T_key, T_data>* search(BinarySearchTree<T_key, T_data>* root, T_key key)
@@ -168,18 +163,14 @@ namespace mathem
 	template <typename T_keys, typename T_data>
 	void treeSort(T_keys* keys, T_data* data, unsigned int length, bool order)
 	{
-		if (keys == nullptr)
-			return;
-		if (data == nullptr)
-			return;
-		if (length == 0)
+		if (keys == nullptr || data == nullptr || length == 0)
 			return;
 
-		BinarySearchTree<T_keys, T_data>* tree = plantSearchTree<T_keys, T_data>(keys[0], data[0]);
+		BinarySearchTree<T_keys, T_data>* tree = new BinarySearchTree<T_keys, T_data>(keys[0], data[0]);
 
 		for (int i = 1; i < length; i++)
 		{
-			insert<T_keys, T_data>(tree, keys[i], data[i]);
+			tree->insert<T_keys, T_data>(keys[i], data[i]);
 		}
 
 		if (order)
