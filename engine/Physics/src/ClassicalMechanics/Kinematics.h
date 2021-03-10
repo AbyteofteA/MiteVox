@@ -2,11 +2,11 @@
 #ifndef PHYSICS_KINEMATICS_H
 #define PHYSICS_KINEMATICS_H
 
-#include "Physics/src/MovementProps.h"
+#include "engine/Physics/src/MovementProps.h"
 
 namespace physcs
 {
-	void applyKinematics(MovementProps* body, float time)
+	inline void applyKinematics(MovementProps* body, float time)
 	{
 		body->velocity.i += body->acceler.i * time;
 		body->velocity.j -= body->acceler.j * time;

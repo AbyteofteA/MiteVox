@@ -4,7 +4,7 @@
 
 namespace physcs
 {
-	void applyLawsOfConservation(
+	inline void applyLawsOfConservation(
 		MovementProps* props1, MovementProps* props2,
 		RigidBody* body1, RigidBody* body2)
 	{

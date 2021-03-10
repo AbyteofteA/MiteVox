@@ -2,13 +2,14 @@
 #ifndef PHYSICS_INTERSECTAABB_H
 #define PHYSICS_INTERSECTAABB_H
 
-#include "Physics/src/Colliders/Primitives.h"
-#include "Physics/src/Colliders/PrimitiveCollider.h"
+#include "engine/Physics/src/Colliders/Primitives.h"
+#include "engine/Physics/src/Colliders/PrimitiveCollider.h"
+#include "engine/Math/src/LinearAlgebra/Point3D.h"
 
 namespace physcs
 {
 	// TODO: calculate collisPoint.
-	bool intersectAABB(Block block1, Block block2, mathem::Point3D* collisPoint)
+	inline bool intersectAABB(Block block1, Block block2, mathem::Point3D* collisPoint)
 	{
 		float maxX = block1.halfSize.x + block2.halfSize.x;
 		float maxY = block1.halfSize.y + block2.halfSize.y;
@@ -29,7 +30,7 @@ namespace physcs
 
 		return true;
 	}
-	bool intersectAABB(Block block, Sphere sphere, mathem::Point3D* collisPoint)
+	inline bool intersectAABB(Block block, Sphere sphere, mathem::Point3D* collisPoint)
 	{
 		collisPoint->x =
 			fmax(block.pos.x - block.halfSize.x,
@@ -55,7 +56,7 @@ namespace physcs
 
 		return true;
 	}
-	bool intersectAABB(Block block, Cylinder cylinder, mathem::Point3D* collisPoint)
+	inline bool intersectAABB(Block block, Cylinder cylinder, mathem::Point3D* collisPoint)
 	{
 		float maxY = block.halfSize.y + cylinder.halfHeight;
 		collisPoint->x =
@@ -86,7 +87,7 @@ namespace physcs
 	}
 
 	// TODO: calculate collisPoint.
-	bool intersectAABB(Sphere sphere1, Sphere sphere2, mathem::Point3D* collisPoint)
+	inline bool intersectAABB(Sphere sphere1, Sphere sphere2, mathem::Point3D* collisPoint)
 	{
 		float maxR = sphere1.radius + sphere2.radius;
 
@@ -106,7 +107,7 @@ namespace physcs
 		return true;
 	}
 	// TODO: calculate collisPoint.
-	bool intersectAABB(Sphere sphere, Cylinder cylinder, mathem::Point3D* collisPoint)
+	inline bool intersectAABB(Sphere sphere, Cylinder cylinder, mathem::Point3D* collisPoint)
 	{
 		float maxY = sphere.radius + cylinder.halfHeight;
 		float maxR = sphere.radius + cylinder.radius;
@@ -128,7 +129,7 @@ namespace physcs
 	}
 
 	// TODO: calculate collisPoint.
-	bool intersectAABB(Cylinder cylinder1, Cylinder cylinder2, mathem::Point3D* collisPoint)
+	inline bool intersectAABB(Cylinder cylinder1, Cylinder cylinder2, mathem::Point3D* collisPoint)
 	{
 		float maxY = cylinder1.halfHeight + cylinder2.halfHeight;
 		float maxXZ = cylinder1.radius + cylinder2.radius;
@@ -149,7 +150,7 @@ namespace physcs
 		return true;
 	}
 
-	bool intersectAABB(PrimitiveCollider collider1, PrimitiveCollider collider2, mathem::Point3D* collisPoint)
+	inline bool intersectAABB(PrimitiveCollider collider1, PrimitiveCollider collider2, mathem::Point3D* collisPoint)
 	{
 		unsigned int amountOfBlocks1 = collider1.blocks.getSizeData();
 		unsigned int amountOfSpheres1 = collider1.spheres.getSizeData();

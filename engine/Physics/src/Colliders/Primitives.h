@@ -2,7 +2,7 @@
 #ifndef PHYSICS_PRIMITIVES_H
 #define PHYSICS_PRIMITIVES_H
 
-#include "Math/src/Math.h"
+#include "engine/Math/src/Math.h"
 
 namespace physcs
 {
