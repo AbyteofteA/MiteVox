@@ -2,7 +2,7 @@
 #ifndef FULLYCONNECTEDLAYER_H
 #define FULLYCONNECTEDLAYER_H
 
-#include "AIModels/src/Structure/Functions.h"
+#include "engine/AIModels/src/Structure/Functions.h"
 
 namespace aimods
 {

@@ -10,7 +10,7 @@ namespace aimods
 {
 	enum struct activation { LINEAR = 0, BINARY, BIPOLAR, RELU, SIGMOID, TANH };
 
-	float activationFunction(float weightedSum, activation function)
+	inline float activationFunction(float weightedSum, activation function)
 	{
 		float f = 0;
 
@@ -55,7 +55,7 @@ namespace aimods
 	}
 
 
-	float activationDerivative(float weightedSum, activation function)
+	inline float activationDerivative(float weightedSum, activation function)
 	{
 		float der = 0;
 

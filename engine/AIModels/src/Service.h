@@ -2,17 +2,17 @@
 #ifndef SERVICE_H
 #define SERVICE_H
 
-#include "AIModels/src/Structure/Functions.h"
+#include "engine/AIModels/src/Structure/Functions.h"
 
 #include <ctime>
 #include <iostream>
 
 namespace aimods
 {
-	/*****************************************************************************************
-	Generates a name for a file based on date and time.
-	*****************************************************************************************/
-	char* nameAFile()
+	/// <summary>
+	/// Generates a name for a file based on date and time.
+	/// </summary>
+	inline char* nameAFile()
 	{
 		time_t t = time(nullptr);
 		struct tm myTime;
@@ -58,10 +58,10 @@ namespace aimods
 		return filename;
 	}
 
-	/************************************************************************************
-	Add character to a string.
-	************************************************************************************/
-	char* addChar2Str(char* str, char ch)
+	/// <summary>
+	/// Add character to a string.
+	/// </summary>
+	inline char* addChar2Str(char* str, char ch)
 	{
 		if (str == nullptr)
 		{

@@ -2,8 +2,8 @@
 #ifndef CONVOLUTIONALLAYER2D_H
 #define CONVOLUTIONALLAYER2D_H
 
-#include "AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/Filter2D.h"
-#include "AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/FilterLayer2DBase.h"
+#include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/Filter2D.h"
+#include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/FilterLayer2DBase.h"
 
 namespace aimods
 {

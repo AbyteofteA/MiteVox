@@ -2,7 +2,7 @@
 #ifndef FILTERLAYER2DBASE_H
 #define FILTERLAYER2DBASE_H
 
-#include "AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/Filter2D.h"
+#include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/Filter2D.h"
 
 #include <cstdlib>
 #include <cstring>

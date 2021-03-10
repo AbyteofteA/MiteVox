@@ -2,7 +2,7 @@
 #ifndef HOPFIELDNN_H
 #define HOPFIELDNN_H
 
-#include "AIModels/src/Structure/FormalNeuron.h"
+#include "engine/AIModels/src/Structure/FormalNeuron.h"
 
 namespace aimods
 {

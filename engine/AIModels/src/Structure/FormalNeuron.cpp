@@ -1,7 +1,7 @@
 
 #include "FormalNeuron.h"
 
-#include "AIModels/src/Structure/Functions.h"
+#include "engine/AIModels/src/Structure/Functions.h"
 
 #include <cmath>
 
