@@ -10,22 +10,23 @@ namespace fs = std::filesystem;
 #include <string>
 #include <thread>
 #include <vector>
+#include <atomic>
 
 namespace fileio
 {
 	struct FileLoaderAsyncInfo
 	{
 		std::string filename;
-		FileStatus fileStatus = FileStatus::LOADING;
+		std::atomic<FileStatus> fileStatus = FileStatus::LOADING;
 		std::thread loaderThread;
 
-		void (*parseFunction)(std::string filename, void** objectDestination, FileStatus* flag);
+		void (*parseFunction)(std::string filename, void** objectDestination, std::atomic<FileStatus>* flag);
 
 		// Temporary storage for the parsed object.
-		void* objectData;
+		void* objectData = nullptr;
 
 		// Destination is assigned with data only when/if the data is ready.
-		void** destination;
+		void** destination = nullptr;
 	};
 
 	struct FileLoaderAsync
@@ -40,7 +41,7 @@ namespace fileio
 			b) if _parseFunction == nullptr, assigns objectDestination with the pointer
 		to the read file.
 		*****************************************************************************************/
-		inline void loadAndParseAsync(std::string _filename, void** _destination, void (*_parseFunction)(std::string filename, void** objectDestination, FileStatus* flag) = nullptr)
+		inline void loadAndParseAsync(std::string _filename, void** _destination, void (*_parseFunction)(std::string filename, void** objectDestination, std::atomic<FileStatus>* flag) = nullptr)
 		{
 			if (exists(_destination))
 			{
@@ -78,7 +79,7 @@ namespace fileio
 		{
 			for (int i = 0; i < (int)fileRecords.size(); i++)
 			{
-				if (fileRecords[i]->fileStatus == FileStatus::READY)
+				if (fileRecords[i]->fileStatus.load() == FileStatus::READY)
 				{
 					fileRecords[i]->loaderThread.join();
 					*fileRecords[i]->destination = fileRecords[i]->objectData;

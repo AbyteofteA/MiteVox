@@ -2,6 +2,7 @@
 #ifndef PARSEMODEL_OBJ_H
 #define PARSEMODEL_OBJ_H
 
+#include <atomic>
 #include <regex>
 #include "engine/FileIO/src/FileIO.h"
 #include "engine/Math/src/Math.h"
@@ -160,13 +161,13 @@ namespace render
 	Application:
 	Description:
 	************************************************************************************/
-	inline void parseModel_OBJ(std::string filename, void** mesh, fileio::FileStatus* flag)
+	inline void parseModel_OBJ(std::string filename, void** mesh, std::atomic<fileio::FileStatus>* flag)
 	{
 		*mesh = nullptr;
-		*flag = fileio::FileStatus::LOADING;
+		flag->store(fileio::FileStatus::LOADING);
 		char* fileData = nullptr;
 
-		fileio::FileStatus tmpFlag = fileio::FileStatus::LOADING;
+		std::atomic<fileio::FileStatus> tmpFlag = fileio::FileStatus::LOADING;
 		fileio::loadBytes(filename, (void**)&fileData, &tmpFlag);
 
 		auto const regex = std::regex(fileio::OBJ_regex);
@@ -467,7 +468,7 @@ namespace render
 		free(fileData);
 		(*mesh) = (void*)meshTmp;
 
-		*flag = fileio::FileStatus::READY;
+		flag->store(fileio::FileStatus::READY);
 		return;
 	}
 

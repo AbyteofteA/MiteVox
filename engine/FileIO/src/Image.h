@@ -2,6 +2,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <atomic>
 #include <string>
 #include "SOIL.h"
 
@@ -9,7 +10,6 @@ namespace fileio
 {
 	struct Image
 	{
-
 	public:
 
 		void* imageData = nullptr;
@@ -24,10 +24,10 @@ namespace fileio
 	};
 
 
-	inline void loadImage(std::string filename, void** image, FileStatus* flag)
+	inline void loadImage(std::string filename, void** image, std::atomic<FileStatus>* flag)
 	{
 		*image = nullptr;
-		*flag = FileStatus::LOADING;
+		flag->store(FileStatus::LOADING);
 
 		Image* tmpImage = new Image();
 
@@ -36,7 +36,7 @@ namespace fileio
 
 		*image = (void*)tmpImage;
 
-		*flag = FileStatus::READY;
+		flag->store(FileStatus::READY);
 		return;
 	}
 }

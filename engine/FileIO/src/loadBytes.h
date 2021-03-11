@@ -4,6 +4,7 @@
 
 #include "FileStatus.h"
 #include <string>
+#include <atomic>
 
 namespace fileio
 {
@@ -12,10 +13,10 @@ namespace fileio
 	Assignes the flag with 1 when the file is loaded.
 	\return Size of the file if success, -1 otherwise.
 	*****************************************************************************************/
-	inline void loadBytes(std::string filename, void** result, FileStatus* flag)
+	inline void loadBytes(std::string filename, void** result, std::atomic<FileStatus>* flag)
 	{
 		*result = nullptr;
-		*flag = FileStatus::LOADING;
+		flag->store(FileStatus::LOADING);
 		char* fileData = nullptr;
 
 		FILE* file;
@@ -24,7 +25,7 @@ namespace fileio
 		{
 			printf("\n ERROR! Cannot open the file.\n");
 			printf("File: %s\n", filename.c_str());
-			*flag = FileStatus::ERROR;
+			flag->store(FileStatus::ERROR);
 			return;
 		}
 		else // read the file
@@ -49,7 +50,7 @@ namespace fileio
 			fclose(file);
 			(*result) = (void*)fileData;
 
-			*flag = FileStatus::READY;
+			flag->store(FileStatus::READY);
 			return;
 		}
 	}
