@@ -30,7 +30,7 @@ namespace render
 
 	// General
 
-	inline int initRenderer(RendererSettings* renderer);
+	inline RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling);
 	inline void closeRenderer(RendererSettings* renderer);
 	inline std::string getVendorName();
 	inline std::string getRendererName();

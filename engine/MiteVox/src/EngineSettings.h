@@ -4,6 +4,8 @@
 
 #include "engine/FileIO/src/FileIO.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
+#include "engine/Profiler/src/Logger.h"
+#include "engine/UIEventHandler/src/InputHandler.h"
 
 #include <string>
 
@@ -16,7 +18,8 @@ namespace mitevox
 
 	public:
 
-		EngineSettings();
+		profile::Logger logger;
+
 		EngineSettings(std::string _executionPath);
 		~EngineSettings();
 
@@ -48,6 +51,7 @@ namespace mitevox
 		std::string savesDir = "";
 
 		render::RendererSettings* renderer = nullptr;
+		InputHandler* inputHandler = nullptr;
 	};
 
 

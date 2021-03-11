@@ -3,16 +3,14 @@
 
 #include "engine/FileIO/src/FileIO.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
+#include "engine/Profiler/src/Logger.h"
+#include "engine/UIEventHandler/src/InputHandler.h"
 
 #include <string>
+#include <cstdio>
 
 namespace mitevox
 {
-	EngineSettings::EngineSettings()
-	{
-
-	}
-
 	EngineSettings::EngineSettings(std::string _executionPath)
 	{
 		executionDir = _executionPath;
@@ -21,13 +19,23 @@ namespace mitevox
 		engineConfig->parseFile(executionDir + "\\engine_config.json");
 		fromJSON(engineConfig);
 
+		inputHandler = new InputHandler(renderer->getWindow());
+
 		delete engineConfig;
 	}
 
 	EngineSettings::~EngineSettings()
 	{
-		render::closeRenderer(renderer);
-		delete renderer;
+		if (renderer)
+		{
+			render::closeRenderer(renderer);
+			delete renderer;
+		}
+
+		if (inputHandler)
+		{
+			delete inputHandler;
+		}
 	}
 
 	void EngineSettings::fromJSON(fileio::JSON* json)
@@ -57,13 +65,25 @@ namespace mitevox
 		fs::path _savesPath = fs::path(pathsConfig->getString("saves_dir"));
 		_savesPath = fs::relative(_savesPath, _executionPath).string();
 
-		renderer = new render::RendererSettings();
+		logger = profile::Logger(true, logDir);
 
-		renderer->screenWidth = (int)generalConfig->getNumber("screen_width");
-		renderer->screenHeight = (int)generalConfig->getNumber("screen_height");
-		renderer->backfaceCulling = generalConfig->getBoolean("back_culling");
+		int screenWidth = (int)generalConfig->getNumber("screen_width");
+		int screenHeight = (int)generalConfig->getNumber("screen_height");
+		bool backfaceCulling = generalConfig->getBoolean("back_culling");
 
-		render::initRenderer(renderer);
+		renderer = render::initRenderer(screenWidth, screenHeight, true, backfaceCulling);
+		if (renderer)
+		{
+			logger.info("EngineSettings", "Window is created.");
+			logger.info("EngineSettings", "Vendor: " + render::getVendorName());
+			logger.info("EngineSettings", "Renderer: " + render::getRendererName());
+			logger.info("EngineSettings", "Version: " + render::getVersion());
+			logger.info("EngineSettings", "Language Version: " + render::getLanguageVersion());
+		}
+		else
+		{
+			logger.error("EngineSettings", "Cannot create window!");
+		}
 	}
 
 	fileio::JSON* EngineSettings::toJSON()

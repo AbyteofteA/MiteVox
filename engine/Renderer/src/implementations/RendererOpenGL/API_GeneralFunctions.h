@@ -6,11 +6,13 @@
 
 namespace render
 {
-	int initRenderer(RendererSettings* renderer)
+	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool _backfaceCulling)
 	{
+		RendererSettings* renderer = new render::RendererSettings();
+
 		if (!glfwInit())
 		{
-			return -1;
+			return nullptr;
 		}
 
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -20,23 +22,35 @@ namespace render
 		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-		//glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
-		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
-		
-
 		glfwWindowHint(GLFW_SAMPLES, 2);
 
-		renderer->setWindow(
-			glfwCreateWindow(mode->width, mode->height, "MiteVox", monitor, nullptr));
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+		glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
+
+		GLFWwindow* window = nullptr;
+		if (isFullScreen)
+		{
+			window = glfwCreateWindow(mode->width, mode->height, "MiteVox", monitor, nullptr);
+		}
+		else
+		{
+			window = glfwCreateWindow(mode->width, mode->height, "MiteVox", nullptr, nullptr);
+		}
+		//glfwSetWindowPos(window, 0, 0);
+
+		renderer->setWindow(window);
+
 		if (renderer->getWindow() == nullptr)
 		{
 			std::cout << "Failed to create GLFW window" << std::endl;
 			glfwTerminate();
-			return -1;
+			return nullptr;
 		}
-		
+		renderer->screenWidth = mode->width;
+		renderer->screenHeight = mode->height;
+		renderer->backfaceCulling = _backfaceCulling;
+
 		glfwMakeContextCurrent(renderer->getWindow());
 
 
@@ -74,8 +88,9 @@ namespace render
 		renderer->lines.resize(PRIMITIVE_BUFFER_SIZE * 2);
 		renderer->triangles.resize(PRIMITIVE_BUFFER_SIZE * 3);
 
-		return 1;
+		return renderer;
 	}
+
 	void closeRenderer(RendererSettings* renderer)
 	{
 		glfwWindowShouldClose(renderer->getWindow());
@@ -86,14 +101,17 @@ namespace render
 	{
 		return std::string((const char*)glGetString(GL_VENDOR));
 	}
+
 	inline std::string getRendererName()
 	{
 		return std::string((const char*)glGetString(GL_RENDERER));
 	}
+
 	inline std::string getVersion()
 	{
 		return std::string((const char*)glGetString(GL_VERSION));
 	}
+
 	inline std::string getLanguageVersion()
 	{
 		return std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -104,6 +122,7 @@ namespace render
 		glClearColor(color.r, color.g, color.b, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
+
 	void clearBufferZ()
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);

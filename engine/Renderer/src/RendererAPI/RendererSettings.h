@@ -20,20 +20,17 @@ namespace render
 {
 	class RendererSettings
 	{
-
-	private:
-
-		GLFWwindow* window = nullptr;
-
 	public:
-
-		// Renderer Settings
 
 		int screenWidth = SCREEN_WIDTH;
 		int screenHeight = SCREEN_HEIGHT;
 		unsigned char backfaceCulling = 1;
 
 		int primitiveShaderID = -1;
+
+		mathem::Buffer<Point> points;
+		mathem::Buffer<Point> lines;
+		mathem::Buffer<Point> triangles;
 
 		RendererSettings(){}
 		RendererSettings(GLFWwindow* _window)
@@ -56,9 +53,9 @@ namespace render
 			window = _window;
 		}
 
-		mathem::Buffer<Point> points;
-		mathem::Buffer<Point> lines;
-		mathem::Buffer<Point> triangles;
+	private:
+
+		GLFWwindow* window = nullptr;
 	};
 }
 

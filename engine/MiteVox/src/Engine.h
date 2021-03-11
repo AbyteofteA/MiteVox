@@ -4,7 +4,6 @@
 
 #include "EngineSettings.h"
 #include "Scene.h"
-#include "engine/UIEventHandler/src/InputHandler.h"
 
 #include <unordered_map>
 
@@ -33,7 +32,6 @@ namespace mitevox
 
 	private:
 
-		InputHandler* inputHandler = nullptr;
 		std::unordered_map<int, Scene*> scenes;
 		mathem::UniqueIDGenerator<int> IDGenerator;
 	};

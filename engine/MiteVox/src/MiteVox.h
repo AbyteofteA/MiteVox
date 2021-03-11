@@ -9,6 +9,7 @@
 #include "engine/Physics/src/Physics.h"
 #include "engine/UIEventHandler/src/UIEventHandler.h"
 #include "engine/ECSManager/src/EntityComponentSystem.h"
+#include "engine/Profiler/src/Logger.h"
 
 typedef unsigned long entityID;
 

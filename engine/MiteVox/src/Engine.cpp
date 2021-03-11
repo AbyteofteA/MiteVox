@@ -18,10 +18,6 @@ namespace mitevox
 		std::string executionDir = fs::path(argv[0]).parent_path().string();
 		settings = new EngineSettings(executionDir);
 
-		inputHandler = new InputHandler(settings->renderer->getWindow());
-		inputHandler->attach();
-		inputHandler->update();
-
 		onCreate();
 	}
 
@@ -33,8 +29,7 @@ namespace mitevox
 		{
 			delete scene.second;
 		}
-		delete inputHandler;
-
+		
 		delete settings;
 	}
 
@@ -44,7 +39,7 @@ namespace mitevox
 		scenes.insert( { ID, new Scene() } );
 		scenes[ID]->name = name;
 		scenes[ID]->renderer = settings->renderer;
-		scenes[ID]->inputHandler = inputHandler;
+		scenes[ID]->inputHandler = settings->inputHandler;
 
 		return ID;
 	}
@@ -64,7 +59,7 @@ namespace mitevox
 	{
 		onUpdate();
 
-		inputHandler->update();
+		settings->inputHandler->update();
 		if (scenes.count(activeScene) > 0)
 		{
 			scenes[activeScene]->update(settings);

@@ -5,116 +5,159 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <chrono>
+#include <ctime>
 #include <thread>
 
 /*
 
 Log format:
-	[TIMESTAMP] EVENT STATUS: "MESSAGE" ID PID
-{
-	log:
-	[
-		{time: 123456, event: "main", status: "INFO", text: "Hello, world!", id: 789456, pid: 789456},
-		{time: 234567, event: "main", status: "INFO", text: "Hello, world!", id: 789456, pid: 789456},
-		{time: 345678, event: "main", status: "INFO", text: "Hello, world!", id: 789456, pid: 789456}
-	]
-}
+	[TIMESTAMP] EVENTNAME STATUS: "MESSAGE" ID PID
+
 	TIMESTAMP - [YYYY-MM-DD hh:mm:ss uuuuuu] or just microseconds
 	ID - the thread ID
 	PID - parent thread ID
-	EVENT
+	EVENTNAME
 	STATUS = { INFO, WARNING, ERROR, START, END }
-	
+
+    {
+      log:
+      [
+        { time: "YYYY-MM-DD hh:mm:ss uuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
+        { time: "YYYY-MM-DD hh:mm:ss uuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
+        { time: "YYYY-MM-DD hh:mm:ss uuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 }
+      ]
+    }
+
 */
 
 namespace profile
 {
 	class Logger
 	{
+	public:
+
+		/// <summary>
+		/// Constructor for the console logger.
+		/// </summary>
+		inline Logger();
+
+		/// <summary>
+		/// Constructor for the file logger. 
+		/// </summary>
+		inline Logger(bool _logConsole, std::string _filePath);
+
+		inline std::string info(std::string name, std::string message);
+		inline std::string warning(std::string name, std::string message);
+		inline std::string error(std::string name, std::string message);
+
+	private:
+
 		bool logConsole;
 		bool logfile;
 		std::string filePath;
 
-		std::chrono::high_resolution_clock::time_point startTime;
-
-	public:
-
-		Logger()
-		{
-			startTime =
-				std::chrono::high_resolution_clock::now();
-
-			logConsole = true;
-			logfile = false;
-		}
-		Logger(bool _logConsole, std::string _filePath)
-		{
-			startTime =
-				std::chrono::high_resolution_clock::now();
-
-			logConsole = _logConsole;
-			logfile = true;
-			filePath = _filePath;
-		}
-
-		void info(std::string message)
-		{
-			std::string infoStr =
-				"[" + getTimeStamp() + "] INFO: \"" + message + "\"";
-
-			if (logConsole)
-			{
-				std::cout << infoStr << std::endl;
-			}
-			if (logfile)
-			{
-				
-			}
-		}
-		void warning(std::string message)
-		{
-			std::string warningStr =
-				"[" + getTimeStamp() + "] WARNING: \"" + message + "\"";
-
-			if (logConsole)
-			{
-				std::cout << warningStr << std::endl;
-			}
-			if (logfile)
-			{
-
-			}
-		}
-		void error(std::string message)
-		{
-			std::string errorStr =
-				"[" + getTimeStamp() + "] ERROR: \"" + message + "\"";
-
-			if (logConsole)
-			{
-				std::cout << errorStr << std::endl;
-			}
-			if (logfile)
-			{
-
-			}
-		}
-
-		std::string getTreadID()
-		{
-			std::stringstream sstream;
-			sstream << std::this_thread::get_id();
-			return sstream.str();
-		}
-		std::string getTimeStamp()
-		{
-			auto now = std::chrono::high_resolution_clock::now();
-			long long time =
-				std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count();
-			return std::to_string(time);
-		}
+		inline std::string getTreadID();
+		inline std::string getTimeStamp();
 	};
+
+
+	// IMPLEMENTATION BELOW //
+
+
+	inline Logger::Logger()
+	{
+		logConsole = true;
+		logfile = false;
+	}
+
+	inline Logger::Logger(bool _logConsole, std::string _filePath)
+	{
+		logConsole = _logConsole;
+		logfile = true;
+		filePath = _filePath;
+	}
+
+	inline std::string Logger::info(std::string name, std::string message)
+	{
+		std::string infoStr =
+			"{ time: \"" + getTimeStamp() +
+			"\", status: \"INFO" +
+			"\", text: \"" + message +
+			"\", name: \"" + name +
+			"\", id: " + getTreadID() + " }";
+
+		if (logConsole)
+		{
+			std::cout << infoStr << std::endl;
+		}
+		if (logfile)
+		{
+
+		}
+
+		return infoStr;
+	}
+
+	inline std::string Logger::warning(std::string name, std::string message)
+	{
+		std::string warningStr =
+			"{ time: \"" + getTimeStamp() +
+			"\", status: \"WARNING" +
+			"\", text: \"" + message +
+			"\", name: \"" + name +
+			"\", id: " + getTreadID() + " }";
+
+		if (logConsole)
+		{
+			std::cout << warningStr << std::endl;
+		}
+		if (logfile)
+		{
+
+		}
+
+		return warningStr;
+	}
+
+	inline std::string Logger::error(std::string name, std::string message)
+	{
+		std::string errorStr =
+			"{ time: \"" + getTimeStamp() +
+			"\", status: \"ERROR" +
+			"\", text: \"" + message +
+			"\", name: \"" + name +
+			"\", id: " + getTreadID() + " }";
+
+		if (logConsole)
+		{
+			std::cout << errorStr << std::endl;
+		}
+		if (logfile)
+		{
+
+		}
+
+		return errorStr;
+	}
+
+	inline std::string Logger::getTreadID()
+	{
+		std::stringstream sstream;
+		sstream << std::this_thread::get_id();
+		return sstream.str();
+	}
+
+	// BUG: it doesn't return appropriate timestamp
+	inline std::string Logger::getTimeStamp()
+	{
+		time_t now = time(nullptr);
+		char date[64];
+		ctime_s(date, sizeof(date), &now);
+
+		std::string timeStamp = std::string(date);
+		timeStamp.pop_back();
+		return timeStamp;
+	}
 }
 
 #endif
