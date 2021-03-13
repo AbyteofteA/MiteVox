@@ -19,9 +19,10 @@ int skyboxShader = -1;
 
 void mitevox::Engine::onCreate() 
 {
-	this->activeScene = this->createScene();
-	mitevox::Scene* myScene = this->getActiveScene();
-	ecs::EntityComponentSystem<entityID>* myECS = this->getActiveScene()->ECS;
+	this->playground->name = "Demo";
+	this->playground->createMainScene("Demo Scene", settings);
+	mitevox::Scene* myScene = this->playground->getActiveScene();
+	ecs::EntityComponentSystem<entityID>* myECS = myScene->ECS;
 
 	// Compile shaders.
 
@@ -70,8 +71,8 @@ void mitevox::Engine::onCreate()
 	darkSomething->roughness = { 0.7f, 0.7f, 0.7f };
 	darkSomething->metallicity = { 0.5f, 0.5f, 0.5f };
 	darkSomething->specularExponent = 5;
-	darkSomething->albedoMap = *SPECchecker0;
-	darkSomething->metallicMap = *white;
+	darkSomething->albedoMap = SPECchecker0;
+	darkSomething->metallicMap = white;
 
 	NativeScript_ECS waveScript = { nullptr, waveModel_Script, nullptr };
 	NativeScript_ECS rotateScript = { nullptr, rotateModel_Script, nullptr };
@@ -120,8 +121,8 @@ void mitevox::Engine::onCreate()
 	light->roughness = { 0, 0, 0 };
 	light->metallicity = { 0, 0, 0 };
 	light->specularExponent = 1;
-	light->albedoMap = *white;
-	light->metallicMap = *white;
+	light->albedoMap = white;
+	light->metallicMap = white;
 	render::Model3D* cubeLight = new render::Model3D(mCube, light, { 3, 3, 3, 0, 0, 0, 0, 0, 0 });
 	cubeLight->shaderID = basicShader;
 	myECS->getPrefab(Light)->attachComponent(

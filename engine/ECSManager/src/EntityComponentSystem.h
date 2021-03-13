@@ -10,7 +10,7 @@
 #include "Prefab.h"
 #include "ComponentManager.h"
 
-#include "engine/Math/src/Math.h"
+#include "engine/Math/src/Generators/UniqueIDGenerator.h"
 
 #include <string>
 #include <unordered_map>

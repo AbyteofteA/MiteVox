@@ -82,8 +82,8 @@ namespace mathem
 
 		Vector3D transformVector(Vector3D v)
 		{
-			Vector3D vNew = { v.i, v.j, v.k, v.length };
-			Vector3D vTmp = { v.i, v.j, v.k, v.length };
+			Vector3D vNew = { v.i, v.j, v.k };
+			Vector3D vTmp = { v.i, v.j, v.k };
 
 
 			float angle = angleY * (float)M_PI / 180;

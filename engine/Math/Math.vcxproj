@@ -27,13 +27,16 @@
     <ClInclude Include="src\Convertations.h" />
     <ClInclude Include="src\DataStructures\HalfTable.h" />
     <ClInclude Include="src\DataStructures\HyperData.h" />
+    <ClInclude Include="src\Generators\NoiseGenerators\PerlinNoiseGenerator.h" />
     <ClInclude Include="src\Generators\UniqueIDGenerator.h" />
     <ClInclude Include="src\DataStructures\Graphs\BinarySearchTree.h" />
     <ClInclude Include="src\DataStructures\Graphs\Octree.h" />
     <ClInclude Include="src\DataStructures\Graphs\OctreeDataPoint.h" />
     <ClInclude Include="src\DataStructures\Graphs\OctreeNode.h" />
+    <ClInclude Include="src\LinearAlgebra\SquareMatrix.h" />
     <ClInclude Include="src\LinearAlgebra\Point3D.h" />
     <ClInclude Include="src\LinearAlgebra\Transform.h" />
+    <ClInclude Include="src\LinearAlgebra\Vector.h" />
     <ClInclude Include="src\LinearAlgebra\Vector3D.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\NumericalAnalysis\Intertolation.h" />

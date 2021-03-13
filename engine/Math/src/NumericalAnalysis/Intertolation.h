@@ -6,6 +6,10 @@
 
 namespace mathem
 {
+	inline float interpolate(float x0, float x1, float a)
+	{
+		return x0 + (x1 - x0) * a;
+	}
 
 	inline void interpolate(float x0, float y0, float x1, float y1, Buffer<float>* buffer)
 	{

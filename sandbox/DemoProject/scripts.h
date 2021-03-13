@@ -1,6 +1,10 @@
-#pragma once
 
-#include "engine/MiteVox/src/MiteVox.h"
+#ifndef SCRIPTS_H
+#define SCRIPTS_H
+
+#include "engine/ECSManager/src/EntityComponentSystem.h"
+#include "engine/Renderer/src/RendererAPI/RendererAPI.h"
+#include "engine/Math/src/Math.h"
 
 void rotateLight_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
@@ -44,7 +48,7 @@ void processInput_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_IND
 
 	mitevox::Scene* scene = (mitevox::Scene*)data;
 
-	InputHandler* inputHandler = scene->inputHandler;
+	InputHandler* inputHandler = scene->settings->getInputHandler();
 
 	mathem::Transform* transform =
 		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
@@ -109,3 +113,5 @@ void rotateCamera_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_IND
 
 	transform->angleY = -angle + 180;
 }
+
+#endif
