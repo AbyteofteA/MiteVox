@@ -9,25 +9,16 @@
 #include <thread>
 
 /*
+	JSON Log format:
 
-Log format:
-	[TIMESTAMP] EVENTNAME STATUS: "MESSAGE" ID PID
-
-	TIMESTAMP - [YYYY-MM-DD hh:mm:ss uuuuuu] or just microseconds
-	ID - the thread ID
-	PID - parent thread ID
-	EVENTNAME
-	STATUS = { INFO, WARNING, ERROR, START, END }
-
-    {
-      log:
-      [
-        { time: "YYYY-MM-DD hh:mm:ss uuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
-        { time: "YYYY-MM-DD hh:mm:ss uuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
-        { time: "YYYY-MM-DD hh:mm:ss uuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 }
-      ]
-    }
-
+	{
+	  log:
+	  [
+	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
+	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
+	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 }
+	  ]
+	}
 */
 
 namespace profile
@@ -46,15 +37,39 @@ namespace profile
 		/// </summary>
 		inline Logger(bool _logConsole, std::string _filePath);
 
+		/// <summary>
+		/// Logs info message.
+		/// </summary>
 		inline std::string info(std::string name, std::string message);
+
+		/// <summary>
+		/// Logs warning message.
+		/// </summary>
 		inline std::string warning(std::string name, std::string message);
+
+		/// <summary>
+		/// Logs error message.
+		/// </summary>
 		inline std::string error(std::string name, std::string message);
+
+		/// <summary>
+		/// Logs start of some process.
+		/// </summary>
+		inline std::string start(std::string name);
+
+		/// <summary>
+		/// Logs end of some process.
+		/// </summary>
+		inline std::string end(std::string name);
 
 	private:
 
 		bool logConsole;
 		bool logfile;
 		std::string filePath;
+
+		inline std::string formLog(std::string name, std::string status, std::string message);
+		inline void placeLog(std::string log);
 
 		inline std::string getTreadID();
 		inline std::string getTimeStamp();
@@ -79,65 +94,68 @@ namespace profile
 
 	inline std::string Logger::info(std::string name, std::string message)
 	{
-		std::string infoStr =
-			"{ time: \"" + getTimeStamp() +
-			"\", status: \"INFO" +
-			"\", text: \"" + message +
-			"\", name: \"" + name +
-			"\", id: " + getTreadID() + " }";
-
-		if (logConsole)
-		{
-			std::cout << infoStr << std::endl;
-		}
-		if (logfile)
-		{
-
-		}
+		std::string infoStr = formLog(name, "INFO", message);
+		placeLog(infoStr);
 
 		return infoStr;
 	}
 
 	inline std::string Logger::warning(std::string name, std::string message)
 	{
-		std::string warningStr =
-			"{ time: \"" + getTimeStamp() +
-			"\", status: \"WARNING" +
-			"\", text: \"" + message +
-			"\", name: \"" + name +
-			"\", id: " + getTreadID() + " }";
-
-		if (logConsole)
-		{
-			std::cout << warningStr << std::endl;
-		}
-		if (logfile)
-		{
-
-		}
+		std::string warningStr = formLog(name, "WARNING", message);
+		placeLog(warningStr);
 
 		return warningStr;
 	}
 
 	inline std::string Logger::error(std::string name, std::string message)
 	{
-		std::string errorStr =
-			"{ time: \"" + getTimeStamp() +
-			"\", status: \"ERROR" +
-			"\", text: \"" + message +
-			"\", name: \"" + name +
-			"\", id: " + getTreadID() + " }";
+		std::string errorStr = formLog(name, "ERROR", message);
+		placeLog(errorStr);
 
+		return errorStr;
+	}
+
+	inline std::string Logger::start(std::string name)
+	{
+		std::string startStr = formLog(name, "START", "");
+		placeLog(startStr);
+
+		return startStr;
+	}
+
+	inline std::string Logger::end(std::string name)
+	{
+		std::string endStr = formLog(name, "END", "");
+		placeLog(endStr);
+
+		return endStr;
+	}
+
+	inline std::string Logger::formLog(std::string name, std::string status, std::string message)
+	{
+		std::string log =
+			"time: \"" + getTimeStamp() +
+			"\", name: \"" + name +
+			"\", status: \"" + status +
+			"\", text: \"" + message +
+			"\", id: " + getTreadID();
+
+		return log;
+	}
+
+	inline void Logger::placeLog(std::string log)
+	{
 		if (logConsole)
 		{
-			std::cout << errorStr << std::endl;
+			std::cout << log << std::endl;
 		}
 		if (logfile)
 		{
+			log = "{ " + log + " }";
 
+			// TODO: Implement file logging.
 		}
-
-		return errorStr;
 	}
 
 	inline std::string Logger::getTreadID()
@@ -147,14 +165,21 @@ namespace profile
 		return sstream.str();
 	}
 
-	// BUG: it doesn't return appropriate timestamp
 	inline std::string Logger::getTimeStamp()
 	{
-		time_t now = time(nullptr);
-		char date[64];
-		ctime_s(date, sizeof(date), &now);
+		std::timespec tmspec;
+		std::timespec_get(&tmspec, TIME_UTC);
 
-		std::string timeStamp = std::string(date);
+		char calendarTimeBuffer[64];
+		char resultBuffer[128];
+
+		std::tm calendarTime;
+		localtime_s(&calendarTime, &tmspec.tv_sec);
+
+		strftime(calendarTimeBuffer, sizeof(calendarTimeBuffer), "%F %T", &calendarTime);
+		sprintf_s(resultBuffer, "%s.%09ld\n", calendarTimeBuffer, tmspec.tv_nsec);
+
+		std::string timeStamp = std::string(resultBuffer);
 		timeStamp.pop_back();
 		return timeStamp;
 	}
