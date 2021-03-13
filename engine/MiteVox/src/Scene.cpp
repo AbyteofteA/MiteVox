@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "EngineSettings.h"
+#include "entityID.h"
 
 #include "callbacks/NativeScript_Callbacks.h"
 #include "callbacks/Model3D_Callbacks.h"
@@ -12,9 +13,10 @@
 
 namespace mitevox
 {
-	Scene::Scene(entityID initialEntitiesBufferSize)
+	Scene::Scene(EngineSettings* _settings, entityID initialEntitiesBufferSize)
 	{
 		ECS = new ecs::EntityComponentSystem(initialEntitiesBufferSize);
+		settings = _settings;
 
 		// Renderer components
 
@@ -66,39 +68,44 @@ namespace mitevox
 		delete ECS;
 	}
 
-	void Scene::update(EngineSettings* settings)
+	void Scene::update()
 	{
-		now = std::chrono::high_resolution_clock::now();
-		dt = std::chrono::duration_cast<std::chrono::duration<double>>(now - prevCycleTime).count();
-		currentTime += dt;
-		prevCycleTime = std::chrono::high_resolution_clock::now();
+		updateTimers();
 
 		// Execute scripts
-		ECS->updateComponent(NativeScript_Component, (void*)this);
+		ECS->updateComponent(NativeScript_Component, this);
 
 		// Cleanup
 		now = std::chrono::high_resolution_clock::now();
 		tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - cleanupTime).count();
-		if (tmpTime > settings->cleanupPeriod)
+		if (tmpTime > settings->getCleanupPeriod())
 		{
 			cleanupTime = std::chrono::high_resolution_clock::now();
+
+			// TODO: Implement cleanup.
 		}
 
 		// Physics and Transform
 		now = std::chrono::high_resolution_clock::now();
 		tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - physicsTime).count();
-		if (tmpTime > settings->physicsPeriod)
+		if (tmpTime > settings->getPhysicsPeriod())
 		{
 			physicsTime = std::chrono::high_resolution_clock::now();
+
+			// TODO: Implement physics update.
 		}
 
 		// Renderer
 		now = std::chrono::high_resolution_clock::now();
 		tmpTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - rendererTime).count();
-		if (tmpTime > settings->rendererPeriod)
+		if (tmpTime > settings->getRendererPeriod())
 		{
-			render::ColorRGBf clearColor = { 0.05f, 0.05f, 0.05f };
-			render::clearBufferXY(clearColor);
+			rendererTime = std::chrono::high_resolution_clock::now();
+
+			render::RendererSettings* renderer = settings->getRendererSettings();
+			renderer->amountOfDrawCalls = 0;
+
+			render::clearBufferXY(renderer->clearColor);
 			render::clearBufferZ();
 
 			// Update lights.
@@ -107,7 +114,7 @@ namespace mitevox
 			ECS->updateComponent(SpotLight_Component, (void*)this);
 
 			// Render 3D models.
-			ECS->updateComponent(Model3D_Component, &this->activeCamera);
+			ECS->updateComponent(Model3D_Component, this);
 
 			// Render primitives.
 			render::Camera* camera =
@@ -120,12 +127,21 @@ namespace mitevox
 			render::renderTriangles(renderer, camera, cameraTransform);
 
 			render::display(renderer);
-			rendererTime = std::chrono::high_resolution_clock::now();
 		}
+
+		//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
 	}
 
 	double Scene::getCurrentTime()
 	{
 		return currentTime;
+	}
+
+	void Scene::updateTimers()
+	{
+		now = std::chrono::high_resolution_clock::now();
+		dt = std::chrono::duration_cast<std::chrono::duration<double>>(now - prevCycleTime).count();
+		currentTime += dt;
+		prevCycleTime = std::chrono::high_resolution_clock::now();
 	}
 }

@@ -11,10 +11,11 @@
 #include "engine/ECSManager/src/EntityComponentSystem.h"
 #include "engine/Profiler/src/Logger.h"
 
-typedef unsigned long entityID;
+#include "entityID.h"
 
 #include "NativeScript.h"
 #include "Scene.h"
+#include "Playground.h"
 #include "Engine.h"
 
 

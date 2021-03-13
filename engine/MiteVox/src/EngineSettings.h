@@ -6,6 +6,7 @@
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Profiler/src/Logger.h"
 #include "engine/UIEventHandler/src/InputHandler.h"
+#include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 
 #include <string>
 
@@ -13,9 +14,6 @@ namespace mitevox
 {
 	class EngineSettings
 	{
-		friend class Engine;
-		friend class Scene;
-
 	public:
 
 		profile::Logger logger;
@@ -32,7 +30,18 @@ namespace mitevox
 		std::string getExecutionDir();
 		std::string getResourceDir();
 		std::string getConfigDir();
+
+		double getCleanupPeriod();
+		void setCleanupPeriod(double value);
+
+		double getPhysicsPeriod();
+		void setPhysicsPeriod(double value);
+
+		double getRendererPeriod();
+		void setRendererPeriod(double value);
+
 		render::RendererSettings* getRendererSettings();
+		InputHandler* getInputHandler();
 
 	private:
 

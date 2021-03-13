@@ -2,7 +2,6 @@
 #ifndef MODEL3D_CALLBACKS_H
 #define MODEL3D_CALLBACKS_H
 
-#include "engine/MiteVox/src/MiteVox.h"
 #include "engine/ECSManager/src/EntityComponentSystem.h"
 
 inline void Model3D_onCreate(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data, entityID index)
@@ -19,19 +18,19 @@ inline void Model3D_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MANA
 		entityID ID =
 			_ecs->componentManagers[_managerIndex]->componentToID[entityIndex];
 
-		long* activeCamera = (long*)data;
+		mitevox::Scene* scene = (mitevox::Scene*)data;
 
 		render::Camera* camera =
-			(render::Camera*)_ecs->getComponent(*activeCamera, CAMERA_COMPONENT);
+			(render::Camera*)_ecs->getComponent(scene->activeCamera, CAMERA_COMPONENT);
 
 		mathem::Transform* globalTransform =
 			(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 		mathem::Transform* cameraTransform =
-			(mathem::Transform*)_ecs->getComponent(*activeCamera, TRANSFORM_COMPONENT);
+			(mathem::Transform*)_ecs->getComponent(scene->activeCamera, TRANSFORM_COMPONENT);
 
 		render::renderModel3D(
-			(render::Model3D*)_ecs->getComponent(ID, MODEL3D_COMPONENT),
+			scene->settings->getRendererSettings(), (render::Model3D*)_ecs->getComponent(ID, MODEL3D_COMPONENT),
 			globalTransform, camera, cameraTransform);
 	}
 }

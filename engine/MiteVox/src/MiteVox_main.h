@@ -1,25 +1,25 @@
 
 #include "MiteVox.h"
 
+#include <exception>
+
 int main(int argc, char* argv[])
 {
 	mitevox::Engine* MiteVox = new mitevox::Engine(argc, argv);
-	
-	while (!glfwWindowShouldClose(MiteVox->settings->getRendererSettings()->getWindow()))
-	{
-		GLFWwindow* window = MiteVox->settings->getRendererSettings()->getWindow();
-		glfwPollEvents();
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		{
-			glfwSetWindowShouldClose(window, true);
-		}
-		int width, height;
-		glfwGetWindowSize(window, &width, &height);
-		glViewport(0, 0, width, height);
 
-		MiteVox->update();
+	try
+	{
+		MiteVox->run();
+		delete MiteVox;
 	}
-	delete MiteVox;
+	catch (std::exception exc) 
+	{
+		render::RendererSettings* renderer = MiteVox->settings->getRendererSettings();
+		render::closeRenderer(renderer);
+
+		std::cerr << exc.what();
+		getchar();
+	}
 
 	return 0;
 }

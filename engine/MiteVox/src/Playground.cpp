@@ -1,19 +1,20 @@
 
 #include "Playground.h"
 
-#include "EngineSettings.h"
 #include "Scene.h"
-#include "engine/UIEventHandler/src/InputHandler.h"
+#include "EngineSettings.h"
+#include "engine/Math/src/Generators/UniqueIDGenerator.h"
 
-#include <vector>
+#include <unordered_map>
+#include <string>
 #include <filesystem>
 namespace fs = std::filesystem;
 
 namespace mitevox
 {
-	Playground::Playground()
+	Playground::Playground(std::string _name)
 	{
-
+		name = _name;
 	}
 
 	Playground::~Playground()
@@ -24,15 +25,27 @@ namespace mitevox
 		}
 	}
 
-	unsigned int Playground::createScene(std::string name)
+	void Playground::update()
+	{
+		if (scenes.count(activeScene) > 0)
+		{
+			scenes[activeScene]->update();
+		}
+	}
+
+	unsigned int Playground::createScene(std::string name, EngineSettings* settings)
 	{
 		unsigned int ID = IDGenerator.getID();
-		scenes.insert({ ID, new Scene() });
+		scenes.insert({ ID, new Scene(settings) });
 		scenes[ID]->name = name;
-		//scenes[ID]->renderer = settings->renderer;
-		//scenes[ID]->inputHandler = settings->inputHandler;
 
 		return ID;
+	}
+
+	unsigned int Playground::createMainScene(std::string name, EngineSettings* settings)
+	{
+		unsigned int ID = createScene(name, settings);
+		return activeScene = ID;
 	}
 
 	void Playground::deleteScene(unsigned int ID)

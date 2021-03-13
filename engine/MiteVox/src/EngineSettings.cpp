@@ -5,6 +5,7 @@
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Profiler/src/Logger.h"
 #include "engine/UIEventHandler/src/InputHandler.h"
+#include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 
 #include <string>
 #include <cstdio>
@@ -46,9 +47,10 @@ namespace mitevox
 		fileio::JSON* rendererConfig = json->getObject("renderer");
 
 		debug = generalConfig->getBoolean("debug");
-		cleanupPeriod = generalConfig->getNumber("cleanup_period");
-		physicsPeriod = generalConfig->getNumber("physics_period");
-		rendererPeriod = generalConfig->getNumber("renderer_period");
+
+		setCleanupPeriod(generalConfig->getNumber("cleanup_period"));
+		setPhysicsPeriod(generalConfig->getNumber("physics_period"));
+		setRendererPeriod(generalConfig->getNumber("renderer_period"));
 
 		fs::path _executionPath = fs::path(executionDir);
 		fs::current_path(_executionPath);
@@ -71,7 +73,8 @@ namespace mitevox
 		int screenHeight = (int)generalConfig->getNumber("screen_height");
 		bool backfaceCulling = generalConfig->getBoolean("back_culling");
 
-		renderer = render::initRenderer(screenWidth, screenHeight, true, backfaceCulling);
+		// TODO: move clearColor to engine_config.json .
+		renderer = render::initRenderer(screenWidth, screenHeight, false, backfaceCulling, { 0.05f, 0.05f, 0.05f });
 		if (renderer)
 		{
 			logger.info("EngineSettings", "Window is created.");
@@ -134,8 +137,64 @@ namespace mitevox
 		return configDir;
 	}
 
+	double EngineSettings::getCleanupPeriod()
+	{
+		return cleanupPeriod;
+	}
+
+	void EngineSettings::setCleanupPeriod(double value)
+	{
+		if (value > 10 || value < 0)
+		{
+			cleanupPeriod = value;
+		}
+		else
+		{
+			cleanupPeriod = 0.5;
+		}
+	}
+
+	double EngineSettings::getPhysicsPeriod()
+	{
+		return physicsPeriod;
+	}
+
+	void EngineSettings::setPhysicsPeriod(double value)
+	{
+		if (value > 0.5 || value < 0)
+		{
+			physicsPeriod = value;
+		}
+		else
+		{
+			physicsPeriod = 0.06;
+		}
+	}
+
+	double EngineSettings::getRendererPeriod()
+	{
+		return rendererPeriod;
+	}
+
+	void EngineSettings::setRendererPeriod(double value)
+	{
+		if (value > 0.1 || value < 0)
+		{
+			rendererPeriod = value;
+		}
+		else
+		{
+			rendererPeriod = 0;
+		}
+	}
+
 	render::RendererSettings* EngineSettings::getRendererSettings()
 	{
 		return renderer;
+	}
+
+	InputHandler* EngineSettings::getInputHandler()
+	{
+		return inputHandler;
 	}
 }

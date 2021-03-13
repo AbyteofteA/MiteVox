@@ -3,7 +3,7 @@
 #define MITEVOX_ENGINE_H
 
 #include "EngineSettings.h"
-#include "Scene.h"
+#include "Playground.h"
 
 #include <unordered_map>
 
@@ -13,7 +13,6 @@ namespace mitevox
 	{
 	public:
 
-		int activeScene = -1;
 		EngineSettings* settings;
 
 		Engine(int argc, char* argv[]);
@@ -22,18 +21,12 @@ namespace mitevox
 		void onCreate();
 		void onUpdate();
 		void onDestroy();
-		
-		int createScene(std::string name = "Untitled");
-		void deleteScene(int ID);
 
-		Scene* getActiveScene();
-
-		void update();
+		void run();
 
 	private:
 
-		std::unordered_map<int, Scene*> scenes;
-		mathem::UniqueIDGenerator<int> IDGenerator;
+		Playground* playground;
 	};
 }
 

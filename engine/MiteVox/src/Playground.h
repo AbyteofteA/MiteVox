@@ -2,10 +2,12 @@
 #ifndef PLAYGROUND_H
 #define PLAYGROUND_H
 
-#include "EngineSettings.h"
 #include "Scene.h"
+#include "EngineSettings.h"
+#include "engine/Math/src/Generators/UniqueIDGenerator.h"
 
 #include <unordered_map>
+#include <string>
 
 namespace mitevox
 {
@@ -13,17 +15,20 @@ namespace mitevox
 	{
 	public:
 
-		Playground();
+		std::string name;
+		unsigned int activeScene = 0;
+
+		Playground(std::string _name = "Untitled");
 		~Playground();
 
-		unsigned int createScene(std::string name = "Untitled");
+		void update();
+		unsigned int createScene(std::string name, EngineSettings* settings);
+		unsigned int createMainScene(std::string name, EngineSettings* settings);
 		void deleteScene(unsigned int ID);
-
 		Scene* getActiveScene();
 
 	private:
 
-		unsigned int activeScene = 0;
 		std::unordered_map<unsigned int, Scene*> scenes;
 		mathem::UniqueIDGenerator<unsigned int> IDGenerator;
 	};

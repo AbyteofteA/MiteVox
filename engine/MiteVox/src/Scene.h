@@ -22,7 +22,7 @@
 #define TAG_COMPONENT 9
 
 #include "EngineSettings.h"
-#include "MiteVox.h"
+#include "entityID.h"
 #include "engine/ECSManager/src/EntityComponentSystem.h"
 
 namespace mitevox
@@ -32,13 +32,13 @@ namespace mitevox
 	public:
 
 		std::string name = "Untitled";
+		//mathem::Octree<float>* octree;
 		ecs::EntityComponentSystem<entityID>* ECS = nullptr;
 		std::vector<render::Skybox> skyboxes;
 		long activeSkybox = -1;
 		entityID activeCamera = -1;
 
-		InputHandler* inputHandler = nullptr;
-		render::RendererSettings* renderer = nullptr;
+		EngineSettings* settings = nullptr;
 
 		//************************************ Components *****************************************
 
@@ -68,10 +68,10 @@ namespace mitevox
 		MANAGER_INDEX_TYPE Tag_Component = 0;
 
 
-		Scene(entityID initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE);
+		Scene(EngineSettings* _settings, entityID initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE);
 		~Scene();
 
-		void update(EngineSettings* settings);
+		void update();
 
 		// Getters //
 
@@ -89,6 +89,8 @@ namespace mitevox
 
 		// Temporary time storage.
 		double tmpTime = 0.0;
+
+		void updateTimers();
 
 	};
 }
