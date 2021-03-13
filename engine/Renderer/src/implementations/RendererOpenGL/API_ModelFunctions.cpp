@@ -87,7 +87,7 @@ namespace render
 		if (model3D->material->isUploaded == 0)
 		{
 			unsigned char* image;
-			image = (unsigned char*)model3D->material->albedoMap.imageData;
+			image = (unsigned char*)model3D->material->albedoMap->imageData;
 			glGenTextures(1, &model3D->material->ambientMapID);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, model3D->material->ambientMapID);
@@ -95,10 +95,10 @@ namespace render
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->albedoMap.width, model3D->material->albedoMap.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->albedoMap->width, model3D->material->albedoMap->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 			glUniform1i(glGetUniformLocation(shaders[model3D->shaderID]->textureID, "albedoMap"), 0);
 			
-			image = (unsigned char*)model3D->material->metallicMap.imageData;
+			image = (unsigned char*)model3D->material->metallicMap->imageData;
 			glGenTextures(1, &model3D->material->specularMapID);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, model3D->material->specularMapID);
@@ -106,13 +106,14 @@ namespace render
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->metallicMap.width, model3D->material->metallicMap.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model3D->material->metallicMap->width, model3D->material->metallicMap->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 			glUniform1i(glGetUniformLocation(shaders[model3D->shaderID]->textureID, "metallicMap"), 1);
 			
 
 			model3D->material->isUploaded = 1;
 		}
 	}
+
 	void selectModel3D(Model3D* model3D)
 	{
 		glBindVertexArray(model3D->mesh->vertexBufferID);
@@ -123,6 +124,7 @@ namespace render
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, model3D->material->specularMapID);
 	}
+
 	void removeModel3D(Model3D* model3D)
 	{
 		glDeleteBuffers(1, &model3D->mesh->vertexBufferID);
@@ -168,12 +170,14 @@ namespace render
 				0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 		}
 	}
+
 	void selectSkybox(Skybox* skybox)
 	{
 		glBindVertexArray(skybox->vertexID);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemap->textureID);
 	}
+
 	void removeSkybox(Skybox* skybox)
 	{
 		glDeleteBuffers(1, &skybox->vertexID);
@@ -183,10 +187,12 @@ namespace render
 
 	// Drawing
 
-	void renderModel3D(Model3D* model3D, mathem::Transform* transform, render::Camera* camera, mathem::Transform* cameraTransform)
+	void renderModel3D(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, render::Camera* camera, mathem::Transform* cameraTransform)
 	{
 		if (!shaders[model3D->shaderID]->use())
 			return;
+
+		renderer->amountOfDrawCalls++;
 
 		selectModel3D(model3D);
 
@@ -236,10 +242,12 @@ namespace render
 		glDrawArrays(GL_TRIANGLES, 0, model3D->mesh->amOfFaces * 24);
 	}
 
-	void renderSkybox(Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform)
+	void renderSkybox(RendererSettings* renderer, Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform)
 	{
 		if (!shaders[skybox->shaderID]->use())
 			return;
+
+		renderer->amountOfDrawCalls++;
 
 		selectSkybox(skybox);
 

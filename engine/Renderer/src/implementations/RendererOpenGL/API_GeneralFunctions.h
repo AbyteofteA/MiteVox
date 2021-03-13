@@ -6,9 +6,9 @@
 
 namespace render
 {
-	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool _backfaceCulling)
+	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor)
 	{
-		RendererSettings* renderer = new render::RendererSettings();
+		RendererSettings* renderer = new render::RendererSettings(width, height, isFullScreen, backfaceCulling, clearColor);
 
 		if (!glfwInit())
 		{
@@ -37,7 +37,7 @@ namespace render
 		{
 			window = glfwCreateWindow(mode->width, mode->height, "MiteVox", nullptr, nullptr);
 		}
-		//glfwSetWindowPos(window, 0, 0);
+		//glfwHideWindow(window);
 
 		renderer->setWindow(window);
 
@@ -47,9 +47,6 @@ namespace render
 			glfwTerminate();
 			return nullptr;
 		}
-		renderer->screenWidth = mode->width;
-		renderer->screenHeight = mode->height;
-		renderer->backfaceCulling = _backfaceCulling;
 
 		glfwMakeContextCurrent(renderer->getWindow());
 
@@ -61,8 +58,6 @@ namespace render
 			// Problem: glewInit failed, something is seriously wrong.
 			fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		}
-
-		
 
 
 		glEnable(GL_MULTISAMPLE);

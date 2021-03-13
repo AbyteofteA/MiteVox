@@ -9,10 +9,9 @@ namespace render
 	class Material
 	{
 	public:
+
 		std::string name;
-
 		unsigned int MaterialID;
-
 		char isUploaded = 0;
 
 			// Color and shading
@@ -28,38 +27,23 @@ namespace render
 
 		char illuminationModel;		// (0 - 10)
 
-		//-------------------------------------------
-
-		// TOFIX: they should be pointers
-
-		fileio::Image albedoMap;
+		fileio::Image* albedoMap;
 		unsigned int ambientMapID;
 
-		fileio::Image roughnessMap;
+		fileio::Image* roughnessMap;
 		unsigned int diffuseMapID;
 
-		fileio::Image metallicMap;
+		fileio::Image* metallicMap;
 		unsigned int specularMapID;
 
-		//-------------------------------------------
-
-		fileio::Image normalMap;
+		fileio::Image* normalMap;
 		unsigned int normalMapID;
 
-		fileio::Image opacityMap;
-		unsigned int opacityMapID;
-
-		fileio::Image glowMap;
+		fileio::Image* glowMap;
 		unsigned int glowMapID;
 	};
 
 
-	/************************************************************************************
-	Parse .mtl
-	------------------------------------------------------------------------------------
-	Application: 
-	Description:
-	************************************************************************************/
 	inline void loadMaterial_MTL(std::string filename, void** material, std::atomic<fileio::FileStatus>* flag)
 	{
 		*material = nullptr;

@@ -81,6 +81,8 @@ namespace render
 		if (amountOfPoints <= 0)
 			return;
 
+		renderer->amountOfDrawCalls++;
+
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
 		view = glm::rotate(view, -glm::radians(cameraTransform->angleY), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -116,6 +118,7 @@ namespace render
 		glDeleteBuffers(1, &pointsArrayID);
 		renderer->points.setSizeData(0);
 	}
+
 	void renderLines(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
 		unsigned int shaderIndex = renderer->primitiveShaderID;
@@ -125,6 +128,8 @@ namespace render
 		unsigned int amountOfLines = renderer->lines.getSizeData();
 		if (amountOfLines <= 0)
 			return;
+
+		renderer->amountOfDrawCalls++;
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -161,6 +166,7 @@ namespace render
 		glDeleteBuffers(1, &linesArrayID);
 		renderer->lines.setSizeData(0);
 	}
+
 	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
 	{
 		unsigned int shaderIndex = renderer->primitiveShaderID;
@@ -170,6 +176,8 @@ namespace render
 		unsigned int amountOfTriangles = renderer->triangles.getSizeData();
 		if (amountOfTriangles <= 0)
 			return;
+
+		renderer->amountOfDrawCalls++;
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));

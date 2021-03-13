@@ -258,7 +258,7 @@ namespace render
 		if (!hasNormals)
 		{
 			meshTmp->vn = (mathem::Vector3D*)realloc(meshTmp->vn, sizeof(mathem::Vector3D) * amOfVrtcs);
-			mathem::Vector3D v = { 0, 0, 0, 0 };
+			mathem::Vector3D v = { 0, 0, 0 };
 
 			for (int i = 0; i < amOfVrtcs; i++)
 				meshTmp->vn[i] = v;
@@ -353,9 +353,6 @@ namespace render
 											vectB.i * vectA.k - vectA.i * vectB.k,
 											vectA.i * vectB.j - vectB.i * vectA.j };
 
-							vectN.length = sqrt(pow(vectN.i, (float)2) + pow(vectN.j, (float)2) + pow(vectN.k, (float)2));
-
-
 							poligon.n = (long*)malloc(sizeof(long) * poligon.amOfVertices);
 							for (size_t j = 0; j < poligon.amOfVertices; j++)
 							{
@@ -364,11 +361,6 @@ namespace render
 								meshTmp->vn[poligon.n[j] - 1].i += vectN.i;
 								meshTmp->vn[poligon.n[j] - 1].j += vectN.j;
 								meshTmp->vn[poligon.n[j] - 1].k += vectN.k;
-
-								meshTmp->vn[poligon.n[j] - 1].length = sqrt(
-									pow(meshTmp->vn[poligon.n[j] - 1].i, (float)2) +
-									pow(meshTmp->vn[poligon.n[j] - 1].j, (float)2) +
-									pow(meshTmp->vn[poligon.n[j] - 1].k, (float)2));
 							}
 						}
 
@@ -454,15 +446,6 @@ namespace render
 			b = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[2] - 1].z - meshTmp->vMin.z) / (meshTmp->vMax.z - meshTmp->vMin.z)) * 255;
 
 			meshTmp->f[i].color[2] = { r, g, b };
-
-			for (size_t j = 0; j < meshTmp->f[i].amOfVertices; j++)
-			{
-				//meshTmp->f[i].n[j] = meshTmp->f[i].p[j];
-				meshTmp->vn[meshTmp->f[i].n[j] - 1].length = sqrt(
-					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].i, (float)2) +
-					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].j, (float)2) +
-					pow(meshTmp->vn[meshTmp->f[i].n[j] - 1].k, (float)2));
-			}
 		}
 
 		free(fileData);

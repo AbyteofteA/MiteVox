@@ -24,19 +24,34 @@ namespace render
 
 		int screenWidth = SCREEN_WIDTH;
 		int screenHeight = SCREEN_HEIGHT;
+
+		bool isFullScreen;
 		unsigned char backfaceCulling = 1;
 
 		int primitiveShaderID = -1;
+
+		ColorRGBf clearColor = { 0 };
 
 		mathem::Buffer<Point> points;
 		mathem::Buffer<Point> lines;
 		mathem::Buffer<Point> triangles;
 
-		RendererSettings(){}
+		unsigned int amountOfDrawCalls = 0;
+
+		RendererSettings(int _screenWidth, int _screenHeight, bool _isFullScreen, unsigned char _backfaceCulling, ColorRGBf _clearColor)
+		{
+			screenWidth = _screenWidth;
+			screenHeight = _screenHeight;
+			isFullScreen = _isFullScreen;
+			backfaceCulling = _backfaceCulling;
+			clearColor = _clearColor;
+		}
+
 		RendererSettings(GLFWwindow* _window)
 		{
 			setWindow(_window);
 		}
+
 		~RendererSettings()
 		{
 			points.wipe();
@@ -48,6 +63,7 @@ namespace render
 		{
 			return window;
 		}
+
 		void setWindow(GLFWwindow* _window)
 		{
 			window = _window;

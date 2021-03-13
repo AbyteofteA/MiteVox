@@ -30,7 +30,7 @@ namespace render
 
 	// General
 
-	inline RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling);
+	inline RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor);
 	inline void closeRenderer(RendererSettings* renderer);
 	inline std::string getVendorName();
 	inline std::string getRendererName();
@@ -74,14 +74,14 @@ namespace render
 	void uploadModel3D(Model3D* model3D);
 	void selectModel3D(Model3D* model3D);
 	void removeModel3D(Model3D* model3D);
-	void renderModel3D(Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
+	void renderModel3D(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
 	
-	void renderWireframe(Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
+	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 
 	inline void uploadSkybox(Skybox* skybox);
 	inline void selectSkybox(Skybox* skybox);
 	inline void removeSkybox(Skybox* skybox);
-	inline void renderSkybox(Skybox* skybox, Camera* camera, mathem::Transform* cameraTransform);
+	inline void renderSkybox(RendererSettings* renderer, Skybox* skybox, Camera* camera, mathem::Transform* cameraTransform);
 }
 
 //==================================================================
