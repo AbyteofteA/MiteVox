@@ -18,6 +18,7 @@ namespace mitevox
 
 		fileio::JSON* engineConfig = new fileio::JSON();
 		engineConfig->parseFile(executionDir + "\\engine_config.json");
+
 		fromJSON(engineConfig);
 
 		inputHandler = new InputHandler(renderer->getWindow());
@@ -41,37 +42,37 @@ namespace mitevox
 
 	void EngineSettings::fromJSON(fileio::JSON* json)
 	{
-		fileio::JSON* generalConfig = json->getObject("general");
-		fileio::JSON* loggingConfig = json->getObject("logging");
-		fileio::JSON* pathsConfig = json->getObject("paths");
-		fileio::JSON* rendererConfig = json->getObject("renderer");
+		fileio::JSON* generalConfig = json->getFieldObject("general");
+		fileio::JSON* loggingConfig = json->getFieldObject("logging");
+		fileio::JSON* pathsConfig = json->getFieldObject("paths");
+		fileio::JSON* rendererConfig = json->getFieldObject("renderer");
 
-		debug = generalConfig->getBoolean("debug");
+		debug = generalConfig->getFieldBoolean("debug");
 
-		setCleanupPeriod(generalConfig->getNumber("cleanup_period"));
-		setPhysicsPeriod(generalConfig->getNumber("physics_period"));
-		setRendererPeriod(generalConfig->getNumber("renderer_period"));
+		setCleanupPeriod(generalConfig->getFieldNumber("cleanup_period"));
+		setPhysicsPeriod(generalConfig->getFieldNumber("physics_period"));
+		setRendererPeriod(generalConfig->getFieldNumber("renderer_period"));
 
 		fs::path _executionPath = fs::path(executionDir);
 		fs::current_path(_executionPath);
 
-		logConsole = loggingConfig->getBoolean("log_console");
-		logFile = loggingConfig->getBoolean("log_file");
-		fs::path _logPath = fs::path(loggingConfig->getString("log_dir"));
+		logConsole = loggingConfig->getFieldBoolean("log_console");
+		logFile = loggingConfig->getFieldBoolean("log_file");
+		fs::path _logPath = fs::path(loggingConfig->getFieldString("log_dir"));
 		logDir = fs::relative(_logPath, _executionPath).string();
 
-		fs::path _configPath = fs::path(pathsConfig->getString("config_dir"));
+		fs::path _configPath = fs::path(pathsConfig->getFieldString("config_dir"));
 		configDir = fs::relative(_configPath, _executionPath).string();
-		fs::path _resourcePath = fs::path(pathsConfig->getString("resource_dir"));
+		fs::path _resourcePath = fs::path(pathsConfig->getFieldString("resource_dir"));
 		resourceDir = fs::relative(_resourcePath, _executionPath).string();
-		fs::path _savesPath = fs::path(pathsConfig->getString("saves_dir"));
+		fs::path _savesPath = fs::path(pathsConfig->getFieldString("saves_dir"));
 		_savesPath = fs::relative(_savesPath, _executionPath).string();
 
 		logger = profile::Logger(true, logDir);
 
-		int screenWidth = (int)generalConfig->getNumber("screen_width");
-		int screenHeight = (int)generalConfig->getNumber("screen_height");
-		bool backfaceCulling = generalConfig->getBoolean("back_culling");
+		int screenWidth = (int)generalConfig->getFieldNumber("screen_width");
+		int screenHeight = (int)generalConfig->getFieldNumber("screen_height");
+		bool backfaceCulling = generalConfig->getFieldBoolean("back_culling");
 
 		// TODO: move clearColor to engine_config.json .
 		renderer = render::initRenderer(screenWidth, screenHeight, false, backfaceCulling, { 0.05f, 0.05f, 0.05f });
@@ -93,10 +94,10 @@ namespace mitevox
 	{
 		fileio::JSON* json = new fileio::JSON();
 
-		fileio::JSON* generalConfig = json->setField("general", fileio::JSONtype::OBJECT);
-		fileio::JSON* loggingConfig = json->setField("logging", fileio::JSONtype::OBJECT);
-		fileio::JSON* pathsConfig = json->setField("paths", fileio::JSONtype::OBJECT);
-		fileio::JSON* rendererConfig = json->setField("renderer", fileio::JSONtype::OBJECT);
+		fileio::JSON* generalConfig = json->setFieldType("general", fileio::JSONtype::OBJECT);
+		fileio::JSON* loggingConfig = json->setFieldType("logging", fileio::JSONtype::OBJECT);
+		fileio::JSON* pathsConfig = json->setFieldType("paths", fileio::JSONtype::OBJECT);
+		fileio::JSON* rendererConfig = json->setFieldType("renderer", fileio::JSONtype::OBJECT);
 
 		generalConfig->setField("debug", debug);
 		generalConfig->setField("cleanup_period", cleanupPeriod);
