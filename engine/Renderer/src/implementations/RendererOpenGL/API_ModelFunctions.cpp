@@ -15,33 +15,33 @@ namespace render
 		const size_t vertexSize = 8;
 		const size_t triangleSize = vertexSize * 3;
 
-		size_t modelDumpSize = (size_t)sizeof(float) * mesh->amOfFaces * triangleSize;
+		size_t modelDumpSize = (size_t)sizeof(float) * mesh->polygonsCount * triangleSize;
 		float* result = (float*)malloc((size_t)modelDumpSize);
 
-		for (size_t i = 0; i < mesh->amOfFaces; i++)
+		for (size_t i = 0; i < mesh->polygonsCount; i++)
 		{
 			for (size_t j = 0; j < 3; j++)
 			{
 				size_t offset = i * triangleSize + j * vertexSize;
 
 				// X Y Z
-				result[offset + 0] = mesh->v[mesh->f[i].p[j] - 1].x;
-				result[offset + 1] = mesh->v[mesh->f[i].p[j] - 1].y;
-				result[offset + 2] = mesh->v[mesh->f[i].p[j] - 1].z;
+				result[offset + 0] = mesh->positions[mesh->polygons[i].positions[j] - 1].x;
+				result[offset + 1] = mesh->positions[mesh->polygons[i].positions[j] - 1].y;
+				result[offset + 2] = mesh->positions[mesh->polygons[i].positions[j] - 1].z;
 
 				// U V
-				if (mesh->f[i].t != nullptr)
+				if (mesh->polygons[i].textureCoords != nullptr)
 				{
-					result[offset + 3] = mesh->vt[mesh->f[i].t[j] - 1].x;
-					result[offset + 4] = mesh->vt[mesh->f[i].t[j] - 1].y;
+					result[offset + 3] = mesh->textureCoords[mesh->polygons[i].textureCoords[j] - 1].x;
+					result[offset + 4] = mesh->textureCoords[mesh->polygons[i].textureCoords[j] - 1].y;
 				}
 
 				// I J K
-				if (mesh->vn != nullptr)
+				if (mesh->normals != nullptr)
 				{
-					result[offset + 5] = mesh->vn[mesh->f[i].n[j] - 1].i;
-					result[offset + 6] = mesh->vn[mesh->f[i].n[j] - 1].j;
-					result[offset + 7] = mesh->vn[mesh->f[i].n[j] - 1].k;
+					result[offset + 5] = mesh->normals[mesh->polygons[i].normals[j] - 1].i;
+					result[offset + 6] = mesh->normals[mesh->polygons[i].normals[j] - 1].j;
+					result[offset + 7] = mesh->normals[mesh->polygons[i].normals[j] - 1].k;
 				}
 			}
 		}
@@ -70,7 +70,7 @@ namespace render
 			glGenBuffers(1, &modelVBO);
 			glBindVertexArray(model3D->mesh->vertexBufferID);
 			glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * model3D->mesh->amOfFaces, modelData, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * model3D->mesh->polygonsCount, modelData, GL_STATIC_DRAW);
 
 			glEnableVertexAttribArray(posAttrib);
 			glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
@@ -239,7 +239,7 @@ namespace render
 		shaders[model3D->shaderID]->setVec3("material.metallicity", tmp);
 		shaders[model3D->shaderID]->setFloat("material.specularExponent", model3D->material->specularExponent);
 
-		glDrawArrays(GL_TRIANGLES, 0, model3D->mesh->amOfFaces * 24);
+		glDrawArrays(GL_TRIANGLES, 0, model3D->mesh->polygonsCount * 24);
 	}
 
 	void renderSkybox(RendererSettings* renderer, Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform)

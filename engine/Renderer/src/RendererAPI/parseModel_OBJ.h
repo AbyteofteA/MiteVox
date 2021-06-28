@@ -99,10 +99,10 @@ namespace render
 		{
 			long a = strtol(endPtr + i, &endPtr, 0);
 			if (a < 0)
-				a = (*md)->amOfVertices + a + 1;
+				a = (*md)->positionsCount + a + 1;
 			poly.amOfVertices += 1;
-			poly.p = (long*)realloc(poly.p, sizeof(long) * poly.amOfVertices);
-			poly.p[poly.amOfVertices - 1] = a;
+			poly.positions = (long*)realloc(poly.positions, sizeof(long) * poly.amOfVertices);
+			poly.positions[poly.amOfVertices - 1] = a;
 
 			if (endPtr[0] == '\\' || endPtr[0] == '/')
 				endPtr = endPtr + 1;
@@ -119,9 +119,9 @@ namespace render
 			{
 				a = strtol(endPtr + i, &endPtr, 0);
 				if (a < 0)
-					a = (*md)->amOfTextureCoords + a + 1;
-				poly.t = (long*)realloc(poly.t, sizeof(long) * poly.amOfVertices);
-				poly.t[poly.amOfVertices - 1] = a;
+					a = (*md)->textureCoordsCount + a + 1;
+				poly.textureCoords = (long*)realloc(poly.textureCoords, sizeof(long) * poly.amOfVertices);
+				poly.textureCoords[poly.amOfVertices - 1] = a;
 
 				if (endPtr[0] == '\\' || endPtr[0] == '/')
 					endPtr = endPtr + 1;
@@ -138,9 +138,9 @@ namespace render
 
 			a = strtol(endPtr + i, &endPtr, 0);
 			if (a < 0)
-				a = (*md)->amOfNormals + a + 1;
-			poly.n = (long*)realloc(poly.n, sizeof(long) * poly.amOfVertices);
-			poly.n[poly.amOfVertices - 1] = a;
+				a = (*md)->normalsCount + a + 1;
+			poly.normals = (long*)realloc(poly.normals, sizeof(long) * poly.amOfVertices);
+			poly.normals[poly.amOfVertices - 1] = a;
 
 			if (endPtr[0] == '\\' || endPtr[0] == '/' || endPtr[0] == ' ')
 			{
@@ -187,25 +187,25 @@ namespace render
 
 		meshTmp->type = 0;
 
-		meshTmp->amOfVertices = 0;
-		meshTmp->v = nullptr;
+		meshTmp->positionsCount = 0;
+		meshTmp->positions = nullptr;
 
-		meshTmp->vMax.x = 0;
-		meshTmp->vMax.y = 0;
-		meshTmp->vMax.z = 0;
+		meshTmp->minPosition.x = 0;
+		meshTmp->minPosition.y = 0;
+		meshTmp->minPosition.z = 0;
 
-		meshTmp->vMin.x = 0;
-		meshTmp->vMin.y = 0;
-		meshTmp->vMin.z = 0;
+		meshTmp->maxPosition.x = 0;
+		meshTmp->maxPosition.y = 0;
+		meshTmp->maxPosition.z = 0;
 
-		meshTmp->amOfTextureCoords = 0;
-		meshTmp->vt = nullptr;
+		meshTmp->textureCoordsCount = 0;
+		meshTmp->textureCoords = nullptr;
 
-		meshTmp->amOfNormals = 0;
-		meshTmp->vn = nullptr;
+		meshTmp->normalsCount = 0;
+		meshTmp->normals = nullptr;
 
-		meshTmp->amOfFaces = 0;
-		meshTmp->f = nullptr;
+		meshTmp->polygonsCount = 0;
+		meshTmp->polygons = nullptr;
 
 
 		//=========================== Looking for normals ============================
@@ -257,12 +257,12 @@ namespace render
 
 		if (!hasNormals)
 		{
-			meshTmp->vn = (mathem::Vector3D*)realloc(meshTmp->vn, sizeof(mathem::Vector3D) * amOfVrtcs);
+			meshTmp->normals = (mathem::Vector3D*)realloc(meshTmp->normals, sizeof(mathem::Vector3D) * amOfVrtcs);
 			mathem::Vector3D v = { 0, 0, 0 };
 
 			for (int i = 0; i < amOfVrtcs; i++)
-				meshTmp->vn[i] = v;
-			meshTmp->amOfNormals = amOfVrtcs;
+				meshTmp->normals[i] = v;
+			meshTmp->normalsCount = amOfVrtcs;
 		}
 
 
@@ -285,23 +285,23 @@ namespace render
 					if (fileData[i + 1] == ' ')
 					{
 						i += 2;
-						meshTmp->amOfVertices += 1;
-						meshTmp->v = (mathem::Point3D*)realloc(meshTmp->v, sizeof(mathem::Point3D) * meshTmp->amOfVertices);
-						meshTmp->v[meshTmp->amOfVertices - 1] = readPoint3D(fileData, i);
+						meshTmp->positionsCount += 1;
+						meshTmp->positions = (mathem::Point3D*)realloc(meshTmp->positions, sizeof(mathem::Point3D) * meshTmp->positionsCount);
+						meshTmp->positions[meshTmp->positionsCount - 1] = readPoint3D(fileData, i);
 
-						if (meshTmp->vMax.x < meshTmp->v[meshTmp->amOfVertices - 1].x)
-							meshTmp->vMax.x = meshTmp->v[meshTmp->amOfVertices - 1].x;
-						if (meshTmp->vMax.y < meshTmp->v[meshTmp->amOfVertices - 1].y)
-							meshTmp->vMax.y = meshTmp->v[meshTmp->amOfVertices - 1].y;
-						if (meshTmp->vMax.z < meshTmp->v[meshTmp->amOfVertices - 1].z)
-							meshTmp->vMax.z = meshTmp->v[meshTmp->amOfVertices - 1].z;
+						if (meshTmp->minPosition.x > meshTmp->positions[meshTmp->positionsCount - 1].x)
+							meshTmp->minPosition.x = meshTmp->positions[meshTmp->positionsCount - 1].x;
+						if (meshTmp->minPosition.y > meshTmp->positions[meshTmp->positionsCount - 1].y)
+							meshTmp->minPosition.y = meshTmp->positions[meshTmp->positionsCount - 1].y;
+						if (meshTmp->minPosition.z > meshTmp->positions[meshTmp->positionsCount - 1].z)
+							meshTmp->minPosition.z = meshTmp->positions[meshTmp->positionsCount - 1].z;
 
-						if (meshTmp->vMin.x > meshTmp->v[meshTmp->amOfVertices - 1].x)
-							meshTmp->vMin.x = meshTmp->v[meshTmp->amOfVertices - 1].x;
-						if (meshTmp->vMin.y > meshTmp->v[meshTmp->amOfVertices - 1].y)
-							meshTmp->vMin.y = meshTmp->v[meshTmp->amOfVertices - 1].y;
-						if (meshTmp->vMin.z > meshTmp->v[meshTmp->amOfVertices - 1].z)
-							meshTmp->vMin.z = meshTmp->v[meshTmp->amOfVertices - 1].z;
+						if (meshTmp->maxPosition.x < meshTmp->positions[meshTmp->positionsCount - 1].x)
+							meshTmp->maxPosition.x = meshTmp->positions[meshTmp->positionsCount - 1].x;
+						if (meshTmp->maxPosition.y < meshTmp->positions[meshTmp->positionsCount - 1].y)
+							meshTmp->maxPosition.y = meshTmp->positions[meshTmp->positionsCount - 1].y;
+						if (meshTmp->maxPosition.z < meshTmp->positions[meshTmp->positionsCount - 1].z)
+							meshTmp->maxPosition.z = meshTmp->positions[meshTmp->positionsCount - 1].z;
 
 						break;
 					}
@@ -311,9 +311,9 @@ namespace render
 						if (fileData[i + 1] == ' ')
 						{
 							i += 2;
-							meshTmp->amOfNormals += 1;
-							meshTmp->vn = (mathem::Vector3D*)realloc(meshTmp->vn, sizeof(mathem::Vector3D) * meshTmp->amOfNormals);
-							meshTmp->vn[meshTmp->amOfNormals - 1] = readNormal(fileData, i);
+							meshTmp->normalsCount += 1;
+							meshTmp->normals = (mathem::Vector3D*)realloc(meshTmp->normals, sizeof(mathem::Vector3D) * meshTmp->normalsCount);
+							meshTmp->normals[meshTmp->normalsCount - 1] = readNormal(fileData, i);
 						}
 						break;
 					}
@@ -323,9 +323,9 @@ namespace render
 						if (fileData[i + 1] == ' ')
 						{
 							i += 2;
-							meshTmp->amOfTextureCoords += 1;
-							meshTmp->vt = (mathem::Point3D*)realloc(meshTmp->vt, sizeof(mathem::Point3D) * meshTmp->amOfTextureCoords);
-							meshTmp->vt[meshTmp->amOfTextureCoords - 1] = readPoint3D(fileData, i);
+							meshTmp->textureCoordsCount += 1;
+							meshTmp->textureCoords = (mathem::Point3D*)realloc(meshTmp->textureCoords, sizeof(mathem::Point3D) * meshTmp->textureCoordsCount);
+							meshTmp->textureCoords[meshTmp->textureCoordsCount - 1] = readPoint3D(fileData, i);
 						}
 						break;
 					}
@@ -335,39 +335,39 @@ namespace render
 					if (fileData[i + 1] == ' ')
 					{
 						i += 2;
-						meshTmp->amOfFaces += 1;
-						meshTmp->f = (Polygon*)realloc(meshTmp->f, sizeof(Polygon) * meshTmp->amOfFaces);
+						meshTmp->polygonsCount += 1;
+						meshTmp->polygons = (Polygon*)realloc(meshTmp->polygons, sizeof(Polygon) * meshTmp->polygonsCount);
 						Polygon poligon = readPolygon(fileData, i, &meshTmp);
 
 						if (!hasNormals)
 						{
-							mathem::Vector3D vectA = { meshTmp->v[poligon.p[2] - 1].x - meshTmp->v[poligon.p[1] - 1].x,
-											meshTmp->v[poligon.p[2] - 1].y - meshTmp->v[poligon.p[1] - 1].y,
-											meshTmp->v[poligon.p[2] - 1].z - meshTmp->v[poligon.p[1] - 1].z };
+							mathem::Vector3D vectA = { meshTmp->positions[poligon.positions[2] - 1].x - meshTmp->positions[poligon.positions[1] - 1].x,
+											meshTmp->positions[poligon.positions[2] - 1].y - meshTmp->positions[poligon.positions[1] - 1].y,
+											meshTmp->positions[poligon.positions[2] - 1].z - meshTmp->positions[poligon.positions[1] - 1].z };
 
-							mathem::Vector3D vectB = { meshTmp->v[poligon.p[0] - 1].x - meshTmp->v[poligon.p[1] - 1].x,
-											meshTmp->v[poligon.p[0] - 1].y - meshTmp->v[poligon.p[1] - 1].y,
-											meshTmp->v[poligon.p[0] - 1].z - meshTmp->v[poligon.p[1] - 1].z };
+							mathem::Vector3D vectB = { meshTmp->positions[poligon.positions[0] - 1].x - meshTmp->positions[poligon.positions[1] - 1].x,
+											meshTmp->positions[poligon.positions[0] - 1].y - meshTmp->positions[poligon.positions[1] - 1].y,
+											meshTmp->positions[poligon.positions[0] - 1].z - meshTmp->positions[poligon.positions[1] - 1].z };
 
 							mathem::Vector3D vectN = { vectA.j * vectB.k - vectB.j * vectA.k,
 											vectB.i * vectA.k - vectA.i * vectB.k,
 											vectA.i * vectB.j - vectB.i * vectA.j };
 
-							poligon.n = (long*)malloc(sizeof(long) * poligon.amOfVertices);
+							poligon.normals = (long*)malloc(sizeof(long) * poligon.amOfVertices);
 							for (size_t j = 0; j < poligon.amOfVertices; j++)
 							{
-								poligon.n[j] = poligon.p[j];
+								poligon.normals[j] = poligon.positions[j];
 
-								meshTmp->vn[poligon.n[j] - 1].i += vectN.i;
-								meshTmp->vn[poligon.n[j] - 1].j += vectN.j;
-								meshTmp->vn[poligon.n[j] - 1].k += vectN.k;
+								meshTmp->normals[poligon.normals[j] - 1].i += vectN.i;
+								meshTmp->normals[poligon.normals[j] - 1].j += vectN.j;
+								meshTmp->normals[poligon.normals[j] - 1].k += vectN.k;
 							}
 						}
 
 						if (poligon.amOfVertices == 3)
 						{
-							meshTmp->f[meshTmp->amOfFaces - 1] = poligon;
-							meshTmp->f[meshTmp->amOfFaces - 1].color = (ColorRGBA*)malloc(sizeof(ColorRGBA) * 3);
+							meshTmp->polygons[meshTmp->polygonsCount - 1] = poligon;
+							meshTmp->polygons[meshTmp->polygonsCount - 1].colors = (ColorRGBA*)malloc(sizeof(ColorRGBA) * 3);
 						}
 						else
 						{
@@ -376,37 +376,37 @@ namespace render
 							{
 								Polygon pTmp = { nullptr, nullptr, nullptr, nullptr, 3 };
 
-								if (meshTmp->v != nullptr)
+								if (meshTmp->positions != nullptr)
 								{
-									pTmp.p = (long*)malloc(sizeof(long) * 3);
-									pTmp.p[0] = poligon.p[0];
-									pTmp.p[1] = poligon.p[k];
-									pTmp.p[2] = poligon.p[k + 1];
+									pTmp.positions = (long*)malloc(sizeof(long) * 3);
+									pTmp.positions[0] = poligon.positions[0];
+									pTmp.positions[1] = poligon.positions[k];
+									pTmp.positions[2] = poligon.positions[k + 1];
 								}
-								if (meshTmp->vt != nullptr && poligon.t != nullptr)
+								if (meshTmp->textureCoords != nullptr && poligon.textureCoords != nullptr)
 								{
-									pTmp.t = (long*)malloc(sizeof(long) * 3);
-									pTmp.t[0] = poligon.t[0];
-									pTmp.t[1] = poligon.t[k];
-									pTmp.t[2] = poligon.t[k + 1];
+									pTmp.textureCoords = (long*)malloc(sizeof(long) * 3);
+									pTmp.textureCoords[0] = poligon.textureCoords[0];
+									pTmp.textureCoords[1] = poligon.textureCoords[k];
+									pTmp.textureCoords[2] = poligon.textureCoords[k + 1];
 								}
-								if (meshTmp->vn != nullptr)
+								if (meshTmp->normals != nullptr)
 								{
-									pTmp.n = (long*)malloc(sizeof(long) * 3);
-									pTmp.n[0] = poligon.n[0];
-									pTmp.n[1] = poligon.n[k];
-									pTmp.n[2] = poligon.n[k + 1];
+									pTmp.normals = (long*)malloc(sizeof(long) * 3);
+									pTmp.normals[0] = poligon.normals[0];
+									pTmp.normals[1] = poligon.normals[k];
+									pTmp.normals[2] = poligon.normals[k + 1];
 								}
-								pTmp.color = (ColorRGBA*)malloc(sizeof(ColorRGBA) * 3);
+								pTmp.colors = (ColorRGBA*)malloc(sizeof(ColorRGBA) * 3);
 
 								if (k != 1)
 								{
-									meshTmp->amOfFaces += 1;
-									meshTmp->f = (Polygon*)realloc(meshTmp->f, sizeof(Polygon) * meshTmp->amOfFaces);
-									meshTmp->f[meshTmp->amOfFaces - 1] = pTmp;
+									meshTmp->polygonsCount += 1;
+									meshTmp->polygons = (Polygon*)realloc(meshTmp->polygons, sizeof(Polygon) * meshTmp->polygonsCount);
+									meshTmp->polygons[meshTmp->polygonsCount - 1] = pTmp;
 								}
 								else
-									meshTmp->f[meshTmp->amOfFaces - 1] = pTmp;
+									meshTmp->polygons[meshTmp->polygonsCount - 1] = pTmp;
 							}
 						}
 
@@ -427,25 +427,34 @@ namespace render
 		}
 
 		unsigned char r, g, b;
-		for (size_t i = 0; i < meshTmp->amOfFaces; i++)
+		for (size_t i = 0; i < meshTmp->polygonsCount; i++)
 		{
-			r = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[0] - 1].x - meshTmp->vMin.x) / (meshTmp->vMax.x - meshTmp->vMin.x)) * 255;
-			g = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[0] - 1].y - meshTmp->vMin.y) / (meshTmp->vMax.y - meshTmp->vMin.y)) * 255;
-			b = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[0] - 1].z - meshTmp->vMin.z) / (meshTmp->vMax.z - meshTmp->vMin.z)) * 255;
+			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].x - meshTmp->minPosition.x) /
+				(meshTmp->maxPosition.x - meshTmp->minPosition.x)) * 255;
+			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].y - meshTmp->minPosition.y) /
+				(meshTmp->maxPosition.y - meshTmp->minPosition.y)) * 255;
+			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].z - meshTmp->minPosition.z) /
+				(meshTmp->maxPosition.z - meshTmp->minPosition.z)) * 255;
 
-			meshTmp->f[i].color[0] = { r, g, b };
+			meshTmp->polygons[i].colors[0] = { r, g, b };
 
-			r = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[1] - 1].x - meshTmp->vMin.x) / (meshTmp->vMax.x - meshTmp->vMin.x)) * 255;
-			g = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[1] - 1].y - meshTmp->vMin.y) / (meshTmp->vMax.y - meshTmp->vMin.y)) * 255;
-			b = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[1] - 1].z - meshTmp->vMin.z) / (meshTmp->vMax.z - meshTmp->vMin.z)) * 255;
+			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].x - meshTmp->minPosition.x) /
+				(meshTmp->maxPosition.x - meshTmp->minPosition.x)) * 255;
+			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].y - meshTmp->minPosition.y) /
+				(meshTmp->maxPosition.y - meshTmp->minPosition.y)) * 255;
+			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].z - meshTmp->minPosition.z) /
+				(meshTmp->maxPosition.z - meshTmp->minPosition.z)) * 255;
 
-			meshTmp->f[i].color[1] = { r, g, b };
+			meshTmp->polygons[i].colors[1] = { r, g, b };
 
-			r = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[2] - 1].x - meshTmp->vMin.x) / (meshTmp->vMax.x - meshTmp->vMin.x)) * 255;
-			g = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[2] - 1].y - meshTmp->vMin.y) / (meshTmp->vMax.y - meshTmp->vMin.y)) * 255;
-			b = (unsigned char)abs((meshTmp->v[meshTmp->f[i].p[2] - 1].z - meshTmp->vMin.z) / (meshTmp->vMax.z - meshTmp->vMin.z)) * 255;
+			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].x - meshTmp->minPosition.x) /
+				(meshTmp->maxPosition.x - meshTmp->minPosition.x)) * 255;
+			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].y - meshTmp->minPosition.y) /
+				(meshTmp->maxPosition.y - meshTmp->minPosition.y)) * 255;
+			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].z - meshTmp->minPosition.z) /
+				(meshTmp->maxPosition.z - meshTmp->minPosition.z)) * 255;
 
-			meshTmp->f[i].color[2] = { r, g, b };
+			meshTmp->polygons[i].colors[2] = { r, g, b };
 		}
 
 		free(fileData);

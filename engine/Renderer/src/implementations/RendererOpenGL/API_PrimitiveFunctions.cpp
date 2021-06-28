@@ -39,12 +39,12 @@ namespace render
 		render::Point point5 = point;
 		render::Point point6 = point;
 
-		point1.pos.x += size;
-		point2.pos.y += size;
-		point3.pos.z += size;
-		point4.pos.x += -size;
-		point5.pos.y += -size;
-		point6.pos.z += -size;
+		point1.position.x += size;
+		point2.position.y += size;
+		point3.position.z += size;
+		point4.position.x += -size;
+		point5.position.y += -size;
+		point6.position.z += -size;
 
 		render::drawLine(renderer, point1, point4);
 		render::drawLine(renderer, point2, point5);
@@ -56,14 +56,14 @@ namespace render
 
 		size /= 2;
 
-		render::Point point1 = { {size + point.pos.x, size + point.pos.y, size + point.pos.z}, point.color};
-		render::Point point2 = { {size + point.pos.x, -size + point.pos.y, size + point.pos.z},  point.color };
-		render::Point point3 = { {size + point.pos.x, -size + point.pos.y, -size + point.pos.z},  point.color };
-		render::Point point4 = { {size + point.pos.x, size + point.pos.y, -size + point.pos.z},  point.color };
-		render::Point point5 = { {-size + point.pos.x, size + point.pos.y, -size + point.pos.z},  point.color };
-		render::Point point6 = { {-size + point.pos.x, -size + point.pos.y, -size + point.pos.z},  point.color };
-		render::Point point7 = { {-size + point.pos.x, -size + point.pos.y, size + point.pos.z},  point.color };
-		render::Point point8 = { {-size + point.pos.x, size + point.pos.y, size + point.pos.z},  point.color };
+		render::Point point1 = { {size + point.position.x, size + point.position.y, size + point.position.z}, point.color};
+		render::Point point2 = { {size + point.position.x, -size + point.position.y, size + point.position.z},  point.color };
+		render::Point point3 = { {size + point.position.x, -size + point.position.y, -size + point.position.z},  point.color };
+		render::Point point4 = { {size + point.position.x, size + point.position.y, -size + point.position.z},  point.color };
+		render::Point point5 = { {-size + point.position.x, size + point.position.y, -size + point.position.z},  point.color };
+		render::Point point6 = { {-size + point.position.x, -size + point.position.y, -size + point.position.z},  point.color };
+		render::Point point7 = { {-size + point.position.x, -size + point.position.y, size + point.position.z},  point.color };
+		render::Point point8 = { {-size + point.position.x, size + point.position.y, size + point.position.z},  point.color };
 
 		render::drawLine(renderer, point1, point6);
 		render::drawLine(renderer, point2, point5);

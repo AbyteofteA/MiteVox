@@ -13,20 +13,20 @@ namespace render
 
 		char isUploaded = 0;
 
-		mathem::Point3D* v = nullptr;
-		size_t amOfVertices = 0;
+		mathem::Point3D* positions = nullptr;
+		size_t positionsCount = 0;
 		unsigned int vertexBufferID = -1;
 
-		mathem::Point3D vMax, vMin;
+		mathem::Point3D minPosition, maxPosition;
 
-		mathem::Vector3D* vn = nullptr;
-		size_t amOfNormals = 0;
+		mathem::Vector3D* normals = nullptr;
+		size_t normalsCount = 0;
 
-		mathem::Point3D* vt = nullptr;
-		size_t amOfTextureCoords = 0;
+		mathem::Point3D* textureCoords = nullptr;
+		size_t textureCoordsCount = 0;
 
-		Polygon* f = nullptr;
-		size_t amOfFaces = 0;
+		Polygon* polygons = nullptr;
+		size_t polygonsCount = 0;
 	};
 }
 
