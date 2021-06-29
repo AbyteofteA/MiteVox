@@ -18,7 +18,7 @@ namespace aimods
 		float* weightArray = nullptr;
 		FormalNeuron** axonArray = nullptr;
 		
-		inline FormalNeuron(activation _function, unsigned int _amountOfAxons);
+		inline FormalNeuron(ActivationFunction _function, unsigned int _amountOfAxons);
 		inline ~FormalNeuron();
 
 		inline void setWeights(float value);
@@ -30,12 +30,12 @@ namespace aimods
 
 		// Getters //
 
-		inline activation getFunction();
+		inline ActivationFunction getFunction();
 		inline size_t getAmountOfAxons();
 
 	private:
 
-		activation function = activation::RELU;
+		ActivationFunction function = ActivationFunction::RELU;
 		size_t amountOfAxons = 0;
 	};
 }

@@ -62,7 +62,7 @@ namespace aimods
 
 		for (size_t i = 0; i < this->size; i++)
 		{
-			this->neuronArray[i] = new FormalNeuron(activation::BIPOLAR, this->size - 1);
+			this->neuronArray[i] = new FormalNeuron(ActivationFunction::BIPOLAR, this->size - 1);
 		}
 		for (size_t i = 0; i < this->size; i++)
 		{

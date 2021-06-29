@@ -6,6 +6,10 @@
 #include "engine/AIModels/src/Structure/Functions.h"
 #include "engine/AIModels/src/Structure/LearningBatch.h"
 #include "engine/AIModels/src/Structure/FormalNeuron.h"
+#include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"
+#include "engine/AIModels/src/Structure/NeuralLayerGeneration.h"
+#include "engine/AIModels/src/Structure/NeuralLayerCompatibility.h"
+#include "engine/AIModels/src/Structure/NeuralNetwork.h"
 
 // FullyConnectedNeuralNets
 #include "engine/AIModels/src/FeedForwardNeuralNets/FullyConnectedLayer.h"
@@ -23,5 +27,7 @@
 
 // Files
 #include "engine/AIModels/src/GZ_File_IO.h"
+#include "Structure/NeuralNetworkSerializer.h"
+#include "Structure/NeuralNetworkDeserializer.h"
 
 #endif

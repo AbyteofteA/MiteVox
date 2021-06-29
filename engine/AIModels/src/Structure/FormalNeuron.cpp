@@ -8,7 +8,7 @@
 namespace aimods
 {
 
-	inline FormalNeuron::FormalNeuron(activation _function, unsigned int _amountOfAxons)
+	inline FormalNeuron::FormalNeuron(ActivationFunction _function, unsigned int _amountOfAxons)
 	{
 		this->function = _function;
 		this->amountOfAxons = _amountOfAxons;
@@ -62,7 +62,7 @@ namespace aimods
 		return this->output;
 	}
 
-	inline activation FormalNeuron::getFunction()
+	inline ActivationFunction FormalNeuron::getFunction()
 	{
 		return function;
 	}
