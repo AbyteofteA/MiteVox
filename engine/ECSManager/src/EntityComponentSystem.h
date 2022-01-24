@@ -6,9 +6,9 @@
 #define MANAGER_INDEX_TYPE unsigned char
 #define MAX_COMPONENTS sizeof(entityID) * 8
 
-#include "Entity.h"
-#include "Prefab.h"
-#include "ComponentManager.h"
+#include "engine/ECSManager/src/Entity.h"
+#include "engine/ECSManager/src/Prefab.h"
+#include "engine/ECSManager/src/ComponentManager.h"
 
 #include "engine/Math/src/Generators/UniqueIDGenerator.h"
 

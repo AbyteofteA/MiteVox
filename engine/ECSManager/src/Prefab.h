@@ -2,7 +2,7 @@
 #ifndef PREFAB_H
 #define PREFAB_H
 
-#include "ComponentManager.h"
+#include "engine/ECSManager/src/ComponentManager.h"
 
 #include <string>
 

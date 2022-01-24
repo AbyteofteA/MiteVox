@@ -3,5 +3,6 @@
 #define CODESAFETY_H
 
 #include "ensureValue.h"
+#include "SafeArray.h"
 
 #endif

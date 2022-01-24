@@ -80,7 +80,7 @@ namespace mathem
 	};
 
 	template<typename T>
-	Buffer<T>** createNBuffers(int n)
+	Buffer<T>** createManyBuffers(int n)
 	{
 		Buffer<T>** buffers = (Buffer<T>**)malloc(sizeof(Buffer<T>*) * n);
 		for (int i = 0; i < n; i++)

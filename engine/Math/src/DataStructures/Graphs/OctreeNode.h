@@ -86,7 +86,7 @@ namespace mathem
 	template <typename T>
 	OctreeNode<T>::~OctreeNode()
 	{
-		if (!isLeaf)
+		if (not isLeaf)
 		{
 			for (size_t i = 0; i < 8; i++)
 			{
@@ -171,7 +171,7 @@ namespace mathem
 		{
 			for (size_t i = 0; i < 8; i++)
 			{
-				if (!subNodes[i]->isEmpty())
+				if (not subNodes[i]->isEmpty())
 				{
 					return false;
 				}
@@ -183,12 +183,11 @@ namespace mathem
 	template <typename T>
 	bool OctreeNode<T>::shouldCollapse()
 	{
-		if (!isLeaf)
+		if (not isLeaf)
 		{
 			for (size_t i = 0; i < 8; i++)
 			{
-				if (!subNodes[i]->isLeaf ||
-					(subNodes[i]->isLeaf && (subNodes[i]->dataPoints.size() != 0)))
+				if (not subNodes[i]->isLeaf || (subNodes[i]->isLeaf && (subNodes[i]->dataPoints.size() != 0)))
 				{
 					return false;
 				}

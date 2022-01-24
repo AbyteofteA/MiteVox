@@ -74,7 +74,7 @@ namespace mathem
 	void UniqueIDGenerator<T>::reset()
 	{
 		maxID = 0;
-		while (!returnedIDs.empty())
+		while (returnedIDs.empty() == false)
 		{
 			returnedIDs.pop();
 		}
