@@ -1,4 +1,5 @@
 
+# Visual Studio unnecessary files and folders
 *.sdf
 *.suo
 *.user
@@ -11,25 +12,28 @@
 *.log
 *.manifest
 *.ilk
-
 *.pch
 *.pdb
 *.res
 *.tlog
 *.filters
+ipch/
+.vs/
+**/bin/**
+
+# Git files and folders 
+.git/
 
 *.sai2
 *.odt
+**/assets_hidden/**
+Backup/**
+engine/NeuralNetworkBuilderUI/**
+engine/NeuralNetworkDatabaseWrapper/**
+engine/NeuralNetworkWrapper/**
+engine/AIModels/src/s/**
+engine/FileIO/src/Formats/glTF_2.0/extensions/**
 
-Backup/
-
-**/bin/intermediates/**
-ipch/
-assets_hidden/
-.git/
-.vs/
-
+# Necessary files and folders
 !dependencies/**
-!engine/Renderer/assets/**
-
 !sandbox/DemoProject/bin/Win32/Debug/engine_config.json

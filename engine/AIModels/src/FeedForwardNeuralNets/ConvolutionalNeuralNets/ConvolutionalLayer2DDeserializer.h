@@ -2,7 +2,7 @@
 #ifndef CONVOLUTIONALLAYER2DDESERIALIZER_H
 #define CONVOLUTIONALLAYER2DDESERIALIZER_H
 
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "ConvolutionalLayer2D.h"
 #include "engine/AIModels/src/Structure/Functions.h"
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"

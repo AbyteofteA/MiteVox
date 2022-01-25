@@ -2,7 +2,7 @@
 #ifndef FULLYCONNECTEDLAYERDESERIALIZER_H
 #define FULLYCONNECTEDLAYERDESERIALIZER_H
 
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "FullyConnectedLayer.h"
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBaseSerializer.h"

@@ -5,7 +5,7 @@
 #include "NeuralNetwork.h"
 #include "NeuralNetworkLayerBase.h"
 #include "NeuralLayerType.h"
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "NeuralNetworkLayerBaseSerializer.h"
 #include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/FilterLayer2DBaseSerializer.h"
 #include "engine/AIModels/src/FeedForwardNeuralNets/FullyConnectedLayer.h"

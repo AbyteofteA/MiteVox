@@ -5,7 +5,7 @@
 #include "SubsamplingLayer2D.h"
 #include "FilterLayer2DBase.h"
 #include "FilterLayer2DBaseSerializer.h"
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 
 namespace aimods
 {

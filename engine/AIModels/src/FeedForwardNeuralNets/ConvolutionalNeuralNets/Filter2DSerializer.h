@@ -3,7 +3,7 @@
 #define FILTER_2D_SERIALIZER_H
 
 #include "Filter2D.h"
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 
 namespace aimods
 {

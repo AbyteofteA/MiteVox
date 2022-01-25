@@ -2,7 +2,7 @@
 #ifndef SUBSAMPLINGLAYER2DDESERIALIZER_H
 #define SUBSAMPLINGLAYER2DDESERIALIZER_H
 
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "SubsamplingLayer2D.h"
 #include "engine/AIModels/src/Structure/Functions.h"
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"

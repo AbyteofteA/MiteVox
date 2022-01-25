@@ -18,21 +18,19 @@ namespace aimods
 			size_t inputHeight,
 			Filter2D<T>* filter);
 
-		inline void weighSum(T* inputs);
-		inline void computeOutput();
-
 		/// <summary>
 		/// Propagates signals through the layer, then stores the results in outputs.
 		/// </summary>
 		/// <param name="inputs"> - array, must be of size FilterLayer2DBase::_inputsDataSize</param>
 		inline void propagate(T* inputs);
-		inline void propagateSavingWeightedSums(T* inputs) {}
+		inline void propagateSavingWeightedSums(T* inputs);
 		inline void adjustWeights(T* inputs, float learningRate) {}
 
 	private:
 
-		inline void computeWeightedSums(T* inputs, T* resultsArray) {}
-		inline void computeOutputs(T* weightedSumsArray) {}
+		void tuneOutputs();
+		inline void computeWeightedSums(T* inputs, T* resultsArray);
+		inline void computeOutputs(T* weightedSumsArray);
 	};
 
 
@@ -49,19 +47,40 @@ namespace aimods
 			amountOfInputMaps,
 			inputWidth,
 			inputHeight,
+			1,
 			filter)
 	{
-
+		this->tuneOutputs();
 	}
 
 	template <typename T>
-	inline void ConvolutionalLayer2D<T>::weighSum(T* inputs) {}
+	inline void ConvolutionalLayer2D<T>::propagate(T* inputs)
+	{
+		computeWeightedSums(inputs, this->_outputs);
+		computeWeightedSums(this->_temporaryCalculations, this->_outputs);
+	}
 
 	template <typename T>
-	inline void ConvolutionalLayer2D<T>::computeOutput() {}
-	
+	inline void ConvolutionalLayer2D<T>::propagateSavingWeightedSums(T* inputs)
+	{
+		computeWeightedSums(inputs, this->_temporaryCalculations);
+		computeWeightedSums(this->_temporaryCalculations, this->_outputs);
+	}
+
+	//template <typename T>
+	//inline void ConvolutionalLayer2D<T>::adjustWeights(T* inputs, float learningRate);
+
 	template <typename T>
-	inline void ConvolutionalLayer2D<T>::propagate(T* inputs)
+	void ConvolutionalLayer2D<T>::tuneOutputs()
+	{
+		this->_outputMapElementCount = this->_outputWidth * this->_outputHeight;
+		this->_outputsCount = this->_outputMapElementCount * this->_amountOfOutputMaps;
+		this->_outputs = new T[this->_outputsCount];
+		this->_outputsDataSize = this->_outputsCount * sizeof(T);
+	}
+
+	template <typename T>
+	inline void ConvolutionalLayer2D<T>::computeWeightedSums(T* inputs, T* resultsArray)
 	{
 		// Check if the inputs are passed.
 		if (inputs == nullptr)
@@ -77,8 +96,20 @@ namespace aimods
 		size_t outputHeight = this->getOutputHeight();
 		size_t outputWidth = this->getOutputWidth();
 
+		long filterDimension = this->_filter->getDimension();
 		long filterHalfDimension = this->_filter->computeHalfDimension();
 		long filterStride = this->_filter->getStride();
+		T* filterData = this->_filter->getFilterData();
+
+		this->setOutputs(0);
+
+		
+	}
+
+	template <typename T>
+	inline void ConvolutionalLayer2D<T>::computeOutputs(T* weightedSumsArray) 
+	{
+
 	}
 }
 

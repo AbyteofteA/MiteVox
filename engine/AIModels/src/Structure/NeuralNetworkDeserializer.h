@@ -5,7 +5,7 @@
 #include "NeuralNetwork.h"
 #include "NeuralNetworkLayerBase.h"
 #include "NeuralLayerType.h"
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/AIModels/src/FeedForwardNeuralNets/FullyConnectedLayer.h"
 #include "engine/AIModels/src/FeedForwardNeuralNets/FullyConnectedLayerDeserializer.h"
 #include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/ConvolutionalLayer2D.h"
@@ -31,7 +31,7 @@ namespace aimods
 
         // Deserialize model's layers.
 
-        fileio::JSON* layersArrayJSON = neuralNetworkJSON->getFieldObject("layers");
+        fileio::JSON* layersArrayJSON = neuralNetworkJSON->getFieldArray("layers");
 
         size_t layersCount = layersArrayJSON->getArraySize();
         for (size_t layerIndex = 0; layerIndex < layersCount; layerIndex++)

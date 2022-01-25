@@ -4,7 +4,7 @@
 
 #include "Filter2D.h"
 #include "engine/AIModels/src/Structure/Functions.h"
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 
 namespace aimods
 {

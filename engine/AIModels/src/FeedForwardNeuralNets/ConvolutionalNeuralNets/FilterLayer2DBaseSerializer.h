@@ -4,7 +4,7 @@
 
 #include "FilterLayer2DBase.h"
 #include "Filter2DSerializer.h"
-#include "engine/FileIO/src/Formats/JSON.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBaseSerializer.h"
 

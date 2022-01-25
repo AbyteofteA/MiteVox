@@ -118,7 +118,7 @@ void InputHandler::detach()
 
 inline void InputHandler::processMouse()
 {
-	if (!isAttached)
+	if (isAttached == false)
 	{
 		return;
 	}
@@ -176,7 +176,7 @@ inline void InputHandler::update()
 			attach();
 		afterPushDelay();
 	}
-	if (!isAttached)
+	if (isAttached == false)
 	{
 		return;
 	}

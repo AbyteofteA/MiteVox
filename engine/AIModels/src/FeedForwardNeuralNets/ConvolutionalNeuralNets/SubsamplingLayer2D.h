@@ -33,11 +33,11 @@ namespace aimods
 		/// <param name="inputs"> - array, must be of size FilterLayer2DBase::_inputsDataSize</param>
 		inline void propagate(T* inputs);
 		inline void propagateSavingWeightedSums(T* inputs);
-
 		inline void adjustWeights(T* inputs, float learningRate) {}
 
 	private:
 
+		void tuneOutputs();
 		inline void computeWeightedSums(T* inputs, T* resultsArray);
 		inline void computeOutputs(T* weightedSumsArray);
 	};
@@ -57,11 +57,13 @@ namespace aimods
 			amountOfInputMaps,
 			inputWidth,
 			inputHeight,
+			amountOfInputMaps,
 			filter)
 	{
 		_weight = 1;
 		_threshold = 0;
 		this->_function = function;
+		this->tuneOutputs();
 	}
 
 	template <typename T>
@@ -92,6 +94,15 @@ namespace aimods
 
 	//template <typename T>
 	//inline void SubsamplingLayer2D<T>::adjustWeights(T* inputs, float learningRate);
+
+	template <typename T>
+	void SubsamplingLayer2D<T>::tuneOutputs()
+	{
+		this->_outputMapElementCount = this->_outputWidth * this->_outputHeight;
+		this->_outputsCount = this->_outputMapElementCount * this->_amountOfOutputMaps;
+		this->_outputs = new T[this->_outputsCount];
+		this->_outputsDataSize = this->_outputsCount * sizeof(T);
+	}
 
 	template <typename T>
 	inline void SubsamplingLayer2D<T>::computeWeightedSums(T* inputs, T* resultsArray)

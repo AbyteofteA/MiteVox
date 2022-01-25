@@ -23,6 +23,7 @@ namespace aimods
 			size_t amountOfInputMaps,
 			size_t inputWidth,
 			size_t inputHeight,
+			size_t amountOfOutputMaps,
 			Filter2D<T>* filter);
 
 		inline ~FilterLayer2DBase();
@@ -63,7 +64,7 @@ namespace aimods
 		inline size_t getOutputHeight();
 		inline size_t getOutputMapElementCount();
 
-	private:
+	protected:
 
 		size_t _inputsDataSize;
 		size_t _amountOfInputMaps;
@@ -77,7 +78,10 @@ namespace aimods
 		size_t _outputHeight;
 		size_t _outputMapElementCount;
 
-		void tuneOutputs();
+	private:
+
+		void tuneParameters();
+		virtual void tuneOutputs() = 0;
 
 		virtual inline void computeWeightedSums(T* inputs, T* resultsArray) = 0;
 		virtual inline void computeOutputs(T* weightedSumsArray) = 0;
@@ -93,6 +97,7 @@ namespace aimods
 		size_t amountOfInputMaps,
 		size_t inputWidth,
 		size_t inputHeight,
+		size_t amountOfOutputMaps,
 		Filter2D<T>* filter) : NeuralNetworkLayerBase<T>(layerType)
 	{
 		// Check if the filter is passed.
@@ -104,12 +109,13 @@ namespace aimods
 		_amountOfInputMaps = safety::ensureMinimum<size_t>(amountOfInputMaps, 1);
 		_inputWidth = safety::ensureMinimum<size_t>(inputWidth, 1);
 		_inputHeight = safety::ensureMinimum<size_t>(inputHeight, 1);
+		_amountOfOutputMaps = safety::ensureMinimum<size_t>(amountOfOutputMaps, 1);
 		_inputMapElementCount = _inputWidth * _inputHeight;
 		this->_inputsCount = _inputMapElementCount * _amountOfInputMaps;
 		_inputsDataSize = this->_inputsCount * sizeof(T);
 		_filter = filter;
 
-		tuneOutputs();
+		tuneParameters();
 	}
 
 	template <typename T>
@@ -332,7 +338,25 @@ namespace aimods
 	}
 
 	template <typename T>
-	void FilterLayer2DBase<T>::tuneOutputs()
+	size_t FilterLayer2DBase<T>::computeInputsDataIndex(long column, long row, size_t mapIndex)
+	{
+		return 
+			_inputMapElementCount * mapIndex +
+			row * _inputWidth + 
+			column;
+	}
+
+	template <typename T>
+	size_t FilterLayer2DBase<T>::computeOutputsDataIndex(long column, long row, size_t mapIndex)
+	{
+		return
+			_outputMapElementCount * mapIndex +
+			row * _outputWidth +
+			column;
+	}
+
+	template <typename T>
+	void FilterLayer2DBase<T>::tuneParameters()
 	{
 		// Check if the filter exists.
 		if (_filter == nullptr)
@@ -370,30 +394,6 @@ namespace aimods
 			// TODO: implement tuning outputs for PaddingType::DILATED.
 			break;
 		}
-
-		_outputMapElementCount = _outputWidth * _outputHeight;
-		_amountOfOutputMaps = _amountOfInputMaps * _filter->_amountOfKernels;
-		this->_outputsCount = _outputMapElementCount * _amountOfOutputMaps;
-		this->_outputs = new T[this->_outputsCount];
-		_outputsDataSize = this->_outputsCount * sizeof(T);
-	}
-
-	template <typename T>
-	size_t FilterLayer2DBase<T>::computeInputsDataIndex(long column, long row, size_t mapIndex)
-	{
-		return 
-			_inputMapElementCount * mapIndex +
-			row * _inputWidth + 
-			column;
-	}
-
-	template <typename T>
-	size_t FilterLayer2DBase<T>::computeOutputsDataIndex(long column, long row, size_t mapIndex)
-	{
-		return
-			_outputMapElementCount * mapIndex +
-			row * _outputWidth +
-			column;
 	}
 }
 
