@@ -3,7 +3,7 @@
 #define FILELOADERASYNC_H
 
 #include "FileStatus.h"
-#include "loadBytes.h"
+#include "FileInputOutput.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -48,7 +48,7 @@ namespace fileio
 				return;
 			}
 
-			if (!fs::exists(fs::path(_filename)))
+			if (fs::exists(fs::path(_filename)) == false)
 			{
 				printf("ERROR: Cannot open %s\n", _filename.c_str());
 				return;
@@ -63,7 +63,14 @@ namespace fileio
 
 			if (_parseFunction == nullptr) // there is no load/parse function
 			{
-				fileInfo->loaderThread = std::thread(loadBytes, fileInfo->filename, &fileInfo->objectData, &fileInfo->fileStatus);
+				void (*loadBinary)(std::string filename, void** result, std::atomic<FileStatus>*flag) = 
+					FileInputOutput::loadBinary;
+				
+				fileInfo->loaderThread = std::thread(
+					loadBinary, 
+					fileInfo->filename, 
+					&fileInfo->objectData, 
+					&fileInfo->fileStatus);
 			}
 			else // there is a load/parse function
 			{
@@ -109,7 +116,7 @@ namespace fileio
 		*****************************************************************************************/
 		inline void awaitAll()
 		{
-			while (!fileRecords.empty())
+			while (fileRecords.empty() == false)
 			{
 				update();
 			}

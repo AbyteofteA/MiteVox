@@ -4,7 +4,13 @@
 
 namespace fileio
 {
-	enum struct FileStatus { ERROR = -1, LOADING, READY };
+	enum struct FileStatus 
+	{ 
+		ERROR = -1, 
+		LOADING, 
+		SAVING, 
+		READY 
+	};
 }
 
 #endif
