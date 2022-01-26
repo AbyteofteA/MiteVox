@@ -28,26 +28,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -89,7 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Simple OpenGL Image Library\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)dependencies\Simple OpenGL Image Library\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -151,17 +151,50 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Formats\glTF_2.0\BufferLayout\ComponentDataType.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Material\Material.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Mesh\MeshPrimitive.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\glTF.h" />
+    <ClInclude Include="src\FileInputOutput.h" />
     <ClInclude Include="src\FileIO.h" />
     <ClInclude Include="src\FileLoaderAsync.h" />
     <ClInclude Include="src\FileStatus.h" />
-    <ClInclude Include="src\Image.h" />
-    <ClInclude Include="src\Formats\JSON.h" />
-    <ClInclude Include="src\loadBytes.h" />
-    <ClInclude Include="src\Formats\OBJ.h" />
+    <ClInclude Include="src\Formats\FileFormatBase.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\BufferLayout\BufferViewAccessor.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\BufferLayout\BufferView.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Material\ImageSampler.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Mesh\Mesh.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Node.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Scene.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\BufferLayout\BufferViewAccessorSparse.h" />
+    <ClInclude Include="src\Formats\JSON\JSONRegex.h" />
+    <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJ.h" />
+    <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJRegexPack.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Material\Image.h" />
+    <ClInclude Include="src\Formats\JSON\JSON.h" />
+    <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJRegex.h" />
+    <ClInclude Include="src\SerializationStatus.h" />
+    <ClInclude Include="src\Formats\glTF_2.0\Material\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Formats\glTF_2.0\BufferLayout\BufferViewAccessorSparse.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Material\Material.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Mesh\MeshPrimitive.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\glTF.cpp" />
+    <ClCompile Include="src\FileInputOutput.cpp" />
     <ClCompile Include="src\FileLoaderAsync.cpp" />
-    <ClCompile Include="src\Image.cpp" />
+    <ClCompile Include="src\Formats\FileFormatBase.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\BufferLayout\BufferViewAccessor.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\BufferLayout\BufferView.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Material\ImageSampler.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Mesh\Mesh.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Node.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Scene.cpp" />
+    <ClCompile Include="src\Formats\JSON\JSON.cpp" />
+    <ClCompile Include="src\Formats\WavefrontOBJ\WavefrontOBJ.cpp" />
+    <ClCompile Include="src\Formats\WavefrontOBJ\WavefrontOBJRegexPack.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Material\Image.cpp" />
+    <ClCompile Include="src\Formats\glTF_2.0\Material\Texture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
