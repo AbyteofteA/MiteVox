@@ -5,13 +5,13 @@
 #define HEXAGON_CONST 0.866025403
 
 #include "engine/Math/src/Math.h"
-#include "engine/FileIO/src/FileIO.h"
+#include "engine/FileIO/src/Formats/glTF_2.0/glTF.h"
 
 #include "Cubemap.h"
 #include "Color.h"
 #include "Primitives.h"
 #include "Skybox.h"
-#include "Material.h"
+#include "engine/FileIO/src/Formats/glTF_2.0/Material/Material.h"
 #include "Camera.h"
 #include "Mesh3D.h"
 #include "Model3D.h"
@@ -75,6 +75,17 @@ namespace render
 	void selectModel3D(Model3D* model3D);
 	void removeModel3D(Model3D* model3D);
 	void renderModel3D(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
+	
+	void uploadMaterial(fileio::Material* material, int shaderID);
+	void selectMaterial(fileio::Material* material, int shaderID);
+	void removeMaterial(fileio::Material* material, int shaderID);
+
+	void uploadBufferView(fileio::BufferView* bufferView);
+	void removeBufferView(fileio::BufferView* bufferView);
+
+	void uploadMesh(fileio::Mesh* mesh, int shaderID);
+	void removeMesh(fileio::Mesh* mesh);
+	void renderMesh(RendererSettings* renderer, int shaderID, fileio::Mesh* mesh, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
 	
 	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 

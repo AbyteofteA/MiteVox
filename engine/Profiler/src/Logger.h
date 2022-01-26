@@ -14,15 +14,22 @@
 	{
 	  log:
 	  [
-	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
-	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 },
-	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", name: "main", status: "INFO", text: "Hello, world!", id: 789456 }
+	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", status: "INFO", name: "main", text: "Hello, world!", id: 789456 },
+	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", status: "INFO", name: "main", text: "Hello, world!", id: 789456 },
+	    { time: "YYYY-MM-DD hh:mm:ss.uuuuuuuuu", status: "INFO", name: "main", text: "Hello, world!", id: 789456 }
 	  ]
 	}
 */
 
 namespace profile
 {
+	enum struct LoggerMode
+	{
+		LOG_IN_CONSOLE = 0b00000001,
+		LOG_IN_JSON_FILE = 0b00000010,
+		LOG_IN_CONSOLE_AND_JSON_FILE = 0b00000011
+	};
+
 	class Logger
 	{
 	public:
@@ -35,41 +42,41 @@ namespace profile
 		/// <summary>
 		/// Constructor for the file logger. 
 		/// </summary>
-		inline Logger(bool _logConsole, std::string _filePath);
+		inline Logger(LoggerMode mode, std::string _filePath);
 
 		/// <summary>
 		/// Logs info message.
 		/// </summary>
-		inline std::string info(std::string name, std::string message);
+		inline void logInfo(std::string name, std::string message);
 
 		/// <summary>
 		/// Logs warning message.
 		/// </summary>
-		inline std::string warning(std::string name, std::string message);
+		inline void logWarning(std::string name, std::string message);
 
 		/// <summary>
 		/// Logs error message.
 		/// </summary>
-		inline std::string error(std::string name, std::string message);
+		inline void logError(std::string name, std::string message);
 
 		/// <summary>
 		/// Logs start of some process.
 		/// </summary>
-		inline std::string start(std::string name);
+		inline void logStart(std::string name);
 
 		/// <summary>
 		/// Logs end of some process.
 		/// </summary>
-		inline std::string end(std::string name);
+		inline void logEnd(std::string name);
 
 	private:
 
-		bool logConsole;
-		bool logfile;
+		LoggerMode _mode;
 		std::string filePath;
 
-		inline std::string formLog(std::string name, std::string status, std::string message);
-		inline void placeLog(std::string log);
+		inline std::string formConsoleLog(std::string name, std::string status, std::string message);
+		inline std::string formJSONLog(std::string name, std::string status, std::string message);
+		inline void placeLog(std::string name, std::string status, std::string message);
 
 		inline std::string getTreadID();
 		inline std::string getTimeStamp();
@@ -81,79 +88,82 @@ namespace profile
 
 	inline Logger::Logger()
 	{
-		logConsole = true;
-		logfile = false;
+		_mode = LoggerMode::LOG_IN_CONSOLE;
 	}
 
-	inline Logger::Logger(bool _logConsole, std::string _filePath)
+	inline Logger::Logger(LoggerMode mode, std::string _filePath)
 	{
-		logConsole = _logConsole;
-		logfile = true;
+		_mode = mode;
 		filePath = _filePath;
 	}
 
-	inline std::string Logger::info(std::string name, std::string message)
+	inline void Logger::logInfo(std::string name, std::string message)
 	{
-		std::string infoStr = formLog(name, "INFO", message);
-		placeLog(infoStr);
-
-		return infoStr;
+		placeLog(name, "INFO   ", message);
 	}
 
-	inline std::string Logger::warning(std::string name, std::string message)
+	inline void Logger::logWarning(std::string name, std::string message)
 	{
-		std::string warningStr = formLog(name, "WARNING", message);
-		placeLog(warningStr);
-
-		return warningStr;
+		placeLog(name, "WARNING", message);
 	}
 
-	inline std::string Logger::error(std::string name, std::string message)
+	inline void Logger::logError(std::string name, std::string message)
 	{
-		std::string errorStr = formLog(name, "ERROR", message);
-		placeLog(errorStr);
-
-		return errorStr;
+		placeLog(name, "ERROR  ", message);
 	}
 
-	inline std::string Logger::start(std::string name)
+	inline void Logger::logStart(std::string name)
 	{
-		std::string startStr = formLog(name, "START", "");
-		placeLog(startStr);
-
-		return startStr;
+		placeLog(name, "START  ", "");
 	}
 
-	inline std::string Logger::end(std::string name)
+	inline void Logger::logEnd(std::string name)
 	{
-		std::string endStr = formLog(name, "END", "");
-		placeLog(endStr);
-
-		return endStr;
+		placeLog(name, "END    ", "");
 	}
 
-	inline std::string Logger::formLog(std::string name, std::string status, std::string message)
+	inline std::string Logger::formConsoleLog(std::string name, std::string status, std::string message)
 	{
-		std::string log =
-			"time: \"" + getTimeStamp() +
-			"\", name: \"" + name +
-			"\", status: \"" + status +
-			"\", text: \"" + message +
-			"\", id: " + getTreadID();
+		std::string log;
+		log += getTimeStamp();
+		log += " | ";
+		log += status;
+		log += " | ";
+		log += name;
+		log += " | ";
+		log += message;
+		log += " | ";
+		log += getTreadID();
 
 		return log;
 	}
 
-	inline void Logger::placeLog(std::string log)
+	inline std::string Logger::formJSONLog(std::string name, std::string status, std::string message)
 	{
-		if (logConsole)
-		{
-			std::cout << log << std::endl;
-		}
-		if (logfile)
-		{
-			log = "{ " + log + " }";
+		std::string log;
+		log += "{ time: \"";
+		log += getTimeStamp();
+		log += "\", status: \"";
+		log += status;
+		log += "\", name: \"";
+		log += name;
+		log += "\", text: \"";
+		log += message;
+		log += "\", id: ";
+		log += getTreadID();
+		log += " }";
 
+		return log;
+	}
+
+	inline void Logger::placeLog(std::string name, std::string status, std::string message)
+	{
+		if ((int)_mode & (int)LoggerMode::LOG_IN_CONSOLE)
+		{
+			std::cout << formConsoleLog(name, status, message) << std::endl;
+		}
+		if ((int)_mode & (int)LoggerMode::LOG_IN_JSON_FILE)
+		{
 			// TODO: Implement file logging.
 		}
 	}

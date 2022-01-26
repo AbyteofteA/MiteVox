@@ -33,7 +33,6 @@
     <ClInclude Include="src\RendererAPI\Color.h" />
     <ClInclude Include="src\RendererAPI\Cubemap.h" />
     <ClInclude Include="src\RendererAPI\Light.h" />
-    <ClInclude Include="src\RendererAPI\Material.h" />
     <ClInclude Include="src\RendererAPI\Mesh3D.h" />
     <ClInclude Include="src\RendererAPI\Model3D.h" />
     <ClInclude Include="src\RendererAPI\Primitives.h" />
@@ -62,6 +61,7 @@
     <ClCompile Include="src\implementations\RendererOpenGL\API_ModelFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.cpp" />
     <ClCompile Include="src\RendererAPI\Cubemap.cpp" />
+    <ClCompile Include="src\RendererAPI\Primitives.cpp" />
     <ClCompile Include="src\RendererAPI\Skybox.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -74,26 +74,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

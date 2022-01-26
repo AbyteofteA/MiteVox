@@ -4,25 +4,26 @@
 
 namespace render
 {
-    struct AmbientLight
-    {
-        ColorRGBAf color;
-    };
-
     struct DirectedLight
     {
         mathem::Vector3D direction;
-        ColorRGBAf color;
+        ColorRGBf color;
+
+        float intensity;
+        float range;
     };
 
     struct PointLight
     {
         mathem::Point3D position;
-        ColorRGBAf color;
+        ColorRGBf color;
 
         float constant;
         float linear;
         float quadratic;
+
+        float intensity;
+        float range;
     };
 
     struct SpotLight
@@ -30,11 +31,14 @@ namespace render
         mathem::Point3D position;
         mathem::Vector3D direction;
         float angle;
-        ColorRGBAf color;
+        ColorRGBf color;
 
         float constant;
         float linear;
         float quadratic;
+
+        float intensity;
+        float range;
     };
 }
 

@@ -2,6 +2,7 @@
 #ifndef SHADERFUNCTIONS_H
 #define SHADERFUNCTIONS_H
 
+#include "engine/FileIO/src/FileLoaderAsync.h"
 #include <string>
 
 namespace render

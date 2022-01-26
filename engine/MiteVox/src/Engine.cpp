@@ -3,8 +3,8 @@
 
 #include "EngineSettings.h"
 #include "Playground.h"
-#include "engine/Math/src/LinearAlgebra/SquareMatrix.h"
 
+#include <string>
 #include <vector>
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -13,10 +13,6 @@ namespace mitevox
 {
 	Engine::Engine(int argc, char* argv[])
 	{
-		mathem::SquareMatrix<float, 4> mat1;
-		mathem::SquareMatrix<float, 4> mat2;
-		mathem::SquareMatrix<float, 4> mat3 = mat1 + mat2;
-
 		std::string executionDir = fs::path(argv[0]).parent_path().string();
 		settings = new EngineSettings(executionDir);
 
@@ -35,6 +31,11 @@ namespace mitevox
 		}
 		
 		delete settings;
+	}
+
+	void Engine::initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, render::ColorRGBf clearColor)
+	{
+
 	}
 
 	void Engine::run()

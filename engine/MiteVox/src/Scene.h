@@ -2,7 +2,12 @@
 #ifndef MITEVOX_SCENE_H
 #define MITEVOX_SCENE_H
 
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
+#include "engine/CodeSafety/src/SafeArray.h"
+
 #include <vector>
+#include <string>
+#include <chrono>
 
 #ifndef INITIAL_ENTITY_BUFFER_SIZE
 #define INITIAL_ENTITY_BUFFER_SIZE 1024
@@ -21,8 +26,8 @@
 #define RIGIDBODY_COMPONENT 8
 #define TAG_COMPONENT 9
 
-#include "EngineSettings.h"
-#include "entityID.h"
+#include "engine/MiteVox/src/EngineSettings.h"
+#include "engine/MiteVox/src/entityID.h"
 #include "engine/ECSManager/src/EntityComponentSystem.h"
 
 namespace mitevox
@@ -34,6 +39,8 @@ namespace mitevox
 		std::string name = "Untitled";
 		//mathem::Octree<float>* octree;
 		ecs::EntityComponentSystem<entityID>* ECS = nullptr;
+		safety::SafeArray<int32_t> nodes;
+
 		std::vector<render::Skybox> skyboxes;
 		long activeSkybox = -1;
 		entityID activeCamera = -1;
@@ -67,7 +74,7 @@ namespace mitevox
 
 		MANAGER_INDEX_TYPE Tag_Component = 0;
 
-
+		Scene();
 		Scene(EngineSettings* _settings, entityID initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE);
 		~Scene();
 
@@ -76,6 +83,8 @@ namespace mitevox
 		// Getters //
 
 		double getCurrentTime();
+
+		void fromGLTF(fileio::JSON* sceneJSON);
 
 	private:
 

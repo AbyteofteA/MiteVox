@@ -13,6 +13,11 @@
 
 namespace mitevox
 {
+	Scene::Scene()
+	{
+
+	}
+
 	Scene::Scene(EngineSettings* _settings, entityID initialEntitiesBufferSize)
 	{
 		ECS = new ecs::EntityComponentSystem(initialEntitiesBufferSize);
@@ -105,9 +110,6 @@ namespace mitevox
 			render::RendererSettings* renderer = settings->getRendererSettings();
 			renderer->amountOfDrawCalls = 0;
 
-			render::clearBufferXY(renderer->clearColor);
-			render::clearBufferZ();
-
 			// Update lights.
 			ECS->updateComponent(DirectedLight_Component, (void*)this);
 			ECS->updateComponent(PointLight_Component, (void*)this);
@@ -135,6 +137,17 @@ namespace mitevox
 	double Scene::getCurrentTime()
 	{
 		return currentTime;
+	}
+
+	void Scene::fromGLTF(fileio::JSON* sceneJSON)
+	{
+		name = sceneJSON->getFieldString("name");
+
+		fileio::JSON* nodesArrayJSON = sceneJSON->getFieldArray("nodes");
+		if (nodesArrayJSON != nullptr)
+		{
+			nodesArrayJSON->toNumberArray<int32_t>(&nodes);
+		}
 	}
 
 	void Scene::updateTimers()

@@ -4,6 +4,7 @@
 
 #include "EngineSettings.h"
 #include "Playground.h"
+#include "engine/Renderer/src/RendererAPI/Color.h"
 
 #include <unordered_map>
 
@@ -22,6 +23,7 @@ namespace mitevox
 		void onUpdate();
 		void onDestroy();
 
+		void initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, render::ColorRGBf clearColor);
 		void run();
 
 	private:

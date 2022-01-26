@@ -2,6 +2,8 @@
 #ifndef RENDERER_CUBEMAP_H
 #define RENDERER_CUBEMAP_H
 
+#include "engine/FileIO/src/Formats/glTF_2.0/Material/Image.h"
+
 namespace render
 {
 

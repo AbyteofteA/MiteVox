@@ -8,13 +8,13 @@ namespace render
 	{
 	public:
 		Mesh3D* mesh = nullptr;
-		Material* material = nullptr;
+		fileio::Material* material = nullptr;
 		mathem::Transform transform;
 		Cubemap* reflectionMap = nullptr;
 
 		int shaderID = 0;
 
-		Model3D(Mesh3D* _mesh, Material* _material, 
+		Model3D(Mesh3D* _mesh, fileio::Material* _material,
 				mathem::Transform _transform = mathem::Transform())
 		{
 			mesh = _mesh;

@@ -13,8 +13,8 @@
 #endif
 
 #define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "dependencies/glew-2.1.0/include/GL/glew.h"
+#include "dependencies/glfw-3.3.2.bin.WIN32/include/GLFW/glfw3.h"
 
 namespace render
 {

@@ -26,14 +26,21 @@ inline void DirectedLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs
 		std::string indexStr = std::to_string(entityIndex);
 		std::string direction = "].direction";
 		std::string color = "].color";
+		std::string intensity = "].intensity";
+		std::string range = "].range";
 
 		std::string directionResult = directedLights + indexStr + direction;
 		std::string colorResult = directedLights + indexStr + color;
+		std::string intensityResult = directedLights + indexStr + intensity;
+		std::string rangeResult = directedLights + indexStr + range;
 
 		render::shaders[shaderIndex]->setVec3(directionResult.c_str(),
 			directedLight->direction.i, directedLight->direction.j, directedLight->direction.k);
 		render::shaders[shaderIndex]->setVec3(colorResult.c_str(),
 			directedLight->color.r, directedLight->color.g, directedLight->color.b);
+
+		render::shaders[shaderIndex]->setFloat(intensityResult.c_str(), directedLight->intensity);
+		render::shaders[shaderIndex]->setFloat(rangeResult.c_str(), directedLight->range);
 	}
 }
 

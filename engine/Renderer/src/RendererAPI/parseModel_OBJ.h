@@ -3,8 +3,11 @@
 #define PARSEMODEL_OBJ_H
 
 #include <atomic>
+#include <string>
 #include <regex>
-#include "engine/FileIO/src/FileIO.h"
+#include "engine/FileIO/src/FileInputOutput.h"
+#include "engine/FileIO/src/Formats/WavefrontOBJ/WavefrontOBJRegex.h"
+#include "engine/FileIO/src/Formats/WavefrontOBJ/WavefrontOBJRegexPack.h"
 #include "engine/Math/src/Math.h"
 
 #include "Color.h"
@@ -13,6 +16,26 @@
 
 namespace render
 {
+	inline bool isNotEndOfLine(char currentChar)
+	{
+		if (currentChar >= 32)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	inline std::string extractLine(char* str, int& indx)
+	{
+		int size = 0;
+		while (isNotEndOfLine(str[indx + size]))
+		{
+			++size;
+		}
+		std::string line(str + indx, size);
+		indx += size;
+		return line;
+	}
 
 	inline double* readFloats3(char* str, int& indx)
 	{
@@ -25,7 +48,7 @@ namespace render
 		{
 			while (str[indx] == ' ')
 				indx++;
-			if ((str[indx] == '\n') || (str[indx] == '\0'))
+			if (isNotEndOfLine(str[indx]) == false)
 				break;
 
 			indxTmp = str + indx;	// Save the initial index
@@ -61,99 +84,111 @@ namespace render
 		return v;
 	}
 
-
-
-	inline Polygon readPolygon(char* str, int& indx, Mesh3D** md)
+	inline Polygon readPolygon(char* str, int& indx, Mesh3D** md, fileio::WavefrontOBJRegexPack* regexPack)
 	{
-		Polygon poly;
+		Polygon polygon;
 
-		//============== Allocating memory for the string after 'f' ==============
+		indx -= 2;
+		std::string polygonStr = extractLine(str, indx);
 
-		char* tmpStr = nullptr; int size = 1;
-		while (str[indx] != '\n' && (str[indx] != '\0'))
+		std::smatch matchPolygonSimple;
+		std::smatch matchPolygonWithNormals;
+		std::smatch matchPolygonWirhTextures;
+		std::smatch matchPolygonComplete;
+		bool polygonIsSimple = std::regex_search(polygonStr, matchPolygonSimple, regexPack->polygonSimple);
+		bool polygonIsWithNormals = std::regex_search(polygonStr, matchPolygonWithNormals, regexPack->polygonWithTexture);
+		bool polygonIsWirhTextures = std::regex_search(polygonStr, matchPolygonWirhTextures, regexPack->polygonWithNormals);
+		bool polygonIsComplete = std::regex_search(polygonStr, matchPolygonComplete, regexPack->polygonComplete);
+
+		long positionIndex = 0;
+		long normalIndex = 0;
+		long textureCoordIndex = 0;
+
+		// TODO: implement polygon decomposition 
+
+		if (polygonIsSimple)
 		{
-			size++; indx++;
+			polygon.setType(PolygonType::POSITIONS);
+			polygonStr = matchPolygonSimple[1].str();
+			std::sregex_iterator regexIterator(polygonStr.begin(), polygonStr.end(), regexPack->intNumber);
+			std::sregex_iterator end;
+			size_t index = 0;
+			while (regexIterator != end)
+			{
+				positionIndex = std::stol((*regexIterator)[1].str());
+				if (positionIndex < 0)
+					positionIndex = (*md)->positionsCount + positionIndex + 1;
+				polygon.setVertexSimple(index, positionIndex);
+				++regexIterator;
+				++index;
+			}
 		}
-		tmpStr = (char*)realloc(tmpStr, sizeof(char) * size);
-		indx -= (size - 1);
-
-		//======================= Assigning the values ===========================
-
-		int i = 0;
-		while (i < (size - 1))
+		else if (polygonIsWithNormals)
 		{
-			tmpStr[i] = str[indx];
-			i++; indx++;
+			polygon.setType(PolygonType::POSITIONS_AND_NORMALS);
+			polygonStr = matchPolygonWithNormals[1].str();
+			std::sregex_iterator regexIterator(polygonStr.begin(), polygonStr.end(), regexPack->vertexWithNormal);
+			std::sregex_iterator end;
+			size_t index = 0;
+			while (regexIterator != end)
+			{
+				positionIndex = std::stol((*regexIterator)[1].str());
+				if (positionIndex < 0)
+					positionIndex = (*md)->positionsCount + positionIndex + 1;
+				normalIndex = std::stol((*regexIterator)[2].str());
+				if (normalIndex < 0)
+					normalIndex = (*md)->normalsCount + normalIndex + 1;
+				polygon.setVertexWithNormal(index, positionIndex, normalIndex);
+				++regexIterator;
+				++index;
+			}
 		}
-		tmpStr[size - 1] = '\0';
-
-		//============================= Parsing ==================================
-
-		i = 0;
-		char* endPtr = tmpStr;
-
-		/*while(tmpStr[i] == ' ')
-			i++;*/
-
-		while (endPtr[0] != '\0')
+		else if (polygonIsWirhTextures)
 		{
-			long a = strtol(endPtr + i, &endPtr, 0);
-			if (a < 0)
-				a = (*md)->positionsCount + a + 1;
-			poly.amOfVertices += 1;
-			poly.positions = (long*)realloc(poly.positions, sizeof(long) * poly.amOfVertices);
-			poly.positions[poly.amOfVertices - 1] = a;
-
-			if (endPtr[0] == '\\' || endPtr[0] == '/')
-				endPtr = endPtr + 1;
-			else if (endPtr[0] == ' ')
+			polygon.setType(PolygonType::POSITIONS_AND_TEXTURE);
+			polygonStr = matchPolygonWirhTextures[1].str();
+			std::sregex_iterator regexIterator(polygonStr.begin(), polygonStr.end(), regexPack->vertexComplete);
+			std::sregex_iterator end;
+			size_t index = 0;
+			while (regexIterator != end)
 			{
-				endPtr = endPtr + 1;
-				continue;
+				positionIndex = std::stol((*regexIterator)[1].str());
+				if (positionIndex < 0)
+					positionIndex = (*md)->positionsCount + positionIndex + 1;
+				textureCoordIndex = std::stol((*regexIterator)[2].str());
+				if (textureCoordIndex < 0)
+					textureCoordIndex = (*md)->textureCoordsCount + textureCoordIndex + 1;
+				polygon.setVertexWithTexture(index, positionIndex, textureCoordIndex);
+				++regexIterator;
+				++index;
 			}
-			else if (endPtr[0] == '\0')
-				break;
-
-
-			if (endPtr[0] != '/')
+		}
+		else if (polygonIsComplete)
+		{
+			polygon.setType(PolygonType::COMPLETE);
+			polygonStr = matchPolygonComplete[1].str();
+			std::sregex_iterator regexIterator(polygonStr.begin(), polygonStr.end(), regexPack->vertexComplete);
+			std::sregex_iterator end;
+			size_t index = 0;
+			while (regexIterator != end)
 			{
-				a = strtol(endPtr + i, &endPtr, 0);
-				if (a < 0)
-					a = (*md)->textureCoordsCount + a + 1;
-				poly.textureCoords = (long*)realloc(poly.textureCoords, sizeof(long) * poly.amOfVertices);
-				poly.textureCoords[poly.amOfVertices - 1] = a;
-
-				if (endPtr[0] == '\\' || endPtr[0] == '/')
-					endPtr = endPtr + 1;
-				else if (endPtr[0] == ' ')
-				{
-					endPtr = endPtr + 1;
-					continue;
-				}
-				else if (endPtr[0] == '\0')
-					break;
+				positionIndex = std::stol((*regexIterator)[1].str());
+				if (positionIndex < 0)
+					positionIndex = (*md)->positionsCount + positionIndex + 1;
+				textureCoordIndex = std::stol((*regexIterator)[2].str());
+				if (textureCoordIndex < 0)
+					textureCoordIndex = (*md)->textureCoordsCount + textureCoordIndex + 1;
+				normalIndex = std::stol((*regexIterator)[3].str());
+				if (normalIndex < 0)
+					normalIndex = (*md)->normalsCount + normalIndex + 1;
+				polygon.setVertexComplete(index, positionIndex, normalIndex, textureCoordIndex);
+				++regexIterator;
+				++index;
 			}
-			else endPtr = endPtr + 1;
-
-
-			a = strtol(endPtr + i, &endPtr, 0);
-			if (a < 0)
-				a = (*md)->normalsCount + a + 1;
-			poly.normals = (long*)realloc(poly.normals, sizeof(long) * poly.amOfVertices);
-			poly.normals[poly.amOfVertices - 1] = a;
-
-			if (endPtr[0] == '\\' || endPtr[0] == '/' || endPtr[0] == ' ')
-			{
-				endPtr = endPtr + 1;
-				continue;
-			}
-			else if (endPtr[0] == '\0')
-				break;
 		}
 
-		return poly;
+		return polygon;
 	}
-
 
 	/************************************************************************************
 	Parse .obj
@@ -163,23 +198,14 @@ namespace render
 	************************************************************************************/
 	inline void parseModel_OBJ(std::string filename, void** mesh, std::atomic<fileio::FileStatus>* flag)
 	{
+		fileio::WavefrontOBJRegexPack regexPack;
+
 		*mesh = nullptr;
 		flag->store(fileio::FileStatus::LOADING);
 		char* fileData = nullptr;
 
 		std::atomic<fileio::FileStatus> tmpFlag = fileio::FileStatus::LOADING;
-		fileio::loadBytes(filename, (void**)&fileData, &tmpFlag);
-
-		auto const regex = std::regex(fileio::OBJ_regex);
-		bool const myTextContainsRegex = std::regex_search(std::string(fileData), regex);
-		if (myTextContainsRegex)
-		{
-			//printf("\nOBJ is correct.\n");
-		}
-		else
-		{
-			//printf("\nOBJ error.\n");
-		}
+		fileio::FileInputOutput::loadBinary(filename, (void**)&fileData, &tmpFlag);
 		
 		Mesh3D* meshTmp = new Mesh3D();
 
@@ -214,48 +240,44 @@ namespace render
 		int amOfFaces = 0;
 
 		int i = 0;
-		while (!hasNormals && (fileData[i] != '\0'))
+		while ((i > -1) && !hasNormals && fileData[i] != '\0')
 		{
-			while ((i > -1) && (fileData[i] != '\n') && (fileData[i] != '\0'))
+			switch (fileData[i])
 			{
-				switch (fileData[i])
-				{
-				case '#':
-					while (fileData[i] != '\n')
-						i++;
-					break;
+			case '#':
+				while (isNotEndOfLine(fileData[i]))
+					i++;
+				break;
 
-				case 'v':
-					if (fileData[i + 1] == ' ')
-					{
-						amOfVrtcs++;
-						i += 2;
-						break;
-					}
-					else if (fileData[i + 1] == 't')
-						break;
-					else if (fileData[i + 1] == 'n')
-					{
-						hasNormals = true;
-						break;
-					}
-					break;
-
-				case 'f':
+			case 'v':
+				if (fileData[i + 1] == ' ')
 				{
-					amOfFaces++;
+					amOfVrtcs++;
 					i += 2;
 					break;
 				}
-				default:
+				else if (fileData[i + 1] == 't')
+					break;
+				else if (fileData[i + 1] == 'n')
+				{
+					hasNormals = true;
 					break;
 				}
-				i++;
+				break;
+
+			case 'f':
+			{
+				amOfFaces++;
+				i += 2;
+				break;
+			}
+			default:
+				break;
 			}
 			i++;
 		}
 
-		if (!hasNormals)
+		if (hasNormals == false)
 		{
 			meshTmp->normals = (mathem::Vector3D*)realloc(meshTmp->normals, sizeof(mathem::Vector3D) * amOfVrtcs);
 			mathem::Vector3D v = { 0, 0, 0 };
@@ -269,15 +291,15 @@ namespace render
 		//================================ Parsing ==================================
 
 		i = 0;
-		while (fileData[i] != '\0')
+		while (i > -1 && fileData[i] != '\0')
 		{
-			while (fileData[i] != '\n' && (fileData[i] != '\0'))
+			while (isNotEndOfLine(fileData[i]))
 			{
 				switch (fileData[i])
 				{
 
 				case '#':
-					while (fileData[i] != '\n')
+					while (isNotEndOfLine(fileData[i]))
 						i++;
 					break;
 
@@ -337,9 +359,9 @@ namespace render
 						i += 2;
 						meshTmp->polygonsCount += 1;
 						meshTmp->polygons = (Polygon*)realloc(meshTmp->polygons, sizeof(Polygon) * meshTmp->polygonsCount);
-						Polygon poligon = readPolygon(fileData, i, &meshTmp);
+						Polygon poligon = readPolygon(fileData, i, &meshTmp, &regexPack);
 
-						if (!hasNormals)
+						if (hasNormals == false)
 						{
 							mathem::Vector3D vectA = { meshTmp->positions[poligon.positions[2] - 1].x - meshTmp->positions[poligon.positions[1] - 1].x,
 											meshTmp->positions[poligon.positions[2] - 1].y - meshTmp->positions[poligon.positions[1] - 1].y,
@@ -353,8 +375,7 @@ namespace render
 											vectB.i * vectA.k - vectA.i * vectB.k,
 											vectA.i * vectB.j - vectB.i * vectA.j };
 
-							poligon.normals = (long*)malloc(sizeof(long) * poligon.amOfVertices);
-							for (size_t j = 0; j < poligon.amOfVertices; j++)
+							for (size_t j = 0; j < 3; j++)
 							{
 								poligon.normals[j] = poligon.positions[j];
 
@@ -364,12 +385,11 @@ namespace render
 							}
 						}
 
-						if (poligon.amOfVertices == 3)
+						if (true /* :) */)
 						{
 							meshTmp->polygons[meshTmp->polygonsCount - 1] = poligon;
-							meshTmp->polygons[meshTmp->polygonsCount - 1].colors = (ColorRGBA*)malloc(sizeof(ColorRGBA) * 3);
 						}
-						else
+						/*else
 						{
 							int kMax = poligon.amOfVertices;
 							for (int k = 1; k < kMax - 1; k++)
@@ -408,7 +428,7 @@ namespace render
 								else
 									meshTmp->polygons[meshTmp->polygonsCount - 1] = pTmp;
 							}
-						}
+						}*/
 
 						break;
 					}

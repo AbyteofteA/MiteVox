@@ -2,7 +2,7 @@
 #ifndef MITEVOX_SETTINGS_H
 #define MITEVOX_SETTINGS_H
 
-#include "engine/FileIO/src/FileIO.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Profiler/src/Logger.h"
 #include "engine/UIEventHandler/src/InputHandler.h"

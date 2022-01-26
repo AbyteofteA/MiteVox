@@ -1,7 +1,7 @@
 
 #include "EngineSettings.h"
 
-#include "engine/FileIO/src/FileIO.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Profiler/src/Logger.h"
 #include "engine/UIEventHandler/src/InputHandler.h"
@@ -17,7 +17,7 @@ namespace mitevox
 		executionDir = _executionPath;
 
 		fileio::JSON* engineConfig = new fileio::JSON();
-		engineConfig->parseFile(executionDir + "\\engine_config.json");
+		engineConfig->readFromFile(executionDir + "\\engine_config.json");
 
 		fromJSON(engineConfig);
 
@@ -68,7 +68,7 @@ namespace mitevox
 		fs::path _savesPath = fs::path(pathsConfig->getFieldString("saves_dir"));
 		_savesPath = fs::relative(_savesPath, _executionPath).string();
 
-		logger = profile::Logger(true, logDir);
+		logger = profile::Logger(profile::LoggerMode::LOG_IN_CONSOLE, logDir);
 
 		int screenWidth = (int)generalConfig->getFieldNumber("screen_width");
 		int screenHeight = (int)generalConfig->getFieldNumber("screen_height");
@@ -78,15 +78,15 @@ namespace mitevox
 		renderer = render::initRenderer(screenWidth, screenHeight, false, backfaceCulling, { 0.05f, 0.05f, 0.05f });
 		if (renderer)
 		{
-			logger.info("EngineSettings", "Window is created.");
-			logger.info("EngineSettings", "Vendor: " + render::getVendorName());
-			logger.info("EngineSettings", "Renderer: " + render::getRendererName());
-			logger.info("EngineSettings", "Version: " + render::getVersion());
-			logger.info("EngineSettings", "Language Version: " + render::getLanguageVersion());
+			logger.logInfo("EngineSettings", "Window is created.");
+			logger.logInfo("EngineSettings", "Vendor: " + render::getVendorName());
+			logger.logInfo("EngineSettings", "Renderer: " + render::getRendererName());
+			logger.logInfo("EngineSettings", "Version: " + render::getVersion());
+			logger.logInfo("EngineSettings", "Language Version: " + render::getLanguageVersion());
 		}
 		else
 		{
-			logger.error("EngineSettings", "Cannot create window!");
+			logger.logError("EngineSettings", "Cannot create window!");
 		}
 	}
 

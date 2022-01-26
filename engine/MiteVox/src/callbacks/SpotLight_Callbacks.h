@@ -34,6 +34,8 @@ inline void SpotLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MA
 		std::string constant = "].constant";
 		std::string linear = "].linear";
 		std::string quadratic = "].quadratic";
+		std::string intensity = "].intensity";
+		std::string range = "].range";
 
 		std::string posResult = spotLights + indexStr + pos;
 		std::string directionResult = spotLights + indexStr + direction;
@@ -42,6 +44,8 @@ inline void SpotLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MA
 		std::string constantResult = spotLights + indexStr + constant;
 		std::string linearResult = spotLights + indexStr + linear;
 		std::string quadraticResult = spotLights + indexStr + quadratic;
+		std::string intensityResult = spotLights + indexStr + intensity;
+		std::string rangeResult = spotLights + indexStr + range;
 
 		glm::vec3 tmpPos;
 
@@ -58,6 +62,9 @@ inline void SpotLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MA
 		render::shaders[shaderIndex]->setFloat(constantResult.c_str(), spotLight->constant);
 		render::shaders[shaderIndex]->setFloat(linearResult.c_str(), spotLight->linear);
 		render::shaders[shaderIndex]->setFloat(quadraticResult.c_str(), spotLight->quadratic);
+
+		render::shaders[shaderIndex]->setFloat(intensityResult.c_str(), spotLight->intensity);
+		render::shaders[shaderIndex]->setFloat(rangeResult.c_str(), spotLight->range);
 	}
 }
 

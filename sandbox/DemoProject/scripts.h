@@ -36,7 +36,7 @@ void rotateModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDE
 		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
 	transform->x = 200 * (float)sin(scene->getCurrentTime() * 2);
-	transform->y = 200 * (float)cos(scene->getCurrentTime() * 2);
+	transform->y = 200.0f * (float)cos(scene->getCurrentTime() * 2);
 	transform->z = 0;// 200 * (float)cos(scene->currentTime * 2);
 }
 

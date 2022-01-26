@@ -32,12 +32,16 @@ inline void PointLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, M
 		std::string constant = "].constant";
 		std::string linear = "].linear";
 		std::string quadratic = "].quadratic";
+		std::string intensity = "].intensity";
+		std::string range = "].range";
 
 		std::string posResult = pointLights + indexStr + pos;
 		std::string colorResult = pointLights + indexStr + color;
 		std::string constantResult = pointLights + indexStr + constant;
 		std::string linearResult = pointLights + indexStr + linear;
 		std::string quadraticResult = pointLights + indexStr + quadratic;
+		std::string intensityResult = pointLights + indexStr + intensity;
+		std::string rangeResult = pointLights + indexStr + range;
 
 		glm::vec3 tmpPos;
 
@@ -50,6 +54,9 @@ inline void PointLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, M
 		render::shaders[shaderIndex]->setFloat(constantResult.c_str(), pointLight->constant);
 		render::shaders[shaderIndex]->setFloat(linearResult.c_str(), pointLight->linear);
 		render::shaders[shaderIndex]->setFloat(quadraticResult.c_str(), pointLight->quadratic);
+
+		render::shaders[shaderIndex]->setFloat(intensityResult.c_str(), pointLight->intensity);
+		render::shaders[shaderIndex]->setFloat(rangeResult.c_str(), pointLight->range);
 	}
 }
 

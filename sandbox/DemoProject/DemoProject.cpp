@@ -5,6 +5,9 @@
 //----------------------------------------------------------------------------------------
 
 #include "engine/MiteVox/src/MiteVox.h"
+#include "engine/FileIO/src/FileLoaderAsync.h"
+
+#include "engine/FileIO/src/Formats/WavefrontOBJ/WavefrontOBJRegexPack.h"
 
 #include "scripts.h"
 
@@ -15,7 +18,6 @@ namespace fs = std::filesystem;
 int basicShader = -1;
 int primitiveShader = -1;
 int skyboxShader = -1;
-
 
 void mitevox::Engine::onCreate() 
 {
@@ -44,12 +46,15 @@ void mitevox::Engine::onCreate()
 	fileio::Image* white = nullptr;
 	fileio::Image* white_rough = nullptr;
 	fileio::Image* light_grey = nullptr;
-	fileio::Image* black = nullptr;
+	fileio::Image* error = nullptr;
+	fileio::Image* UVchecker = nullptr;
 	fileio::Image* UVchecker0 = nullptr;
 	fileio::Image* UVchecker1 = nullptr;
 	fileio::Image* SPECchecker0 = nullptr;
 
 	std::string texturesDir = settings->getResourceDir() + "/assets/textures";
+	fileio::fileLoader.loadAndParseAsync(
+		texturesDir + "/UVchecker.png", (void**)&UVchecker, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
 		texturesDir + "/UVchecker0.png", (void**)&UVchecker0, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
@@ -63,16 +68,17 @@ void mitevox::Engine::onCreate()
 	fileio::fileLoader.loadAndParseAsync(
 		texturesDir + "/light_grey.png", (void**)&light_grey, fileio::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
-		texturesDir + "/black.png", (void**)&black, fileio::loadImage);
+		texturesDir + "/error.png", (void**)&error, fileio::loadImage);
 	fileio::fileLoader.awaitAll();
 
-	render::Material* darkSomething = new render::Material();
-	darkSomething->albedo = { 0.0f, 0.0f, 0.0f };
-	darkSomething->roughness = { 0.7f, 0.7f, 0.7f };
-	darkSomething->metallicity = { 0.5f, 0.5f, 0.5f };
+	fileio::Material* darkSomething = new fileio::Material();
+	darkSomething->baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	darkSomething->roughness = 1.0f;
+	darkSomething->metallicity = 1.0f;
 	darkSomething->specularExponent = 5;
-	darkSomething->albedoMap = SPECchecker0;
-	darkSomething->metallicMap = white;
+	darkSomething->albedoMap = new fileio::Texture(error);
+	darkSomething->metallicRoughnessMap = new fileio::Texture(SPECchecker0);
+	darkSomething->illuminationModel = 2;
 
 	NativeScript_ECS waveScript = { nullptr, waveModel_Script, nullptr };
 	NativeScript_ECS rotateScript = { nullptr, rotateModel_Script, nullptr };
@@ -116,18 +122,18 @@ void mitevox::Engine::onCreate()
 	entityID Light = myECS->createPrefab("Light");
 	myECS->getPrefab(Light)->attachComponent(
 		myECS->componentManagers[myScene->Transform_Component]);
-	render::Material* light = new render::Material();
-	light->albedo = { 1, 1, 1 };
-	light->roughness = { 0, 0, 0 };
-	light->metallicity = { 0, 0, 0 };
-	light->specularExponent = 1;
-	light->albedoMap = white;
-	light->metallicMap = white;
+	fileio::Material* light = new fileio::Material();
+	light->baseColor = { 1.0, 1.0, 1.0, 1.0 };
+	light->roughness = 1.0;
+	light->metallicity = 1.0;
+	light->specularExponent = 8.0;
+	//light->albedoMap = new fileio::Texture(white);
+	//light->metallicRoughnessMap = new fileio::Texture(white);
 	render::Model3D* cubeLight = new render::Model3D(mCube, light, { 3, 3, 3, 0, 0, 0, 0, 0, 0 });
 	cubeLight->shaderID = basicShader;
 	myECS->getPrefab(Light)->attachComponent(
 		myECS->componentManagers[myScene->Model3D_Component], cubeLight);
-	render::PointLight tmpPointLight = { { 0 }, { 1, 1, 1, 1 },  1, 0.0014f, 0.000007f };
+	render::PointLight tmpPointLight = { { 0 }, { 1, 1, 1 },  1, 0.0014f, 0.000007f, 1.0, 200.0 };
 	myECS->getPrefab(Light)->attachComponent(
 		myECS->componentManagers[myScene->PointLight_Component], &tmpPointLight);
 	myECS->getPrefab(Light)->attachComponent(
@@ -135,8 +141,8 @@ void mitevox::Engine::onCreate()
 
 	// Spawn 9x9 grid of cubes.
 
-	int maxX = 3;
-	int maxY = 3;
+	/*int maxX = 2;
+	int maxY = 2;
 	for (int i = -maxX; i <= maxX; i++)
 	{
 		for (int j = -maxY; j <= maxY; j++)
@@ -145,7 +151,7 @@ void mitevox::Engine::onCreate()
 			mathem::Transform tmpTransform = { 1, 1, 1, 0, 0, 0, (float)50 * i, 0, (float)50 * j };
 			*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
 		}
-	}
+	}*/
 
 	// Spawn lights.
 
@@ -165,7 +171,7 @@ void mitevox::Engine::onCreate()
 	tmpTransform.x = lightPos; tmpTransform.y = lightPos; tmpTransform.z = -lightPos;
 	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
 
-	tmpID = myECS->createEntity(Light);
+	/*tmpID = myECS->createEntity(Light);
 	tmpTransform.x = lightPos; tmpTransform.y = -lightPos; tmpTransform.z = lightPos;
 	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
 	tmpID = myECS->createEntity(Light);
@@ -176,7 +182,7 @@ void mitevox::Engine::onCreate()
 	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
 	tmpID = myECS->createEntity(Light);
 	tmpTransform.x = lightPos; tmpTransform.y = -lightPos; tmpTransform.z = -lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
+	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;*/
 
 	tmpID = myECS->createEntity(Light);
 	tmpTransform.x = 0; tmpTransform.y = 300; tmpTransform.z = 0;
@@ -187,7 +193,11 @@ void mitevox::Engine::onCreate()
 
 void mitevox::Engine::onUpdate() 
 {
-	float cubeSize = 1000;
+	auto rendererSettings = this->settings->getRendererSettings();
+	render::clearBufferXY(rendererSettings->clearColor);
+	render::clearBufferZ();
+
+	float cubeSize = 100;
 	render::ColorRGBAf grey = { 0.3f, 0.3f, 0.3f, 1 };
 	render::ColorRGBAf red = { 1, 0, 0, 1 };
 	render::ColorRGBAf green = { 0, 1, 0, 1 };
@@ -202,7 +212,6 @@ void mitevox::Engine::onUpdate()
 	render::Point point7 = { {-cubeSize, -cubeSize, cubeSize}, grey };
 	render::Point point8 = { {-cubeSize, cubeSize, cubeSize}, grey };
 
-	auto rendererSettings = this->settings->getRendererSettings();
 	render::drawLine(rendererSettings, point1, point2);
 	render::drawLine(rendererSettings, point2, point3);
 	render::drawLine(rendererSettings, point3, point4);
