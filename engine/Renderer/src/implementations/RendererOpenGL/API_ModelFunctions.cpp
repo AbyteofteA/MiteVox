@@ -247,7 +247,7 @@ namespace render
 		glDeleteTextures(1, &material->metallicRoughnessMap->ID);
 	}
 
-	void uploadBufferView(fileio::BufferView* bufferView)
+	void uploadBufferView(mitevox::BufferView* bufferView)
 	{
 		if (bufferView->ID == 0)
 		{
@@ -256,13 +256,13 @@ namespace render
 			uint8_t* bufferData = bufferView->buffer->getElementsArray();
 			uint8_t* bufferViewData = bufferData + bufferView->byteOffset;
 
-			if (bufferView->target == fileio::BufferView::ARRAY_BUFFER)
+			if (bufferView->target == mitevox::BufferView::ARRAY_BUFFER)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, bufferView->ID);
 				glBufferData(GL_ARRAY_BUFFER, bufferView->byteLength, bufferViewData, GL_STATIC_DRAW);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
-			else if (bufferView->target == fileio::BufferView::ELEMENT_ARRAY_BUFFER)
+			else if (bufferView->target == mitevox::BufferView::ELEMENT_ARRAY_BUFFER)
 			{
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferView->ID);
 				glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferView->byteLength, bufferViewData, GL_STATIC_DRAW);
@@ -271,12 +271,12 @@ namespace render
 		}
 	}
 
-	void removeBufferView(fileio::BufferView* bufferView)
+	void removeBufferView(mitevox::BufferView* bufferView)
 	{
 		glDeleteBuffers(1, &bufferView->ID);
 	}
 
-	void uploadMesh(fileio::Mesh* mesh, int shaderID)
+	void uploadMesh(mitevox::Mesh* mesh, int shaderID)
 	{
 		if (!shaders[shaderID]->use())
 			return;
@@ -288,7 +288,7 @@ namespace render
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{
-			fileio::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
+			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
 
 			if (auto positionAccessor = meshPrimitive->getPositions())
 			{
@@ -353,12 +353,12 @@ namespace render
 		}
 	}
 
-	void removeMesh(fileio::Mesh* mesh)
+	void removeMesh(mitevox::Mesh* mesh)
 	{
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{
-			fileio::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
+			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
 			glDeleteVertexArrays(1, &meshPrimitive->ID);
 
 			if (auto positionAccessor = meshPrimitive->getPositions())
@@ -380,7 +380,7 @@ namespace render
 		}
 	}
 
-	void renderMesh(RendererSettings* renderer, int shaderID, fileio::Mesh* mesh, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform)
+	void renderMesh(RendererSettings* renderer, int shaderID, mitevox::Mesh* mesh, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform)
 	{
 		if (!shaders[shaderID]->use())
 			return;
@@ -412,7 +412,7 @@ namespace render
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{
-			fileio::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
+			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
 
 			renderer->amountOfDrawCalls++;
 

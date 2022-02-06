@@ -1,15 +1,14 @@
 #ifndef GLTFMESHPRIMITIVE_H
 #define GLTFMESHPRIMITIVE_H
 
-#include "engine/FileIO/src/Formats/JSON/JSON.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/BufferLayout/BufferViewAccessor.h"
+#include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
 #include "engine/FileIO/src/Formats/glTF_2.0/Material/Material.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 
 #include <string>
 #include <cstdint>
 
-namespace fileio
+namespace mitevox
 {
     class MeshAttributeSet
     {
@@ -41,17 +40,11 @@ namespace fileio
         };
 
         MeshAttributeSet attributes;
-        BufferViewAccessor* indecesAccessor;
-        Material* material;
-        TopologyType mode;
+        BufferViewAccessor* indecesAccessor = nullptr;
+        fileio::Material* material = nullptr;
+        TopologyType mode = TopologyType::TRIANGLES;
         safety::SafeArray<MeshAttributeSet*> morphTargets;
-        uint32_t ID;
-
-        MeshPrimitive();
-        void fromGLTF(
-            JSON* meshPrimitiveJSON,
-            safety::SafeArray<BufferViewAccessor*>* accessors,
-            safety::SafeArray<Material*>* materials);
+        uint32_t ID = 0;
 
         BufferViewAccessor* getPositions();
         BufferViewAccessor* getNormals();
@@ -62,10 +55,6 @@ namespace fileio
         BufferViewAccessor* getJoints_0();
         BufferViewAccessor* getWeights_0();
         BufferViewAccessor* getIndeces();
-
-    private:
-
-        void collectAttributesFromJSON(JSON* meshAttributesJSON, safety::SafeArray<BufferViewAccessor*>* accessors, MeshAttributeSet* attributes);
     };
 }
 

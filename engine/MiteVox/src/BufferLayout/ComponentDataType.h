@@ -1,7 +1,7 @@
 #ifndef COMPONENTDATATYPE_H
 #define COMPONENTDATATYPE_H
 
-namespace fileio
+namespace mitevox
 {
     enum ComponentDataType
     {

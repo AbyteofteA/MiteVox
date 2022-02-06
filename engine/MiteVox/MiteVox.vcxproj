@@ -89,13 +89,23 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Animation\Animation.cpp" />
+    <ClCompile Include="src\BufferLayout\BufferViewAccessor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\EngineSettings.cpp" />
+    <ClCompile Include="src\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="src\MiteVox_main.h" />
     <ClCompile Include="src\Playground.cpp" />
     <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Animation\Animation.h" />
+    <ClInclude Include="src\Animation\AnimationChannel.h" />
+    <ClInclude Include="src\Animation\AnimationChannelBase.h" />
+    <ClInclude Include="src\BufferLayout\BufferView.h" />
+    <ClInclude Include="src\BufferLayout\BufferViewAccessor.h" />
+    <ClInclude Include="src\BufferLayout\BufferViewAccessorSparse.h" />
+    <ClInclude Include="src\BufferLayout\ComponentDataType.h" />
     <ClInclude Include="src\callbacks\DirectedLight_Callbacks.h" />
     <ClInclude Include="src\callbacks\Model3D_Callbacks.h" />
     <ClInclude Include="src\callbacks\NativeScript_Callbacks.h" />
@@ -103,6 +113,8 @@
     <ClInclude Include="src\callbacks\SpotLight_Callbacks.h" />
     <ClInclude Include="src\callbacks\Transform_Callbacks.h" />
     <ClInclude Include="src\entityID.h" />
+    <ClInclude Include="src\Mesh\Mesh.h" />
+    <ClInclude Include="src\Mesh\MeshPrimitive.h" />
     <ClInclude Include="src\MiteVox.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Playground.h" />

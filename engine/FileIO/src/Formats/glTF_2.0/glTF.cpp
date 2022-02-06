@@ -1,5 +1,8 @@
 #include "glTF.h"
 
+#include "engine/FileIO/src/BufferLayoutCodec/BufferViewCodec.h"
+#include "engine/FileIO/src/BufferLayoutCodec/BufferViewAccessorCodec.h"
+#include "engine/FileIO/src/Mesh/MeshCodec.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/FileIO/src/FileInputOutput.h"
 #include "engine/Renderer/src/RendererAPI/Camera.h"
@@ -137,28 +140,28 @@ namespace fileio
 		{
 			JSON* cameraJSON = camerasArrayJSON->getArrayItem(i);
 
-			render::Camera camera;
-			camera._name = cameraJSON->getFieldString("name");
+			render::Camera* camera = new render::Camera();
+			camera->_name = cameraJSON->getFieldString("name");
 			std::string cameraType = cameraJSON->getFieldString("type");
 			if (cameraType == "perspective")
 			{
-				camera._type = render::CameraType::PERPECTIVE;
+				camera->_type = render::CameraType::PERPECTIVE;
 				JSON* perspectiveCameraJSON = cameraJSON->getFieldObject("perspective");
 
 				double aspectRatio = cameraJSON->getFieldNumber("aspectRatio");
-				camera.FOV = (float)cameraJSON->getFieldNumber("yfov");
-				camera.farCullPlane = (float)cameraJSON->getFieldNumber("zfar");
-				camera.nearCullPlane = (float)cameraJSON->getFieldNumber("znear");
+				camera->FOV = (float)cameraJSON->getFieldNumber("yfov");
+				camera->farCullPlane = (float)cameraJSON->getFieldNumber("zfar");
+				camera->nearCullPlane = (float)cameraJSON->getFieldNumber("znear");
 			}
 			else if (cameraType == "orthographic")
 			{
-				camera._type = render::CameraType::ORTHOGRAPHIC;
+				camera->_type = render::CameraType::ORTHOGRAPHIC;
 				JSON* orthographicCameraJSON = cameraJSON->getFieldObject("orthographic");
 
 				double xMagnification = cameraJSON->getFieldNumber("xmag");
 				double yMagnification = cameraJSON->getFieldNumber("ymag");
-				camera.farCullPlane = (float)cameraJSON->getFieldNumber("zfar");
-				camera.nearCullPlane = (float)cameraJSON->getFieldNumber("znear");
+				camera->farCullPlane = (float)cameraJSON->getFieldNumber("zfar");
+				camera->nearCullPlane = (float)cameraJSON->getFieldNumber("znear");
 			}
 
 			_cameras.setElement(i, camera);
@@ -213,8 +216,7 @@ namespace fileio
 		for (int64_t i = 0; i < bufferViewsCount; ++i)
 		{
 			JSON* bufferViewJSON = bufferViewsArrayJSON->getArrayItem(i);
-			BufferView* bufferView = new BufferView();
-			bufferView->fromGLTF(bufferViewJSON, &_buffers);
+			mitevox::BufferView* bufferView = BufferViewCodec::fromGLTF(bufferViewJSON, &_buffers);
 			_bufferViews.setElement(i, bufferView);
 		}
 	}
@@ -233,8 +235,8 @@ namespace fileio
 		for (int64_t i = 0; i < accessorsCount; ++i)
 		{
 			JSON* accessorJSON = accessorsArrayJSON->getArrayItem(i);
-			BufferViewAccessor* accessor = new BufferViewAccessor();
-			accessor->fromGLTF(accessorJSON, &_bufferViews);
+			mitevox::BufferViewAccessor* accessor = 
+				BufferViewAccessorCodec::fromGLTF(accessorJSON, &_bufferViews);
 			_accessors.setElement(i, accessor);
 		}
 	}
@@ -353,8 +355,7 @@ namespace fileio
 		for (size_t i = 0; i < meshesCount; ++i)
 		{
 			JSON* meshJSON = meshesArrayJSON->getArrayItem(i);
-			Mesh* mesh = new Mesh();
-			mesh->fromGLTF(meshJSON, &_accessors, &_materials);
+			mitevox::Mesh* mesh = MeshCodec::fromGLTF(meshJSON, &_accessors, &_materials);
 			_meshes.setElement((int64_t)i, mesh);
 		}
 	}
@@ -372,10 +373,14 @@ namespace fileio
 
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
+			_nodes.setElement((int64_t)i, new Node());
+		}
+
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
 			JSON* nodeJSON = nodesArrayJSON->getArrayItem(i);
-			Node* node = new Node();
-			node->fromGLTF(nodeJSON);
-			_nodes.setElement((int64_t)i, node);
+			Node* node = _nodes.getElement(i);
+			node->fromGLTF(nodeJSON, &_cameras, &_meshes, &_nodes);
 		}
 	}
 
@@ -394,7 +399,7 @@ namespace fileio
 		{
 			JSON* sceneJSON = scenesArrayJSON->getArrayItem(i);
 			Scene* scene = new Scene();
-			scene->fromGLTF(sceneJSON);
+			scene->fromGLTF(sceneJSON, &_nodes);
 			_scenes.setElement((int64_t)i, scene);
 		}
 	}

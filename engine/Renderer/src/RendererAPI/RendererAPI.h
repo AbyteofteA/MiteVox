@@ -80,12 +80,12 @@ namespace render
 	void selectMaterial(fileio::Material* material, int shaderID);
 	void removeMaterial(fileio::Material* material, int shaderID);
 
-	void uploadBufferView(fileio::BufferView* bufferView);
-	void removeBufferView(fileio::BufferView* bufferView);
+	void uploadBufferView(mitevox::BufferView* bufferView);
+	void removeBufferView(mitevox::BufferView* bufferView);
 
-	void uploadMesh(fileio::Mesh* mesh, int shaderID);
-	void removeMesh(fileio::Mesh* mesh);
-	void renderMesh(RendererSettings* renderer, int shaderID, fileio::Mesh* mesh, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
+	void uploadMesh(mitevox::Mesh* mesh, int shaderID);
+	void removeMesh(mitevox::Mesh* mesh);
+	void renderMesh(RendererSettings* renderer, int shaderID, mitevox::Mesh* mesh, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
 	
 	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 

@@ -1,9 +1,10 @@
 #ifndef GLTF_H
 #define GLTF_H
 
-#include "engine/FileIO/src/Formats/glTF_2.0/BufferLayout/BufferView.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/BufferLayout/BufferViewAccessor.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Mesh/Mesh.h"
+#include "engine/MiteVox/src/BufferLayout/BufferView.h"
+#include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
+#include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
+#include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/FileIO/src/Formats/glTF_2.0/Node.h"
 #include "engine/FileIO/src/Formats/glTF_2.0/Scene.h"
 #include "engine/FileIO/src/Formats/glTF_2.0/Material/ImageSampler.h"
@@ -37,11 +38,11 @@ namespace fileio
         safety::SafeArray<std::string> _extensionsUsed;
         safety::SafeArray<std::string> _extensionsRequired;
 
-        safety::SafeArray<render::Camera> _cameras;
+        safety::SafeArray<render::Camera*> _cameras;
         safety::SafeArray<safety::SafeByteArray*> _buffers;
-        safety::SafeArray<BufferView*> _bufferViews;
-        safety::SafeArray<BufferViewAccessor*> _accessors;
-        safety::SafeArray<Mesh*> _meshes;
+        safety::SafeArray<mitevox::BufferView*> _bufferViews;
+        safety::SafeArray<mitevox::BufferViewAccessor*> _accessors;
+        safety::SafeArray<mitevox::Mesh*> _meshes;
         safety::SafeArray<Node*> _nodes;
         safety::SafeArray<Scene*> _scenes;
         safety::SafeArray<ImageSampler> _imageSamplers;
@@ -54,7 +55,9 @@ namespace fileio
         SerializationStatus serialize(safety::SafeByteArray* fileData);
         DeserializationStatus deserialize(safety::SafeByteArray* fileData);
 
-        void collectExtensions(fileio::JSON* glTFJSON);
+    private:
+
+        void collectExtensions(JSON* glTFJSON);
         bool extensionsAreSupported();
 
         /// <summary>
@@ -65,44 +68,44 @@ namespace fileio
         /// TODO: Camera::fromGLTF
         /// </summary>
         /// <param name="camerasArrayJSON"></param>
-        void collectCameras(fileio::JSON* camerasArrayJSON);
+        void collectCameras(JSON* camerasArrayJSON);
 
         /// <summary>
         /// TODO: buffer.base64
         /// </summary>
         /// <param name="buffersArrayJSON"></param>
-        void collectBuffers(fileio::JSON* buffersArrayJSON);
-        void collectBufferViews(fileio::JSON* bufferViewsArrayJSON);
-        void collectAccessors(fileio::JSON* accessorsArrayJSON);
-        void collectImageSamplers(fileio::JSON* imageSamplersArrayJSON);
+        void collectBuffers(JSON* buffersArrayJSON);
+        void collectBufferViews(JSON* bufferViewsArrayJSON);
+        void collectAccessors(JSON* accessorsArrayJSON);
+        void collectImageSamplers(JSON* imageSamplersArrayJSON);
 
         /// <summary>
         /// TODO: construct from BufferView
         /// </summary>
         /// <param name="imagesArrayJSON"></param>
-        void collectImages(fileio::JSON* imagesArrayJSON);
+        void collectImages(JSON* imagesArrayJSON);
 
         /// <summary>
         /// TODO: set error texture.
         /// </summary>
         /// <param name="texturesArrayJSON"></param>
-        void collectTextures(fileio::JSON* texturesArrayJSON);
+        void collectTextures(JSON* texturesArrayJSON);
 
         /// <summary>
         /// NOTE: it doesn't support material.normalTextureInfo (glTF)
         /// NOTE: it doesn't support material.occlusionTextureInfo (glTF)
         /// </summary>
         /// <param name="materialsArrayJSON"></param>
-        void collectMaterials(fileio::JSON* materialsArrayJSON);
+        void collectMaterials(JSON* materialsArrayJSON);
 
-        void collectMeshes(fileio::JSON* meshesArrayJSON);
+        void collectMeshes(JSON* meshesArrayJSON);
 
         /// <summary>
         /// TODO: transform
         /// </summary>
         /// <param name="nodeJSON"></param>
-        void collectNodes(fileio::JSON* nodesArrayJSON);
-        void collectScenes(fileio::JSON* scenesArrayJSON);
+        void collectNodes(JSON* nodesArrayJSON);
+        void collectScenes(JSON* scenesArrayJSON);
     };
 }
 

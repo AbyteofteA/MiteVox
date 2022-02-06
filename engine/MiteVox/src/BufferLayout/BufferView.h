@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <string>
 
-namespace fileio
+namespace mitevox
 {
     class BufferView
     {
@@ -19,16 +19,13 @@ namespace fileio
             ELEMENT_ARRAY_BUFFER = 34963
         };
 
-        safety::SafeByteArray* buffer;
-        uint64_t byteOffset;
-        uint64_t byteLength;
-        uint16_t byteStride;
-        TargetBufferType target;
+        safety::SafeByteArray* buffer = nullptr;
+        uint64_t byteOffset = 0;
+        uint64_t byteLength = 0;
+        uint16_t byteStride = 0;
+        TargetBufferType target = TargetBufferType::ARRAY_BUFFER;
         std::string name;
         uint32_t ID = 0;
-
-        BufferView();
-        void fromGLTF(JSON* bufferViewJSON, safety::SafeArray<safety::SafeByteArray*>* buffers);
     };
 }
 
