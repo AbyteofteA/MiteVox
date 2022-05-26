@@ -1,17 +1,11 @@
 
 # MiteVox
 
-Technologies: 
-![](https://img.shields.io/badge/-C++-00599c?style=flat&logo=c%2b%2b&logoColor=white)
-![](https://img.shields.io/badge/-OpenGL-5586a4?style=flat&logo=opengl&logoColor=white)
-![](https://img.shields.io/badge/-GLSL-5586a4?style=flat&logo=opengl&logoColor=white)
-![](https://img.shields.io/badge/-JSON-dddddd?style=flat&logo=json&logoColor=000000)
+MiteVox is a game engine (or rather a game framework so far). 
+The engine is a result of experiments in Computer Graghics, Machine Learning and Computer Science in general.
 
-The project is built with: 
-![](https://img.shields.io/badge/-Visual%20Studio%202022-5c2d91?style=flat&logo=visual-studio&logoColor=white)
-
-MiteVox is an **Entity-Component-System**-based game engine. 
-The engine is a result of experiments in Computer Graghics, Machine Learning and Computer Science in general. 
+## How to build
+The project is built with ``Visual Studio 2022``.
 
 ## Potential use cases
 :video_game: Sandbox games
@@ -20,8 +14,10 @@ The engine is a result of experiments in Computer Graghics, Machine Learning and
 
 :robot: AI's virtual playground
 
-## Screenshot
-![mitevox_demo](docs/mitevox_demo.png)
+## Screenshots
+Custom scene               | Duck from [glTF 2.0 Sample Models](https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0)
+---------------------------|-----------------------------------
+![](docs/mitevox_demo.png) | ![](docs/duck_1.png)
 
 ## Structure, features & TODO
 :warning: - TODO
