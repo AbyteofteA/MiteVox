@@ -8,30 +8,23 @@ namespace mathem
 	{
 	public:
 
-		float i = 0.;
-		float j = 0.;
-		float k = 0.;
+		float i = 0.0f;
+		float j = 0.0f;
+		float k = 0.0f;
 
-		inline float getLength();
-		inline void normalize();
+		Vector3D& operator-();
+		Vector3D& operator*(float multiplier);
+		Vector3D& operator/(float divider);
+
+		float getLength();
+		void normalize();
 	};
 
+	Vector3D operator+(Vector3D& vectorA, Vector3D& vectorB);
+	Vector3D operator-(Vector3D& vectorA, Vector3D& vectorB);
 
-	// IMPLEMENTATION BELOW //
-
-
-	inline float Vector3D::getLength()
-	{
-		return (float)sqrt(pow(i, 2) + pow(j, 2) + pow(k, 2));
-	}
-
-	inline void Vector3D::normalize()
-	{
-		float length = getLength();
-		i /= length;
-		j /= length;
-		k /= length;
-	}
+	float dotProduct(Vector3D vectorA, Vector3D vectorB);
+	Vector3D crossProduct(Vector3D vectorA, Vector3D vectorB);
 }
 
 #endif
