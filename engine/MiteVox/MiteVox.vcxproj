@@ -66,7 +66,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)engine\FileIO\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\ECSManager\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Math\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Physics\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Renderer\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\UIEventHandler\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\AIModels\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FileIO.lib;Renderer.lib;ECSManager.lib;AIModels.lib;Math.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Math.lib;ECSManager.lib;Renderer.lib;FileIO.lib;AIModels.lib;UIEventHandler.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -93,6 +93,9 @@
     <ClCompile Include="src\BufferLayout\BufferViewAccessor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\EngineSettings.cpp" />
+    <ClCompile Include="src\Mesh\Mesh.cpp" />
+    <ClCompile Include="src\Material\Image.cpp" />
+    <ClCompile Include="src\Material\Texture.cpp" />
     <ClCompile Include="src\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="src\MiteVox_main.h" />
     <ClCompile Include="src\Playground.cpp" />
@@ -113,10 +116,15 @@
     <ClInclude Include="src\callbacks\SpotLight_Callbacks.h" />
     <ClInclude Include="src\callbacks\Transform_Callbacks.h" />
     <ClInclude Include="src\entityID.h" />
+    <ClInclude Include="src\Material\Image.h" />
+    <ClInclude Include="src\Material\ImageSampler.h" />
+    <ClInclude Include="src\Material\Material.h" />
+    <ClInclude Include="src\Material\Texture.h" />
     <ClInclude Include="src\Mesh\Mesh.h" />
     <ClInclude Include="src\Mesh\MeshPrimitive.h" />
     <ClInclude Include="src\MiteVox.h" />
     <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\Node.h" />
     <ClInclude Include="src\Playground.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\EngineSettings.h" />

@@ -1,29 +1,20 @@
 
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef IMAGECODEC_H
+#define IMAGECODEC_H
 
-#include <atomic>
-#include <string>
+#include "engine/MiteVox/src/Material/Image.h"
 #include "engine/FileIO/src/FileStatus.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
+#include <atomic>
+#include <string>
 
 namespace fileio
 {
-	class Image
+	class ImageCodec
 	{
 	public:
 
-		std::string name;
-		std::string mimeType;
-		int32_t bufferViewIndex;
-		void* imageData;
-		int width;
-		int height;
-		int format;
-
-		Image();
-		~Image();
-		void fromGLTF(JSON* imageJSON, std::string JSONPath);
+		static void fromGLTF(mitevox::Image* imageResult, JSON* imageJSON, std::string JSONPath);
 	};
 
 	void loadImage(std::string filename, void** imageData, int* width, int* height, int* format);

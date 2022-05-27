@@ -1,20 +1,15 @@
-#include "Node.h"
+#include "NodeCodec.h"
 
 namespace fileio
 {
-	Node::Node() :
-		skinIndex(-1)
-	{
-
-	}
-
-	void Node::fromGLTF(
+	void NodeCodec::fromGLTF(
+		mitevox::Node* nodeResult,
 		JSON* nodeJSON,
 		safety::SafeArray<render::Camera*>* cameras,
 		safety::SafeArray<mitevox::Mesh*>* meshes,
-		safety::SafeArray<Node*>* nodes)
+		safety::SafeArray<mitevox::Node*>* nodes)
 	{
-		name = nodeJSON->getFieldString("name");
+		nodeResult->name = nodeJSON->getFieldString("name");
 
 		JSON* numberJSON = nodeJSON->getField("camera");
 		if (numberJSON != nullptr)
@@ -22,7 +17,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t cameraIndex = (int32_t)numberJSON->getNumber();
-				camera = cameras->getElement(cameraIndex);
+				nodeResult->camera = cameras->getElement(cameraIndex);
 			}
 		}
 		numberJSON = nodeJSON->getField("skin");
@@ -30,7 +25,7 @@ namespace fileio
 		{
 			if (numberJSON->isNumber())
 			{
-				skinIndex = (int32_t)numberJSON->getNumber();
+				nodeResult->skinIndex = (int32_t)numberJSON->getNumber();
 			}
 		}
 		numberJSON = nodeJSON->getField("mesh");
@@ -39,31 +34,31 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t meshIndex = (int32_t)numberJSON->getNumber();
-				mesh = meshes->getElement(meshIndex);
+				nodeResult->mesh = meshes->getElement(meshIndex);
 			}
 		}
 
 		JSON* weightsArrayJSON = nodeJSON->getFieldArray("weights");
 		if (weightsArrayJSON != nullptr)
 		{
-			weightsArrayJSON->toNumberArray<float>(&weights);
+			weightsArrayJSON->toNumberArray<float>(&nodeResult->weights);
 		}
 		JSON* matrixArrayJSON = nodeJSON->getFieldArray("matrix");
 		if (matrixArrayJSON != nullptr)
 		{
-			matrixArrayJSON->toNumberArray<float>(&matrix);
+			matrixArrayJSON->toNumberArray<float>(&nodeResult->matrix);
 		}
 		JSON* childrenArrayJSON = nodeJSON->getFieldArray("children");
 		if (childrenArrayJSON != nullptr)
 		{
 			size_t childrenCount = childrenArrayJSON->getArraySize();
-			children.resize(childrenCount);
-			children.fillWithZeros();
+			nodeResult->children.resize(childrenCount);
+			nodeResult->children.fillWithZeros();
 
 			for (size_t i = 0; i < childrenCount; ++i)
 			{
 				int32_t childIndex = (int32_t)childrenArrayJSON->getArrayItemNumber(i);
-				children.setElement(i, nodes->getElement(childIndex));
+				nodeResult->children.setElement(i, nodes->getElement(childIndex));
 			}
 		}
 	}

@@ -1,8 +1,14 @@
 #include "glTF.h"
 
+#include "engine/FileIO/src/SerializationStatus.h"
 #include "engine/FileIO/src/BufferLayoutCodec/BufferViewCodec.h"
 #include "engine/FileIO/src/BufferLayoutCodec/BufferViewAccessorCodec.h"
-#include "engine/FileIO/src/Mesh/MeshCodec.h"
+#include "engine/FileIO/src/MaterialCodec/ImageCodec.h"
+#include "engine/FileIO/src/MaterialCodec/ImageSamplerCodec.h"
+#include "engine/FileIO/src/MaterialCodec/MaterialCodec.h"
+#include "engine/FileIO/src/MeshCodec/MeshCodec.h"
+#include "engine/FileIO/src/SceneCodec/NodeCodec.h"
+#include "engine/FileIO/src/SceneCodec/SceneCodec.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/FileIO/src/FileInputOutput.h"
 #include "engine/Renderer/src/RendererAPI/Camera.h"
@@ -20,7 +26,7 @@ namespace fileio
 
 	SerializationStatus glTF::serialize(safety::SafeByteArray* fileData)
 	{
-		return SerializationStatus::ERROR;
+		return SerializationStatus::ERROR_UNKNOWN;
 	}
 
 	DeserializationStatus glTF::deserialize(safety::SafeByteArray* fileData)
@@ -46,7 +52,7 @@ namespace fileio
 		collectExtensions(fileDataJSON);
 		if (extensionsAreSupported() == false)
 		{
-			return DeserializationStatus::ERROR;
+			return DeserializationStatus::ERROR_UNKNOWN;
 		}
 
 		JSON* camerasArrayJSON = fileDataJSON->getFieldArray("cameras");
@@ -216,7 +222,8 @@ namespace fileio
 		for (int64_t i = 0; i < bufferViewsCount; ++i)
 		{
 			JSON* bufferViewJSON = bufferViewsArrayJSON->getArrayItem(i);
-			mitevox::BufferView* bufferView = BufferViewCodec::fromGLTF(bufferViewJSON, &_buffers);
+			mitevox::BufferView* bufferView = new mitevox::BufferView();
+			BufferViewCodec::fromGLTF(bufferView, bufferViewJSON, &_buffers);
 			_bufferViews.setElement(i, bufferView);
 		}
 	}
@@ -235,8 +242,8 @@ namespace fileio
 		for (int64_t i = 0; i < accessorsCount; ++i)
 		{
 			JSON* accessorJSON = accessorsArrayJSON->getArrayItem(i);
-			mitevox::BufferViewAccessor* accessor = 
-				BufferViewAccessorCodec::fromGLTF(accessorJSON, &_bufferViews);
+			mitevox::BufferViewAccessor* accessor = new mitevox::BufferViewAccessor();
+			BufferViewAccessorCodec::fromGLTF(accessor, accessorJSON, &_bufferViews);
 			_accessors.setElement(i, accessor);
 		}
 	}
@@ -254,9 +261,10 @@ namespace fileio
 		for (int64_t i = 0; i < imageSamplersCount; ++i)
 		{
 			JSON* imageSamplerJSON = imageSamplersArrayJSON->getArrayItem(i);
-			ImageSampler imageSampler;
-			imageSampler.fromGLTF(imageSamplerJSON);
-			_imageSamplers.setElement(i, imageSampler);
+			mitevox::ImageSampler* imageSampler = new mitevox::ImageSampler();
+			ImageSamplerCodec::fromGLTF(imageSampler, imageSamplerJSON);
+			_imageSamplers.setElement(i, *imageSampler);
+			delete imageSampler;
 		}
 	}
 
@@ -274,8 +282,8 @@ namespace fileio
 		for (int64_t i = 0; i < imagesCount; ++i)
 		{
 			JSON* imageJSON = imagesArrayJSON->getArrayItem(i);
-			Image* image = new Image();
-			image->fromGLTF(imageJSON, _path);
+			mitevox::Image* image = new mitevox::Image();
+			ImageCodec::fromGLTF(image, imageJSON, _path);
 			_images.setElement(i, image);
 		}
 	}
@@ -295,7 +303,7 @@ namespace fileio
 		{
 			JSON* textureJSON = texturesArrayJSON->getArrayItem(i);
 
-			Texture* texture = new Texture();
+			mitevox::Texture* texture = new mitevox::Texture();
 
 			JSON* numberJSON = textureJSON->getField("sampler");
 			if (numberJSON != nullptr)
@@ -335,8 +343,8 @@ namespace fileio
 		for (int64_t i = 0; i < materialsCount; ++i)
 		{
 			JSON* materialJSON = materialsArrayJSON->getArrayItem(i);
-			Material* material = new Material();
-			material->fromGLTF(materialJSON, &_textures);
+			mitevox::Material* material = new mitevox::Material();
+			MaterialCodec::fromGLTF(material, materialJSON, &_textures);
 			_materials.setElement(i, material);
 		}
 	}
@@ -355,7 +363,8 @@ namespace fileio
 		for (size_t i = 0; i < meshesCount; ++i)
 		{
 			JSON* meshJSON = meshesArrayJSON->getArrayItem(i);
-			mitevox::Mesh* mesh = MeshCodec::fromGLTF(meshJSON, &_accessors, &_materials);
+			mitevox::Mesh* mesh = new mitevox::Mesh();
+			MeshCodec::fromGLTF(mesh, meshJSON, &_accessors, &_materials);
 			_meshes.setElement((int64_t)i, mesh);
 		}
 	}
@@ -373,14 +382,14 @@ namespace fileio
 
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
-			_nodes.setElement((int64_t)i, new Node());
+			_nodes.setElement((int64_t)i, new mitevox::Node());
 		}
 
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
 			JSON* nodeJSON = nodesArrayJSON->getArrayItem(i);
-			Node* node = _nodes.getElement(i);
-			node->fromGLTF(nodeJSON, &_cameras, &_meshes, &_nodes);
+			mitevox::Node* node = _nodes.getElement(i);
+			NodeCodec::fromGLTF(node, nodeJSON, &_cameras, &_meshes, &_nodes);
 		}
 	}
 
@@ -398,8 +407,8 @@ namespace fileio
 		for (size_t i = 0; i < scenesCount; ++i)
 		{
 			JSON* sceneJSON = scenesArrayJSON->getArrayItem(i);
-			Scene* scene = new Scene();
-			scene->fromGLTF(sceneJSON, &_nodes);
+			mitevox::Scene* scene = new mitevox::Scene();
+			SceneCodec::fromGLTF(scene, sceneJSON, &_nodes);
 			_scenes.setElement((int64_t)i, scene);
 		}
 	}

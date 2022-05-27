@@ -18,12 +18,12 @@ namespace fileio
     SerializationStatus WavefrontOBJ::serialize(safety::SafeByteArray* fileData)
     {
 
-        return SerializationStatus::ERROR;
+        return SerializationStatus::ERROR_UNKNOWN;
     }
 
     DeserializationStatus WavefrontOBJ::deserialize(safety::SafeByteArray* fileData)
     {
 
-        return DeserializationStatus::ERROR;
+        return DeserializationStatus::ERROR_UNKNOWN;
     }
 }

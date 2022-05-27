@@ -5,12 +5,12 @@
 #include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
 #include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Node.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Scene.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/ImageSampler.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/Image.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/Texture.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/Material.h"
+#include "engine/MiteVox/src/Node.h"
+#include "engine/MiteVox/src/Scene.h"
+#include "engine/MiteVox/src/Material/ImageSampler.h"
+#include "engine/MiteVox/src/Material/Image.h"
+#include "engine/MiteVox/src/Material/Texture.h"
+#include "engine/MiteVox/src/Material/Material.h"
 #include "engine/FileIO/src/Formats/FileFormatBase.h"
 #include "engine/FileIO/src/SerializationStatus.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
@@ -43,12 +43,12 @@ namespace fileio
         safety::SafeArray<mitevox::BufferView*> _bufferViews;
         safety::SafeArray<mitevox::BufferViewAccessor*> _accessors;
         safety::SafeArray<mitevox::Mesh*> _meshes;
-        safety::SafeArray<Node*> _nodes;
-        safety::SafeArray<Scene*> _scenes;
-        safety::SafeArray<ImageSampler> _imageSamplers;
-        safety::SafeArray<Image*> _images;
-        safety::SafeArray<Texture*> _textures;
-        safety::SafeArray<Material*> _materials;
+        safety::SafeArray<mitevox::Node*> _nodes;
+        safety::SafeArray<mitevox::Scene*> _scenes;
+        safety::SafeArray<mitevox::ImageSampler> _imageSamplers;
+        safety::SafeArray<mitevox::Image*> _images;
+        safety::SafeArray<mitevox::Texture*> _textures;
+        safety::SafeArray<mitevox::Material*> _materials;
 
         glTF();
 

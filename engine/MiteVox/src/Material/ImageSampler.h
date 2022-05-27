@@ -1,11 +1,9 @@
 #ifndef GLTFIMAGESAMPLER_H
 #define GLTFIMAGESAMPLER_H
 
-#include "engine/FileIO/src/Formats/JSON/JSON.h"
-
 #include <string>
 
-namespace fileio
+namespace mitevox
 {
 	class ImageSampler
 	{
@@ -33,8 +31,6 @@ namespace fileio
 		WrappingMode wrappingModeU = WrappingMode::REPEAT;
 		WrappingMode wrappingModeV = WrappingMode::REPEAT;
 		std::string name;
-
-		void fromGLTF(JSON* imageSamplerJSON);
 	};
 }
 

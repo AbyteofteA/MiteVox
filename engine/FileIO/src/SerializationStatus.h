@@ -6,14 +6,14 @@ namespace fileio
 {
 	enum struct SerializationStatus
 	{
-		ERROR = -1,
+		ERROR_UNKNOWN = -1,
 		PENDING,
 		COMPLETE
 	};
 
 	enum struct DeserializationStatus
 	{
-		ERROR = -1,
+		ERROR_UNKNOWN = -1,
 		PENDING,
 		COMPLETE
 	};

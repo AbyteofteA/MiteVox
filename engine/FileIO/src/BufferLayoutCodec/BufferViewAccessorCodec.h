@@ -10,14 +10,15 @@ namespace fileio
 	{
 	public:
 
-		static mitevox::BufferViewAccessor* fromGLTF(
-			JSON* accessorJSON, 
+		static void fromGLTF(
+			mitevox::BufferViewAccessor* bufferViewAccessorResult,
+			JSON* accessorJSON,
 			safety::SafeArray<mitevox::BufferView*>* bufferViews);
 
 	private:
 
-		static void collectMinMaxFromGLTF(JSON* accessorJSON, mitevox::BufferViewAccessor* bufferViewAccessor);
-		static void sparseFromGLTF(JSON* accessorSparseJSON, mitevox::BufferViewAccessor* bufferViewAccessor);
+		static void collectMinMaxFromGLTF(mitevox::BufferViewAccessor* bufferViewAccessor, JSON* accessorJSON);
+		static void sparseFromGLTF(mitevox::BufferViewAccessor* bufferViewAccessor, JSON* accessorSparseJSON);
 	};
 }
 

@@ -144,7 +144,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\CodeSafety.h" />
     <ClInclude Include="src\ensureValue.h" />
     <ClInclude Include="src\SafeArray.h" />
   </ItemGroup>

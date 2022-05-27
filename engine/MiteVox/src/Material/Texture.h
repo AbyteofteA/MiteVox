@@ -1,14 +1,13 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/ImageSampler.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/Image.h"
-#include "engine/FileIO/src/Formats/JSON/JSON.h"
+#include "engine/MiteVox/src/Material/ImageSampler.h"
+#include "engine/MiteVox/src/Material/Image.h"
 
 #include <cstdint>
 #include <string>
 
-namespace fileio
+namespace mitevox
 {
 	class Texture
 	{

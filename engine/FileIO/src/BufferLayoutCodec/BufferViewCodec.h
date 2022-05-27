@@ -10,8 +10,9 @@ namespace fileio
 	{
 	public:
 
-		static mitevox::BufferView* fromGLTF(
-			JSON* bufferViewJSON, 
+		static void fromGLTF(
+			mitevox::BufferView* bufferViewResult,
+			JSON* bufferViewJSON,
 			safety::SafeArray<safety::SafeByteArray*>* buffers);
 	};
 }

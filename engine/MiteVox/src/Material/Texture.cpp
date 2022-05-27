@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-namespace fileio
+namespace mitevox
 {
 	Texture::Texture()
 	{

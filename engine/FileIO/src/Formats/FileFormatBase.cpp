@@ -35,11 +35,11 @@ namespace fileio
 
     SerializationStatus FileFormatBase::serialize(safety::SafeByteArray* fileData)
     {
-        return SerializationStatus::ERROR;
+        return SerializationStatus::ERROR_UNKNOWN;
     }
 
     DeserializationStatus FileFormatBase::deserialize(safety::SafeByteArray* fileData)
     {
-        return DeserializationStatus::ERROR;
+        return DeserializationStatus::ERROR_UNKNOWN;
     }
 }

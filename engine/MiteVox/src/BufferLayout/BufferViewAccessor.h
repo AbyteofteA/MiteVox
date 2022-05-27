@@ -39,6 +39,19 @@ namespace mitevox
 
         BufferViewAccessor();
         void deallocate();
+
+        int8_t getByte(int64_t index);
+        uint8_t getUnsignedByte(int64_t index);
+        int16_t getShort(int64_t index);
+        uint16_t getUnsignedShort(int64_t index);
+        uint32_t getUnignedInt(int64_t index);
+        float getFloat(int64_t index);
+        // TODO: getVector2D(int64_t index);
+        // TODO: getVector3D(int64_t index);
+        // TODO: getVector4D(int64_t index);
+        // TODO: getMatrix2x2(int64_t index);
+        // TODO: getMatrix3x3(int64_t index);
+        // TODO: getMatrix4x4(int64_t index);
         bool isSparse();
         void makeSparse(BufferViewAccessorSparse* sparseAccessor);
         void makeNotSparse();

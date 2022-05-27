@@ -47,4 +47,47 @@ namespace mitevox
 	{
 		return indecesAccessor;
 	}
+
+	bool MeshPrimitive::isTriangularMesh()
+	{
+		switch (mode)
+		{
+		case mitevox::TRIANGLES:
+		case mitevox::TRIANGLE_STRIP:
+		case mitevox::TRIANGLE_FAN:
+			return true;
+
+		default:
+			return false;
+		}
+	}
+
+	uint32_t MeshPrimitive::getPointsCount()
+	{
+		return getPositions()->count;
+	}
+
+	mathem::Vector3D MeshPrimitive::getPoint(uint32_t index)
+	{
+		mathem::Vector3D resultPoint;
+
+		// TODO:
+
+		return resultPoint;
+	}
+
+	uint32_t MeshPrimitive::getTrianglesCount()
+	{
+		// TODO:
+
+		return 0;
+	}
+
+	mathem::TriangleGeometry MeshPrimitive::getTriangle(uint32_t index)
+	{
+		// TODO:
+
+		return mathem::TriangleGeometry();
+	}
+
 }

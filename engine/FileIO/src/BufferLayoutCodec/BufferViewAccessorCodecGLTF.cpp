@@ -5,17 +5,17 @@
 
 namespace fileio
 {
-    mitevox::BufferViewAccessor* BufferViewAccessorCodec::fromGLTF(
+    void BufferViewAccessorCodec::fromGLTF(
+        mitevox::BufferViewAccessor* bufferViewAccessorResult, 
         JSON* accessorJSON,
         safety::SafeArray<mitevox::BufferView*>* bufferViews)
     {
-        mitevox::BufferViewAccessor* bufferViewAccessor = new mitevox::BufferViewAccessor();
-        bufferViewAccessor->name = accessorJSON->getFieldString("name");
-        bufferViewAccessor->byteOffset = (uint64_t)accessorJSON->getFieldNumber("byteOffset");
-        bufferViewAccessor->componentType = 
+        bufferViewAccessorResult->name = accessorJSON->getFieldString("name");
+        bufferViewAccessorResult->byteOffset = (uint64_t)accessorJSON->getFieldNumber("byteOffset");
+        bufferViewAccessorResult->componentType = 
             (mitevox::ComponentDataType)accessorJSON->getFieldNumber("componentType");
-        bufferViewAccessor->count = (uint64_t)accessorJSON->getFieldNumber("count");
-        bufferViewAccessor->normalized = accessorJSON->getFieldBoolean("normalized");
+        bufferViewAccessorResult->count = (uint64_t)accessorJSON->getFieldNumber("count");
+        bufferViewAccessorResult->normalized = accessorJSON->getFieldBoolean("normalized");
         
         JSON* numberJSON = accessorJSON->getField("bufferView");
         if (numberJSON != nullptr)
@@ -23,27 +23,25 @@ namespace fileio
             if (numberJSON->isNumber())
             {
                 int32_t bufferViewIndex = (int32_t)numberJSON->getNumber();
-                bufferViewAccessor->bufferView = bufferViews->getElement(bufferViewIndex);
+                bufferViewAccessorResult->bufferView = bufferViews->getElement(bufferViewIndex);
             }
         }
 
         std::string typeName = accessorJSON->getFieldString("type");
-        bufferViewAccessor->type = mitevox::BufferViewAccessor::mapTypeNameToType(typeName);
+        bufferViewAccessorResult->type = mitevox::BufferViewAccessor::mapTypeNameToType(typeName);
 
-        collectMinMaxFromGLTF(accessorJSON, bufferViewAccessor);
+        collectMinMaxFromGLTF(bufferViewAccessorResult, accessorJSON);
 
         JSON* accessorSparseJSON = accessorJSON->getField("sparse");
         if (accessorSparseJSON != nullptr)
         {
-            sparseFromGLTF(accessorSparseJSON, bufferViewAccessor);
+            sparseFromGLTF(bufferViewAccessorResult, accessorSparseJSON);
         }
-
-        return bufferViewAccessor;
     }
 
     void BufferViewAccessorCodec::collectMinMaxFromGLTF(
-        JSON* accessorJSON, 
-        mitevox::BufferViewAccessor* bufferViewAccessor)
+        mitevox::BufferViewAccessor* bufferViewAccessor, 
+        JSON* accessorJSON)
     {
         JSON* minArrayJSON = accessorJSON->getFieldArray("min");
         if (minArrayJSON != nullptr)
@@ -59,8 +57,8 @@ namespace fileio
     }
 
     void BufferViewAccessorCodec::sparseFromGLTF(
-        JSON* accessorSparseJSON, 
-        mitevox::BufferViewAccessor* bufferViewAccessor)
+        mitevox::BufferViewAccessor* bufferViewAccessor,
+        JSON* accessorSparseJSON)
     {
         mitevox::BufferViewAccessorSparse* bufferViewAccessorSparse = new mitevox::BufferViewAccessorSparse();
         JSON* numberJSON = accessorSparseJSON->getField("count");

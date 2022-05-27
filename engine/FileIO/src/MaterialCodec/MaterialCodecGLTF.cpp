@@ -1,10 +1,13 @@
-#include "Material.h"
+#include "MaterialCodec.h"
 
 namespace fileio
 {
-	void Material::fromGLTF(JSON* materialJSON, safety::SafeArray<Texture*>* textures)
+	void MaterialCodec::fromGLTF(
+		mitevox::Material* materialResult, 
+		JSON* materialJSON,
+		safety::SafeArray<mitevox::Texture*>* textures)
 	{
-		name = materialJSON->getFieldString("name");
+		materialResult->name = materialJSON->getFieldString("name");
 
 		JSON* pbrMetallicRoughnessJSON = materialJSON->getField("pbrMetallicRoughness");
 		if (pbrMetallicRoughnessJSON != nullptr)
@@ -12,10 +15,10 @@ namespace fileio
 			JSON* baseColorFactorArrayJSON = pbrMetallicRoughnessJSON->getField("baseColorFactor");
 			if (baseColorFactorArrayJSON != nullptr)
 			{
-				baseColor.r = (float)baseColorFactorArrayJSON->getArrayItem(0)->getNumber();
-				baseColor.g = (float)baseColorFactorArrayJSON->getArrayItem(1)->getNumber();
-				baseColor.b = (float)baseColorFactorArrayJSON->getArrayItem(2)->getNumber();
-				baseColor.a = (float)baseColorFactorArrayJSON->getArrayItem(3)->getNumber();
+				materialResult->baseColor.r = (float)baseColorFactorArrayJSON->getArrayItem(0)->getNumber();
+				materialResult->baseColor.g = (float)baseColorFactorArrayJSON->getArrayItem(1)->getNumber();
+				materialResult->baseColor.b = (float)baseColorFactorArrayJSON->getArrayItem(2)->getNumber();
+				materialResult->baseColor.a = (float)baseColorFactorArrayJSON->getArrayItem(3)->getNumber();
 			}
 			JSON* baseColorTextureJSON = pbrMetallicRoughnessJSON->getField("baseColorTexture");
 			if (baseColorTextureJSON != nullptr)
@@ -26,8 +29,8 @@ namespace fileio
 					if (numberJSON->isNumber())
 					{
 						int32_t baseColorTextureIndex = (int32_t)numberJSON->getNumber();
-						Texture* texture = textures->getElement(baseColorTextureIndex);
-						albedoMap = texture;
+						mitevox::Texture* texture = textures->getElement(baseColorTextureIndex);
+						materialResult->albedoMap = texture;
 					}
 				}
 			}
@@ -36,7 +39,7 @@ namespace fileio
 			{
 				if (numberJSON->isNumber())
 				{
-					metallicity = (float)numberJSON->getNumber();
+					materialResult->metallicity = (float)numberJSON->getNumber();
 				}
 			}
 			numberJSON = pbrMetallicRoughnessJSON->getField("roughnessFactor");
@@ -44,7 +47,7 @@ namespace fileio
 			{
 				if (numberJSON->isNumber())
 				{
-					roughness = (float)numberJSON->getNumber();
+					materialResult->roughness = (float)numberJSON->getNumber();
 				}
 			}
 			JSON* pbrMetallicRoughnessTextureJSON = 
@@ -57,8 +60,8 @@ namespace fileio
 					if (numberJSON->isNumber())
 					{
 						int32_t pbrMetallicRoughnessTextureIndex = (int32_t)numberJSON->getNumber();
-						Texture* texture = textures->getElement(pbrMetallicRoughnessTextureIndex);
-						metallicRoughnessMap = texture;
+						mitevox::Texture* texture = textures->getElement(pbrMetallicRoughnessTextureIndex);
+						materialResult->metallicRoughnessMap = texture;
 					}
 				}
 			}

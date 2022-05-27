@@ -49,16 +49,6 @@ namespace mitevox
 		NativeScript_Component = ECS->registerComponent("NativeScript_ECS", sizeof(NativeScript_ECS),
 			NativeScript_onCreate, NativeScript_onUpdateAll, NativeScript_onDestroy);
 
-		// Physics components
-
-		PrimitiveCollider_Component = ECS->registerComponent("PrimitiveCollider", sizeof(physcs::PrimitiveCollider));
-
-		RigidBody_Component = ECS->registerComponent("RigidBody", sizeof(physcs::RigidBody));
-
-		// Other components
-
-		Tag_Component = ECS->registerComponent("Tag", sizeof(std::string));
-
 		// Initialize timers.
 
 		prevCycleTime = std::chrono::high_resolution_clock::now();
@@ -137,17 +127,6 @@ namespace mitevox
 	double Scene::getCurrentTime()
 	{
 		return currentTime;
-	}
-
-	void Scene::fromGLTF(fileio::JSON* sceneJSON)
-	{
-		name = sceneJSON->getFieldString("name");
-
-		fileio::JSON* nodesArrayJSON = sceneJSON->getFieldArray("nodes");
-		if (nodesArrayJSON != nullptr)
-		{
-			nodesArrayJSON->toNumberArray<int32_t>(&nodes);
-		}
 	}
 
 	void Scene::updateTimers()

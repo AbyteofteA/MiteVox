@@ -1,47 +1,46 @@
 #include "MeshCodec.h"
+#include "engine/MiteVox/src/Material/Material.h"
 
 namespace fileio
 {
-	mitevox::Mesh* MeshCodec::fromGLTF(
+	void MeshCodec::fromGLTF(
+		mitevox::Mesh* meshResult, 
 		JSON* meshJSON,
 		safety::SafeArray<mitevox::BufferViewAccessor*>* accessors,
-		safety::SafeArray<Material*>* materials)
+		safety::SafeArray<mitevox::Material*>* materials)
 	{
-		mitevox::Mesh* mesh = new mitevox::Mesh();
-		mesh->name = meshJSON->getFieldString("name");
+		meshResult->name = meshJSON->getFieldString("name");
 
 		JSON* weightsArrayJSON = meshJSON->getFieldArray("weights");
 		if (weightsArrayJSON != nullptr)
 		{
-			weightsArrayJSON->toNumberArray<float>(&mesh->weights);
+			weightsArrayJSON->toNumberArray<float>(&meshResult->weights);
 		}
 
 		JSON* meshPrimitivesArrayJSON = meshJSON->getFieldArray("primitives");
 		if (meshPrimitivesArrayJSON != nullptr)
 		{
 			size_t meshPrimitivesArraySize = meshPrimitivesArrayJSON->getArraySize();
-			mesh->primitives.resize(meshPrimitivesArraySize);
+			meshResult->primitives.resize(meshPrimitivesArraySize);
 
 			for (size_t i = 0; i < meshPrimitivesArraySize; ++i)
 			{
 				JSON* meshPrimitiveJSON = meshPrimitivesArrayJSON->getArrayItem(i);
-				mitevox::MeshPrimitive* meshPrimitive = 
-					meshPrimitiveFromGLTF(meshPrimitiveJSON, accessors, materials);
-				mesh->primitives.setElement(i, meshPrimitive);
+				mitevox::MeshPrimitive* meshPrimitive = new mitevox::MeshPrimitive();
+				meshPrimitiveFromGLTF(meshPrimitive, meshPrimitiveJSON, accessors, materials);
+				meshResult->primitives.setElement(i, meshPrimitive);
 			}
 		}
-		
-		return mesh;
 	}
 
-	mitevox::MeshPrimitive* MeshCodec::meshPrimitiveFromGLTF(
+	void MeshCodec::meshPrimitiveFromGLTF(
+		mitevox::MeshPrimitive* meshPrimitiveResult, 
 		JSON* meshPrimitiveJSON,
 		safety::SafeArray<mitevox::BufferViewAccessor*>* accessors,
-		safety::SafeArray<Material*>* materials)
+		safety::SafeArray<mitevox::Material*>* materials)
 	{
-		mitevox::MeshPrimitive* meshPrimitive = new mitevox::MeshPrimitive();
 		JSON* meshAttributesJSON = meshPrimitiveJSON->getFieldObject("attributes");
-		collectAttributesFromJSON(meshAttributesJSON, &meshPrimitive->attributes, accessors);
+		collectAttributesFromJSON(&meshPrimitiveResult->attributes, meshAttributesJSON, accessors);
 
 		JSON* numberJSON = meshPrimitiveJSON->getField("indices");
 		if (numberJSON != nullptr)
@@ -49,7 +48,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t indecesAccessorIndex = (int32_t)numberJSON->getNumber();
-				meshPrimitive->indecesAccessor = accessors->getElement(indecesAccessorIndex);
+				meshPrimitiveResult->indecesAccessor = accessors->getElement(indecesAccessorIndex);
 			}
 		}
 
@@ -59,20 +58,20 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t materialIndex = (int32_t)numberJSON->getNumber();
-				meshPrimitive->material = materials->getElement(materialIndex);
+				meshPrimitiveResult->material = materials->getElement(materialIndex);
 			}
 		}
 		else
 		{
-			meshPrimitive->material = new Material();
-			materials->appendElement(meshPrimitive->material);
+			meshPrimitiveResult->material = new mitevox::Material();
+			materials->appendElement(meshPrimitiveResult->material);
 		}
 		numberJSON = meshPrimitiveJSON->getField("mode");
 		if (numberJSON != nullptr)
 		{
 			if (numberJSON->isNumber())
 			{
-				meshPrimitive->mode = (mitevox::MeshPrimitive::TopologyType)numberJSON->getNumber();
+				meshPrimitiveResult->mode = (mitevox::TopologyType)numberJSON->getNumber();
 			}
 		}
 
@@ -80,23 +79,21 @@ namespace fileio
 		if (targetsArrayJSON != nullptr)
 		{
 			size_t targetsArraySize = (size_t)targetsArrayJSON->getArraySize();
-			meshPrimitive->morphTargets.resize(targetsArraySize);
+			meshPrimitiveResult->morphTargets.resize(targetsArraySize);
 
 			for (size_t i = 0; i < targetsArraySize; ++i)
 			{
 				mitevox::MeshAttributeSet* attributeSet = new mitevox::MeshAttributeSet();
-				meshPrimitive->morphTargets.setElement(i, attributeSet);
+				meshPrimitiveResult->morphTargets.setElement(i, attributeSet);
 				JSON* targetJSON = targetsArrayJSON->getArrayItem(i);
-				collectAttributesFromJSON(targetJSON, attributeSet, accessors);
+				collectAttributesFromJSON(attributeSet, targetJSON, accessors);
 			}
 		}
-
-		return meshPrimitive;
 	}
 
 	void MeshCodec::collectAttributesFromJSON(
-		JSON* meshAttributesJSON,
 		mitevox::MeshAttributeSet* meshAttributeSet,
+		JSON* meshAttributesJSON,
 		safety::SafeArray<mitevox::BufferViewAccessor*>* accessors)
 	{
 		JSON* numberJSON = meshAttributesJSON->getField("POSITION");
