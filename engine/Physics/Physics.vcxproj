@@ -144,11 +144,8 @@
   <ItemGroup>
     <ClInclude Include="src\ClassicalMechanics\Dynamics.h" />
     <ClInclude Include="src\ClassicalMechanics\Kinematics.h" />
-    <ClInclude Include="src\Colliders\PrimitiveCollider.h" />
     <ClInclude Include="src\Physics.h" />
-    <ClInclude Include="src\Colliders\intersectAABB.h" />
     <ClInclude Include="src\MovementProps.h" />
-    <ClInclude Include="src\Colliders\Primitives.h" />
     <ClInclude Include="src\RigidBody.h" />
   </ItemGroup>
   <ItemGroup>

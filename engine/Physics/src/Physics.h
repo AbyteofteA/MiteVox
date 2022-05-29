@@ -11,13 +11,8 @@
 
 #include "engine/Math/src/Math.h"
 
-
 #include "MovementProps.h"
 #include "RigidBody.h"
-
-#include "Colliders/Primitives.h"
-#include "Colliders/PrimitiveCollider.h"
-#include "Colliders/intersectAABB.h"
 
 #include "ClassicalMechanics/Kinematics.h"
 #include "ClassicalMechanics/Dynamics.h"
