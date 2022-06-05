@@ -8,28 +8,28 @@ namespace physcs
 {
 	inline void applyKinematics(MovementProps* body, float time)
 	{
-		body->velocity.i += body->acceler.i * time;
-		body->velocity.j -= body->acceler.j * time;
-		body->velocity.k += body->acceler.k * time;
+		body->velocity.x() += body->acceler.x() * time;
+		body->velocity.y() -= body->acceler.y() * time;
+		body->velocity.z() += body->acceler.z() * time;
 
-		body->pos.i += body->velocity.i * time;
-		body->pos.j -= body->velocity.j * time;
-		body->pos.k += body->velocity.k * time;
+		body->pos.x() += body->velocity.x() * time;
+		body->pos.y() -= body->velocity.y() * time;
+		body->pos.z() += body->velocity.z() * time;
 
-		body->angularVelocity.i += body->angularAcceler.i * time;
-		body->angularVelocity.j += body->angularAcceler.j * time;
-		body->angularVelocity.k += body->angularAcceler.k * time;
+		body->angularVelocity.x() += body->angularAcceler.x() * time;
+		body->angularVelocity.y() += body->angularAcceler.y() * time;
+		body->angularVelocity.z() += body->angularAcceler.z() * time;
 
-		body->angle.i += body->angularVelocity.i * time;
-		body->angle.j += body->angularVelocity.j * time;
-		body->angle.k += body->angularVelocity.k * time;
+		body->angle.x() += body->angularVelocity.x() * time;
+		body->angle.y() += body->angularVelocity.y() * time;
+		body->angle.z() += body->angularVelocity.z() * time;
 
-		body->acceler.i = 0;
-		body->acceler.j = 0;
-		body->acceler.k = 0;
-		body->angularAcceler.i = 0;
-		body->angularAcceler.j = 0;
-		body->angularAcceler.k = 0;
+		body->acceler.x() = 0;
+		body->acceler.y() = 0;
+		body->acceler.z() = 0;
+		body->angularAcceler.x() = 0;
+		body->angularAcceler.y() = 0;
+		body->angularAcceler.z() = 0;
 	}
 }
 

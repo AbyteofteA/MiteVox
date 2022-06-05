@@ -7,6 +7,10 @@
 
 #include "API_ModelFunctions.h"
 
+#include "engine/MiteVox/src/Material/Material.h"
+#include "engine/MiteVox/src/BufferLayout/BufferView.h"
+#include "engine/MiteVox/src/Mesh/Mesh.h"
+
 #define RENDERER_VERTEX_SIZE 8 // Amount of floats to store a vertex (XYZ + UV + IJK)
 #define RENDERER_TRIANGLE_SIZE RENDERER_VERTEX_SIZE * 3
 
@@ -46,9 +50,9 @@ namespace render
 				{
 					size_t normalIndex = mesh->polygons[i].normals[j] - 1;
 					normal = mesh->normals[normalIndex];
-					result[offset + 5] = normal.i;
-					result[offset + 6] = normal.j;
-					result[offset + 7] = normal.k;
+					result[offset + 5] = normal.x();
+					result[offset + 6] = normal.y();
+					result[offset + 7] = normal.z();
 				}
 			}
 		}
@@ -157,10 +161,10 @@ namespace render
 		}
 	}
 
-	void uploadMaterial(fileio::Material* material, int shaderID)
+	void uploadMaterial(mitevox::Material* material, int shaderID)
 	{
 		int textureUnit = 0;
-		fileio::Texture* albedoMap = material->albedoMap;
+		mitevox::Texture* albedoMap = material->albedoMap;
 		if (albedoMap != nullptr)
 		{
 			if (albedoMap->ID == 0)
@@ -181,7 +185,7 @@ namespace render
 			}
 			textureUnit++;
 		}
-		fileio::Texture* metallicRoughnessMap = material->metallicRoughnessMap;
+		mitevox::Texture* metallicRoughnessMap = material->metallicRoughnessMap;
 		if (metallicRoughnessMap != nullptr)
 		{
 			if (metallicRoughnessMap->ID == 0)
@@ -205,7 +209,7 @@ namespace render
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void selectMaterial(fileio::Material* material, int shaderID)
+	void selectMaterial(mitevox::Material* material, int shaderID)
 	{
 		glm::vec3 baseColor = { material->baseColor.r, material->baseColor.g, material->baseColor.b };
 		shaders[shaderID]->setVec3("material.baseColor", baseColor);
@@ -241,7 +245,7 @@ namespace render
 		shaders[shaderID]->setInt("material.illuminationModel", material->illuminationModel);
 	}
 
-	void removeMaterial(fileio::Material* material, int shaderID)
+	void removeMaterial(mitevox::Material* material, int shaderID)
 	{
 		glDeleteTextures(1, &material->albedoMap->ID);
 		glDeleteTextures(1, &material->metallicRoughnessMap->ID);

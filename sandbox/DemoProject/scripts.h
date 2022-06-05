@@ -12,9 +12,9 @@ void rotateLight_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDE
 	render::DirectedLight* light =
 		(render::DirectedLight*)_ecs->getComponent(ID, DIRECTEDLIGHT_COMPONENT);
 
-	light->direction.i = (float)sin(scene->getCurrentTime());
-	light->direction.j = -0.5f;
-	light->direction.k = (float)cos(scene->getCurrentTime());
+	light->direction.x() = (float)sin(scene->getCurrentTime());
+	light->direction.y() = -0.5f;
+	light->direction.z() = (float)cos(scene->getCurrentTime());
 	light->direction.normalize();
 }
 

@@ -65,19 +65,19 @@ namespace render
 		{
 			Cubemap* tmpCubemap = new Cubemap();
 
-			fileio::Image* front;
-			fileio::Image* back;
-			fileio::Image* up;
-			fileio::Image* down;
-			fileio::Image* right;
-			fileio::Image* left;
+			mitevox::Image* front;
+			mitevox::Image* back;
+			mitevox::Image* up;
+			mitevox::Image* down;
+			mitevox::Image* right;
+			mitevox::Image* left;
 
-			fileio::fileLoader.loadAndParseAsync(frontPath, (void**)&front, fileio::loadImage);
-			fileio::fileLoader.loadAndParseAsync(backPath, (void**)&back, fileio::loadImage);
-			fileio::fileLoader.loadAndParseAsync(upPath, (void**)&up, fileio::loadImage);
-			fileio::fileLoader.loadAndParseAsync(downPath, (void**)&down, fileio::loadImage);
-			fileio::fileLoader.loadAndParseAsync(rightPath, (void**)&right, fileio::loadImage);
-			fileio::fileLoader.loadAndParseAsync(leftPath, (void**)&left, fileio::loadImage);
+			fileio::fileLoader.loadAndParseAsync(frontPath, (void**)&front, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(backPath, (void**)&back, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(upPath, (void**)&up, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(downPath, (void**)&down, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(rightPath, (void**)&right, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(leftPath, (void**)&left, mitevox::loadImage);
 			fileio::fileLoader.awaitAll();
 
 			tmpCubemap->textures[0] = *right;

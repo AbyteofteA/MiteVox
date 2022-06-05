@@ -77,9 +77,9 @@ namespace render
 	{
 		mathem::Vector3D v;
 		double* tmpFloats = readFloats3(str, indx);
-		v.i = (float)tmpFloats[0];
-		v.j = (float)tmpFloats[1];
-		v.k = (float)tmpFloats[2];
+		v.i() = (float)tmpFloats[0];
+		v.j() = (float)tmpFloats[1];
+		v.k() = (float)tmpFloats[2];
 
 		return v;
 	}
@@ -371,17 +371,18 @@ namespace render
 											meshTmp->positions[poligon.positions[0] - 1].y - meshTmp->positions[poligon.positions[1] - 1].y,
 											meshTmp->positions[poligon.positions[0] - 1].z - meshTmp->positions[poligon.positions[1] - 1].z };
 
-							mathem::Vector3D vectN = { vectA.j * vectB.k - vectB.j * vectA.k,
-											vectB.i * vectA.k - vectA.i * vectB.k,
-											vectA.i * vectB.j - vectB.i * vectA.j };
+							mathem::Vector3D vectN = { 
+								vectA.j() * vectB.k() - vectB.j() * vectA.k(),
+								vectB.i() * vectA.k() - vectA.i() * vectB.k(),
+								vectA.i() * vectB.j() - vectB.i() * vectA.j() };
 
 							for (size_t j = 0; j < 3; j++)
 							{
 								poligon.normals[j] = poligon.positions[j];
 
-								meshTmp->normals[poligon.normals[j] - 1].i += vectN.i;
-								meshTmp->normals[poligon.normals[j] - 1].j += vectN.j;
-								meshTmp->normals[poligon.normals[j] - 1].k += vectN.k;
+								meshTmp->normals[poligon.normals[j] - 1].i() += vectN.i();
+								meshTmp->normals[poligon.normals[j] - 1].j() += vectN.j();
+								meshTmp->normals[poligon.normals[j] - 1].k() += vectN.k();
 							}
 						}
 

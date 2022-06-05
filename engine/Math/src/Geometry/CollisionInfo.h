@@ -1,8 +1,8 @@
 #ifndef COLLISIONINFO_H
 #define COLLISIONINFO_H
 
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Point3D.h"
+#include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
 
 #include <cstdint>

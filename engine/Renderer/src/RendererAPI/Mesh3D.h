@@ -2,6 +2,7 @@
 #ifndef RENDERER_MESH3D_H
 #define RENDERER_MESH3D_H
 
+#include "engine/Math/src/Vector.h"
 #include <cstdlib>
 #include <string>
 

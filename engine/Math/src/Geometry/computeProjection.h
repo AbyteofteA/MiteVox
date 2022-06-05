@@ -2,7 +2,7 @@
 #ifndef COMPUTEPROJECTION_H
 #define COMPUTEPROJECTION_H
 
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Geometry/BoxGeometry.h"
 #include "engine/Math/src/Geometry/SphereGeometry.h"

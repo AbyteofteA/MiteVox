@@ -2,8 +2,8 @@
 #ifndef GEOMETRYPRIMITIVEBASE_H
 #define GEOMETRYPRIMITIVEBASE_H
 
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Point3D.h"
+#include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 
 #include <cstdint>

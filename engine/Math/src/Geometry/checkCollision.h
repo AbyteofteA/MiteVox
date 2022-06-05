@@ -16,8 +16,8 @@
 #include "engine/Math/src/Geometry/RayGeometry.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/Math/src/Geometry/CollisionInfo.h"
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Point3D.h"
+#include "engine/Math/src/Vector.h"
 
 namespace mathem
 {

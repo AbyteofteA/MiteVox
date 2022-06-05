@@ -2,7 +2,7 @@
 #ifndef RENDERER_CUBEMAP_H
 #define RENDERER_CUBEMAP_H
 
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/Image.h"
+#include "engine/MiteVox/src/Material/Image.h"
 
 namespace render
 {
@@ -21,7 +21,7 @@ namespace render
 			}
 		}
 
-		fileio::Image textures[6];
+		mitevox::Image textures[6];
 		unsigned int textureID;
 	};
 

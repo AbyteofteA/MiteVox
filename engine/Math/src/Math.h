@@ -19,8 +19,8 @@
 #include "Generators/UniqueIDGenerator.h"
 #include "Generators/NoiseGenerators/PerlinNoiseGenerator.h"
 
-#include "LinearAlgebra/Point3D.h"
-#include "LinearAlgebra/Vector3D.h"
+#include "Point3D.h"
+#include "Vector.h"
 #include "LinearAlgebra/Transform.h"
 #include "LinearAlgebra/SquareMatrix.h"
 

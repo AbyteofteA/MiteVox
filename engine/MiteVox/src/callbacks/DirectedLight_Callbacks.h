@@ -35,7 +35,7 @@ inline void DirectedLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs
 		std::string rangeResult = directedLights + indexStr + range;
 
 		render::shaders[shaderIndex]->setVec3(directionResult.c_str(),
-			directedLight->direction.i, directedLight->direction.j, directedLight->direction.k);
+			directedLight->direction.x(), directedLight->direction.y(), directedLight->direction.z());
 		render::shaders[shaderIndex]->setVec3(colorResult.c_str(),
 			directedLight->color.r, directedLight->color.g, directedLight->color.b);
 

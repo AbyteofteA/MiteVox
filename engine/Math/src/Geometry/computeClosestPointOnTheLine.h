@@ -2,7 +2,7 @@
 #ifndef COMPUTECLOSESTPOINTONTHELINE_H
 #define COMPUTECLOSESTPOINTONTHELINE_H
 
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Vector.h"
 
 namespace mathem
 {

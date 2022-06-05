@@ -82,27 +82,27 @@ namespace mathem
 
 		Vector3D transformVector(Vector3D v)
 		{
-			Vector3D vNew = { v.i, v.j, v.k };
-			Vector3D vTmp = { v.i, v.j, v.k };
+			Vector3D vNew = v;
+			Vector3D vTmp = v;
 
 
 			float angle = angleY * (float)M_PI / 180;
-			vTmp.i = (float)cos(angle) * vNew.i + (float)sin(angle) * vNew.k;
-			vTmp.k = (float)-sin(angle) * vNew.i + (float)cos(angle) * vNew.k;
-			vNew.i = vTmp.i;
-			vNew.k = vTmp.k;
+			vTmp.i() = (float)cos(angle) * vNew.i() + (float)sin(angle) * vNew.k();
+			vTmp.k() = (float)-sin(angle) * vNew.i() + (float)cos(angle) * vNew.k();
+			vNew.i() = vTmp.i();
+			vNew.k() = vTmp.k();
 
 			angle = angleX * (float)M_PI / 180;
-			vTmp.j = (float)cos(angle) * vNew.j - (float)sin(angle) * vNew.k;
-			vTmp.k = (float)sin(angle) * vNew.j + (float)cos(angle) * vNew.k;
-			vNew.j = vTmp.j;
-			vNew.k = vTmp.k;
+			vTmp.j() = (float)cos(angle) * vNew.j() - (float)sin(angle) * vNew.k();
+			vTmp.k() = (float)sin(angle) * vNew.j() + (float)cos(angle) * vNew.k();
+			vNew.j() = vTmp.j();
+			vNew.k() = vTmp.k();
 
 			angle = angleZ * (float)M_PI / 180;
-			vTmp.i = (float)cos(angle) * vNew.i - (float)sin(angle) * vNew.j;
-			vTmp.j = (float)sin(angle) * vNew.i + (float)cos(angle) * vNew.j;
-			vNew.i = vTmp.i;
-			vNew.j = vTmp.j;
+			vTmp.i() = (float)cos(angle) * vNew.i() - (float)sin(angle) * vNew.j();
+			vTmp.j() = (float)sin(angle) * vNew.i() + (float)cos(angle) * vNew.j();
+			vNew.i() = vTmp.i();
+			vNew.j() = vTmp.j();
 
 			
 			return vNew;

@@ -28,8 +28,8 @@ namespace mathem
 
 		// Check box1's local Z-axis
 		{
-			tmpBox1ProjectionMin = dotProduct(box1->getPoint(7, box1Transform), tmpNormal);
-			tmpBox1ProjectionMax = dotProduct(box1->getPoint(0, box1Transform), tmpNormal);
+			tmpBox1ProjectionMin = box1->getPoint(7, box1Transform) * tmpNormal;
+			tmpBox1ProjectionMax = box1->getPoint(0, box1Transform) * tmpNormal;
 			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
 			{
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
@@ -47,8 +47,8 @@ namespace mathem
 		{
 			tmpTriangle = box1->getTriangle(2, box1Transform);
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBox1ProjectionMin = dotProduct(box1->getPoint(0, box1Transform), tmpNormal);
-			tmpBox1ProjectionMax = dotProduct(box1->getPoint(3, box1Transform), tmpNormal);
+			tmpBox1ProjectionMin = box1->getPoint(0, box1Transform) * tmpNormal;
+			tmpBox1ProjectionMax = box1->getPoint(3, box1Transform) * tmpNormal;
 			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
 			{
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
@@ -66,8 +66,8 @@ namespace mathem
 		{
 			tmpTriangle = box1->getTriangle(4, box1Transform);
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBox1ProjectionMin = dotProduct(box1->getPoint(0, box1Transform), tmpNormal);
-			tmpBox1ProjectionMax = dotProduct(box1->getPoint(1, box1Transform), tmpNormal);
+			tmpBox1ProjectionMin = box1->getPoint(0, box1Transform) * tmpNormal;
+			tmpBox1ProjectionMax = box1->getPoint(1, box1Transform) * tmpNormal;
 			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
 			{
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
@@ -110,8 +110,8 @@ namespace mathem
 
 		// Check box's local Z-axis
 		{
-			tmpBoxProjectionMin = dotProduct(box->getPoint(7, boxTransform), tmpNormal);
-			tmpBoxProjectionMax = dotProduct(box->getPoint(0, boxTransform), tmpNormal);
+			tmpBoxProjectionMin = box->getPoint(7, boxTransform) * tmpNormal;
+			tmpBoxProjectionMax = box->getPoint(0, boxTransform) * tmpNormal;
 			if (tmpBoxProjectionMax < tmpBoxProjectionMin)
 			{
 				std::swap(tmpBoxProjectionMin, tmpBoxProjectionMax);
@@ -129,8 +129,8 @@ namespace mathem
 		{
 			tmpTriangle = box->getTriangle(2, boxTransform);
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBoxProjectionMin = dotProduct(box->getPoint(0, boxTransform), tmpNormal);
-			tmpBoxProjectionMax = dotProduct(box->getPoint(3, boxTransform), tmpNormal);
+			tmpBoxProjectionMin = box->getPoint(0, boxTransform) * tmpNormal;
+			tmpBoxProjectionMax = box->getPoint(3, boxTransform) * tmpNormal;
 			if (tmpBoxProjectionMax < tmpBoxProjectionMin)
 			{
 				std::swap(tmpBoxProjectionMin, tmpBoxProjectionMax);
@@ -148,8 +148,8 @@ namespace mathem
 		{
 			tmpTriangle = box->getTriangle(4, boxTransform);
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBoxProjectionMin = dotProduct(box->getPoint(0, boxTransform), tmpNormal);
-			tmpBoxProjectionMax = dotProduct(box->getPoint(1, boxTransform), tmpNormal);
+			tmpBoxProjectionMin = box->getPoint(0, boxTransform) * tmpNormal;
+			tmpBoxProjectionMax = box->getPoint(1, boxTransform) * tmpNormal;
 			if (tmpBoxProjectionMax < tmpBoxProjectionMin)
 			{
 				std::swap(tmpBoxProjectionMin, tmpBoxProjectionMax);
@@ -198,10 +198,10 @@ namespace mathem
 		float tmpCapsuleProjectionMin = 0.0f, tmpCapsuleProjectionMax = 0.0f;
 
 		Vector3D capsulePosition1 = capsule->position;
-		capsulePosition1.j -= capsule->halfHeight;
+		capsulePosition1.y() -= capsule->halfHeight;
 		// TODO: transform capsulePosition1 via capsuleTransform
 		Vector3D capsulePosition2 = capsule->position;
-		capsulePosition2.j += capsule->halfHeight;
+		capsulePosition2.y() += capsule->halfHeight;
 		// TODO: transform capsulePosition2 via capsuleTransform
 
 		uint32_t  boxPointsCount = box->getPointsCount();
@@ -288,15 +288,15 @@ namespace mathem
 
 		// TODO: transform sphere1 & sphere2
 
-		if (std::abs(sphere1->position.i - sphere2->position.i) > maxR)
+		if (std::abs(sphere1->position.x() - sphere2->position.x()) > maxR)
 		{
 			return false;
 		}
-		if (std::abs(sphere1->position.j - sphere2->position.j) > maxR)
+		if (std::abs(sphere1->position.y() - sphere2->position.y()) > maxR)
 		{
 			return false;
 		}
-		if (std::abs(sphere1->position.k - sphere2->position.k) > maxR)
+		if (std::abs(sphere1->position.z() - sphere2->position.z()) > maxR)
 		{
 			return false;
 		}

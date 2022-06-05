@@ -12,6 +12,10 @@
 #define MAX_SHADERS 128
 #endif
 
+#include "engine/Renderer/src/RendererAPI/Color.h"
+#include "engine/Renderer/src/RendererAPI/Primitives.h"
+#include "engine/Math/src/DataStructures/Buffer.h"
+
 #define GLEW_STATIC
 #include "dependencies/glew-2.1.0/include/GL/glew.h"
 #include "dependencies/glfw-3.3.2.bin.WIN32/include/GLFW/glfw3.h"

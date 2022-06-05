@@ -3,8 +3,8 @@
 #define MITEVOX_TRIANGLE_H
 
 #include "engine/Math/src/Geometry/GeometryPrimitiveBase.h"
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Point3D.h"
+#include "engine/Math/src/Vector.h"
 
 namespace mathem
 {
@@ -12,9 +12,9 @@ namespace mathem
 	{
 	public:
 
-		Vector3D point1 = { 0.f };
-		Vector3D point2 = { 0.f };
-		Vector3D point3 = { 0.f };
+		Vector3D point1;
+		Vector3D point2;
+		Vector3D point3;
 
 		explicit TriangleGeometry();
 		explicit TriangleGeometry(Vector3D point1, Vector3D point2, Vector3D point3);

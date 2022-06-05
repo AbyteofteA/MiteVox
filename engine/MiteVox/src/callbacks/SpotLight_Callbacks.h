@@ -54,7 +54,7 @@ inline void SpotLight_onUpdateAll(ecs::EntityComponentSystem<entityID>* _ecs, MA
 		tmpPos.z = spotLight->position.z + transform->z;
 		render::shaders[shaderIndex]->setVec3(posResult.c_str(), tmpPos.x, tmpPos.y, tmpPos.z);
 		render::shaders[shaderIndex]->setVec3(directionResult.c_str(),
-			spotLight->direction.i, spotLight->direction.j, spotLight->direction.k);
+			spotLight->direction.x(), spotLight->direction.y(), spotLight->direction.z());
 		render::shaders[shaderIndex]->setFloat(angleResult.c_str(), spotLight->angle);
 
 		render::shaders[shaderIndex]->setVec3(colorResult.c_str(), spotLight->color.r, spotLight->color.g, spotLight->color.b);

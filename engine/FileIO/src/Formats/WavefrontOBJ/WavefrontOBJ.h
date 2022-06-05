@@ -2,8 +2,8 @@
 #define WAVEFRONTOBJ_H
 
 #include "engine/FileIO/src/SerializationStatus.h"
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Point3D.h"
+#include "engine/Math/src/Vector.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 
 #include <cstdint>

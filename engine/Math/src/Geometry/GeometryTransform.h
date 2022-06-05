@@ -2,7 +2,7 @@
 #ifndef GEOMETRYTRANSFORM_H
 #define GEOMETRYTRANSFORM_H
 
-#include "engine/Math/src/LinearAlgebra/Vector3D.h"
+#include "engine/Math/src/Vector.h"
 
 namespace mathem
 {
@@ -10,9 +10,9 @@ namespace mathem
 	{
 	public:
 
-		Vector3D position = { 0.f };
-		Vector3D orientation = { 0.f }; /// TODO: move to quaternions
-		Vector3D scale = { 1.f };
+		Vector3D position;
+		Vector4D orientation; /// TODO: move to quaternions
+		Vector3D scale = { 1.0f, 1.0f, 1.0f };
 	};
 }
 

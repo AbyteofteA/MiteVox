@@ -2,19 +2,21 @@
 #ifndef RENDERER_MODEL3D_H
 #define RENDERER_MODEL3D_H
 
+#include "engine/Math/src/LinearAlgebra/Transform.h"
+
 namespace render
 {
 	class Model3D
 	{
 	public:
 		Mesh3D* mesh = nullptr;
-		fileio::Material* material = nullptr;
+		mitevox::Material* material = nullptr;
 		mathem::Transform transform;
 		Cubemap* reflectionMap = nullptr;
 
 		int shaderID = 0;
 
-		Model3D(Mesh3D* _mesh, fileio::Material* _material,
+		Model3D(Mesh3D* _mesh, mitevox::Material* _material,
 				mathem::Transform _transform = mathem::Transform())
 		{
 			mesh = _mesh;

@@ -4,14 +4,13 @@
 
 #define HEXAGON_CONST 0.866025403
 
-#include "engine/Math/src/Math.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/glTF.h"
-
 #include "Cubemap.h"
 #include "Color.h"
 #include "Primitives.h"
 #include "Skybox.h"
-#include "engine/FileIO/src/Formats/glTF_2.0/Material/Material.h"
+#include "engine/MiteVox/src/Material/Material.h"
+#include "engine/MiteVox/src/BufferLayout/BufferView.h"
+#include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "Camera.h"
 #include "Mesh3D.h"
 #include "Model3D.h"
@@ -19,7 +18,6 @@
 #include "Light.h"
 #include "Effects.h"
 #include "RendererSettings.h"
-
 
 namespace render
 {
@@ -36,6 +34,7 @@ namespace render
 	inline std::string getRendererName();
 	inline std::string getVersion();
 	inline std::string getLanguageVersion();
+	inline void printError();
 
 	// Shaders
 
@@ -76,9 +75,9 @@ namespace render
 	void removeModel3D(Model3D* model3D);
 	void renderModel3D(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
 	
-	void uploadMaterial(fileio::Material* material, int shaderID);
-	void selectMaterial(fileio::Material* material, int shaderID);
-	void removeMaterial(fileio::Material* material, int shaderID);
+	void uploadMaterial(mitevox::Material* material, int shaderID);
+	void selectMaterial(mitevox::Material* material, int shaderID);
+	void removeMaterial(mitevox::Material* material, int shaderID);
 
 	void uploadBufferView(mitevox::BufferView* bufferView);
 	void removeBufferView(mitevox::BufferView* bufferView);
@@ -89,10 +88,10 @@ namespace render
 	
 	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 
-	inline void uploadSkybox(Skybox* skybox);
-	inline void selectSkybox(Skybox* skybox);
-	inline void removeSkybox(Skybox* skybox);
-	inline void renderSkybox(RendererSettings* renderer, Skybox* skybox, Camera* camera, mathem::Transform* cameraTransform);
+	void uploadSkybox(Skybox* skybox);
+	void selectSkybox(Skybox* skybox);
+	void removeSkybox(Skybox* skybox);
+	void renderSkybox(RendererSettings* renderer, Skybox* skybox, Camera* camera, mathem::Transform* cameraTransform);
 }
 
 //==================================================================

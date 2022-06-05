@@ -2,7 +2,7 @@
 #ifndef RENDERER_PRIMITIVES_H
 #define RENDERER_PRIMITIVES_H
 
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
+#include "engine/Math/src/Point3D.h"
 #include "engine/Renderer/src/RendererAPI/Color.h"
 
 namespace render

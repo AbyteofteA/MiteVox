@@ -12,17 +12,17 @@ namespace physcs
 		float netEnergyY = pow(body1->velocityY, 2) * body1->mass + pow(body2->velocityY, 2) * body2->mass;
 		float netEnergyZ = pow(body1->velocityZ, 2) * body1->mass + pow(body2->velocityZ, 2) * body2->mass;*/
 
-		float netImpulseX = props1->velocity.i * body1->mass + props2->velocity.i * body2->mass;
-		float netImpulseY = props1->velocity.j * body1->mass + props2->velocity.j * body2->mass;
-		float netImpulseZ = props1->velocity.k * body1->mass + props2->velocity.k * body2->mass;
+		float netImpulseX = props1->velocity.x() * body1->mass + props2->velocity.x() * body2->mass;
+		float netImpulseY = props1->velocity.y() * body1->mass + props2->velocity.y() * body2->mass;
+		float netImpulseZ = props1->velocity.z() * body1->mass + props2->velocity.z() * body2->mass;
 		float netMass = body1->mass + body2->mass;
 
-		float vX = (2 * body2->mass * props2->velocity.i + (body1->mass - body2->mass) * props1->velocity.i) / netMass;
-		float vY = (2 * body2->mass * props2->velocity.j + (body1->mass - body2->mass) * props1->velocity.j) / netMass;
-		float vZ = (2 * body2->mass * props2->velocity.k + (body1->mass - body2->mass) * props1->velocity.k) / netMass;
-		props1->velocity.i = vX;
-		props1->velocity.j = vY;
-		props1->velocity.k = vZ;
+		float vX = (2 * body2->mass * props2->velocity.x() + (body1->mass - body2->mass) * props1->velocity.x()) / netMass;
+		float vY = (2 * body2->mass * props2->velocity.y() + (body1->mass - body2->mass) * props1->velocity.y()) / netMass;
+		float vZ = (2 * body2->mass * props2->velocity.z() + (body1->mass - body2->mass) * props1->velocity.z()) / netMass;
+		props1->velocity.x() = vX;
+		props1->velocity.y() = vY;
+		props1->velocity.z() = vZ;
 
 		/*float sign = 1;
 		if (body2->velocityX <= 0)
@@ -92,9 +92,9 @@ namespace physcs
 							2 * (pow(body2->mass, 2) / body1->mass + body2->mass);
 		body2->velocityZ += vZ;*/
 
-		props2->velocity.i = (netImpulseX - vX * body1->mass) / body2->mass;
-		props2->velocity.j = (netImpulseY - vY * body1->mass) / body2->mass;
-		props2->velocity.k = (netImpulseZ - vZ * body1->mass) / body2->mass;
+		props2->velocity.x() = (netImpulseX - vX * body1->mass) / body2->mass;
+		props2->velocity.y() = (netImpulseY - vY * body1->mass) / body2->mass;
+		props2->velocity.z() = (netImpulseZ - vZ * body1->mass) / body2->mass;
 	}
 }
 

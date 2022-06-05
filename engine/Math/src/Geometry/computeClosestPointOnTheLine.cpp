@@ -9,7 +9,7 @@ namespace mathem
 		lineVector.normalize();
 		Vector3D pointVector = point - lineStart;
 
-		float pointProjection = dotProduct(pointVector, lineVector);
+		float pointProjection = pointVector * lineVector;
 		float lineLength = lineVector.getLength();
 
 		if (pointProjection <= 0)
@@ -22,7 +22,8 @@ namespace mathem
 		}
 		else
 		{
-			resultClosestPoint = lineStart + lineVector * pointProjection;
+			resultClosestPoint = lineVector * pointProjection;
+			resultClosestPoint += lineStart;
 		}
 		return resultClosestPoint;
 	}
