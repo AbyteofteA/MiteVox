@@ -29,12 +29,12 @@ namespace mathem
 		return true;
 	}
 
-	uint32_t TriangleGeometry::getPointsCount()
+	uint32_t TriangleGeometry::getVertecesCount()
 	{
 		return 3;
 	}
 
-	Vector3D TriangleGeometry::getPoint(uint32_t index)
+	Vector3D TriangleGeometry::getVertexPosition(uint32_t index)
 	{
 		switch (index)
 		{
@@ -50,28 +50,14 @@ namespace mathem
 		return Vector3D();
 	}
 
-	Vector3D TriangleGeometry::getPoint(uint32_t index, GeometryTransform* globalTransform)
-	{
-		Vector3D resultPoint = getPoint(index);
-		// TODO: transform resultPoint via globalTransform;
-		return resultPoint;
-	}
-
 	uint32_t TriangleGeometry::getTrianglesCount()
 	{
 		return 1;
 	}
 
-	TriangleGeometry TriangleGeometry::getTriangle(uint32_t index)
+	TriangleGeometry TriangleGeometry::getTrianglePositions(uint32_t index)
 	{
 		return *this;
-	}
-
-	TriangleGeometry TriangleGeometry::getTriangle(uint32_t index, GeometryTransform* globalTransform)
-	{
-		TriangleGeometry resultTriangle = *this;
-		// TODO: transform resultTriangle via globalTransform;
-		return resultTriangle;
 	}
 
 	bool TriangleGeometry::isIdealGeometry()

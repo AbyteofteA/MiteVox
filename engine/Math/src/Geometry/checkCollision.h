@@ -5,15 +5,15 @@
 #ifndef CHECKCOLLISION_H
 #define CHECKCOLLISION_H
 
-#include "engine/Math/src/Geometry/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/RayGeometry.h"
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
-#include "engine/Math/src/Geometry/TriangleGeometry.h"
-#include "engine/Math/src/Geometry/BoxGeometry.h"
-#include "engine/Math/src/Geometry/SphereGeometry.h"
-#include "engine/Math/src/Geometry/CapsuleGeometry.h"
-#include "engine/Math/src/Geometry/TruncatedPyramidGeometry.h"
-#include "engine/Math/src/Geometry/RayGeometry.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/Math/src/Geometry/CollisionInfo.h"
 #include "engine/Math/src/Point3D.h"

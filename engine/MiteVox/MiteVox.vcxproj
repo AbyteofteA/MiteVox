@@ -90,6 +90,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\Animation.cpp" />
+    <ClCompile Include="src\BufferLayout\BufferView.cpp" />
     <ClCompile Include="src\BufferLayout\BufferViewAccessor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\EngineSettings.cpp" />

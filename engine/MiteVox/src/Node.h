@@ -4,7 +4,7 @@
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Renderer/src/RendererAPI/Camera.h"
-//#include "engine/Math/src/LinearAlgebra/Transform.h"
+#include "engine/Math/src/Geometry/GeometryTransform.h"
 
 #include <string>
 #include <cstdint>
@@ -19,9 +19,8 @@ namespace mitevox
         int32_t skinIndex = -1;
         Mesh* mesh = nullptr;
         std::string name;
-        //mathem::Transform transform;
         safety::SafeFloatArray weights;
-        safety::SafeFloatArray matrix;
+        mathem::GeometryTransform transform;
         safety::SafeArray<Node*> children;
     };
 }

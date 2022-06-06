@@ -26,6 +26,8 @@ namespace mitevox
         TargetBufferType target = TargetBufferType::ARRAY_BUFFER;
         std::string name;
         uint32_t ID = 0;
+
+        void* getDataStart();
     };
 }
 

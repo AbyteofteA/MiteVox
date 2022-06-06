@@ -20,6 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DataStructures\Graphs\BinarySearchTree.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\BoxGeometry.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\CapsuleGeometry.cpp" />
+    <ClCompile Include="src\Geometry\checkCollision.cpp" />
+    <ClCompile Include="src\Geometry\computeClosestPointOnTheLine.cpp" />
+    <ClCompile Include="src\Geometry\computeProjection.cpp" />
+    <ClCompile Include="src\Geometry\GeometryTransform.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\RayGeometry.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\SphereGeometry.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.cpp" />
+    <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Calculus\Sequences.h" />
@@ -33,11 +44,24 @@
     <ClInclude Include="src\DataStructures\Graphs\Octree.h" />
     <ClInclude Include="src\DataStructures\Graphs\OctreeDataPoint.h" />
     <ClInclude Include="src\DataStructures\Graphs\OctreeNode.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\BoxGeometry.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\CapsuleGeometry.h" />
+    <ClInclude Include="src\Geometry\checkCollision.h" />
+    <ClInclude Include="src\Geometry\CollisionInfo.h" />
+    <ClInclude Include="src\Geometry\ComplexGeometry.h" />
+    <ClInclude Include="src\Geometry\computeClosestPointOnTheLine.h" />
+    <ClInclude Include="src\Geometry\computeProjection.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\GeometryPrimitiveBase.h" />
+    <ClInclude Include="src\Geometry\GeometryTransform.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\RayGeometry.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\SphereGeometry.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\TriangleGeometry.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.h" />
     <ClInclude Include="src\LinearAlgebra\SquareMatrix.h" />
-    <ClInclude Include="src\LinearAlgebra\Point3D.h" />
+    <ClInclude Include="src\Matrix.h" />
+    <ClInclude Include="src\Point3D.h" />
     <ClInclude Include="src\LinearAlgebra\Transform.h" />
-    <ClInclude Include="src\LinearAlgebra\Vector.h" />
-    <ClInclude Include="src\LinearAlgebra\Vector3D.h" />
+    <ClInclude Include="src\Vector.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\NumericalAnalysis\Intertolation.h" />
     <ClInclude Include="src\Generators\RandomNumberGenerators\CongruentialGenerator.h" />

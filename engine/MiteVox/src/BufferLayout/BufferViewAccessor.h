@@ -5,6 +5,8 @@
 #include "engine/MiteVox/src/BufferLayout/BufferViewAccessorSparse.h"
 #include "engine/MiteVox/src/BufferLayout/ComponentDataType.h"
 #include "engine/CodeSafety/src/SafeArray.h"
+#include "engine/Math/src/Vector.h"
+#include "engine/Math/src/Matrix.h"
 
 #include <cstdint>
 #include <string>
@@ -33,29 +35,34 @@ namespace mitevox
         Type type = Type::INVALID;
         std::string name;
 
-        safety::SafeFloatArray* min = nullptr;
-        safety::SafeFloatArray* max = nullptr;
+        safety::SafeFloatArray min;
+        safety::SafeFloatArray max;
         BufferViewAccessorSparse* sparse = nullptr;
 
-        BufferViewAccessor();
-        void deallocate();
+        uint32_t getComponentsCount();
 
-        int8_t getByte(int64_t index);
-        uint8_t getUnsignedByte(int64_t index);
-        int16_t getShort(int64_t index);
-        uint16_t getUnsignedShort(int64_t index);
-        uint32_t getUnignedInt(int64_t index);
-        float getFloat(int64_t index);
-        // TODO: getVector2D(int64_t index);
-        // TODO: getVector3D(int64_t index);
-        // TODO: getVector4D(int64_t index);
-        // TODO: getMatrix2x2(int64_t index);
-        // TODO: getMatrix3x3(int64_t index);
-        // TODO: getMatrix4x4(int64_t index);
+        template<typename T>
+        T getElementsComponent(int64_t elementIndex, int64_t componentIndex);
+
+        float getElementsComponentAsFloat(int64_t elementIndex, int64_t componentIndex);
+        uint32_t getElementsComponentAsUint(int64_t elementIndex, int64_t componentIndex);
+        int32_t getElementsComponentAsInt(int64_t elementIndex, int64_t componentIndex);
+
+        mathem::Vector2D getVector2D(int64_t index);
+        mathem::Vector3D getVector3D(int64_t index);
+        mathem::Vector4D getVector4D(int64_t index);
+        mathem::Matrix2x2 getMatrix2x2(int64_t index);
+        mathem::Matrix3x3 getMatrix3x3(int64_t index);
+        mathem::Matrix4x4 getMatrix4x4(int64_t index);
+
         bool isSparse();
         void makeSparse(BufferViewAccessorSparse* sparseAccessor);
         void makeNotSparse();
         static Type mapTypeNameToType(std::string typeName);
+
+    private:
+
+        void* getDataStart();
     };
 }
 

@@ -31,12 +31,10 @@ namespace mathem
 		GeometryPrimitiveType type = GeometryPrimitiveType::NONE;
 
 		virtual bool isTriangularMesh() = 0;
-		virtual uint32_t getPointsCount() = 0;
-		virtual Vector3D getPoint(uint32_t index) = 0;
-		virtual Vector3D getPoint(uint32_t index, GeometryTransform* globalTransform) = 0;
+		virtual uint32_t getVertecesCount() = 0;
+		virtual Vector3D getVertexPosition(uint32_t index) = 0;
 		virtual uint32_t getTrianglesCount() = 0;
-		virtual TriangleGeometry getTriangle(uint32_t index) = 0;
-		virtual TriangleGeometry getTriangle(uint32_t index, GeometryTransform* globalTransform) = 0;
+		virtual TriangleGeometry getTrianglePositions(uint32_t index) = 0;
 		virtual bool isIdealGeometry() = 0;
 	};
 }

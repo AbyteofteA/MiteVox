@@ -71,7 +71,7 @@ namespace fileio
 		{
 			if (numberJSON->isNumber())
 			{
-				meshPrimitiveResult->mode = (mitevox::TopologyType)numberJSON->getNumber();
+				meshPrimitiveResult->topologyType = (mitevox::TopologyType)numberJSON->getNumber();
 			}
 		}
 

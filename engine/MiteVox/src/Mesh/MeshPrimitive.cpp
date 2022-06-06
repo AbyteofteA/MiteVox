@@ -50,7 +50,7 @@ namespace mitevox
 
 	bool MeshPrimitive::isTriangularMesh()
 	{
-		switch (mode)
+		switch (topologyType)
 		{
 		case mitevox::TRIANGLES:
 		case mitevox::TRIANGLE_STRIP:
@@ -62,32 +62,92 @@ namespace mitevox
 		}
 	}
 
-	uint32_t MeshPrimitive::getPointsCount()
+	uint32_t MeshPrimitive::getVertecesCount()
 	{
-		return getPositions()->count;
+		if (indecesAccessor != nullptr)
+		{
+			return getIndeces()->count;
+		}
+		else
+		{
+			return getPositions()->count;
+		}
 	}
 
-	mathem::Vector3D MeshPrimitive::getPoint(uint32_t index)
+	mathem::Vector3D MeshPrimitive::getVertexPosition(uint32_t index)
 	{
-		mathem::Vector3D resultPoint;
-
-		// TODO:
-
-		return resultPoint;
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			return getPositions()->getVector3D(actualPointIndex);
+		}
+		else
+		{
+			return getPositions()->getVector3D(index);
+		}
 	}
 
 	uint32_t MeshPrimitive::getTrianglesCount()
 	{
-		// TODO:
+		uint32_t pointsCount = getVertecesCount();
+
+		switch (topologyType)
+		{
+		case mitevox::TRIANGLES:
+			return pointsCount / 3;
+
+		case mitevox::TRIANGLE_STRIP:
+		case mitevox::TRIANGLE_FAN:
+			return pointsCount - 2;
+
+		default:
+			return 0;
+		}
 
 		return 0;
 	}
 
-	mathem::TriangleGeometry MeshPrimitive::getTriangle(uint32_t index)
+	mathem::TriangleGeometry MeshPrimitive::getTrianglePositions(uint32_t index)
 	{
-		// TODO:
+		mathem::TriangleGeometry resultTriangle;
 
-		return mathem::TriangleGeometry();
+		switch (topologyType)
+		{
+		case mitevox::TRIANGLES:
+		{
+			uint32_t firstPointIndex = index * 3;
+			resultTriangle.point1 = getVertexPosition(firstPointIndex);
+			resultTriangle.point2 = getVertexPosition(firstPointIndex + 1);
+			resultTriangle.point3 = getVertexPosition(firstPointIndex + 2);
+			break;
+		}
+		case mitevox::TRIANGLE_STRIP:
+		{
+			resultTriangle.point1 = getVertexPosition(index);
+			if (index & 1)
+			{
+				resultTriangle.point2 = getVertexPosition(index + 2);
+				resultTriangle.point3 = getVertexPosition(index + 1);
+			}
+			else
+			{
+				resultTriangle.point2 = getVertexPosition(index + 1);
+				resultTriangle.point3 = getVertexPosition(index + 2);
+			}
+			break;
+		}
+		case mitevox::TRIANGLE_FAN:
+		{
+			uint32_t secondPointIndex = index * 2 + 1;
+			resultTriangle.point1 = getVertexPosition(secondPointIndex);
+			resultTriangle.point2 = getVertexPosition(secondPointIndex + 1);
+			resultTriangle.point3 = getVertexPosition(0);
+			break;
+		}
+		default:
+			break;
+		}
+
+		return resultTriangle;
 	}
-
 }

@@ -4,7 +4,7 @@
 #include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/CodeSafety/src/SafeArray.h"
-#include "engine/Math/src/Geometry/TriangleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
 
 #include <string>
 #include <cstdint>
@@ -43,7 +43,7 @@ namespace mitevox
         MeshAttributeSet attributes;
         BufferViewAccessor* indecesAccessor = nullptr;
         Material* material = nullptr;
-        TopologyType mode = TopologyType::TRIANGLES;
+        TopologyType topologyType = TopologyType::TRIANGLES;
         safety::SafeArray<MeshAttributeSet*> morphTargets;
         uint32_t ID = 0;
 
@@ -58,12 +58,22 @@ namespace mitevox
         BufferViewAccessor* getIndeces();
 
         bool isTriangularMesh();
-        uint32_t getPointsCount();
-        mathem::Vector3D getPoint(uint32_t index);
+
+        uint32_t getVertecesCount();
+        mathem::Vector3D getVertexPosition(uint32_t index);
+        /// TODO: mathem::Vector3D getVertexNormal(uint32_t index);
+        /// TODO: mathem::Vector3D getVertexTangent(uint32_t index);
+        /// TODO: getVertexTextureCoords_0(uint32_t index);
+        /// TODO: getVertexTextureCoords_1(uint32_t index);
+        /// TODO: getVertexColors_0(uint32_t index);
+        /// TODO: getVertexJoints_0(uint32_t index);
+        /// TODO: getVertexWeights_0(uint32_t index);
+        /// TODO: getVertexIndeces(uint32_t index);
+
         uint32_t getTrianglesCount();
-        mathem::TriangleGeometry getTriangle(uint32_t index);
-        /// TODO: getTriangleNormals(uint32_t index);
-        /// TODO: getTriangleTangents(uint32_t index);
+        mathem::TriangleGeometry getTrianglePositions(uint32_t index);
+        /// TODO: mathem::TriangleGeometry getTriangleNormals(uint32_t index);
+        /// TODO: mathem::TriangleGeometry getTriangleTangents(uint32_t index);
         /// TODO: getTriangleTextureCoords_0(uint32_t index);
         /// TODO: getTriangleTextureCoords_1(uint32_t index);
         /// TODO: getTriangleColors_0(uint32_t index);

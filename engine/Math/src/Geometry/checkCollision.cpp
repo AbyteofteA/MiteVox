@@ -21,15 +21,23 @@ namespace mathem
 			collisionInfo->type = CollisionType::INTERSECTION;
 		}
 
-		TriangleGeometry tmpTriangle = box1->getTriangle(0, box1Transform);
+		TriangleGeometry tmpTriangle = box1->getTrianglePositions(0);
+		// TODO: transform tmpTriangle via box1Transform
+		Vector3D tmpPositionMax;
+		Vector3D tmpPositionMin;
 		Vector3D tmpNormal = tmpTriangle.computeNormal();
 		float tmpBox1ProjectionMin = 0.0f, tmpBox1ProjectionMax = 0.0f;
 		float tmpBox2ProjectionMin = 0.0f, tmpBox2ProjectionMax = 0.0f;
 
 		// Check box1's local Z-axis
 		{
-			tmpBox1ProjectionMin = box1->getPoint(7, box1Transform) * tmpNormal;
-			tmpBox1ProjectionMax = box1->getPoint(0, box1Transform) * tmpNormal;
+			tmpPositionMin = box1->getVertexPosition(7);
+			tmpPositionMax = box1->getVertexPosition(0);
+			// TODO: transform tmpPositionMin via box1Transform
+			// TODO: transform tmpPositionMax via box1Transform
+			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
+
 			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
 			{
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
@@ -45,10 +53,17 @@ namespace mathem
 
 		// Check box1's local X-axis
 		{
-			tmpTriangle = box1->getTriangle(2, box1Transform);
+			tmpTriangle = box1->getTrianglePositions(2);
+			// TODO: transform tmpTriangle via box1Transform
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBox1ProjectionMin = box1->getPoint(0, box1Transform) * tmpNormal;
-			tmpBox1ProjectionMax = box1->getPoint(3, box1Transform) * tmpNormal;
+
+			tmpPositionMin = box1->getVertexPosition(0);
+			tmpPositionMax = box1->getVertexPosition(3);
+			// TODO: transform tmpPositionMin via box1Transform
+			// TODO: transform tmpPositionMax via box1Transform
+			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
+
 			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
 			{
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
@@ -64,10 +79,17 @@ namespace mathem
 
 		// Check box1's local Y-axis
 		{
-			tmpTriangle = box1->getTriangle(4, box1Transform);
+			tmpTriangle = box1->getTrianglePositions(4);
+			// TODO: transform tmpTriangle via box1Transform
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBox1ProjectionMin = box1->getPoint(0, box1Transform) * tmpNormal;
-			tmpBox1ProjectionMax = box1->getPoint(1, box1Transform) * tmpNormal;
+			
+			tmpPositionMin = box1->getVertexPosition(0);
+			tmpPositionMax = box1->getVertexPosition(1);
+			// TODO: transform tmpPositionMin via box1Transform
+			// TODO: transform tmpPositionMax via box1Transform
+			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
+
 			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
 			{
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
@@ -103,15 +125,23 @@ namespace mathem
 		bool computeCollisionInfo,
 		CollisionInfo* collisionInfo)
 	{
-		TriangleGeometry tmpTriangle = box->getTriangle(0, boxTransform);
+		TriangleGeometry tmpTriangle = box->getTrianglePositions(0);
+		// TODO: transform tmpTriangle via boxTransform
+		Vector3D tmpPositionMax;
+		Vector3D tmpPositionMin;
 		Vector3D tmpNormal = tmpTriangle.computeNormal();
 		float tmpBoxProjectionMin = 0.0f, tmpBoxProjectionMax = 0.0f;
 		float tmpSphereProjectionMin = 0.0f, tmpSphereProjectionMax = 0.0f;
 
 		// Check box's local Z-axis
 		{
-			tmpBoxProjectionMin = box->getPoint(7, boxTransform) * tmpNormal;
-			tmpBoxProjectionMax = box->getPoint(0, boxTransform) * tmpNormal;
+			tmpPositionMin = box->getVertexPosition(7);
+			tmpPositionMax = box->getVertexPosition(0);
+			// TODO: transform tmpPositionMin via boxTransform
+			// TODO: transform tmpPositionMax via boxTransform
+			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
+
 			if (tmpBoxProjectionMax < tmpBoxProjectionMin)
 			{
 				std::swap(tmpBoxProjectionMin, tmpBoxProjectionMax);
@@ -127,10 +157,17 @@ namespace mathem
 
 		// Check box's local X-axis
 		{
-			tmpTriangle = box->getTriangle(2, boxTransform);
+			tmpTriangle = box->getTrianglePositions(2);
+			// TODO: transform tmpTriangle via boxTransform
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBoxProjectionMin = box->getPoint(0, boxTransform) * tmpNormal;
-			tmpBoxProjectionMax = box->getPoint(3, boxTransform) * tmpNormal;
+
+			tmpPositionMin = box->getVertexPosition(0);
+			tmpPositionMax = box->getVertexPosition(3);
+			// TODO: transform tmpPositionMin via boxTransform
+			// TODO: transform tmpPositionMax via boxTransform
+			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
+
 			if (tmpBoxProjectionMax < tmpBoxProjectionMin)
 			{
 				std::swap(tmpBoxProjectionMin, tmpBoxProjectionMax);
@@ -146,10 +183,17 @@ namespace mathem
 
 		// Check box's local Y-axis
 		{
-			tmpTriangle = box->getTriangle(4, boxTransform);
+			tmpTriangle = box->getTrianglePositions(4);
+			// TODO: transform tmpTriangle via boxTransform
 			tmpNormal = tmpTriangle.computeNormal();
-			tmpBoxProjectionMin = box->getPoint(0, boxTransform) * tmpNormal;
-			tmpBoxProjectionMax = box->getPoint(1, boxTransform) * tmpNormal;
+
+			tmpPositionMin = box->getVertexPosition(0);
+			tmpPositionMax = box->getVertexPosition(1);
+			// TODO: transform tmpPositionMin via boxTransform
+			// TODO: transform tmpPositionMax via boxTransform
+			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
+
 			if (tmpBoxProjectionMax < tmpBoxProjectionMin)
 			{
 				std::swap(tmpBoxProjectionMin, tmpBoxProjectionMax);
@@ -165,7 +209,7 @@ namespace mathem
 
 		// Check sphere vs box
 		{
-			tmpNormal = box->position - sphere->position;
+			tmpNormal = box->translation - sphere->translation;
 			tmpNormal.normalize();
 			tmpSphereProjectionMin = -sphere->radius;
 			tmpSphereProjectionMax = sphere->radius;
@@ -197,17 +241,18 @@ namespace mathem
 		float tmpBoxProjectionMin = 0.0f, tmpBoxProjectionMax = 0.0f;
 		float tmpCapsuleProjectionMin = 0.0f, tmpCapsuleProjectionMax = 0.0f;
 
-		Vector3D capsulePosition1 = capsule->position;
+		Vector3D capsulePosition1 = capsule->translation;
 		capsulePosition1.y() -= capsule->halfHeight;
 		// TODO: transform capsulePosition1 via capsuleTransform
-		Vector3D capsulePosition2 = capsule->position;
+		Vector3D capsulePosition2 = capsule->translation;
 		capsulePosition2.y() += capsule->halfHeight;
 		// TODO: transform capsulePosition2 via capsuleTransform
 
-		uint32_t  boxPointsCount = box->getPointsCount();
+		uint32_t  boxPointsCount = box->getVertecesCount();
 		for (uint32_t i = 0; i < boxPointsCount; ++i)
 		{
-			Vector3D boxPoint = box->getPoint(i, boxTransform);
+			Vector3D boxPoint = box->getVertexPosition(i);
+			// TODO: transform boxPoint via boxTransform
 
 			Vector3D closestCapsuleSpherePosition =
 				computeClosestPointOnTheLine(capsulePosition1, capsulePosition2, boxPoint);
@@ -288,15 +333,15 @@ namespace mathem
 
 		// TODO: transform sphere1 & sphere2
 
-		if (std::abs(sphere1->position.x() - sphere2->position.x()) > maxR)
+		if (std::abs(sphere1->translation.x() - sphere2->translation.x()) > maxR)
 		{
 			return false;
 		}
-		if (std::abs(sphere1->position.y() - sphere2->position.y()) > maxR)
+		if (std::abs(sphere1->translation.y() - sphere2->translation.y()) > maxR)
 		{
 			return false;
 		}
-		if (std::abs(sphere1->position.z() - sphere2->position.z()) > maxR)
+		if (std::abs(sphere1->translation.z() - sphere2->translation.z()) > maxR)
 		{
 			return false;
 		}

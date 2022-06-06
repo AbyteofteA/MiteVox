@@ -11,12 +11,14 @@ namespace mathem
 		float* min, 
 		float* max)
 	{
-		Vector3D tmpPoint = box->getPoint(0, boxTransform);
+		Vector3D tmpPoint = box->getVertexPosition(0);
+		// TODO: transform tmpPoint with boxTransform
 		*max = tmpPoint * (*vector);
 		*min = *max;
 		for (uint16_t pointIndex = 1; pointIndex < 8; ++pointIndex)
 		{
-			tmpPoint = box->getPoint(pointIndex, boxTransform);
+			tmpPoint = box->getVertexPosition(pointIndex);
+			// TODO: transform tmpPoint with boxTransform
 			float tmpProjection = tmpPoint * (*vector);
 
 			if (tmpProjection < *min)
@@ -37,7 +39,7 @@ namespace mathem
 		float* min, 
 		float* max)
 	{
-		Vector3D spherePosition = sphere->position;
+		Vector3D spherePosition = sphere->translation;
 		// TODO: transform spherePosition via sphereTransform
 		float spherePositionProjection = spherePosition * (*vector);
 		*min = spherePositionProjection - sphere->radius;
@@ -51,9 +53,9 @@ namespace mathem
 		float* min,
 		float* max)
 	{
-		Vector3D capsulePosition1 = capsule->position;
+		Vector3D capsulePosition1 = capsule->translation;
 		capsulePosition1.y() += capsule->halfHeight;
-		Vector3D capsulePosition2 = capsule->position;
+		Vector3D capsulePosition2 = capsule->translation;
 		capsulePosition2.y() -= capsule->halfHeight;
 		// TODO: transform capsulePosition1 via capsuleTransform
 		// TODO: transform capsulePosition2 via capsuleTransform

@@ -2,7 +2,7 @@
 #ifndef MITEVOX_TRIANGLE_H
 #define MITEVOX_TRIANGLE_H
 
-#include "engine/Math/src/Geometry/GeometryPrimitiveBase.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Point3D.h"
 #include "engine/Math/src/Vector.h"
 
@@ -21,12 +21,10 @@ namespace mathem
 		Vector3D computeNormal();
 
 		bool isTriangularMesh();
-		uint32_t getPointsCount();
-		Vector3D getPoint(uint32_t index);
-		Vector3D getPoint(uint32_t index, GeometryTransform* globalTransform);
+		uint32_t getVertecesCount();
+		Vector3D getVertexPosition(uint32_t index);
 		uint32_t getTrianglesCount();
-		TriangleGeometry getTriangle(uint32_t index);
-		TriangleGeometry getTriangle(uint32_t index, GeometryTransform* globalTransform);
+		TriangleGeometry getTrianglePositions(uint32_t index);
 		bool isIdealGeometry();
 	};
 }

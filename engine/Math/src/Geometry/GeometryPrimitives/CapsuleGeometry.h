@@ -1,8 +1,8 @@
 #ifndef CAPSULEGEOMETRY_H
 #define CAPSULEGEOMETRY_H
 
-#include "engine/Math/src/Geometry/GeometryPrimitiveBase.h"
-#include "engine/Math/src/Geometry/TriangleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
 
 namespace mathem
 {

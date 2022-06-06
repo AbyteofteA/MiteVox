@@ -14,7 +14,7 @@ namespace mitevox
 		return true;
 	}
 
-	uint32_t Mesh::getPointsCount()
+	uint32_t Mesh::getVertecesCount()
 	{
 		uint32_t resultPointsCount = 0;
 		
@@ -22,13 +22,13 @@ namespace mitevox
 		for (uint32_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
 		{
 			mitevox::MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
-			resultPointsCount += primitive->getPointsCount();
+			resultPointsCount += primitive->getVertecesCount();
 		}
 
 		return resultPointsCount;
 	}
 
-	mathem::Vector3D Mesh::getPoint(uint32_t index)
+	mathem::Vector3D Mesh::getVertexPosition(uint32_t index)
 	{
 		mathem::Vector3D resultPoint;
 
@@ -47,28 +47,21 @@ namespace mitevox
 		return resultPoint;
 	}
 
-	mathem::Vector3D Mesh::getPoint(uint32_t index, mathem::GeometryTransform* globalTransform)
-	{
-		// TODO:
-
-		return mathem::Vector3D();
-	}
-
 	uint32_t Mesh::getTrianglesCount()
 	{
-		// TODO:
+		uint32_t resultTrianglesCount = 0;
 
-		return 0;
+		uint32_t primitivesCount = primitives.getElementsCount();
+		for (uint32_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			mitevox::MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			resultTrianglesCount += primitive->getTrianglesCount();
+		}
+
+		return resultTrianglesCount;
 	}
 
-	mathem::TriangleGeometry Mesh::getTriangle(uint32_t index)
-	{
-		// TODO:
-
-		return mathem::TriangleGeometry();
-	}
-
-	mathem::TriangleGeometry Mesh::getTriangle(uint32_t index, mathem::GeometryTransform* globalTransform)
+	mathem::TriangleGeometry Mesh::getTrianglePositions(uint32_t index)
 	{
 		// TODO:
 

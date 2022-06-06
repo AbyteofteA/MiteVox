@@ -1,9 +1,9 @@
 #ifndef GLTFMESH_H
 #define GLTFMESH_H
 
-#include "engine/Math/src/Geometry/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
-#include "engine/Math/src/Geometry/TriangleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
 #include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 
@@ -23,12 +23,10 @@ namespace mitevox
 
         explicit Mesh();
         bool isTriangularMesh();
-        uint32_t getPointsCount();
-        mathem::Vector3D getPoint(uint32_t index);
-        mathem::Vector3D getPoint(uint32_t index, mathem::GeometryTransform* globalTransform);
+        uint32_t getVertecesCount();
+        mathem::Vector3D getVertexPosition(uint32_t index);
         uint32_t getTrianglesCount();
-        mathem::TriangleGeometry getTriangle(uint32_t index);
-        mathem::TriangleGeometry getTriangle(uint32_t index, mathem::GeometryTransform* globalTransform);
+        mathem::TriangleGeometry getTrianglePositions(uint32_t index);
         bool isIdealGeometry();
     };
 }

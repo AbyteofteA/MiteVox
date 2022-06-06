@@ -46,13 +46,13 @@ namespace fileio
         JSON* minArrayJSON = accessorJSON->getFieldArray("min");
         if (minArrayJSON != nullptr)
         {
-            minArrayJSON->toNumberArray<float>(bufferViewAccessor->min);
+            minArrayJSON->toNumberArray<float>(&bufferViewAccessor->min);
         }
 
         JSON* maxArrayJSON = accessorJSON->getFieldArray("max");
         if (maxArrayJSON != nullptr)
         {
-            maxArrayJSON->toNumberArray<float>(bufferViewAccessor->max);
+            maxArrayJSON->toNumberArray<float>(&bufferViewAccessor->max);
         }
     }
 

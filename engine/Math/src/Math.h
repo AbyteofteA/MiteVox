@@ -21,6 +21,7 @@
 
 #include "Point3D.h"
 #include "Vector.h"
+#include "Matrix.h"
 #include "LinearAlgebra/Transform.h"
 #include "LinearAlgebra/SquareMatrix.h"
 

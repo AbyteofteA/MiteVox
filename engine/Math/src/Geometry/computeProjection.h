@@ -4,11 +4,11 @@
 
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
-#include "engine/Math/src/Geometry/BoxGeometry.h"
-#include "engine/Math/src/Geometry/SphereGeometry.h"
-#include "engine/Math/src/Geometry/CapsuleGeometry.h"
-// TODO: #include "engine/Math/src/Geometry/TruncatedPyramidGeometry.h"
-// TODO: #include "engine/Math/src/Geometry/RayGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
+// TODO: #include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
+// TODO: #include "engine/Math/src/Geometry/GeometryPrimitives/RayGeometry.h"
 // TODO: #include "engine/MiteVox/src/Mesh/Mesh.h"
 
 namespace mathem

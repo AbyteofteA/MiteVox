@@ -37,17 +37,43 @@ namespace fileio
 				nodeResult->mesh = meshes->getElement(meshIndex);
 			}
 		}
-
 		JSON* weightsArrayJSON = nodeJSON->getFieldArray("weights");
 		if (weightsArrayJSON != nullptr)
 		{
 			weightsArrayJSON->toNumberArray<float>(&nodeResult->weights);
 		}
+
+		nodeResult->transform.reset();
+
+		JSON* scaleArrayJSON = nodeJSON->getFieldArray("scale");
+		if (scaleArrayJSON != nullptr)
+		{
+			safety::SafeFloatArray scaleArray;
+			scaleArrayJSON->toNumberArray<float>(&scaleArray);
+			nodeResult->transform.fromScaleArray(&scaleArray);
+		}
+		JSON* rotationArrayJSON = nodeJSON->getFieldArray("rotation");
+		if (rotationArrayJSON != nullptr)
+		{
+			safety::SafeFloatArray rotationArray;
+			rotationArrayJSON->toNumberArray<float>(&rotationArray);
+			nodeResult->transform.fromRotationArray(&rotationArray);
+		}
+		JSON* translationArrayJSON = nodeJSON->getFieldArray("translation");
+		if (translationArrayJSON != nullptr)
+		{
+			safety::SafeFloatArray translationArray;
+			translationArrayJSON->toNumberArray<float>(&translationArray);
+			nodeResult->transform.fromTranslationArray(&translationArray);
+		}
 		JSON* matrixArrayJSON = nodeJSON->getFieldArray("matrix");
 		if (matrixArrayJSON != nullptr)
 		{
-			matrixArrayJSON->toNumberArray<float>(&nodeResult->matrix);
+			safety::SafeFloatArray transformationMatrix;
+			matrixArrayJSON->toNumberArray<float>(&transformationMatrix);
+			nodeResult->transform.fromArray4x4(&transformationMatrix);
 		}
+
 		JSON* childrenArrayJSON = nodeJSON->getFieldArray("children");
 		if (childrenArrayJSON != nullptr)
 		{

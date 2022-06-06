@@ -4,7 +4,7 @@
 
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
-#include "engine/Math/src/Geometry/GeometryPrimitiveBase.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 
 namespace mathem
 {
