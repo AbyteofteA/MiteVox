@@ -13,7 +13,6 @@ namespace mathem
 	enum struct GeometryPrimitiveType : uint8_t 
 	{ 
 		NONE = 0, 		   /// 
-		TRIANGLE,		   /// 
 		BOX, 			   /// 
 		SPHERE, 		   /// 
 		CAPSULE,  		   /// 

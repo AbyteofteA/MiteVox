@@ -45,4 +45,38 @@ namespace mathem
 		translation.y() = translationArray->getElement(1);
 		translation.z() = translationArray->getElement(2);
 	}
+
+	void GeometryTransform::applyTo(Vector3D& vector)
+	{
+		vector.x() *= scale.x();
+		vector.y() *= scale.y();
+		vector.z() *= scale.z();
+
+		// TODO: rotate vector via the quaternion
+
+		vector.x() += translation.x();
+		vector.y() += translation.y();
+		vector.z() += translation.z();
+	}
+
+	Vector3D GeometryTransform::applyToCopy(Vector3D vector)
+	{
+		Vector3D resultVector = vector;
+		this->applyTo(resultVector);
+		return resultVector;
+	}
+
+	void GeometryTransform::applyTo(TriangleGeometry& triangle)
+	{
+		this->applyTo(triangle.point1);
+		this->applyTo(triangle.point2);
+		this->applyTo(triangle.point3);
+	}
+
+	TriangleGeometry GeometryTransform::applyToCopy(TriangleGeometry triangle)
+	{
+		TriangleGeometry resultTriangle = triangle;
+		this->applyTo(resultTriangle);
+		return resultTriangle;
+	}
 }

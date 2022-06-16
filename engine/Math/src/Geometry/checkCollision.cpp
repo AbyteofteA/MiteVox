@@ -22,7 +22,7 @@ namespace mathem
 		}
 
 		TriangleGeometry tmpTriangle = box1->getTrianglePositions(0);
-		// TODO: transform tmpTriangle via box1Transform
+		box1Transform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
 		Vector3D tmpNormal = tmpTriangle.computeNormal();
@@ -33,8 +33,8 @@ namespace mathem
 		{
 			tmpPositionMin = box1->getVertexPosition(7);
 			tmpPositionMax = box1->getVertexPosition(0);
-			// TODO: transform tmpPositionMin via box1Transform
-			// TODO: transform tmpPositionMax via box1Transform
+			box1Transform->applyTo(tmpPositionMin);
+			box1Transform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
 
@@ -54,13 +54,13 @@ namespace mathem
 		// Check box1's local X-axis
 		{
 			tmpTriangle = box1->getTrianglePositions(2);
-			// TODO: transform tmpTriangle via box1Transform
+			box1Transform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMin = box1->getVertexPosition(0);
 			tmpPositionMax = box1->getVertexPosition(3);
-			// TODO: transform tmpPositionMin via box1Transform
-			// TODO: transform tmpPositionMax via box1Transform
+			box1Transform->applyTo(tmpPositionMin);
+			box1Transform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
 
@@ -80,13 +80,13 @@ namespace mathem
 		// Check box1's local Y-axis
 		{
 			tmpTriangle = box1->getTrianglePositions(4);
-			// TODO: transform tmpTriangle via box1Transform
+			box1Transform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 			
 			tmpPositionMin = box1->getVertexPosition(0);
 			tmpPositionMax = box1->getVertexPosition(1);
-			// TODO: transform tmpPositionMin via box1Transform
-			// TODO: transform tmpPositionMax via box1Transform
+			box1Transform->applyTo(tmpPositionMin);
+			box1Transform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
 
@@ -126,7 +126,7 @@ namespace mathem
 		CollisionInfo* collisionInfo)
 	{
 		TriangleGeometry tmpTriangle = box->getTrianglePositions(0);
-		// TODO: transform tmpTriangle via boxTransform
+		boxTransform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
 		Vector3D tmpNormal = tmpTriangle.computeNormal();
@@ -137,8 +137,8 @@ namespace mathem
 		{
 			tmpPositionMin = box->getVertexPosition(7);
 			tmpPositionMax = box->getVertexPosition(0);
-			// TODO: transform tmpPositionMin via boxTransform
-			// TODO: transform tmpPositionMax via boxTransform
+			boxTransform->applyTo(tmpPositionMin);
+			boxTransform->applyTo(tmpPositionMax);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
 
@@ -158,13 +158,13 @@ namespace mathem
 		// Check box's local X-axis
 		{
 			tmpTriangle = box->getTrianglePositions(2);
-			// TODO: transform tmpTriangle via boxTransform
+			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMin = box->getVertexPosition(0);
 			tmpPositionMax = box->getVertexPosition(3);
-			// TODO: transform tmpPositionMin via boxTransform
-			// TODO: transform tmpPositionMax via boxTransform
+			boxTransform->applyTo(tmpPositionMin);
+			boxTransform->applyTo(tmpPositionMax);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
 
@@ -184,13 +184,13 @@ namespace mathem
 		// Check box's local Y-axis
 		{
 			tmpTriangle = box->getTrianglePositions(4);
-			// TODO: transform tmpTriangle via boxTransform
+			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMin = box->getVertexPosition(0);
 			tmpPositionMax = box->getVertexPosition(1);
-			// TODO: transform tmpPositionMin via boxTransform
-			// TODO: transform tmpPositionMax via boxTransform
+			boxTransform->applyTo(tmpPositionMin);
+			boxTransform->applyTo(tmpPositionMax);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
 
@@ -243,16 +243,17 @@ namespace mathem
 
 		Vector3D capsulePosition1 = capsule->translation;
 		capsulePosition1.y() -= capsule->halfHeight;
-		// TODO: transform capsulePosition1 via capsuleTransform
+		capsuleTransform->applyTo(capsulePosition1);
+
 		Vector3D capsulePosition2 = capsule->translation;
 		capsulePosition2.y() += capsule->halfHeight;
-		// TODO: transform capsulePosition2 via capsuleTransform
+		capsuleTransform->applyTo(capsulePosition2);
 
 		uint32_t  boxPointsCount = box->getVertecesCount();
 		for (uint32_t i = 0; i < boxPointsCount; ++i)
 		{
 			Vector3D boxPoint = box->getVertexPosition(i);
-			// TODO: transform boxPoint via boxTransform
+			boxTransform->applyTo(boxPoint);
 
 			Vector3D closestCapsuleSpherePosition =
 				computeClosestPointOnTheLine(capsulePosition1, capsulePosition2, boxPoint);
@@ -289,9 +290,6 @@ namespace mathem
 
 		switch (otherGeometry->type)
 		{
-		case GeometryPrimitiveType::TRIANGLE:
-			break;
-
 		case GeometryPrimitiveType::BOX:
 		{
 			BoxGeometry* otherBox = (BoxGeometry*)otherGeometry;

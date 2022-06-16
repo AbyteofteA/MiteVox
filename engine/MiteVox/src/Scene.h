@@ -33,7 +33,7 @@ namespace mitevox
 	public:
 
 		std::string name = "Untitled";
-		//mathem::Octree<float>* octree;
+		//mathem::Octree<mitevox::Node*>* octree;
 		ecs::EntityComponentSystem<entityID>* ECS = nullptr;
 		safety::SafeArray<mitevox::Node*> nodes;
 
@@ -42,6 +42,11 @@ namespace mitevox
 		entityID activeCamera = -1;
 
 		EngineSettings* settings = nullptr;
+
+		float timeSinceCleanup = 0.0f;
+		float timeSincePhysicsUpdate = 0.0f;
+		float timeSinceRendererUpdate = 0.0f;
+		double currentTime = 0.0f;
 
 		//************************************ Components *****************************************
 
@@ -65,27 +70,9 @@ namespace mitevox
 		Scene(EngineSettings* _settings, entityID initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE);
 		~Scene();
 
-		void update();
-
 		// Getters //
 
 		double getCurrentTime();
-
-	private:
-
-		std::chrono::high_resolution_clock::time_point prevCycleTime;
-		std::chrono::high_resolution_clock::time_point cleanupTime;
-		std::chrono::high_resolution_clock::time_point physicsTime;
-		std::chrono::high_resolution_clock::time_point rendererTime;
-		std::chrono::high_resolution_clock::time_point now;
-		double dt = 0.0;
-		double currentTime = 0.0;
-
-		// Temporary time storage.
-		double tmpTime = 0.0;
-
-		void updateTimers();
-
 	};
 }
 

@@ -21,15 +21,6 @@
 
 namespace mathem
 {
-	// TODO: checkCollision TRIANGLE vs TRIANGLE
-	// TODO: checkCollision TRIANGLE vs BOX
-	// TODO: checkCollision TRIANGLE vs SPHERE
-	// TODO: checkCollision TRIANGLE vs CAPSULE
-	// TODO: checkCollision TRIANGLE vs TRUNCATED_PYRAMID
-	// TODO: checkCollision TRIANGLE vs RAY
-	// TODO: checkCollision TRIANGLE vs MESH
-	// TODO: checkCollision TRIANGLE vs GeometryPrimitiveBase
-
 	/// checkCollision - BOX vs BOX
 	/// 
 	/// Algorithm:

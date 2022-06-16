@@ -151,18 +151,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\PlaygroundCodec\PlaygroundCodecGLTF.h" />
     <ClInclude Include="src\BufferLayoutCodec\BufferViewAccessorCodec.h" />
     <ClInclude Include="src\BufferLayoutCodec\BufferViewCodec.h" />
-    <ClInclude Include="src\SceneCodec\NodeCodec.h" />
+    <ClInclude Include="src\PlaygroundCodec\NodeCodec.h" />
     <ClInclude Include="src\MaterialCodec\MaterialCodec.h" />
-    <ClInclude Include="src\Formats\glTF_2.0\glTF.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\CodecGLTF.h" />
     <ClInclude Include="src\FileInputOutput.h" />
     <ClInclude Include="src\FileLoaderAsync.h" />
     <ClInclude Include="src\FileStatus.h" />
     <ClInclude Include="src\Formats\FileFormatBase.h" />
     <ClInclude Include="src\MaterialCodec\ImageSamplerCodec.h" />
     <ClInclude Include="src\MeshCodec\MeshCodec.h" />
-    <ClInclude Include="src\SceneCodec\SceneCodec.h" />
+    <ClInclude Include="src\PlaygroundCodec\SceneCodec.h" />
     <ClInclude Include="src\Formats\JSON\JSONRegex.h" />
     <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJ.h" />
     <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJRegexPack.h" />
@@ -172,8 +173,9 @@
     <ClInclude Include="src\SerializationStatus.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\PlaygroundCodec\PlaygroundCodecGLTF.cpp" />
     <ClCompile Include="src\MaterialCodec\MaterialCodecGLTF.cpp" />
-    <ClCompile Include="src\Formats\glTF_2.0\glTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\CodecGLTF.cpp" />
     <ClCompile Include="src\FileInputOutput.cpp" />
     <ClCompile Include="src\FileLoaderAsync.cpp" />
     <ClCompile Include="src\Formats\FileFormatBase.cpp" />
@@ -181,8 +183,8 @@
     <ClCompile Include="src\BufferLayoutCodec\BufferViewCodecGLTF.cpp" />
     <ClCompile Include="src\MaterialCodec\ImageSamplerCodecGLTF.cpp" />
     <ClCompile Include="src\MeshCodec\MeshCodecGLTF.cpp" />
-    <ClCompile Include="src\SceneCodec\NodeCodecGLTF.cpp" />
-    <ClCompile Include="src\SceneCodec\SceneCodecGLTF.cpp" />
+    <ClCompile Include="src\PlaygroundCodec\NodeCodecGLTF.cpp" />
+    <ClCompile Include="src\PlaygroundCodec\SceneCodecGLTF.cpp" />
     <ClCompile Include="src\Formats\JSON\JSON.cpp" />
     <ClCompile Include="src\Formats\WavefrontOBJ\WavefrontOBJ.cpp" />
     <ClCompile Include="src\Formats\WavefrontOBJ\WavefrontOBJRegexPack.cpp" />

@@ -2,35 +2,63 @@
 #ifndef PLAYGROUND_H
 #define PLAYGROUND_H
 
-#include "engine/MiteVox/src/Scene.h"
 #include "engine/MiteVox/src/EngineSettings.h"
-#include "engine/Math/src/Generators/UniqueIDGenerator.h"
+
+#include "engine/MiteVox/src/BufferLayout/BufferView.h"
+#include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
+#include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
+#include "engine/MiteVox/src/Mesh/Mesh.h"
+#include "engine/MiteVox/src/Node.h"
+#include "engine/MiteVox/src/Scene.h"
+#include "engine/MiteVox/src/Material/ImageSampler.h"
+#include "engine/MiteVox/src/Material/Image.h"
+#include "engine/MiteVox/src/Material/Texture.h"
+#include "engine/MiteVox/src/Material/Material.h"
+#include "engine/FileIO/src/Formats/FileFormatBase.h"
+#include "engine/FileIO/src/SerializationStatus.h"
+#include "engine/FileIO/src/Formats/JSON/JSON.h"
+#include "engine/CodeSafety/src/SafeArray.h"
+#include "engine/Renderer/src/RendererAPI/Camera.h"
 
 #include <unordered_map>
 #include <string>
+
+namespace fileio
+{
+	class PlaygroundCodecGLTF;
+}
 
 namespace mitevox
 {
 	class Playground
 	{
+		friend class fileio::PlaygroundCodecGLTF;
+
 	public:
 
 		std::string name;
-		unsigned int activeScene = 0;
+		size_t activeScene = 0;
 
 		Playground(std::string _name = "Untitled");
 		~Playground();
-
-		void update();
-		unsigned int createScene(std::string name, EngineSettings* settings);
-		unsigned int createMainScene(std::string name, EngineSettings* settings);
-		void deleteScene(unsigned int ID);
+		size_t createScene(std::string name, EngineSettings* settings);
+		size_t createActiveScene(std::string name, EngineSettings* settings);
+		void deleteScene(size_t index);
 		Scene* getActiveScene();
 
-	private:
+	// TODO: make private:
 
-		std::unordered_map<unsigned int, Scene*> scenes;
-		mathem::UniqueIDGenerator<unsigned int> IDGenerator;
+		safety::SafeArray<safety::SafeByteArray*> buffers;
+		safety::SafeArray<BufferView*> bufferViews;
+		safety::SafeArray<BufferViewAccessor*> accessors;
+		safety::SafeArray<render::Camera*> cameras;
+		safety::SafeArray<ImageSampler> imageSamplers;
+		safety::SafeArray<Image*> images;
+		safety::SafeArray<Texture*> textures;
+		safety::SafeArray<Material*> materials;
+		safety::SafeArray<Mesh*> meshes;
+		safety::SafeArray<Scene*> scenes;
+		safety::SafeArray<Node*> nodes;
 	};
 }
 

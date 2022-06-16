@@ -6,6 +6,7 @@
 #include "Playground.h"
 #include "engine/Renderer/src/RendererAPI/Color.h"
 
+#include <chrono>
 #include <unordered_map>
 
 namespace mitevox
@@ -27,6 +28,8 @@ namespace mitevox
 		void run();
 
 	private:
+
+		std::chrono::high_resolution_clock::time_point prevCycleTime;
 
 		Playground* playground;
 	};

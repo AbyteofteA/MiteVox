@@ -19,43 +19,35 @@ namespace mitevox
 
 	Playground::~Playground()
 	{
-		for (auto scene : scenes)
+		size_t scenesCount = scenes.getElementsCount();
+		for (size_t i = 0; i < scenesCount; ++i)
 		{
-			delete scene.second;
+			delete scenes.getElement(i);
 		}
 	}
 
-	void Playground::update()
+	size_t Playground::createScene(std::string name, EngineSettings* settings)
 	{
-		if (scenes.count(activeScene) > 0)
-		{
-			scenes[activeScene]->update();
-		}
+		auto newScene = new Scene(settings);
+		newScene->name = name;
+		scenes.appendElement(newScene);
+		return scenes.getElementsCount() - 1;
 	}
 
-	unsigned int Playground::createScene(std::string name, EngineSettings* settings)
+	size_t Playground::createActiveScene(std::string name, EngineSettings* settings)
 	{
-		unsigned int ID = IDGenerator.getID();
-		scenes.insert({ ID, new Scene(settings) });
-		scenes[ID]->name = name;
-
-		return ID;
+		size_t index = createScene(name, settings);
+		return activeScene = index;
 	}
 
-	unsigned int Playground::createMainScene(std::string name, EngineSettings* settings)
+	void Playground::deleteScene(size_t index)
 	{
-		unsigned int ID = createScene(name, settings);
-		return activeScene = ID;
-	}
-
-	void Playground::deleteScene(unsigned int ID)
-	{
-		delete scenes[ID];
-		scenes.erase(ID);
+		delete scenes.getElement(index);
+		scenes.removeElement(index);
 	}
 
 	Scene* Playground::getActiveScene()
 	{
-		return scenes[activeScene];
+		return scenes.getElement(activeScene);
 	}
 }

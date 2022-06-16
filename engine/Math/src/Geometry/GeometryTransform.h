@@ -4,6 +4,7 @@
 
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Matrix.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 
 namespace mathem
@@ -29,6 +30,11 @@ namespace mathem
 		void fromRotationArray(safety::SafeFloatArray* rotationArray);
 		void fromTranslationArray(safety::SafeFloatArray* translationArray);
 		// TODO: fromQuaternion(Quaternion);
+
+		void applyTo(Vector3D& vector);
+		Vector3D applyToCopy(Vector3D vector);
+		void applyTo(TriangleGeometry& triangle);
+		TriangleGeometry applyToCopy(TriangleGeometry triangle);
 	};
 }
 
