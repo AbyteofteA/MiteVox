@@ -18,17 +18,18 @@ namespace safety
     public:
 
         inline SafeArray();
-        inline SafeArray(int64_t elementCount);
+        inline SafeArray(size_t elementCount);
         inline void deallocate();
+        inline void resize(size_t newElementCount);
 
-        inline void resize(int64_t newElementCount);
-        inline int64_t getElementsCount();
-        inline int64_t getSize();
+        inline size_t getElementsCount();
+        inline size_t getSize();
         inline T* getElementsArray();
-        inline T getElement(int64_t index);
-        inline void setElement(int64_t index, T value);
+        inline T getElement(size_t index);
+        inline void setElement(size_t index, T value);
         inline void setAllElements(T value);
         inline void appendElement(T value);
+        inline void removeElement(size_t index);
         inline void fillWithZeros();
         inline void concatenate(SafeArray<T> arrayToConcatenate);
 
@@ -40,7 +41,7 @@ namespace safety
     private:
 
         T* _elements;
-        int64_t _elementsCount;
+        size_t _elementsCount;
     };
 
 
@@ -55,7 +56,7 @@ namespace safety
     }
 
     template <typename T>
-    inline SafeArray<T>::SafeArray(int64_t elementCount) : SafeArray<T>::SafeArray()
+    inline SafeArray<T>::SafeArray(size_t elementCount) : SafeArray<T>::SafeArray()
     {
         resize(elementCount);
     }
@@ -69,9 +70,9 @@ namespace safety
     }
 
     template <typename T>
-    inline void SafeArray<T>::resize(int64_t newElementCount)
+    inline void SafeArray<T>::resize(size_t newElementCount)
     {
-        if (newElementCount < 1)
+        if (newElementCount == 0)
         {
             // TODO: log WARNING message.
 
@@ -84,13 +85,13 @@ namespace safety
     }
 
     template <typename T>
-    inline int64_t SafeArray<T>::getElementsCount()
+    inline size_t SafeArray<T>::getElementsCount()
     {
         return _elementsCount;
     }
 
     template <typename T>
-    inline int64_t SafeArray<T>::getSize()
+    inline size_t SafeArray<T>::getSize()
     {
         return _elementsCount * sizeof(T);
     }
@@ -102,9 +103,9 @@ namespace safety
     }
 
     template <typename T>
-    inline T SafeArray<T>::getElement(int64_t index)
+    inline T SafeArray<T>::getElement(size_t index)
     {
-        if ((index < 0) || (index >= _elementsCount))
+        if (index >= _elementsCount)
         {
             // TODO: log WARNING message.
 
@@ -115,9 +116,9 @@ namespace safety
     }
 
     template <typename T>
-    inline void SafeArray<T>::setElement(int64_t index, T value)
+    inline void SafeArray<T>::setElement(size_t index, T value)
     {
-        if ((index < 0) || (index >= _elementsCount))
+        if (index >= _elementsCount)
         {
             // TODO: log WARNING message.
 
@@ -130,7 +131,7 @@ namespace safety
     template <typename T>
     inline void SafeArray<T>::setAllElements(T value)
     {
-        for (int64_t index = 0; index < _elementsCount; ++index)
+        for (size_t index = 0; index < _elementsCount; ++index)
         {
             _elements[index] = value;
         }
@@ -143,6 +144,24 @@ namespace safety
         delete[] _elements;
         _elements = new T[_elementsCount];
         _elements[_elementsCount - 1] = value;
+    }
+
+    template <typename T>
+    inline void SafeArray<T>::removeElement(size_t index)
+    {
+        if (index >= _elementsCount)
+        {
+            // TODO: log WARNING message.
+
+            return;
+        }
+
+        size_t maxIndex = _elementsCount - 1;
+        if (index < maxIndex)
+        {
+            _elements[index] = _elements[maxIndex];
+        }
+        _elementsCount -= 1;
     }
 
     template <typename T>
@@ -161,7 +180,7 @@ namespace safety
     template <typename T>
     inline void SafeArray<T>::concatenate(SafeArray<T> arrayToConcatenate)
     {
-        int64_t arrayToConcatenateElementCount = arrayToConcatenate.getElementsCount();
+        size_t arrayToConcatenateElementCount = arrayToConcatenate.getElementsCount();
 
         if (arrayToConcatenateElementCount == 0)
         {
@@ -178,7 +197,7 @@ namespace safety
     template <typename T>
     inline std::string SafeArray<T>::toASCII()
     {
-        int64_t arraySize = getSize();
+        size_t arraySize = getSize();
         std::string result((char*)_elements, arraySize);
         return result;
     }
@@ -186,7 +205,7 @@ namespace safety
     template <typename T>
     inline void SafeArray<T>::fromASCII(std::string arrayData)
     {
-        int64_t arraySize = arrayData.size() / sizeof(T);
+        size_t arraySize = arrayData.size() / sizeof(T);
         resize(arraySize);
         memcpy(_elements, arrayData.data(), arraySize);
     }
