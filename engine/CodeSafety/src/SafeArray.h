@@ -18,25 +18,50 @@ namespace safety
     public:
 
         inline SafeArray();
+        inline SafeArray(const SafeArray<T>& otherArray);
         inline SafeArray(size_t elementCount);
         inline void deallocate();
         inline void resize(size_t newElementCount);
 
-        inline size_t getElementsCount();
+        inline size_t getElementsCount() const;
         inline size_t getSize();
         inline T* getElementsArray();
-        inline T getElement(size_t index);
+        inline T getElement(size_t index) const;
         inline void setElement(size_t index, T value);
         inline void setAllElements(T value);
         inline void appendElement(T value);
         inline void removeElement(size_t index);
         inline void fillWithZeros();
+
         inline void concatenate(SafeArray<T> arrayToConcatenate);
+        inline SafeArray<T>* getPart(size_t startIdex, size_t elementCount);
 
         inline std::string toASCII();
         inline void fromASCII(std::string arrayData);
-        inline std::string toBase64();
-        inline void fromBase64(std::string arrayData);
+        inline std::string toBase64(); // TODO: 
+        inline void fromBase64(std::string arrayData); // TODO: 
+
+        inline SafeArray<T>& operator=(const SafeArray<T>& otherArray);
+        inline T& operator[](size_t index);
+
+        inline SafeArray<T>& operator-();
+
+        inline SafeArray<T> operator*(T multiplier);
+        inline void operator*=(T multiplier);
+        inline T operator*(SafeArray<T>& otherArray);
+
+        inline SafeArray<T> operator/(T divider);
+        inline void operator/=(T divider);
+
+        inline SafeArray<T> operator+(T value);
+        inline void operator+=(T value);
+        inline SafeArray<T> operator+(SafeArray<T>& otherArray);
+        inline void operator+=(SafeArray<T>& otherArray);
+
+        inline SafeArray<T> operator-(T value);
+        inline void operator-=(T value);
+        inline SafeArray<T> operator-(SafeArray<T>& otherArray);
+        inline void operator-=(SafeArray<T>& otherArray);
 
     private:
 
@@ -53,6 +78,12 @@ namespace safety
     {
         _elements = nullptr;
         _elementsCount = 0;
+    }
+
+    template <typename T>
+    inline SafeArray<T>::SafeArray(const SafeArray<T>& otherArray) : SafeArray<T>::SafeArray()
+    {
+        *this = otherArray;
     }
 
     template <typename T>
@@ -79,13 +110,23 @@ namespace safety
             return;
         }
 
+        T* tmpElements = new T[newElementCount];
+        if (_elementsCount < newElementCount)
+        {
+            memcpy(tmpElements, _elements, _elementsCount * sizeof(T));
+        }
+        else
+        {
+            memcpy(tmpElements, _elements, newElementCount * sizeof(T));
+        }
+        
         delete[] _elements;
-        _elements = new T[newElementCount];
+        _elements = tmpElements;
         _elementsCount = newElementCount;
     }
 
     template <typename T>
-    inline size_t SafeArray<T>::getElementsCount()
+    inline size_t SafeArray<T>::getElementsCount() const
     {
         return _elementsCount;
     }
@@ -103,15 +144,12 @@ namespace safety
     }
 
     template <typename T>
-    inline T SafeArray<T>::getElement(size_t index)
+    inline T SafeArray<T>::getElement(size_t index) const
     {
         if (index >= _elementsCount)
         {
-            // TODO: log WARNING message.
-
-            return T();
+            // TODO: log ERROR message.
         }
-
         return _elements[index];
     }
 
@@ -120,11 +158,10 @@ namespace safety
     {
         if (index >= _elementsCount)
         {
-            // TODO: log WARNING message.
+            // TODO: log ERROR message.
 
             return;
         }
-
         _elements[index] = value;
     }
 
@@ -140,9 +177,7 @@ namespace safety
     template <typename T>
     inline void SafeArray<T>::appendElement(T value)
     {
-        _elementsCount += 1;
-        delete[] _elements;
-        _elements = new T[_elementsCount];
+        resize(_elementsCount + 1);
         _elements[_elementsCount - 1] = value;
     }
 
@@ -151,7 +186,7 @@ namespace safety
     {
         if (index >= _elementsCount)
         {
-            // TODO: log WARNING message.
+            // TODO: log ERROR message.
 
             return;
         }
@@ -173,7 +208,6 @@ namespace safety
 
             return;
         }
-
         memset(_elements, 0, _elementsCount * sizeof(T));
     }
 
@@ -189,9 +223,26 @@ namespace safety
             return;
         }
 
-        _elements = (T*)realloc(_elements, (_elementsCount + arrayToConcatenateElementCount) * sizeof(T));
+        resize(_elementsCount + arrayToConcatenateElementCount);
         memcpy(_elements + _elementsCount, arrayToConcatenate.getElementsArray(), arrayToConcatenateElementCount * sizeof(T));
         _elementsCount += arrayToConcatenateElementCount;
+    }
+
+    template <typename T>
+    inline SafeArray<T>* SafeArray<T>::getPart(size_t startIndex, size_t elementCount)
+    {
+        if (this->_elementsCount < startIndex + elementCount)
+        {
+            // TODO: log WARNING message.
+
+            size_t redundantElementsCount = (startIndex + elementCount) - this->_elementsCount;
+            elementCount -= redundantElementsCount;
+        }
+
+        SafeArray<T>* arrayPart = new SafeArray<T>(elementCount);
+        memcpy(arrayPart->getElementsArray(), this->_elements + startIndex, elementCount * sizeof(T));
+
+        return arrayPart;
     }
 
     template <typename T>
@@ -210,8 +261,7 @@ namespace safety
         memcpy(_elements, arrayData.data(), arraySize);
     }
 
-    // TODO: 
-    template <typename T>
+    /*template <typename T>
     inline std::string SafeArray<T>::toBase64()
     {
 
@@ -227,12 +277,188 @@ namespace safety
         }
 
         return base64result;
-    }
+    }*/
 
-    template <typename T>
+    /*template <typename T>
     inline void SafeArray<T>::fromBase64(std::string arrayData)
     {
 
+    }*/
+
+    template <typename T>
+    inline SafeArray<T>& SafeArray<T>::operator=(const SafeArray<T>& otherArray)
+    {
+        size_t otherArrayElementsCount = otherArray.getElementsCount();
+        if (_elementsCount != otherArrayElementsCount)
+        {
+            resize(otherArrayElementsCount);
+        }
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] = otherArray.getElement(i);
+        }
+        return *this;
+    }
+
+    template <typename T>
+    inline T& SafeArray<T>::operator[](size_t index)
+    {
+        if (index >= _elementsCount)
+        {
+            // TODO: log ERROR message.
+        }
+        return _elements[index];
+    }
+
+    template <typename T>
+    inline SafeArray<T>& SafeArray<T>::operator-()
+    {
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] = -_elements[i];
+        }
+        return *this;
+    }
+
+    template <typename T>
+    inline SafeArray<T> SafeArray<T>::operator*(T multiplier)
+    {
+        SafeArray<T> resultVector(_elementsCount);
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            resultVector[i] = _elements[i] * multiplier;
+        }
+        return resultVector;
+    }
+
+    template <typename T>
+    inline void SafeArray<T>::operator*=(T multiplier)
+    {
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] *= multiplier;
+        }
+    }
+
+    template <typename T>
+    inline T SafeArray<T>::operator*(SafeArray<T>& otherArray)
+    {
+        T resultScalar = (T)0;
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            resultScalar += _elements[i] * otherArray[i];
+        }
+        return resultScalar;
+    }
+
+    template <typename T>
+    inline SafeArray<T> SafeArray<T>::operator/(T divider)
+    {
+        SafeArray<T> resultVector(_elementsCount);
+        if (divider == (T)0)
+        {
+            return resultVector;
+        }
+        T multiplier = (T)1 / divider;
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            resultVector[i] = _elements[i] * multiplier;
+        }
+        return resultVector;
+    }
+
+    template <typename T>
+    inline void SafeArray<T>::operator/=(T divider)
+    {
+        if (divider == (T)0)
+        {
+            return;
+        }
+        T multiplier = (T)1 / divider;
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] *= multiplier;
+        }
+    }
+
+    template <typename T>
+    inline SafeArray<T> SafeArray<T>::operator+(T value)
+    {
+        SafeArray<T> resultVector(_elementsCount);
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            resultVector[i] = _elements[i] + value;
+        }
+        return resultVector;
+    }
+
+    template <typename T>
+    inline void SafeArray<T>::operator+=(T value)
+    {
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] += value;
+        }
+    }
+
+    template <typename T>
+    inline SafeArray<T> SafeArray<T>::operator+(SafeArray<T>& otherArray)
+    {
+        SafeArray<T> resultVector(_elementsCount);
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            resultVector[i] = _elements[i] + otherArray[i];
+        }
+        return resultVector;
+    }
+
+    template <typename T>
+    inline void SafeArray<T>::operator+=(SafeArray<T>& otherArray)
+    {
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] += otherArray[i];
+        }
+    }
+
+    template <typename T>
+    inline SafeArray<T> SafeArray<T>::operator-(T value)
+    {
+        SafeArray<T> resultVector(_elementsCount);
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            resultVector[i] = _elements[i] - value;
+        }
+        return resultVector;
+    }
+
+    template <typename T>
+    inline void SafeArray<T>::operator-=(T value)
+    {
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] -= value;
+        }
+    }
+
+    template <typename T>
+    inline SafeArray<T> SafeArray<T>::operator-(SafeArray<T>& otherArray)
+    {
+        SafeArray<T> resultVector(_elementsCount);
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            resultVector[i] = _elements[i] - otherArray[i];
+        }
+        return resultVector;
+    }
+
+    template <typename T>
+    inline void SafeArray<T>::operator-=(SafeArray<T>& otherArray)
+    {
+        for (size_t i = 0; i < _elementsCount; ++i)
+        {
+            _elements[i] -= otherArray[i];
+        }
     }
 
     typedef SafeArray<uint8_t> SafeByteArray;
