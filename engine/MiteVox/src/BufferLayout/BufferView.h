@@ -28,6 +28,7 @@ namespace mitevox
         uint32_t ID = 0;
 
         void* getDataStart();
+        void makeSeparateCopyTo(BufferView* resultBufferView);
     };
 }
 

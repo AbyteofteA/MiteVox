@@ -21,7 +21,7 @@ namespace render
 		std::string _name;
 		float FOV = 45.f;
 		int width, height;
-		float nearCullPlane = 1.f;
+		float nearCullPlane = 0.f;
 		float farCullPlane = 100000.f;
 
 		Camera() {}

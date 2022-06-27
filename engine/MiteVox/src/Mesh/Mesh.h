@@ -12,8 +12,7 @@
 namespace mitevox
 {
     class Mesh :
-        public mathem::GeometryPrimitiveBase,
-        public mathem::GeometryTransform
+        public mathem::GeometryPrimitiveBase
     {
     public:
 
@@ -22,12 +21,20 @@ namespace mitevox
         std::string name;
 
         explicit Mesh();
+
+        void makeCopyForAnimationTo(Mesh* resultMesh);
+
         bool isTriangularMesh();
-        uint32_t getVertecesCount();
+        size_t getVertecesCount();
         mathem::Vector3D getVertexPosition(uint32_t index);
-        uint32_t getTrianglesCount();
+        size_t getTrianglesCount();
         mathem::TriangleGeometry getTrianglePositions(uint32_t index);
         bool isIdealGeometry();
+
+        void setVertexPosition(uint32_t index, mathem::Vector3D value);
+
+        bool isMorphable();
+        size_t getMorphTargetsCount();
     };
 }
 

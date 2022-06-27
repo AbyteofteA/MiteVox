@@ -2,6 +2,22 @@
 
 namespace mitevox
 {
+	void MeshPrimitive::makeCopyForAnimationTo(MeshPrimitive* resultMeshPrimitive)
+	{
+		attributes.makeSeparateCopyTo(&resultMeshPrimitive->attributes);
+		if (indecesAccessor)
+		{
+			resultMeshPrimitive->indecesAccessor = new BufferViewAccessor();
+			indecesAccessor->makeSeparateCopyTo(resultMeshPrimitive->indecesAccessor);
+		}
+		resultMeshPrimitive->material = material; // TODO: copy material
+		resultMeshPrimitive->topologyType = topologyType;
+		resultMeshPrimitive->ID = 0;
+
+		/// NOTE: We don't copy morphTargets because resultMeshPrimitive will store 
+		/// only the result of animation.
+	}
+
 	mitevox::BufferViewAccessor* MeshPrimitive::getPositions()
 	{
 		return attributes.positionAccessor;
@@ -149,5 +165,44 @@ namespace mitevox
 		}
 
 		return resultTriangle;
+	}
+
+	void MeshPrimitive::setVertexPosition(uint32_t index, mathem::Vector3D position)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			getPositions()->setVector3D(actualPointIndex, position);
+		}
+		else
+		{
+			getPositions()->setVector3D(index, position);
+		}
+	}
+
+	mathem::Vector3D MeshPrimitive::getMorphVertexPosition(uint32_t morphIndex, uint32_t index)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			return morphTargets.getElement(morphIndex)->positionAccessor->getVector3D(actualPointIndex);
+		}
+		else
+		{
+			return morphTargets.getElement(morphIndex)->positionAccessor->getVector3D(index);
+		}
+	}
+
+	void MeshPrimitive::setMorphVertexPosition(uint32_t morphIndex, uint32_t index, mathem::Vector3D position)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			morphTargets.getElement(morphIndex)->positionAccessor->setVector3D(actualPointIndex, position);
+		}
+		else
+		{
+			morphTargets.getElement(morphIndex)->positionAccessor->setVector3D(index, position);
+		}
 	}
 }

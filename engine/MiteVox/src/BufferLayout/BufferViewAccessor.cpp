@@ -33,7 +33,15 @@ namespace mitevox
         {
             return (T)0;
         }
-        int64_t actualIndex = elementIndex * bufferView->byteStride + componentIndex;
+        int64_t actualIndex = 0;
+        if (bufferView->byteStride == 0)
+        {
+            actualIndex = elementIndex * getComponentsCount() + componentIndex;
+        }
+        else
+        {
+            actualIndex = elementIndex * bufferView->byteStride + componentIndex;
+        }
         return ((T*)getDataStart())[actualIndex];
     }
 
@@ -135,6 +143,96 @@ namespace mitevox
         }
     }
 
+    void BufferViewAccessor::getElementsComponentsAsFloatArray(
+        safety::SafeFloatArray* resultArray, 
+        int64_t elementIndex, 
+        int64_t componentsCount)
+    {
+        for (size_t i = 0; i < componentsCount; ++i)
+        {
+            float value = getElementsComponentAsFloat(i + elementIndex * componentsCount, 0);
+            resultArray->setElement(i, value);
+        }
+    }
+
+    template <typename T>
+    void BufferViewAccessor::setElementsComponent(int64_t elementIndex, int64_t componentIndex, T value)
+    {
+        if (elementIndex >= count ||
+            componentIndex >= getComponentsCount())
+        {
+            return;
+        }
+        int64_t actualIndex = 0;
+        if (bufferView->byteStride == 0)
+        {
+            actualIndex = elementIndex * getComponentsCount() + componentIndex;
+        }
+        else
+        {
+            actualIndex = elementIndex * bufferView->byteStride + componentIndex;
+        }
+        ((T*)getDataStart())[actualIndex] = value;
+    }
+
+    void BufferViewAccessor::setElementsComponentAsFloat(int64_t elementIndex, int64_t componentIndex, float value)
+    {
+        if (normalized)
+        {
+            switch (componentType)
+            {
+            case mitevox::BYTE:
+            {
+                int8_t normalizedValue = std::round(value * 127.0);
+                setElementsComponent<int8_t>(elementIndex, componentIndex, normalizedValue);
+                break;
+            }
+            case mitevox::UNSIGNED_BYTE:
+            {
+                uint8_t normalizedValue = std::round(value * 255.0);
+                setElementsComponent<uint8_t>(elementIndex, componentIndex, normalizedValue);
+                break;
+            }
+            case mitevox::SHORT:
+            {
+                int16_t normalizedValue = std::round(value * 32767.0);
+                setElementsComponent<int16_t>(elementIndex, componentIndex, normalizedValue);
+                break;
+            }
+            case mitevox::UNSIGNED_SHORT:
+            {
+                uint16_t normalizedValue = std::round(value * 65535.0);
+                setElementsComponent<uint16_t>(elementIndex, componentIndex, normalizedValue);
+                break;
+            }
+            case mitevox::UNSIGNED_INT:
+                setElementsComponent<uint32_t>(elementIndex, componentIndex, (uint32_t)value); break;
+            case mitevox::FLOAT:
+                setElementsComponent<float>(elementIndex, componentIndex, value); break;
+            default: break;
+            }
+        }
+        else
+        {
+            switch (componentType)
+            {
+            case mitevox::BYTE:
+                setElementsComponent<int8_t>(elementIndex, componentIndex, (int8_t)value); break;
+            case mitevox::UNSIGNED_BYTE:
+                setElementsComponent<uint8_t>(elementIndex, componentIndex, (uint8_t)value); break;
+            case mitevox::SHORT:
+                setElementsComponent<int16_t>(elementIndex, componentIndex, (int16_t)value); break;
+            case mitevox::UNSIGNED_SHORT:
+                setElementsComponent<uint16_t>(elementIndex, componentIndex, (uint16_t)value); break;
+            case mitevox::UNSIGNED_INT:
+                setElementsComponent<uint32_t>(elementIndex, componentIndex, (uint32_t)value); break;
+            case mitevox::FLOAT:
+                setElementsComponent<float>(elementIndex, componentIndex, value); break;
+            default: break;
+            }
+        }
+    }
+
     mathem::Vector2D BufferViewAccessor::getVector2D(int64_t index)
     {
         mathem::Vector2D resultVector2D;
@@ -201,6 +299,60 @@ namespace mitevox
         return resultMatrix4x4;
     }
 
+    void BufferViewAccessor::setVector2D(int64_t index, mathem::Vector2D value)
+    {
+        setElementsComponentAsFloat(index, 0, value.u());
+        setElementsComponentAsFloat(index, 1, value.v());
+    }
+
+    void BufferViewAccessor::setVector3D(int64_t index, mathem::Vector3D value)
+    {
+        setElementsComponentAsFloat(index, 0, value.x());
+        setElementsComponentAsFloat(index, 1, value.y());
+        setElementsComponentAsFloat(index, 2, value.z());
+    }
+
+    void BufferViewAccessor::setVector4D(int64_t index, mathem::Vector4D value)
+    {
+        setElementsComponentAsFloat(index, 0, value.x());
+        setElementsComponentAsFloat(index, 1, value.y());
+        setElementsComponentAsFloat(index, 2, value.z());
+        setElementsComponentAsFloat(index, 3, value.s());
+    }
+
+    void BufferViewAccessor::setMatrix2x2(int64_t index, mathem::Matrix2x2 value)
+    {
+        setElementsComponentAsFloat(index, 0, value.at(0, 0));
+        setElementsComponentAsFloat(index, 1, value.at(0, 1));
+        setElementsComponentAsFloat(index, 2, value.at(1, 0));
+        setElementsComponentAsFloat(index, 3, value.at(1, 1));
+    }
+
+    void BufferViewAccessor::setMatrix3x3(int64_t index, mathem::Matrix3x3 value)
+    {
+        setElementsComponentAsFloat(index, 0, value.at(0, 0));
+        setElementsComponentAsFloat(index, 1, value.at(0, 1));
+        setElementsComponentAsFloat(index, 2, value.at(0, 2));
+        setElementsComponentAsFloat(index, 3, value.at(1, 0));
+        setElementsComponentAsFloat(index, 4, value.at(1, 1));
+        setElementsComponentAsFloat(index, 5, value.at(1, 2));
+        setElementsComponentAsFloat(index, 6, value.at(2, 0));
+        setElementsComponentAsFloat(index, 7, value.at(2, 1));
+        setElementsComponentAsFloat(index, 8, value.at(2, 2));
+    }
+
+    void BufferViewAccessor::setMatrix4x4(int64_t index, mathem::Matrix4x4 value)
+    {
+        for (uint32_t indexX = 0; indexX < 4; ++indexX)
+        {
+            for (uint32_t indexY = 0; indexY < 4; ++indexY)
+            {
+                size_t actualIndex = indexX * 4 + indexY;
+                setElementsComponentAsFloat(index, actualIndex, value.at(indexX, indexY));
+            }
+        }
+    }
+
     bool BufferViewAccessor::isSparse()
     {
         return sparse != nullptr;
@@ -249,6 +401,20 @@ namespace mitevox
         }
 
         return Type::INVALID;
+    }
+
+    void BufferViewAccessor::makeSeparateCopyTo(BufferViewAccessor* resultBufferViewAccessor)
+    {
+        *resultBufferViewAccessor = *this;
+        if (this->bufferView)
+        { 
+            resultBufferViewAccessor->bufferView = new BufferView();
+            this->bufferView->makeSeparateCopyTo(resultBufferViewAccessor->bufferView);
+        }
+        if (this->sparse)
+        {
+            // TODO: copy sparse
+        }
     }
 
     void* BufferViewAccessor::getDataStart()

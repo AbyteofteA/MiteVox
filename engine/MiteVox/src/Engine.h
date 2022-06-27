@@ -29,9 +29,29 @@ namespace mitevox
 
 	private:
 
-		std::chrono::high_resolution_clock::time_point prevCycleTime;
+		std::chrono::steady_clock::time_point prevCycleTime;
 
 		Playground* playground;
+
+		int basicShader = -1;
+		int primitiveShader = -1;
+		int skyboxShader = -1;
+
+		void prepareNodeRecursively(Node* node);
+		void preparePlayground();
+
+		void simulateNode(Node* node);
+		void simulateNodes(safety::SafeArray<Node*>* nodes);
+
+		void animateNodeRecursively(Node* node, float deltaTime);
+		void animateNodes(safety::SafeArray<Node*>* nodes, float deltaTime);
+
+		void uploadNodesRecursively(safety::SafeArray<Node*>* nodes, int shaderID);
+		void renderNodesRecursively(
+			safety::SafeArray<Node*>* nodes,
+			int shaderID,
+			render::Camera* camera,
+			mathem::Transform* cameraTransform);
 	};
 }
 

@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\AnimationCodec\AnimationCodec.h" />
     <ClInclude Include="src\PlaygroundCodec\PlaygroundCodecGLTF.h" />
     <ClInclude Include="src\BufferLayoutCodec\BufferViewAccessorCodec.h" />
     <ClInclude Include="src\BufferLayoutCodec\BufferViewCodec.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="src\SerializationStatus.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AnimationCodec\AnimationCodec.cpp" />
     <ClCompile Include="src\PlaygroundCodec\PlaygroundCodecGLTF.cpp" />
     <ClCompile Include="src\MaterialCodec\MaterialCodecGLTF.cpp" />
     <ClCompile Include="src\Formats\CodecGLTF\CodecGLTF.cpp" />

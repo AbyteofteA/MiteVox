@@ -19,12 +19,11 @@
 // Default components IDs //
 
 #define CAMERA_COMPONENT 0
-#define MODEL3D_COMPONENT 1
-#define POINTLIGHT_COMPONENT 2
-#define DIRECTEDLIGHT_COMPONENT 3
-#define SPOTLIGHT_COMPONENT 4
-#define TRANSFORM_COMPONENT 5
-#define NATIVE_SCRIPT_COMPONENT 6
+#define POINTLIGHT_COMPONENT 1
+#define DIRECTEDLIGHT_COMPONENT 2
+#define SPOTLIGHT_COMPONENT 3
+#define TRANSFORM_COMPONENT 4
+#define NATIVE_SCRIPT_COMPONENT 5
 
 namespace mitevox
 {
@@ -46,14 +45,13 @@ namespace mitevox
 		float timeSinceCleanup = 0.0f;
 		float timeSincePhysicsUpdate = 0.0f;
 		float timeSinceRendererUpdate = 0.0f;
-		double currentTime = 0.0f;
+		float currentTime = 0.0f;
 
 		//************************************ Components *****************************************
 
 		// Renderer components
 
 		MANAGER_INDEX_TYPE Camera_Component = 0;
-		MANAGER_INDEX_TYPE Model3D_Component = 0;
 		MANAGER_INDEX_TYPE PointLight_Component = 0;
 		MANAGER_INDEX_TYPE DirectedLight_Component = 0;
 		MANAGER_INDEX_TYPE SpotLight_Component = 0;
@@ -70,9 +68,11 @@ namespace mitevox
 		Scene(EngineSettings* _settings, entityID initialEntitiesBufferSize = INITIAL_ENTITY_BUFFER_SIZE);
 		~Scene();
 
+		void update(float deltaTime);
+
 		// Getters //
 
-		double getCurrentTime();
+		float getCurrentTime();
 	};
 }
 

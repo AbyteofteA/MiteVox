@@ -6,14 +6,15 @@
 
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
 #include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
-#include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
-#include "engine/MiteVox/src/Mesh/Mesh.h"
-#include "engine/MiteVox/src/Node.h"
-#include "engine/MiteVox/src/Scene.h"
 #include "engine/MiteVox/src/Material/ImageSampler.h"
 #include "engine/MiteVox/src/Material/Image.h"
 #include "engine/MiteVox/src/Material/Texture.h"
 #include "engine/MiteVox/src/Material/Material.h"
+#include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
+#include "engine/MiteVox/src/Mesh/Mesh.h"
+#include "engine/MiteVox/src/Node.h"
+#include "engine/MiteVox/src/Scene.h"
+#include "engine/MiteVox/src/Animation/Animation.h"
 #include "engine/FileIO/src/Formats/FileFormatBase.h"
 #include "engine/FileIO/src/SerializationStatus.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
@@ -57,8 +58,9 @@ namespace mitevox
 		safety::SafeArray<Texture*> textures;
 		safety::SafeArray<Material*> materials;
 		safety::SafeArray<Mesh*> meshes;
-		safety::SafeArray<Scene*> scenes;
 		safety::SafeArray<Node*> nodes;
+		safety::SafeArray<Scene*> scenes;
+		safety::SafeArray<Animation*> animations;
 	};
 }
 

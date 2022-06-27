@@ -79,4 +79,35 @@ namespace mathem
 		this->applyTo(resultTriangle);
 		return resultTriangle;
 	}
+
+	void GeometryTransform::operator*=(GeometryTransform& otherTransform)
+	{
+		scale.x() *= otherTransform.scale.x();
+		scale.y() *= otherTransform.scale.y();
+		scale.z() *= otherTransform.scale.z();
+
+		//rotation = otherTransform.rotation;
+		// TODO: rotation
+
+		translation.x() += otherTransform.translation.x();
+		translation.y() += otherTransform.translation.y();
+		translation.z() += otherTransform.translation.z();
+	}
+
+	GeometryTransform GeometryTransform::operator*(GeometryTransform& otherTransform)
+	{
+		GeometryTransform thisTransform = *this;
+		thisTransform.scale.x() *= otherTransform.scale.x();
+		thisTransform.scale.y() *= otherTransform.scale.y();
+		thisTransform.scale.z() *= otherTransform.scale.z();
+
+		//thisTransform.rotation = otherTransform.rotation;
+		// TODO: rotation
+
+		thisTransform.translation.x() += otherTransform.translation.x();
+		thisTransform.translation.y() += otherTransform.translation.y();
+		thisTransform.translation.z() += otherTransform.translation.z();
+
+		return thisTransform;
+	}
 }

@@ -7,6 +7,21 @@ namespace mitevox
 		type = mathem::GeometryPrimitiveType::MESH;
 	}
 
+	void Mesh::makeCopyForAnimationTo(Mesh* resultMesh)
+	{
+		size_t primitivesCount = primitives.getElementsCount();
+		resultMesh->primitives.resize(primitivesCount);
+		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			MeshPrimitive* primitive = new MeshPrimitive();
+			primitives.getElement(primitiveIndex)->makeCopyForAnimationTo(primitive);
+			resultMesh->primitives.setElement(primitiveIndex, primitive);
+		}
+		resultMesh->name = name;
+
+		/// NOTE: We don't copy weights because resultMesh will store only the result of animation.
+	}
+
 	bool Mesh::isTriangularMesh()
 	{
 		// TODO:
@@ -14,14 +29,14 @@ namespace mitevox
 		return true;
 	}
 
-	uint32_t Mesh::getVertecesCount()
+	size_t Mesh::getVertecesCount()
 	{
-		uint32_t resultPointsCount = 0;
+		size_t resultPointsCount = 0;
 		
-		uint32_t primitivesCount = primitives.getElementsCount();
-		for (uint32_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
 		{
-			mitevox::MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
 			resultPointsCount += primitive->getVertecesCount();
 		}
 
@@ -35,7 +50,7 @@ namespace mitevox
 		uint32_t primitivesCount = primitives.getElementsCount();
 		for (uint32_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
 		{
-			mitevox::MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
 
 			// TODO:
 			/*if ()
@@ -47,14 +62,14 @@ namespace mitevox
 		return resultPoint;
 	}
 
-	uint32_t Mesh::getTrianglesCount()
+	size_t Mesh::getTrianglesCount()
 	{
-		uint32_t resultTrianglesCount = 0;
+		size_t resultTrianglesCount = 0;
 
-		uint32_t primitivesCount = primitives.getElementsCount();
-		for (uint32_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
 		{
-			mitevox::MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
 			resultTrianglesCount += primitive->getTrianglesCount();
 		}
 
@@ -71,5 +86,30 @@ namespace mitevox
 	bool Mesh::isIdealGeometry()
 	{
 		return false;
+	}
+
+	void setVertexPosition(uint32_t index, mathem::Vector3D value)
+	{
+		// TODO:
+	}
+
+	bool Mesh::isMorphable()
+	{
+		return getMorphTargetsCount() > 0;
+	}
+
+	size_t Mesh::getMorphTargetsCount()
+	{
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			size_t primitiveMorphTargetsCount = primitive->morphTargets.getElementsCount();
+			if (primitiveMorphTargetsCount > 0)
+			{
+				return primitiveMorphTargetsCount;
+			}
+		}
+		return 0;
 	}
 }

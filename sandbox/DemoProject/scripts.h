@@ -44,7 +44,7 @@ void rotateModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDE
 void processInput_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	float cameraSensitivity = 0.1f;
-	float speed = 450;
+	float speed = 15;
 
 	mitevox::Scene* scene = (mitevox::Scene*)data;
 

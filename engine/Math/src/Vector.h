@@ -38,7 +38,7 @@ namespace mathem
 		inline T getLength();
 		inline void normalize();
 
-		inline VECTOR& operator=(T values[Dimension]);
+		inline void operator=(T values[Dimension]);
 		inline T& operator[](size_t index);
 
 		inline VECTOR& operator-();
@@ -173,7 +173,7 @@ namespace mathem
 	}
 
 	VECTOR_TEMPLATE
-	inline VECTOR& VECTOR::operator=(T values[Dimension])
+	inline void VECTOR::operator=(T values[Dimension])
 	{
 		for (size_t i = 0; i < Dimension; ++i)
 		{

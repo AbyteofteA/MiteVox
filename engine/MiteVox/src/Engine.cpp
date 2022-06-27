@@ -4,6 +4,9 @@
 #include "EngineSettings.h"
 #include "Playground.h"
 
+#include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
+#include "engine/MiteVox/src/Animation/MorphTargetAnimation/applyMorphTargetAnimation.h"
+
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -16,7 +19,28 @@ namespace mitevox
 		std::string executionDir = fs::path(argv[0]).parent_path().string();
 		settings = new EngineSettings(executionDir);
 
-		playground = new Playground();
+		if (argc > 1)
+		{
+			fileio::CodecGLTF* playgroundGLTF = new fileio::CodecGLTF();
+			playgroundGLTF->readFromFile(std::string(argv[1]));
+			playground = playgroundGLTF->result;
+		}
+		else
+		{
+			playground = new Playground();
+		}
+
+		preparePlayground();
+
+		// Compile shaders.
+
+		std::string shadersDir = settings->getResourceDir() + "/shaders";
+		basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
+		skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
+		primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
+		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
+
+		uploadNodesRecursively(&playground->nodes, basicShader);
 
 		onCreate();
 	}
@@ -54,8 +78,8 @@ namespace mitevox
 			glViewport(0, 0, width, height);
 
 			// Update timers
-			std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
-			float deltaTime = std::chrono::duration_cast<std::chrono::duration<double>>(now - prevCycleTime).count();
+			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+			float deltaTime = std::chrono::duration_cast<std::chrono::duration<float>>(now - prevCycleTime).count();
 			prevCycleTime = now;
 
 			onUpdate();
@@ -65,8 +89,8 @@ namespace mitevox
 			size_t activeScene = playground->activeScene;
 			if (activeScene < playground->scenes.getElementsCount())
 			{
-				Scene* scene = playground->scenes.getElement(activeScene);
-				scene->currentTime += deltaTime;
+				Scene* scene = playground->getActiveScene();
+				scene->update(deltaTime);
 
 				// Execute scripts
 				scene->ECS->updateComponent(scene->NativeScript_Component, scene);
@@ -80,6 +104,21 @@ namespace mitevox
 					// TODO: Implement cleanup.
 				}
 
+				// Space culling
+				safety::SafeArray<Node*>* nodesToSimulate;
+				safety::SafeArray<Node*>* nodesToRender;
+				if (settings->spaceCulling)
+				{
+					nodesToSimulate = new safety::SafeArray<Node*>();
+					nodesToRender = new safety::SafeArray<Node*>();
+					// TODO: 
+				}
+				else
+				{
+					nodesToSimulate = &scene->nodes;
+					nodesToRender = &scene->nodes;
+				}
+
 				// Physics and Transform
 				scene->timeSincePhysicsUpdate += deltaTime;
 				if (scene->timeSincePhysicsUpdate > settings->getPhysicsPeriod())
@@ -88,6 +127,9 @@ namespace mitevox
 
 					// TODO: Implement physics update.
 				}
+
+				// TODO: add animation period
+				animateNodes(nodesToRender, deltaTime);
 
 				// Renderer
 				scene->timeSinceRendererUpdate += deltaTime;
@@ -103,15 +145,15 @@ namespace mitevox
 					scene->ECS->updateComponent(scene->PointLight_Component, scene);
 					scene->ECS->updateComponent(scene->SpotLight_Component, scene);
 
-					// Render 3D models.
-					scene->ECS->updateComponent(scene->Model3D_Component, scene);
-
-					// Render primitives.
 					render::Camera* camera =
 						(render::Camera*)scene->ECS->getComponent(scene->activeCamera, scene->Camera_Component);
 					mathem::Transform* cameraTransform =
 						(mathem::Transform*)scene->ECS->getComponent(scene->activeCamera, scene->Transform_Component);
 
+					// Render 3D models.
+					renderNodesRecursively(nodesToRender, basicShader, camera, cameraTransform);
+
+					// Render primitives.
 					render::renderPoints(renderer, camera, cameraTransform);
 					render::renderLines(renderer, camera, cameraTransform);
 					render::renderTriangles(renderer, camera, cameraTransform);
@@ -121,6 +163,129 @@ namespace mitevox
 
 				//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
 			}
+		}
+	}
+
+	void Engine::prepareNodeRecursively(Node* node)
+	{
+		if (node->mesh)
+		{
+			if (node->isAnimatedMesh())
+			{
+				node->meshAnimationTarget = new Mesh();
+				node->mesh->makeCopyForAnimationTo(node->meshAnimationTarget);
+			}
+
+			// Apply default material where needed
+			size_t meshPrimitivesCount = node->mesh->primitives.getElementsCount();
+			for (size_t i = 0; i < meshPrimitivesCount; ++i)
+			{
+				MeshPrimitive* meshPrimitive = node->mesh->primitives.getElement(i);
+				if (meshPrimitive->material == nullptr)
+				{
+					meshPrimitive->material = new Material();
+				}
+			}
+		}
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			prepareNodeRecursively(node->children.getElement(i));
+		}
+	}
+
+	void Engine::preparePlayground()
+	{
+		size_t nodesCount = playground->nodes.getElementsCount();
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
+			prepareNodeRecursively(playground->nodes.getElement(i));
+		}
+
+		size_t scenesCount = playground->scenes.getElementsCount();
+		for (size_t i = 0; i < scenesCount; ++i)
+		{
+			playground->scenes.getElement(i)->settings = this->settings;
+		}
+
+		size_t animationsCount = playground->animations.getElementsCount();
+		for (size_t i = 0; i < animationsCount; ++i)
+		{
+			playground->animations.getElement(i)->start();
+		}
+	}
+
+	void Engine::simulateNode(Node* node)
+	{
+
+	}
+
+	void Engine::simulateNodes(safety::SafeArray<Node*>* nodes)
+	{
+
+	}
+
+	void Engine::animateNodeRecursively(Node* node, float deltaTime)
+	{
+		if (node->mesh != nullptr)
+		{
+			applyMorphTargetAnimation(node);
+			render::updateMesh(node->getMeshToRender(), basicShader);
+		}
+
+		if (0/*node->skinIndex*/)
+		{
+			// TODO: apply skeletal animation to node->resultMesh
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			animateNodeRecursively(node->children.getElement(i), deltaTime);
+		}
+	}
+
+	void Engine::animateNodes(safety::SafeArray<Node*>* nodes, float deltaTime)
+	{
+		size_t animationsCount = playground->animations.getElementsCount();
+		for (size_t i = 0; i < animationsCount; ++i)
+		{
+			playground->animations.getElement(i)->update(deltaTime);
+		}
+
+		size_t nodesCount = nodes->getElementsCount();
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
+			animateNodeRecursively(nodes->getElement(i), deltaTime);
+		}
+	}
+
+	void Engine::uploadNodesRecursively(safety::SafeArray<Node*>* nodes, int shaderID)
+	{
+		size_t nodesCount = nodes->getElementsCount();
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
+			render::uploadNodeRecursively(nodes->getElement(i), shaderID);
+		}
+	}
+
+	void Engine::renderNodesRecursively(
+		safety::SafeArray<Node*>* nodes, 
+		int shaderID, 
+		render::Camera* camera, 
+		mathem::Transform* cameraTransform)
+	{
+		size_t nodesCount = nodes->getElementsCount();
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
+			mathem::GeometryTransform transform;
+			render::renderNodeRecursively(
+				settings->renderer, 
+				shaderID, 
+				nodes->getElement(i), 
+				&transform, 
+				camera, 
+				cameraTransform);
 		}
 	}
 }

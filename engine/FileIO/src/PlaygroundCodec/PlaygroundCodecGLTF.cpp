@@ -9,6 +9,7 @@
 #include "engine/FileIO/src/MeshCodec/MeshCodec.h"
 #include "engine/FileIO/src/PlaygroundCodec/NodeCodec.h"
 #include "engine/FileIO/src/PlaygroundCodec/SceneCodec.h"
+#include "engine/FileIO/src/AnimationCodec/AnimationCodec.h"
 
 #include <string>
 
@@ -51,6 +52,9 @@ namespace fileio
 		collectNodes(playgroundResult, nodesArrayJSON);
 		JSON* scenesArrayJSON = playgroundJSON->getFieldArray("scenes");
 		collectScenes(playgroundResult, scenesArrayJSON);
+
+		JSON* animationsArrayJSON = playgroundJSON->getFieldArray("animations");
+		collectAnimations(playgroundResult, animationsArrayJSON);
 	}
 
 	void PlaygroundCodecGLTF::collectCameras(mitevox::Playground* playgroundResult, fileio::JSON* camerasArrayJSON)
@@ -342,6 +346,29 @@ namespace fileio
 			mitevox::Scene* scene = new mitevox::Scene();
 			SceneCodec::fromGLTF(scene, sceneJSON, &playgroundResult->nodes);
 			playgroundResult->scenes.setElement((int64_t)i, scene);
+		}
+	}
+
+	void PlaygroundCodecGLTF::collectAnimations(mitevox::Playground* playgroundResult, JSON* animationsArrayJSON)
+	{
+		if (animationsArrayJSON == nullptr)
+		{
+			return;
+		}
+
+		size_t animationsCount = animationsArrayJSON->getArraySize();
+		playgroundResult->animations.resize(animationsCount);
+		playgroundResult->animations.fillWithZeros();
+
+		for (size_t i = 0; i < animationsCount; ++i)
+		{
+			JSON* animationJSON = animationsArrayJSON->getArrayItem(i);
+			mitevox::Animation* animation = new mitevox::Animation();
+			AnimationCodec::fromGLTF(
+				animation, animationJSON, 
+				&playgroundResult->nodes, 
+				&playgroundResult->accessors);
+			playgroundResult->animations.setElement((int64_t)i, animation);
 		}
 	}
 }

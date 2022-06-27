@@ -89,6 +89,8 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Animation\MorphTargetAnimation\applyMorphTargetAnimation.cpp" />
+    <ClCompile Include="src\Mesh\MeshAttributeSet.cpp" />
     <ClCompile Include="src\Animation\Animation.cpp" />
     <ClCompile Include="src\BufferLayout\BufferView.cpp" />
     <ClCompile Include="src\BufferLayout\BufferViewAccessor.cpp" />
@@ -99,10 +101,13 @@
     <ClCompile Include="src\Material\Texture.cpp" />
     <ClCompile Include="src\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="src\MiteVox_main.h" />
+    <ClCompile Include="src\Node.cpp" />
     <ClCompile Include="src\Playground.cpp" />
     <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Animation\MorphTargetAnimation\applyMorphTargetAnimation.h" />
+    <ClInclude Include="src\Mesh\MeshAttributeSet.h" />
     <ClInclude Include="src\Animation\Animation.h" />
     <ClInclude Include="src\Animation\AnimationChannel.h" />
     <ClInclude Include="src\Animation\AnimationChannelBase.h" />
@@ -111,7 +116,6 @@
     <ClInclude Include="src\BufferLayout\BufferViewAccessorSparse.h" />
     <ClInclude Include="src\BufferLayout\ComponentDataType.h" />
     <ClInclude Include="src\callbacks\DirectedLight_Callbacks.h" />
-    <ClInclude Include="src\callbacks\Model3D_Callbacks.h" />
     <ClInclude Include="src\callbacks\NativeScript_Callbacks.h" />
     <ClInclude Include="src\callbacks\PointLight_Callbacks.h" />
     <ClInclude Include="src\callbacks\SpotLight_Callbacks.h" />

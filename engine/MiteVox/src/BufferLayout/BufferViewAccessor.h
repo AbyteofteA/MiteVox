@@ -48,6 +48,16 @@ namespace mitevox
         uint32_t getElementsComponentAsUint(int64_t elementIndex, int64_t componentIndex);
         int32_t getElementsComponentAsInt(int64_t elementIndex, int64_t componentIndex);
 
+        void getElementsComponentsAsFloatArray(
+            safety::SafeFloatArray* resultArray, 
+            int64_t elementIndex, 
+            int64_t componentsCount);
+
+        template<typename T>
+        void setElementsComponent(int64_t elementIndex, int64_t componentIndex, T value);
+
+        void setElementsComponentAsFloat(int64_t elementIndex, int64_t componentIndex, float value);
+
         mathem::Vector2D getVector2D(int64_t index);
         mathem::Vector3D getVector3D(int64_t index);
         mathem::Vector4D getVector4D(int64_t index);
@@ -55,10 +65,19 @@ namespace mitevox
         mathem::Matrix3x3 getMatrix3x3(int64_t index);
         mathem::Matrix4x4 getMatrix4x4(int64_t index);
 
+        void setVector2D(int64_t index, mathem::Vector2D);
+        void setVector3D(int64_t index, mathem::Vector3D);
+        void setVector4D(int64_t index, mathem::Vector4D);
+        void setMatrix2x2(int64_t index, mathem::Matrix2x2);
+        void setMatrix3x3(int64_t index, mathem::Matrix3x3);
+        void setMatrix4x4(int64_t index, mathem::Matrix4x4);
+
         bool isSparse();
         void makeSparse(BufferViewAccessorSparse* sparseAccessor);
         void makeNotSparse();
         static Type mapTypeNameToType(std::string typeName);
+
+        void makeSeparateCopyTo(BufferViewAccessor* resultBufferViewAccessor);
 
     private:
 

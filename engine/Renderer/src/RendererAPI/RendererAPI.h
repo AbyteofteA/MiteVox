@@ -11,6 +11,7 @@
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
+#include "engine/MiteVox/src/Node.h"
 #include "Camera.h"
 #include "Mesh3D.h"
 #include "Model3D.h"
@@ -34,7 +35,9 @@ namespace render
 	inline std::string getRendererName();
 	inline std::string getVersion();
 	inline std::string getLanguageVersion();
-	inline void printError();
+	inline void printErrors(const char* file, int line);
+#define PRINT_RENDERER_ERRORS \
+printErrors(__FILE__, __LINE__);
 
 	// Shaders
 
@@ -80,12 +83,31 @@ namespace render
 	void removeMaterial(mitevox::Material* material, int shaderID);
 
 	void uploadBufferView(mitevox::BufferView* bufferView);
+	void updateBufferView(mitevox::BufferView* bufferView);
 	void removeBufferView(mitevox::BufferView* bufferView);
 
 	void uploadMesh(mitevox::Mesh* mesh, int shaderID);
+	void updateMesh(mitevox::Mesh* mesh, int shaderID);
 	void removeMesh(mitevox::Mesh* mesh);
-	void renderMesh(RendererSettings* renderer, int shaderID, mitevox::Mesh* mesh, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
+	void renderMesh(
+		RendererSettings* renderer, 
+		int shaderID, 
+		mitevox::Mesh* mesh, 
+		mathem::GeometryTransform* transform, 
+		Camera* camera, 
+		mathem::Transform* cameraTransform);
 	
+	void uploadNodeRecursively(mitevox::Node* node, int shaderID);
+	// TODO: void updateNodeRecursively(mitevox::Node* node, int shaderID);
+	void removeNodeRecursively(mitevox::Node* node);
+	void renderNodeRecursively(
+		RendererSettings* renderer, 
+		int shaderID, 
+		mitevox::Node* node, 
+		mathem::GeometryTransform* transform, 
+		Camera* camera, 
+		mathem::Transform* cameraTransform);
+
 	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 
 	void uploadSkybox(Skybox* skybox);

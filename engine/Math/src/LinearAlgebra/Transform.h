@@ -6,13 +6,14 @@ namespace mathem
 {
 	struct Transform
 	{
-		float scaleX = 0.f, scaleY = 0.f, scaleZ = 0.f;
-		float angleX = 0.f, angleY = 0.f, angleZ = 0.f;
-		float x = 0.f, y = 0.f, z = 0.f;
+		float scaleX = 1.0f, scaleY = 1.0f, scaleZ = 1.0f;
+		float angleX = 0.0f, angleY = 0.0f, angleZ = 0.0f;
+		float x = 0.0f, y = 0.0f, z = 0.0f;
 
-		Transform(float _scaleX = 1, float _scaleY = 1, float _scaleZ = 1,
-			float _angleX = 0, float _angleY = 0, float _angleZ = 0,
-			float _x = 0, float _y = 0, float _z = 0)
+		Transform(
+			float _scaleX = 1.0f, float _scaleY = 1.0f, float _scaleZ = 1.0f,
+			float _angleX = 0.0f, float _angleY = 0.0f, float _angleZ = 0.0f,
+			float _x = 0.0f, float _y = 0.0f, float _z = 0.0f)
 		{
 			scaleX = _scaleX;
 			scaleY = _scaleY;

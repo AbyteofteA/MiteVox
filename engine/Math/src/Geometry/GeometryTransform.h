@@ -35,6 +35,9 @@ namespace mathem
 		Vector3D applyToCopy(Vector3D vector);
 		void applyTo(TriangleGeometry& triangle);
 		TriangleGeometry applyToCopy(TriangleGeometry triangle);
+
+		void operator*=(GeometryTransform& otherTransform);
+		GeometryTransform operator*(GeometryTransform& otherTransform);
 	};
 }
 

@@ -14,6 +14,8 @@ namespace mitevox
 {
 	class EngineSettings
 	{
+		friend class Engine;
+
 	public:
 
 		profile::Logger logger;
@@ -46,6 +48,7 @@ namespace mitevox
 	private:
 
 		bool debug = true;
+		bool spaceCulling = false;
 		double cleanupPeriod = 0.5;
 		double physicsPeriod = 0.06;
 		double rendererPeriod = 0.0;

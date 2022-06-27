@@ -207,6 +207,8 @@ namespace render
 			textureUnit++;
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
+
+		PRINT_RENDERER_ERRORS;
 	}
 
 	void selectMaterial(mitevox::Material* material, int shaderID)
@@ -243,6 +245,8 @@ namespace render
 		}
 
 		shaders[shaderID]->setInt("material.illuminationModel", material->illuminationModel);
+
+		PRINT_RENDERER_ERRORS;
 	}
 
 	void removeMaterial(mitevox::Material* material, int shaderID)
@@ -256,28 +260,107 @@ namespace render
 		if (bufferView->ID == 0)
 		{
 			glGenBuffers(1, &bufferView->ID);
-
-			uint8_t* bufferData = bufferView->buffer->getElementsArray();
-			uint8_t* bufferViewData = bufferData + bufferView->byteOffset;
+			
+			uint8_t* bufferViewData = (uint8_t*)bufferView->getDataStart();
 
 			if (bufferView->target == mitevox::BufferView::ARRAY_BUFFER)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, bufferView->ID);
-				glBufferData(GL_ARRAY_BUFFER, bufferView->byteLength, bufferViewData, GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, bufferView->byteLength, 0, GL_DYNAMIC_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, bufferView->byteLength, bufferViewData);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 			else if (bufferView->target == mitevox::BufferView::ELEMENT_ARRAY_BUFFER)
 			{
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferView->ID);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferView->byteLength, bufferViewData, GL_STATIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferView->byteLength, 0, GL_DYNAMIC_DRAW);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, bufferView->byteLength, bufferViewData);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			}
 		}
+		PRINT_RENDERER_ERRORS;
+	}
+
+	void updateBufferView(mitevox::BufferView* bufferView)
+	{
+		if (bufferView->ID != 0)
+		{
+			uint8_t* bufferViewData = (uint8_t*)bufferView->getDataStart();
+
+			if (bufferView->target == mitevox::BufferView::ARRAY_BUFFER)
+			{
+				glBindBuffer(GL_ARRAY_BUFFER, bufferView->ID);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, bufferView->byteLength, bufferViewData);
+			}
+			else if (bufferView->target == mitevox::BufferView::ELEMENT_ARRAY_BUFFER)
+			{
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferView->ID);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, bufferView->byteLength, bufferViewData);
+			}
+		}
+		PRINT_RENDERER_ERRORS;
 	}
 
 	void removeBufferView(mitevox::BufferView* bufferView)
 	{
 		glDeleteBuffers(1, &bufferView->ID);
+	}
+
+	void checkBufferView(mitevox::BufferView* bufferView)
+	{
+		if (bufferView->ID != 0)
+		{
+			if (bufferView->target == mitevox::BufferView::ARRAY_BUFFER)
+			{
+				glBindBuffer(GL_ARRAY_BUFFER, bufferView->ID);
+
+				GLint size = 0;
+				glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+				if (bufferView->byteLength != size)
+				{
+					std::cout << "GL_ARRAY_BUFFER " << bufferView->ID << " byteLength == " << size << std::endl;
+				}
+			}
+			else if (bufferView->target == mitevox::BufferView::ELEMENT_ARRAY_BUFFER)
+			{
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferView->ID);
+
+				GLint size = 0;
+				glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+				if (bufferView->byteLength != size)
+				{
+					std::cout << "GL_ELEMENT_ARRAY_BUFFER " << bufferView->ID << " byteLength == " << size << std::endl;
+				}
+			}
+		}
+	}
+
+	void checkMeshBuffers(mitevox::Mesh* mesh)
+	{
+		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
+		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
+		{
+			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
+
+			if (auto positionAccessor = meshPrimitive->getPositions())
+			{
+				checkBufferView(positionAccessor->bufferView);
+			}
+			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
+			{
+				checkBufferView(textureAccessor->bufferView);
+			}
+			if (auto normalAccessor = meshPrimitive->getNormals())
+			{
+				checkBufferView(normalAccessor->bufferView);
+			}
+			if (auto indexAccessor = meshPrimitive->getIndeces())
+			{
+				checkBufferView(indexAccessor->bufferView);
+			}
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	void uploadMesh(mitevox::Mesh* mesh, int shaderID)
@@ -354,11 +437,53 @@ namespace render
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 			uploadMaterial(meshPrimitive->material, shaderID);
+
+			PRINT_RENDERER_ERRORS;
+		}
+
+		checkMeshBuffers(mesh);
+	}
+
+	void updateMesh(mitevox::Mesh* mesh, int shaderID)
+	{
+		if (!shaders[shaderID]->use())
+			return;
+
+		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
+		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
+		{
+			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
+
+			if (auto positionAccessor = meshPrimitive->getPositions())
+			{
+				updateBufferView(positionAccessor->bufferView);
+			}
+			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
+			{
+				updateBufferView(textureAccessor->bufferView);
+			}
+			if (auto normalAccessor = meshPrimitive->getNormals())
+			{
+				updateBufferView(normalAccessor->bufferView);
+			}
+			if (auto indexAccessor = meshPrimitive->getIndeces())
+			{
+				updateBufferView(indexAccessor->bufferView);
+			}
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+			//updateMaterial(meshPrimitive->material, shaderID);
+
+			PRINT_RENDERER_ERRORS;
 		}
 	}
 
-	void removeMesh(mitevox::Mesh* mesh)
+	void removeMesh(mitevox::Mesh* mesh, int shaderID)
 	{
+		if (!shaders[shaderID]->use())
+			return;
+
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{
@@ -384,20 +509,29 @@ namespace render
 		}
 	}
 
-	void renderMesh(RendererSettings* renderer, int shaderID, mitevox::Mesh* mesh, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform)
+	void renderMesh(
+		RendererSettings* renderer,
+		int shaderID,
+		mitevox::Mesh* mesh,
+		mathem::GeometryTransform* transform,
+		Camera* camera,
+		mathem::Transform* cameraTransform)
 	{
 		if (!shaders[shaderID]->use())
 			return;
 
+		checkMeshBuffers(mesh);
+
 		shaders[shaderID]->setInt("hasCubemap", 0);
 		shaders[shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
 
-		glm::mat4 global = glm::mat4(1.0f);
-		global = glm::translate(global, glm::vec3(transform->x, transform->y, transform->z));
-		global = glm::scale(global, glm::vec3(transform->scaleX, transform->scaleY, transform->scaleZ));
-		global = glm::rotate(global, glm::radians(transform->angleX), glm::vec3(1.0, 0.0, 0.0));
-		global = glm::rotate(global, glm::radians(transform->angleY), glm::vec3(0.0, 1.0, 0.0));
-		global = glm::rotate(global, glm::radians(transform->angleZ), glm::vec3(0.0, 0.0, 1.0));
+		const glm::highp_quat rotation(transform->rotation.s(), transform->rotation.x(), transform->rotation.y(), transform->rotation.z());
+		glm::mat4 global = glm::mat4_cast<float, glm::packed_highp>(rotation);
+		global = glm::translate(global, glm::vec3(transform->translation.x(), transform->translation.y(), transform->translation.z()));
+		global = glm::scale(global, glm::vec3(transform->scale.x(), transform->scale.y(), transform->scale.z()));
+		//global = glm::rotate(global, glm::radians(transform->rotation.x()), glm::vec3(1.0, 0.0, 0.0));
+		//global = glm::rotate(global, glm::radians(transform->rotation.y()), glm::vec3(0.0, 1.0, 0.0));
+		//global = glm::rotate(global, glm::radians(transform->rotation.z()), glm::vec3(0.0, 0.0, 1.0));
 
 		shaders[shaderID]->setMat4("model", global);
 
@@ -423,23 +557,6 @@ namespace render
 			glBindVertexArray(meshPrimitive->ID);
 			selectMaterial(meshPrimitive->material, shaderID);
 
-			/*if (auto positionAccessor = meshPrimitive->getPositions())
-			{
-				glBindBuffer(GL_ARRAY_BUFFER, positionAccessor->bufferView->ID);
-			}
-			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
-			{
-				glBindBuffer(GL_ARRAY_BUFFER, textureAccessor->bufferView->ID);
-			}
-			if (auto normalsAccessor = meshPrimitive->getNormals())
-			{
-				glBindBuffer(GL_ARRAY_BUFFER, normalsAccessor->bufferView->ID);
-			}
-			if (auto indexAccessor = meshPrimitive->getIndeces())
-			{
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexAccessor->bufferView->ID);
-			}*/
-
 			if (auto indexAccessor = meshPrimitive->getIndeces())
 			{
 				glDrawElements(GL_TRIANGLES, indexAccessor->count, indexAccessor->componentType, (GLvoid*)indexAccessor->byteOffset);
@@ -448,9 +565,61 @@ namespace render
 			{
 				glDrawArrays(GL_TRIANGLES, 0, meshPrimitive->attributes.positionAccessor->count);
 			}
+
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+			PRINT_RENDERER_ERRORS;
+		}
+	}
+
+	void uploadNodeRecursively(mitevox::Node* node, int shaderID)
+	{
+		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::uploadMesh(meshToRender, shaderID);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			uploadNodeRecursively(node->children.getElement(i), shaderID);
+		}
+	}
+
+	void removeNodeRecursively(mitevox::Node* node, int shaderID)
+	{
+		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::removeMesh(meshToRender, shaderID);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			removeNodeRecursively(node->children.getElement(i), shaderID);
+		}
+	}
+
+	void renderNodeRecursively(RendererSettings* renderer, int shaderID, mitevox::Node* node, mathem::GeometryTransform* transform, Camera* camera, mathem::Transform* cameraTransform)
+	{
+		mathem::GeometryTransform nodeGlobalTransform = *transform * node->transform;
+		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			renderNodeRecursively(
+				renderer, 
+				shaderID, 
+				node->children.getElement(i), 
+				&nodeGlobalTransform, 
+				camera, 
+				cameraTransform);
 		}
 	}
 

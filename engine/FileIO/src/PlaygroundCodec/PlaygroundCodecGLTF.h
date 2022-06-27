@@ -61,6 +61,7 @@ namespace fileio
         static void collectMeshes(mitevox::Playground* playgroundResult, JSON* meshesArrayJSON);
         static void collectNodes(mitevox::Playground* playgroundResult, JSON* nodesArrayJSON);
         static void collectScenes(mitevox::Playground* playgroundResult, JSON* scenesArrayJSON);
+        static void collectAnimations(mitevox::Playground* playgroundResult, JSON* animationsArrayJSON);
 	};
 }
 

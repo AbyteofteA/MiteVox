@@ -2,6 +2,7 @@
 #define GLTFMESHPRIMITIVE_H
 
 #include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
+#include "engine/MiteVox/src/Mesh/MeshAttributeSet.h"
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
@@ -11,20 +12,6 @@
 
 namespace mitevox
 {
-    class MeshAttributeSet
-    {
-    public:
-
-        BufferViewAccessor* positionAccessor = nullptr;
-        BufferViewAccessor* normalAccessor = nullptr;
-        BufferViewAccessor* tangentAccessor = nullptr;
-        BufferViewAccessor* textureCoordAccessor_0 = nullptr;
-        BufferViewAccessor* textureCoordAccessor_1 = nullptr;
-        BufferViewAccessor* colorAccessor_0 = nullptr;
-        BufferViewAccessor* jointsAccessor_0 = nullptr;
-        BufferViewAccessor* weightsAccessor_0 = nullptr;
-    };
-
     enum TopologyType
     {
         POINTS = 0,
@@ -46,6 +33,8 @@ namespace mitevox
         TopologyType topologyType = TopologyType::TRIANGLES;
         safety::SafeArray<MeshAttributeSet*> morphTargets;
         uint32_t ID = 0;
+
+        void makeCopyForAnimationTo(MeshPrimitive* resultMeshPrimitive);
 
         BufferViewAccessor* getPositions();
         BufferViewAccessor* getNormals();
@@ -80,6 +69,11 @@ namespace mitevox
         /// TODO: getTriangleJoints_0(uint32_t index);
         /// TODO: getTriangleWeights_0(uint32_t index);
         /// TODO: getTriangleIndeces(uint32_t index);
+        
+        void setVertexPosition(uint32_t index, mathem::Vector3D position);
+        
+        mathem::Vector3D getMorphVertexPosition(uint32_t morphIndex, uint32_t index);
+        void setMorphVertexPosition(uint32_t morphIndex, uint32_t index, mathem::Vector3D position);
     };
 }
 
