@@ -30,6 +30,7 @@ namespace mitevox
 		void start();
 		void pause();
 		void resume();
+		bool isActive();
 		float getCurrentTime();
 		void update(float deltaTime);
 		void addChannel(AnimationChannelBase* animationChannel);

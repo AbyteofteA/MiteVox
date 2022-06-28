@@ -44,6 +44,7 @@ namespace mitevox
 
 		float timeSinceCleanup = 0.0f;
 		float timeSincePhysicsUpdate = 0.0f;
+		float timeSinceAnimationsUpdate = 0.0f;
 		float timeSinceRendererUpdate = 0.0f;
 		float currentTime = 0.0f;
 

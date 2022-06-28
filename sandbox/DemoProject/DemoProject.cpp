@@ -81,7 +81,7 @@ void mitevox::Engine::onCreate()
 	// Create subject entity.
 
 	entityID subject0 = myECS->createEntity();
-	render::Camera tmpCamera = { 50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 100000 };
+	render::Camera tmpCamera = { 50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 100000 };
 	myECS->attachComponent(subject0, myScene->Camera_Component, &tmpCamera);
 	myScene->activeCamera = subject0;
 	mathem::Transform tmpTransform = { 1, 1, 1, 0, 0, 0, 0, 0, -30 };
@@ -164,12 +164,7 @@ void mitevox::Engine::onCreate()
 }
 
 
-void mitevox::Engine::onUpdate() 
-{
-	auto rendererSettings = this->settings->getRendererSettings();
-	render::clearBufferXY(rendererSettings->clearColor);
-	render::clearBufferZ();
-}
+void mitevox::Engine::onUpdate() {}
 
 void mitevox::Engine::onDestroy() {}
 

@@ -33,14 +33,17 @@ namespace mitevox
 		std::string getResourceDir();
 		std::string getConfigDir();
 
-		double getCleanupPeriod();
-		void setCleanupPeriod(double value);
+		float getCleanupPeriod();
+		void setCleanupPeriod(float value);
 
-		double getPhysicsPeriod();
-		void setPhysicsPeriod(double value);
+		float getPhysicsPeriod();
+		void setPhysicsPeriod(float value);
 
-		double getRendererPeriod();
-		void setRendererPeriod(double value);
+		float getAnimationsPeriod();
+		void setAnimationsPeriod(float value);
+
+		float getRendererPeriod();
+		void setRendererPeriod(float value);
 
 		render::RendererSettings* getRendererSettings();
 		InputHandler* getInputHandler();
@@ -49,9 +52,10 @@ namespace mitevox
 
 		bool debug = true;
 		bool spaceCulling = false;
-		double cleanupPeriod = 0.5;
-		double physicsPeriod = 0.06;
-		double rendererPeriod = 0.0;
+		float cleanupPeriod = 0.5;
+		float physicsPeriod = 0.06;
+		float animationPeriod = 0.06;
+		float rendererPeriod = 0.017;
 
 		bool logConsole = true;
 		bool logFile = true;

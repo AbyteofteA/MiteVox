@@ -48,7 +48,6 @@ namespace mitevox
 		fileio::JSON* rendererConfig = json->getFieldObject("renderer");
 
 		debug = generalConfig->getFieldBoolean("debug");
-
 		setCleanupPeriod(generalConfig->getFieldNumber("cleanup_period"));
 		setPhysicsPeriod(generalConfig->getFieldNumber("physics_period"));
 		setRendererPeriod(generalConfig->getFieldNumber("renderer_period"));
@@ -70,9 +69,9 @@ namespace mitevox
 
 		logger = profile::Logger(profile::LoggerMode::LOG_IN_CONSOLE, logDir);
 
-		int screenWidth = (int)generalConfig->getFieldNumber("screen_width");
-		int screenHeight = (int)generalConfig->getFieldNumber("screen_height");
-		bool backfaceCulling = generalConfig->getFieldBoolean("back_culling");
+		int screenWidth = (int)rendererConfig->getFieldNumber("screen_width");
+		int screenHeight = (int)rendererConfig->getFieldNumber("screen_height");
+		bool backfaceCulling = rendererConfig->getFieldBoolean("back_culling");
 
 		// TODO: move clearColor to engine_config.json .
 		renderer = render::initRenderer(screenWidth, screenHeight, false, backfaceCulling, { 0.05f, 0.05f, 0.05f });
@@ -138,12 +137,12 @@ namespace mitevox
 		return configDir;
 	}
 
-	double EngineSettings::getCleanupPeriod()
+	float EngineSettings::getCleanupPeriod()
 	{
 		return cleanupPeriod;
 	}
 
-	void EngineSettings::setCleanupPeriod(double value)
+	void EngineSettings::setCleanupPeriod(float value)
 	{
 		if (value > 10 || value < 0)
 		{
@@ -155,12 +154,12 @@ namespace mitevox
 		}
 	}
 
-	double EngineSettings::getPhysicsPeriod()
+	float EngineSettings::getPhysicsPeriod()
 	{
 		return physicsPeriod;
 	}
 
-	void EngineSettings::setPhysicsPeriod(double value)
+	void EngineSettings::setPhysicsPeriod(float value)
 	{
 		if (value > 0.5 || value < 0)
 		{
@@ -172,12 +171,29 @@ namespace mitevox
 		}
 	}
 
-	double EngineSettings::getRendererPeriod()
+	float EngineSettings::getAnimationsPeriod()
+	{
+		return animationPeriod;
+	}
+
+	void EngineSettings::setAnimationsPeriod(float value)
+	{
+		if (value > 0.5 || value < 0)
+		{
+			animationPeriod = value;
+		}
+		else
+		{
+			animationPeriod = 0.06;
+		}
+	}
+
+	float EngineSettings::getRendererPeriod()
 	{
 		return rendererPeriod;
 	}
 
-	void EngineSettings::setRendererPeriod(double value)
+	void EngineSettings::setRendererPeriod(float value)
 	{
 		if (value > 0.1 || value < 0)
 		{

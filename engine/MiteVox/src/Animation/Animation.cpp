@@ -33,6 +33,11 @@ namespace mitevox
 		_isPaused = false;
 	}
 
+	bool Animation::isActive()
+	{
+		return !_isPaused;
+	}
+
 	float Animation::getCurrentTime()
 	{
 		return _currentTime;

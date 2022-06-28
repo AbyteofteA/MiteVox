@@ -128,9 +128,15 @@ namespace mitevox
 					// TODO: Implement physics update.
 				}
 
-				// TODO: add animation period
 				animateNodes(nodesToRender, deltaTime);
-
+				// Accumulate deltaTime to work properly.
+				/*scene->timeSinceAnimationsUpdate += deltaTime;
+				if (scene->timeSinceAnimationsUpdate > settings->getAnimationsPeriod())
+				{
+					scene->timeSinceAnimationsUpdate = 0.0f;
+					animateNodes(nodesToRender, deltaTime);
+				}*/
+				
 				// Renderer
 				scene->timeSinceRendererUpdate += deltaTime;
 				if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
@@ -149,6 +155,17 @@ namespace mitevox
 						(render::Camera*)scene->ECS->getComponent(scene->activeCamera, scene->Camera_Component);
 					mathem::Transform* cameraTransform =
 						(mathem::Transform*)scene->ECS->getComponent(scene->activeCamera, scene->Transform_Component);
+
+					render::clearBufferXY(renderer->clearColor);
+					render::clearBufferZ();
+					if (renderer->backfaceCulling)
+					{
+						glEnable(GL_CULL_FACE);
+					}
+					else
+					{
+						glDisable(GL_CULL_FACE);
+					}
 
 					// Render 3D models.
 					renderNodesRecursively(nodesToRender, basicShader, camera, cameraTransform);
@@ -227,7 +244,7 @@ namespace mitevox
 
 	void Engine::animateNodeRecursively(Node* node, float deltaTime)
 	{
-		if (node->mesh != nullptr)
+		if (node->mesh != nullptr && node->mesh->isMorphable())
 		{
 			applyMorphTargetAnimation(node);
 			render::updateMesh(node->getMeshToRender(), basicShader);
@@ -250,7 +267,11 @@ namespace mitevox
 		size_t animationsCount = playground->animations.getElementsCount();
 		for (size_t i = 0; i < animationsCount; ++i)
 		{
-			playground->animations.getElement(i)->update(deltaTime);
+			Animation* animation = playground->animations.getElement(i);
+			if (animation->isActive())
+			{
+				animation->update(deltaTime);
+			}
 		}
 
 		size_t nodesCount = nodes->getElementsCount();
