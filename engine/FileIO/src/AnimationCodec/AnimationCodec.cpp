@@ -103,16 +103,16 @@ namespace fileio
 					else if (animationTargetPath == "rotation")
 					{
 						mitevox::Node* node = nodes->getElement((size_t)numberJSON->getNumber());
-						auto animationChannel = new mitevox::AnimationChannel<mathem::Vector4D>(
+						auto animationChannel = new mitevox::AnimationChannel<mathem::Quaternion>(
 							&node->transform.rotation, interpolationType, animationFramesCount);
 						for (size_t i = 0; i < animationFramesCount; ++i)
 						{
 							float time = timeAccessor->getElementsComponentAsFloat(i, 0);
-							mathem::Vector4D rotation;
-							rotation.x() = dataAccessor->getElementsComponentAsFloat(i, 0);
-							rotation.y() = dataAccessor->getElementsComponentAsFloat(i, 1);
-							rotation.z() = dataAccessor->getElementsComponentAsFloat(i, 2);
-							rotation.s() = dataAccessor->getElementsComponentAsFloat(i, 3);
+							mathem::Quaternion rotation;
+							rotation.binary.scalar = dataAccessor->getElementsComponentAsFloat(i, 3);
+							rotation.binary.vector.x() = dataAccessor->getElementsComponentAsFloat(i, 0);
+							rotation.binary.vector.y() = dataAccessor->getElementsComponentAsFloat(i, 1);
+							rotation.binary.vector.z() = dataAccessor->getElementsComponentAsFloat(i, 2);
 							animationChannel->setFrame(i, time, rotation);
 						}
 						animationChannelBase = animationChannel;

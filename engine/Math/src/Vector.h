@@ -12,6 +12,12 @@
 
 namespace mathem
 {
+	VECTOR_TEMPLATE class Vector;
+
+	typedef Vector<float, 2> Vector2D;
+	typedef Vector<float, 3> Vector3D;
+	typedef Vector<float, 4> Vector4D;
+
 	VECTOR_TEMPLATE
 	class Vector
 	{
@@ -36,12 +42,13 @@ namespace mathem
 		inline T& s();
 
 		inline T getLength();
+		inline T getLengthSquared();
 		inline void normalize();
 
 		inline void operator=(T values[Dimension]);
 		inline T& operator[](size_t index);
 
-		inline VECTOR& operator-();
+		inline VECTOR operator-();
 
 		inline VECTOR operator*(T multiplier);
 		inline void operator*=(T multiplier);
@@ -60,10 +67,6 @@ namespace mathem
 		inline VECTOR operator-(VECTOR& otherVector);
 		inline void operator-=(VECTOR& otherVector);
 	};
-	
-	typedef Vector<float, 2> Vector2D;
-	typedef Vector<float, 3> Vector3D;
-	typedef Vector<float, 4> Vector4D;
 
 	Vector3D crossProduct(Vector3D vectorA, Vector3D vectorB);
 
@@ -149,12 +152,18 @@ namespace mathem
 	VECTOR_TEMPLATE
 	inline T VECTOR::getLength()
 	{
-		T tmp = (T)0;
+		return (T)std::sqrt(getLengthSquared());
+	}
+
+	VECTOR_TEMPLATE
+	inline T VECTOR::getLengthSquared()
+	{
+		T lengthSquared = (T)0;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
-			tmp += std::pow(this->data[i], 2);
+			lengthSquared += std::pow(this->data[i], 2);
 		}
-		return (T)std::sqrt(tmp);
+		return lengthSquared;
 	}
 
 	VECTOR_TEMPLATE
@@ -189,7 +198,7 @@ namespace mathem
 	}
 
 	VECTOR_TEMPLATE
-	inline VECTOR& VECTOR::operator-()
+	inline VECTOR VECTOR::operator-()
 	{
 		for (size_t i = 0; i < Dimension; ++i)
 		{

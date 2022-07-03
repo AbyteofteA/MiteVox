@@ -3,6 +3,7 @@
 #define GEOMETRYTRANSFORM_H
 
 #include "engine/Math/src/Vector.h"
+#include "engine/Math/src/Quaternion.h"
 #include "engine/Math/src/Matrix.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
 #include "engine/CodeSafety/src/SafeArray.h"
@@ -14,7 +15,7 @@ namespace mathem
 	public:
 
 		Vector3D translation = { 0.0f, 0.0f, 0.0f };
-		Vector4D rotation = { 0.0f, 0.0f, 0.0f, 1.0f }; /// TODO: move to quaternions
+		Quaternion rotation;
 		Vector3D scale = { 1.0f, 1.0f, 1.0f };
 
 		GeometryTransform();

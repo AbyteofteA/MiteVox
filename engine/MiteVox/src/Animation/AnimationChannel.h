@@ -3,6 +3,7 @@
 
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/MiteVox/src/Animation/AnimationChannelBase.h"
+#include "engine/Math/src/NumericalAnalysis/Intertolation.h"
 
 namespace mitevox
 {
@@ -95,19 +96,14 @@ namespace mitevox
         {
             AnimationFrame<T> currentFrame = _frames.getElement(currentFrameIndex);
             AnimationFrame<T> nextFrame = _frames.getElement(currentFrameIndex + 1);
-            T deltaFrameData = nextFrame.data - currentFrame.data;
             float slope = ((time - currentFrame.time) / (nextFrame.time - currentFrame.time));
-
-            // Interpolated data calculation
-            deltaFrameData *= slope;
-            deltaFrameData += currentFrame.data;
+            T deltaFrameData = mathem::lerp<T>(currentFrame.data, nextFrame.data, slope);
             *_target = deltaFrameData;
             break;
         }
 
         case InterpolationType::CUBIC_SPLINE:
             // TODO: Implement InterpolationType::CUBIC_SPLINE
-            *_target = _frames.getElement(currentFrameIndex).data;
             break;
         }
     }

@@ -525,13 +525,16 @@ namespace render
 		shaders[shaderID]->setInt("hasCubemap", 0);
 		shaders[shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
 
-		const glm::highp_quat rotation(transform->rotation.s(), transform->rotation.x(), transform->rotation.y(), transform->rotation.z());
-		glm::mat4 global = glm::mat4_cast<float, glm::packed_highp>(rotation);
+		const glm::highp_quat rotation(
+			transform->rotation.binary.scalar, 
+			transform->rotation.binary.vector.x(), 
+			transform->rotation.binary.vector.y(), 
+			transform->rotation.binary.vector.z());
+		glm::mat4 rotationMatrix = glm::mat4_cast<float, glm::packed_highp>(rotation);
+		glm::mat4 global = glm::mat4(1.0f);
 		global = glm::translate(global, glm::vec3(transform->translation.x(), transform->translation.y(), transform->translation.z()));
+		global *= rotationMatrix;
 		global = glm::scale(global, glm::vec3(transform->scale.x(), transform->scale.y(), transform->scale.z()));
-		//global = glm::rotate(global, glm::radians(transform->rotation.x()), glm::vec3(1.0, 0.0, 0.0));
-		//global = glm::rotate(global, glm::radians(transform->rotation.y()), glm::vec3(0.0, 1.0, 0.0));
-		//global = glm::rotate(global, glm::radians(transform->rotation.z()), glm::vec3(0.0, 0.0, 1.0));
 
 		shaders[shaderID]->setMat4("model", global);
 

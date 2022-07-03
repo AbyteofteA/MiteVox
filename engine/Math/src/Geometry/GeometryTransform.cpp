@@ -15,7 +15,7 @@ namespace mathem
 	void GeometryTransform::reset()
 	{
 		translation = { 0.0f, 0.0f, 0.0f };
-		rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+		rotation = Quaternion();
 		scale = { 1.0f, 1.0f, 1.0f };
 	}
 
@@ -33,10 +33,10 @@ namespace mathem
 
 	void GeometryTransform::fromRotationArray(safety::SafeFloatArray* rotationArray)
 	{
-		rotation.x() = rotationArray->getElement(0);
-		rotation.y() = rotationArray->getElement(1);
-		rotation.z() = rotationArray->getElement(2);
-		rotation.s() = rotationArray->getElement(3);
+		rotation.binary.scalar = rotationArray->getElement(3);
+		rotation.binary.vector.x() = rotationArray->getElement(0);
+		rotation.binary.vector.y() = rotationArray->getElement(1);
+		rotation.binary.vector.z() = rotationArray->getElement(2);
 	}
 
 	void GeometryTransform::fromTranslationArray(safety::SafeFloatArray* translationArray)
@@ -52,7 +52,9 @@ namespace mathem
 		vector.y() *= scale.y();
 		vector.z() *= scale.z();
 
-		// TODO: rotate vector via the quaternion
+		Quaternion vectorAsQuaternion;
+		rotation.rotate(vectorAsQuaternion);
+		// TODO: vectorAsQuaternion to vector
 
 		vector.x() += translation.x();
 		vector.y() += translation.y();
@@ -86,8 +88,7 @@ namespace mathem
 		scale.y() *= otherTransform.scale.y();
 		scale.z() *= otherTransform.scale.z();
 
-		//rotation = otherTransform.rotation;
-		// TODO: rotation
+		rotation = rotation.rotate(otherTransform.rotation);
 
 		translation.x() += otherTransform.translation.x();
 		translation.y() += otherTransform.translation.y();
@@ -96,18 +97,17 @@ namespace mathem
 
 	GeometryTransform GeometryTransform::operator*(GeometryTransform& otherTransform)
 	{
-		GeometryTransform thisTransform = *this;
-		thisTransform.scale.x() *= otherTransform.scale.x();
-		thisTransform.scale.y() *= otherTransform.scale.y();
-		thisTransform.scale.z() *= otherTransform.scale.z();
+		GeometryTransform resultTransform = *this;
+		resultTransform.scale.x() *= otherTransform.scale.x();
+		resultTransform.scale.y() *= otherTransform.scale.y();
+		resultTransform.scale.z() *= otherTransform.scale.z();
 
-		//thisTransform.rotation = otherTransform.rotation;
-		// TODO: rotation
+		resultTransform.rotation = resultTransform.rotation.rotate(otherTransform.rotation);
 
-		thisTransform.translation.x() += otherTransform.translation.x();
-		thisTransform.translation.y() += otherTransform.translation.y();
-		thisTransform.translation.z() += otherTransform.translation.z();
+		resultTransform.translation.x() += otherTransform.translation.x();
+		resultTransform.translation.y() += otherTransform.translation.y();
+		resultTransform.translation.z() += otherTransform.translation.z();
 
-		return thisTransform;
+		return resultTransform;
 	}
 }
