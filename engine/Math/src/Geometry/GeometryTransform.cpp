@@ -2,48 +2,22 @@
 
 namespace mathem
 {
-	GeometryTransform::GeometryTransform()
-	{
-
-	}
-
-	GeometryTransform::GeometryTransform(safety::SafeFloatArray* columnMajorArray4x4)
-	{
-		// TODO:
-	}
-
 	void GeometryTransform::reset()
 	{
-		translation = { 0.0f, 0.0f, 0.0f };
-		rotation = Quaternion();
-		scale = { 1.0f, 1.0f, 1.0f };
+		translation.setAll(0.0f);
+		rotation.reset();
+		scale.setAll(1.0f);
 	}
 
-	void GeometryTransform::fromArray4x4(safety::SafeFloatArray* columnMajorMatrix4x4)
+	GeometryTransform GeometryTransform::getInverse()
 	{
-		// TODO:
-	}
-
-	void GeometryTransform::fromScaleArray(safety::SafeFloatArray* scaleArray)
-	{
-		scale.x() = scaleArray->getElement(0);
-		scale.y() = scaleArray->getElement(1);
-		scale.z() = scaleArray->getElement(2);
-	}
-
-	void GeometryTransform::fromRotationArray(safety::SafeFloatArray* rotationArray)
-	{
-		rotation.binary.scalar = rotationArray->getElement(3);
-		rotation.binary.vector.x() = rotationArray->getElement(0);
-		rotation.binary.vector.y() = rotationArray->getElement(1);
-		rotation.binary.vector.z() = rotationArray->getElement(2);
-	}
-
-	void GeometryTransform::fromTranslationArray(safety::SafeFloatArray* translationArray)
-	{
-		translation.x() = translationArray->getElement(0);
-		translation.y() = translationArray->getElement(1);
-		translation.z() = translationArray->getElement(2);
+		GeometryTransform inverseTransform;
+		inverseTransform.translation = -translation;
+		inverseTransform.rotation = rotation.getConjugate();
+		inverseTransform.scale.x() = 1.0f / scale.x();
+		inverseTransform.scale.y() = 1.0f / scale.y();
+		inverseTransform.scale.z() = 1.0f / scale.z();
+		return inverseTransform;
 	}
 
 	void GeometryTransform::applyTo(Vector3D& vector)
@@ -52,9 +26,10 @@ namespace mathem
 		vector.y() *= scale.y();
 		vector.z() *= scale.z();
 
-		Quaternion vectorAsQuaternion;
-		rotation.rotate(vectorAsQuaternion);
-		// TODO: vectorAsQuaternion to vector
+		// TODO: check rotation
+		Quaternion vectorAsQuaternion(vector);
+		vectorAsQuaternion = vectorAsQuaternion.rotate(rotation);
+		vector = vectorAsQuaternion.binary.vector;
 
 		vector.x() += translation.x();
 		vector.y() += translation.y();
@@ -84,29 +59,31 @@ namespace mathem
 
 	void GeometryTransform::operator*=(GeometryTransform& otherTransform)
 	{
-		scale.x() *= otherTransform.scale.x();
-		scale.y() *= otherTransform.scale.y();
-		scale.z() *= otherTransform.scale.z();
+		this->scale.x() *= otherTransform.scale.x();
+		this->scale.y() *= otherTransform.scale.y();
+		this->scale.z() *= otherTransform.scale.z();
 
-		rotation = rotation.rotate(otherTransform.rotation);
+		this->rotation.multiply(otherTransform.rotation);
 
-		translation.x() += otherTransform.translation.x();
-		translation.y() += otherTransform.translation.y();
-		translation.z() += otherTransform.translation.z();
+		Quaternion translationQuaternion(otherTransform.translation);
+		translationQuaternion = this->rotation.rotate(translationQuaternion);
+		this->translation += translationQuaternion.binary.vector;
 	}
 
 	GeometryTransform GeometryTransform::operator*(GeometryTransform& otherTransform)
 	{
-		GeometryTransform resultTransform = *this;
-		resultTransform.scale.x() *= otherTransform.scale.x();
-		resultTransform.scale.y() *= otherTransform.scale.y();
-		resultTransform.scale.z() *= otherTransform.scale.z();
+		GeometryTransform resultTransform;
+		resultTransform.scale.x() = this->scale.x() * otherTransform.scale.x();
+		resultTransform.scale.y() = this->scale.y() * otherTransform.scale.y();
+		resultTransform.scale.z() = this->scale.z() * otherTransform.scale.z();
 
-		resultTransform.rotation = resultTransform.rotation.rotate(otherTransform.rotation);
+		resultTransform.rotation = this->rotation.multiplyCopy(otherTransform.rotation);
 
-		resultTransform.translation.x() += otherTransform.translation.x();
-		resultTransform.translation.y() += otherTransform.translation.y();
-		resultTransform.translation.z() += otherTransform.translation.z();
+		Quaternion translationQuaternion(otherTransform.translation);
+		translationQuaternion = this->rotation.rotate(translationQuaternion);
+		resultTransform.translation = this->translation + translationQuaternion.binary.vector;
+		
+		// BUG: scale may influence translation like rotation does
 
 		return resultTransform;
 	}

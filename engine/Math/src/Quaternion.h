@@ -13,17 +13,19 @@ namespace mathem
 
 		union
 		{
-			Vector4D components = { 1.0f, 0.0f, 0.0f, 0.0f };
+			Vector4D components = { 0.0f, 0.0f, 0.0f, 1.0f };
 			struct Binary
 			{
-				float scalar;
 				Vector3D vector;
+				float scalar;
 			} binary;
 		};
 
 		explicit Quaternion();
 		explicit Quaternion(Vector3D vector);
-		explicit Quaternion(float s, float x, float y, float z);
+		explicit Quaternion(float x, float y, float z, float s);
+		explicit Quaternion(safety::SafeFloatArray* quaternionArray);
+		void reset();
 		float getLength();
 		float getLengthSquared();
 		void normalize();

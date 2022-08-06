@@ -10,17 +10,34 @@ namespace mathem
 	Quaternion::Quaternion(Vector3D vector)
 	{
 		binary.scalar = 0;
-		binary.vector.x() = vector.x();
-		binary.vector.y() = vector.y();
-		binary.vector.z() = vector.z();
+		binary.vector = vector;
 	}
 
-	Quaternion::Quaternion(float s, float x, float y, float z)
+	Quaternion::Quaternion(float x, float y, float z, float s)
 	{
-		binary.scalar = s;
 		binary.vector.x() = x;
 		binary.vector.y() = y;
 		binary.vector.z() = z;
+		binary.scalar = s;
+	}
+
+	Quaternion::Quaternion(safety::SafeFloatArray* quaternionArray)
+	{
+		if (quaternionArray->getElementsCount() >= 4)
+		{
+			components.x() = quaternionArray->getElement(0);
+			components.y() = quaternionArray->getElement(1);
+			components.z() = quaternionArray->getElement(2);
+			components.s() = quaternionArray->getElement(3);
+		}
+	}
+
+	void Quaternion::reset()
+	{
+		binary.vector.x() = 0.0f;
+		binary.vector.y() = 0.0f;
+		binary.vector.z() = 0.0f;
+		binary.scalar = 1.0f;
 	}
 
 	float Quaternion::getLength()

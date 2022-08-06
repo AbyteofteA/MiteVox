@@ -18,19 +18,9 @@ namespace mathem
 		Quaternion rotation;
 		Vector3D scale = { 1.0f, 1.0f, 1.0f };
 
-		GeometryTransform();
-		GeometryTransform(safety::SafeFloatArray* columnMajorArray4x4);
-		// TODO: GeometryTransform(Matrix4x4* transformationMatrix);
-		// TODO: GeometryTransform(Quaternion);
-
 		void reset();
 
-		void fromArray4x4(safety::SafeFloatArray* columnMajorMatrix4x4);
-		// TODO: fromMatrix4x4(Matrix4x4* transformationMatrix);
-		void fromScaleArray(safety::SafeFloatArray* scaleArray);
-		void fromRotationArray(safety::SafeFloatArray* rotationArray);
-		void fromTranslationArray(safety::SafeFloatArray* translationArray);
-		// TODO: fromQuaternion(Quaternion);
+		GeometryTransform getInverse();
 
 		void applyTo(Vector3D& vector);
 		Vector3D applyToCopy(Vector3D vector);

@@ -1,6 +1,7 @@
-
 #ifndef MATH_VECTOR_H
 #define MATH_VECTOR_H
+
+#include "engine/CodeSafety/src/SafeArray.h"
 
 #include <cmath>
 #include <cassert>
@@ -23,10 +24,13 @@ namespace mathem
 	{
 	public:
 
-		T data[Dimension] = { 0 };
+		T data[Dimension];
 
 		explicit inline Vector();
+		explicit inline Vector(safety::SafeFloatArray* values);
 		inline Vector(std::initializer_list<T> initializerList);
+
+		void setAll(T value);
 
 		inline T& u();
 		inline T& v();
@@ -81,6 +85,20 @@ namespace mathem
 	}
 
 	VECTOR_TEMPLATE
+	inline VECTOR::Vector(safety::SafeFloatArray* values)
+	{
+		size_t valuesCountToInitialize = values->getElementsCount();
+		if (valuesCountToInitialize < Dimension)
+		{
+			valuesCountToInitialize = Dimension;
+		}
+		for (size_t index = 0; index < valuesCountToInitialize; ++index)
+		{
+			data[index] = values->getElement(index);
+		}
+	}
+
+	VECTOR_TEMPLATE
 	inline VECTOR::Vector(std::initializer_list<T> initializerList)
 	{
 		assert((Dimension > 1) && "ERROR: the mathem::Vector cannot be that small!");
@@ -89,6 +107,15 @@ namespace mathem
 		for (size_t index = 0; index < Dimension; ++index)
 		{
 			data[index] = *(initializerList.begin() + index);
+		}
+	}
+
+	VECTOR_TEMPLATE
+	void VECTOR::setAll(T value)
+	{
+		for (size_t index = 0; index < Dimension; ++index)
+		{
+			data[index] = value;
 		}
 	}
 
