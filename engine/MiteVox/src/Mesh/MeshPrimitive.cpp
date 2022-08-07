@@ -20,42 +20,42 @@ namespace mitevox
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getPositions()
 	{
-		return attributes.positionAccessor;
+		return attributes.byName.positionAccessor;
 	}
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getNormals()
 	{
-		return attributes.normalAccessor;
+		return attributes.byName.normalAccessor;
 	}
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getTangents()
 	{
-		return attributes.tangentAccessor;
+		return attributes.byName.tangentAccessor;
 	}
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getTextureCoords_0()
 	{
-		return attributes.textureCoordAccessor_0;
+		return attributes.byName.textureCoordAccessor_0;
 	}
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getTextureCoords_1()
 	{
-		return attributes.textureCoordAccessor_1;
+		return attributes.byName.textureCoordAccessor_1;
 	}
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getColors_0()
 	{
-		return attributes.colorAccessor_0;
+		return attributes.byName.colorAccessor_0;
 	}
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getJoints_0()
 	{
-		return attributes.jointsAccessor_0;
+		return attributes.byName.jointsAccessor_0;
 	}
 
 	mitevox::BufferViewAccessor* MeshPrimitive::getWeights_0()
 	{
-		return attributes.weightsAccessor_0;
+		return attributes.byName.weightsAccessor_0;
 	}
 
 
@@ -185,11 +185,11 @@ namespace mitevox
 		if (indecesAccessor != nullptr)
 		{
 			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
-			return morphTargets.getElement(morphIndex)->positionAccessor->getVector3D(actualPointIndex);
+			return morphTargets.getElement(morphIndex)->byName.positionAccessor->getVector3D(actualPointIndex);
 		}
 		else
 		{
-			return morphTargets.getElement(morphIndex)->positionAccessor->getVector3D(index);
+			return morphTargets.getElement(morphIndex)->byName.positionAccessor->getVector3D(index);
 		}
 	}
 
@@ -198,11 +198,11 @@ namespace mitevox
 		if (indecesAccessor != nullptr)
 		{
 			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
-			morphTargets.getElement(morphIndex)->positionAccessor->setVector3D(actualPointIndex, position);
+			morphTargets.getElement(morphIndex)->byName.positionAccessor->setVector3D(actualPointIndex, position);
 		}
 		else
 		{
-			morphTargets.getElement(morphIndex)->positionAccessor->setVector3D(index, position);
+			morphTargets.getElement(morphIndex)->byName.positionAccessor->setVector3D(index, position);
 		}
 	}
 }

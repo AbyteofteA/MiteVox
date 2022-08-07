@@ -1,5 +1,7 @@
 #include "NodeCodec.h"
 
+#include "engine/Math/src/Convertations.h"
+
 namespace fileio
 {
 	void NodeCodec::fromGLTF(
@@ -25,7 +27,8 @@ namespace fileio
 		{
 			if (numberJSON->isNumber())
 			{
-				nodeResult->skinIndex = (int32_t)numberJSON->getNumber();
+				size_t skeletonIndex = (size_t)numberJSON->getNumber() + 1;
+				nodeResult->skeleton = (mitevox::SkeletonBase*)skeletonIndex;
 			}
 		}
 		numberJSON = nodeJSON->getField("mesh");
@@ -50,28 +53,28 @@ namespace fileio
 		{
 			safety::SafeFloatArray scaleArray;
 			scaleArrayJSON->toNumberArray<float>(&scaleArray);
-			nodeResult->transform.fromScaleArray(&scaleArray);
+			nodeResult->transform.scale = mathem::Vector3D(&scaleArray);
 		}
 		JSON* rotationArrayJSON = nodeJSON->getFieldArray("rotation");
 		if (rotationArrayJSON != nullptr)
 		{
 			safety::SafeFloatArray rotationArray;
 			rotationArrayJSON->toNumberArray<float>(&rotationArray);
-			nodeResult->transform.fromRotationArray(&rotationArray);
+			nodeResult->transform.rotation = mathem::Quaternion(&rotationArray);
 		}
 		JSON* translationArrayJSON = nodeJSON->getFieldArray("translation");
 		if (translationArrayJSON != nullptr)
 		{
 			safety::SafeFloatArray translationArray;
 			translationArrayJSON->toNumberArray<float>(&translationArray);
-			nodeResult->transform.fromTranslationArray(&translationArray);
+			nodeResult->transform.translation = mathem::Vector3D(&translationArray);
 		}
 		JSON* matrixArrayJSON = nodeJSON->getFieldArray("matrix");
 		if (matrixArrayJSON != nullptr)
 		{
-			safety::SafeFloatArray transformationMatrix;
-			matrixArrayJSON->toNumberArray<float>(&transformationMatrix);
-			nodeResult->transform.fromArray4x4(&transformationMatrix);
+			safety::SafeFloatArray transformationMatrixArray;
+			matrixArrayJSON->toNumberArray<float>(&transformationMatrixArray);
+			nodeResult->transform = mathem::matrixToTransform(mathem::Matrix4x4(&transformationMatrixArray));
 		}
 
 		JSON* childrenArrayJSON = nodeJSON->getFieldArray("children");

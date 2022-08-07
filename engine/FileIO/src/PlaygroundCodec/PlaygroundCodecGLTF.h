@@ -2,7 +2,7 @@
 #ifndef PLAYGROUNDCODECGLTF_H
 #define PLAYGROUNDCODECGLTF_H
 
-#include "engine/MiteVox/src/Playground.h"
+#include "engine/MiteVox/src/Playground/Playground.h"
 
 namespace fileio
 {
@@ -62,6 +62,7 @@ namespace fileio
         static void collectNodes(mitevox::Playground* playgroundResult, JSON* nodesArrayJSON);
         static void collectScenes(mitevox::Playground* playgroundResult, JSON* scenesArrayJSON);
         static void collectAnimations(mitevox::Playground* playgroundResult, JSON* animationsArrayJSON);
+        static void collectSkins(mitevox::Playground* playgroundResult, JSON* skinsArrayJSON);
 	};
 }
 

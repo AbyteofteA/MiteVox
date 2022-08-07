@@ -36,29 +36,11 @@ void mitevox::Engine::onCreate()
 	// Load images (textures).
 
 	mitevox::Image* white = nullptr;
-	mitevox::Image* white_rough = nullptr;
-	mitevox::Image* light_grey = nullptr;
 	mitevox::Image* error = nullptr;
-	mitevox::Image* UVchecker = nullptr;
-	mitevox::Image* UVchecker0 = nullptr;
-	mitevox::Image* UVchecker1 = nullptr;
-	mitevox::Image* SPECchecker0 = nullptr;
 
 	std::string texturesDir = settings->getResourceDir() + "/assets/textures";
 	fileio::fileLoader.loadAndParseAsync(
-		texturesDir + "/UVchecker.png", (void**)&UVchecker, mitevox::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		texturesDir + "/UVchecker0.png", (void**)&UVchecker0, mitevox::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		texturesDir + "/UVchecker1.png", (void**)&UVchecker1, mitevox::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		texturesDir + "/SPECchecker0.png", (void**)&SPECchecker0, mitevox::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
 		texturesDir + "/white.png", (void**)&white, mitevox::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		texturesDir + "/white_rough.png", (void**)&white_rough, mitevox::loadImage);
-	fileio::fileLoader.loadAndParseAsync(
-		texturesDir + "/light_grey.png", (void**)&light_grey, mitevox::loadImage);
 	fileio::fileLoader.loadAndParseAsync(
 		texturesDir + "/error.png", (void**)&error, mitevox::loadImage);
 	fileio::fileLoader.awaitAll();
@@ -69,7 +51,7 @@ void mitevox::Engine::onCreate()
 	darkSomething->metallicity = 1.0f;
 	darkSomething->specularExponent = 5;
 	darkSomething->albedoMap = new mitevox::Texture(error);
-	darkSomething->metallicRoughnessMap = new mitevox::Texture(SPECchecker0);
+	darkSomething->metallicRoughnessMap = new mitevox::Texture(white);
 	darkSomething->illuminationModel = 2;
 
 	NativeScript_ECS waveScript = { nullptr, waveModel_Script, nullptr };
@@ -81,16 +63,11 @@ void mitevox::Engine::onCreate()
 	// Create subject entity.
 
 	entityID subject0 = myECS->createEntity();
-	render::Camera tmpCamera = { 50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 100000 };
-	myECS->attachComponent(subject0, myScene->Camera_Component, &tmpCamera);
 	myScene->activeCamera = subject0;
-	mathem::Transform tmpTransform = { 1, 1, 1, 0, 0, 0, 0, 0, -30 };
+	mathem::Transform tmpTransform = { 1, 1, 1, 0, 0, 0, 0, 0, -10 };
 	myECS->attachComponent(subject0, myScene->Transform_Component, &tmpTransform);
 	NativeScript_ECS tmpNativeScript = { nullptr, processInput_Script, nullptr };
 	myECS->attachComponent(subject0, myScene->NativeScript_Component, &tmpNativeScript);
-	/*render::SpotLight tmpSpotLight = { { 0, 0, 0 }, { 0, 1, 0 }, 10,
-									{ 1, 1, 1, 1 }, 1, 0.0007, 0.00002 };
-	ECS->attachComponent<render::SpotLight>(subject0, SpotLight_Component, &tmpSpotLight);*/
 
 	// Create Light prefab.
 

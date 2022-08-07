@@ -1,8 +1,8 @@
 #ifndef SCENECODEC_H
 #define SCENECODEC_H
 
-#include "engine/MiteVox/src/Node.h"
-#include "engine/MiteVox/src/Scene.h"
+#include "engine/MiteVox/src/Playground/Node.h"
+#include "engine/MiteVox/src/Playground/Scene.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 

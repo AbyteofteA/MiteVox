@@ -1,4 +1,3 @@
-
 #ifndef GENERALFUNCTIONS_H
 #define GENERALFUNCTIONS_H
 
@@ -8,7 +7,7 @@ namespace render
 {
 	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor)
 	{
-		RendererSettings* renderer = new render::RendererSettings(width, height, isFullScreen, backfaceCulling, clearColor);
+		RendererSettings* renderer = new RendererSettings(width, height, isFullScreen, backfaceCulling, clearColor);
 
 		if (!glfwInit())
 		{

@@ -1,7 +1,7 @@
 #ifndef NODE_CODEC_H
 #define NODE_CODEC_H
 
-#include "engine/MiteVox/src/Node.h"
+#include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/CodeSafety/src/SafeArray.h"

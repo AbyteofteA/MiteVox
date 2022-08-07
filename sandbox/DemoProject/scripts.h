@@ -2,6 +2,7 @@
 #ifndef SCRIPTS_H
 #define SCRIPTS_H
 
+#include "engine/MiteVox/src/Playground/Playground.h"
 #include "engine/ECSManager/src/EntityComponentSystem.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Math/src/Math.h"
@@ -44,16 +45,17 @@ void rotateModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDE
 void processInput_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	float cameraSensitivity = 0.1f;
-	float speed = 15;
+	float speed = 5;
 
-	mitevox::Scene* scene = (mitevox::Scene*)data;
+	mitevox::Playground* playground = (mitevox::Playground*)data;
+	mitevox::Scene* scene = playground->getActiveScene();
 
-	InputHandler* inputHandler = scene->settings->getInputHandler();
+	InputHandler* inputHandler = playground->getActiveScene()->settings->getInputHandler();
 
 	mathem::Transform* transform =
 		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
 
-	render::Camera* camera = (render::Camera*)_ecs->getComponent(scene->activeCamera, CAMERA_COMPONENT);
+	render::Camera* camera = scene->activeCameraNode->camera;
 	camera->FOV += inputHandler->mouseDeltaScroll;
 
 	float timeForMoves = (float)inputHandler->dt;

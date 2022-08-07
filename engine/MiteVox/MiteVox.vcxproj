@@ -89,6 +89,8 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Skeleton\NodeBasedSkeleton.cpp" />
+    <ClCompile Include="src\Skeleton\SkeletonBase.cpp" />
     <ClCompile Include="src\Animation\MorphTargetAnimation\applyMorphTargetAnimation.cpp" />
     <ClCompile Include="src\Mesh\MeshAttributeSet.cpp" />
     <ClCompile Include="src\Animation\Animation.cpp" />
@@ -101,11 +103,13 @@
     <ClCompile Include="src\Material\Texture.cpp" />
     <ClCompile Include="src\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="src\MiteVox_main.h" />
-    <ClCompile Include="src\Node.cpp" />
-    <ClCompile Include="src\Playground.cpp" />
-    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Playground\Node.cpp" />
+    <ClCompile Include="src\Playground\Playground.cpp" />
+    <ClCompile Include="src\Playground\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Skeleton\NodeBasedSkeleton.h" />
+    <ClInclude Include="src\Skeleton\SkeletonBase.h" />
     <ClInclude Include="src\Animation\MorphTargetAnimation\applyMorphTargetAnimation.h" />
     <ClInclude Include="src\Mesh\MeshAttributeSet.h" />
     <ClInclude Include="src\Animation\Animation.h" />
@@ -129,9 +133,9 @@
     <ClInclude Include="src\Mesh\MeshPrimitive.h" />
     <ClInclude Include="src\MiteVox.h" />
     <ClInclude Include="src\Engine.h" />
-    <ClInclude Include="src\Node.h" />
-    <ClInclude Include="src\Playground.h" />
-    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Playground\Node.h" />
+    <ClInclude Include="src\Playground\Playground.h" />
+    <ClInclude Include="src\Playground\Scene.h" />
     <ClInclude Include="src\EngineSettings.h" />
     <ClInclude Include="src\NativeScript.h" />
   </ItemGroup>

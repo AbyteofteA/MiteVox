@@ -9,130 +9,16 @@
 
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
+#include "engine/MiteVox/src/Skeleton/SkeletonBase.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
-
-#define RENDERER_VERTEX_SIZE 8 // Amount of floats to store a vertex (XYZ + UV + IJK)
-#define RENDERER_TRIANGLE_SIZE RENDERER_VERTEX_SIZE * 3
 
 namespace render
 {
-	float* modelToXYZUVIJK(Mesh3D* mesh)
-	{
-		size_t modelDumpSize = (size_t)sizeof(float) * mesh->polygonsCount * RENDERER_TRIANGLE_SIZE;
-		float* result = (float*)malloc((size_t)modelDumpSize);
-
-		for (size_t i = 0; i < mesh->polygonsCount; i++)
-		{
-			for (size_t j = 0; j < 3; j++)
-			{
-				size_t offset = i * RENDERER_TRIANGLE_SIZE + j * RENDERER_VERTEX_SIZE;
-
-				// X Y Z
-				size_t positionIndex = mesh->polygons[i].positions[j] - 1;
-				mathem::Point3D position = mesh->positions[positionIndex];
-				result[offset + 0] = position.x;
-				result[offset + 1] = position.y;
-				result[offset + 2] = position.z;
-
-				// U V
-				mathem::Point3D textureCoord;
-				if (mesh->polygons[i].textureCoords != nullptr)
-				{
-					size_t textureCoordIndex = mesh->polygons[i].textureCoords[j] - 1;
-					textureCoord = mesh->textureCoords[textureCoordIndex];
-					result[offset + 3] = textureCoord.x;
-					result[offset + 4] = textureCoord.y;
-				}
-
-				// I J K
-				mathem::Vector3D normal;
-				if (mesh->polygons[i].normals != nullptr)
-				{
-					size_t normalIndex = mesh->polygons[i].normals[j] - 1;
-					normal = mesh->normals[normalIndex];
-					result[offset + 5] = normal.x();
-					result[offset + 6] = normal.y();
-					result[offset + 7] = normal.z();
-				}
-			}
-		}
-
-		return result;
-	}
-
-	// Model3D
-
-	void uploadModel3D(Model3D* model3D)
-	{
-		if (!shaders[model3D->shaderID]->use())
-			return;
-
-		if (model3D->mesh->isUploaded == 0)
-		{
-			float* modelData = modelToXYZUVIJK(model3D->mesh);
-
-			unsigned int modelVBO;
-			glGenBuffers(1, &modelVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
-			glBufferData(
-				GL_ARRAY_BUFFER,
-				sizeof(float) * RENDERER_TRIANGLE_SIZE * model3D->mesh->polygonsCount,
-				modelData,
-				GL_STATIC_DRAW);
-
-			glGenVertexArrays(1, &model3D->mesh->vertexBufferID);
-			glBindVertexArray(model3D->mesh->vertexBufferID);
-			
-			GLint posAttrib = glGetAttribLocation(shaders[model3D->shaderID]->textureID, "position");
-			GLint texAttrib = glGetAttribLocation(shaders[model3D->shaderID]->textureID, "texcoord");
-			GLint normalAttrib = glGetAttribLocation(shaders[model3D->shaderID]->textureID, "normal");
-
-			glEnableVertexAttribArray(posAttrib);
-			glEnableVertexAttribArray(texAttrib);
-			glEnableVertexAttribArray(normalAttrib);
-			glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, RENDERER_VERTEX_SIZE * sizeof(GLfloat), 0);
-			glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, RENDERER_VERTEX_SIZE * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-			glVertexAttribPointer(normalAttrib, 3, GL_FLOAT, GL_FALSE, RENDERER_VERTEX_SIZE * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
-
-			model3D->mesh->isUploaded = 1;
-
-			free(modelData);
-
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindVertexArray(0);
-		}
-
-		uploadMaterial(model3D->material, model3D->shaderID);
-	}
-
-	void selectModel3D(Model3D* model3D)
-	{
-		if (!shaders[model3D->shaderID]->use())
-			return;
-
-		glBindVertexArray(model3D->mesh->vertexBufferID);
-		selectMaterial(model3D->material, model3D->shaderID);
-	}
-
-	void removeModel3D(Model3D* model3D)
-	{
-		if (!shaders[model3D->shaderID]->use())
-			return;
-
-		glDeleteBuffers(1, &model3D->mesh->vertexBufferID);
-		removeMaterial(model3D->material, model3D->shaderID);
-
-		model3D->mesh->isUploaded = 0;
-	}
-
-
-	// Scene
-
 	extern float skyboxVert[];
 
 	void uploadSkybox(Skybox* skybox)
 	{
-		GLint posAttrib = glGetAttribLocation(shaders[1]->textureID, "position");
+		GLint posAttrib = glGetAttribLocation(shaders[1]->shaderID, "position");
 
 		unsigned int skyboxVBO;
 		glGenVertexArrays(1, &skybox->vertexID);
@@ -181,7 +67,7 @@ namespace render
 					albedoMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 					albedoMap->image->imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
-				glUniform1i(glGetUniformLocation(shaders[shaderID]->textureID, "albedoMap"), textureUnit);
+				glUniform1i(glGetUniformLocation(shaders[shaderID]->shaderID, "albedoMap"), textureUnit);
 			}
 			textureUnit++;
 		}
@@ -202,7 +88,7 @@ namespace render
 					metallicRoughnessMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 					metallicRoughnessMap->image->imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
-				glUniform1i(glGetUniformLocation(shaders[shaderID]->textureID, "metallicRoughnessMap"), textureUnit);
+				glUniform1i(glGetUniformLocation(shaders[shaderID]->shaderID, "metallicRoughnessMap"), textureUnit);
 			}
 			textureUnit++;
 		}
@@ -342,18 +228,14 @@ namespace render
 		{
 			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
 
-			if (auto positionAccessor = meshPrimitive->getPositions())
+			for (size_t i = 0; i < mitevox::MeshAttributeSet::attributesCount; ++i)
 			{
-				checkBufferView(positionAccessor->bufferView);
+				if (auto attributeAccessor = meshPrimitive->attributes.byIndex[i])
+				{
+					checkBufferView(attributeAccessor->bufferView);
+				}
 			}
-			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
-			{
-				checkBufferView(textureAccessor->bufferView);
-			}
-			if (auto normalAccessor = meshPrimitive->getNormals())
-			{
-				checkBufferView(normalAccessor->bufferView);
-			}
+
 			if (auto indexAccessor = meshPrimitive->getIndeces())
 			{
 				checkBufferView(indexAccessor->bufferView);
@@ -363,32 +245,40 @@ namespace render
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
+	mitevox::SkeletonBase* tryUploadSkeleton(mitevox::Node* node, int shaderID)
+	{
+		if (!shaders[shaderID]->use())
+			return nullptr;
+
+		if (mitevox::SkeletonBase* skeleton = (mitevox::SkeletonBase*)node->skeleton)
+		{
+			shaders[shaderID]->setInt("jointsCount", skeleton->jointMatrices.getElementsCount());
+			shaders[shaderID]->setMatrix4x4Array("jointMatrices", &skeleton->jointMatrices);
+			return skeleton;
+		}
+		
+		shaders[shaderID]->setInt("jointsCount", 0);
+		return nullptr;
+	}
+
 	void uploadMesh(mitevox::Mesh* mesh, int shaderID)
 	{
 		if (!shaders[shaderID]->use())
 			return;
-
-		GLint posAttrib = glGetAttribLocation(shaders[shaderID]->textureID, "position");
-		GLint texAttrib = glGetAttribLocation(shaders[shaderID]->textureID, "texcoord");
-		GLint normalAttrib = glGetAttribLocation(shaders[shaderID]->textureID, "normal");
 
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{
 			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
 
-			if (auto positionAccessor = meshPrimitive->getPositions())
+			for (size_t i = 0; i < mitevox::MeshAttributeSet::attributesCount; ++i)
 			{
-				uploadBufferView(positionAccessor->bufferView);
+				if (auto attributeAccessor = meshPrimitive->attributes.byIndex[i])
+				{
+					uploadBufferView(attributeAccessor->bufferView);
+				}
 			}
-			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
-			{
-				uploadBufferView(textureAccessor->bufferView);
-			}
-			if (auto normalAccessor = meshPrimitive->getNormals())
-			{
-				uploadBufferView(normalAccessor->bufferView);
-			}
+
 			if (auto indexAccessor = meshPrimitive->getIndeces())
 			{
 				uploadBufferView(indexAccessor->bufferView);
@@ -397,37 +287,48 @@ namespace render
 			glGenVertexArrays(1, &meshPrimitive->ID);
 			glBindVertexArray(meshPrimitive->ID);
 
-			if (auto positionAccessor = meshPrimitive->getPositions())
+#define ATTRIBUTE_LOCATION_POSITION 0
+#define ATTRIBUTE_LOCATION_NORNAL 1
+#define ATTRIBUTE_LOCATION_TEXTURE_COORD_0 2
+#define ATTRIBUTE_LOCATION_TEXTURE_COORD_1 3
+#define ATTRIBUTE_LOCATION_COLOR 4
+#define ATTRIBUTE_LOCATION_JOINTS 5
+#define ATTRIBUTE_LOCATION_WEIGHTS 6
+#define ATTRIBUTE_LOCATION_TANGENTS 7
+
+			for (size_t i = 0; i < mitevox::MeshAttributeSet::attributesCount; ++i)
 			{
-				glEnableVertexAttribArray(posAttrib);
-				glBindBuffer(GL_ARRAY_BUFFER, positionAccessor->bufferView->ID);
-				glVertexAttribPointer(posAttrib, 3, 
-					positionAccessor->componentType, 
-					positionAccessor->normalized,
-					positionAccessor->bufferView->byteStride,
-					(void*)positionAccessor->byteOffset);
+				if (auto attributeAccessor = meshPrimitive->attributes.byIndex[i])
+				{
+					if (i != ATTRIBUTE_LOCATION_JOINTS)
+					{
+						const size_t attributeLocation = i;
+						glEnableVertexAttribArray(attributeLocation);
+						glBindBuffer(GL_ARRAY_BUFFER, attributeAccessor->bufferView->ID);
+						glVertexAttribPointer(
+							attributeLocation,
+							attributeAccessor->getComponentsCount(),
+							attributeAccessor->componentType,
+							attributeAccessor->normalized,
+							attributeAccessor->bufferView->byteStride,
+							(void*)attributeAccessor->byteOffset);
+					}
+					else
+					{
+						const size_t attributeLocation = ATTRIBUTE_LOCATION_JOINTS;
+						glEnableVertexAttribArray(attributeLocation);
+						glBindBuffer(GL_ARRAY_BUFFER, attributeAccessor->bufferView->ID);
+						glVertexAttribIPointer(
+							attributeLocation,
+							attributeAccessor->getComponentsCount(),
+							attributeAccessor->componentType,
+							attributeAccessor->bufferView->byteStride,
+							(void*)attributeAccessor->byteOffset);
+					}
+					
+				}
 			}
-			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
-			{
-				glEnableVertexAttribArray(texAttrib);
-				glBindBuffer(GL_ARRAY_BUFFER, textureAccessor->bufferView->ID);
-				glVertexAttribPointer(texAttrib, 2, 
-					textureAccessor->componentType, 
-					textureAccessor->normalized,
-					textureAccessor->bufferView->byteStride,
-					(void*)textureAccessor->byteOffset);
-			}
-			if (auto normalAccessor = meshPrimitive->getNormals())
-			{
-				glEnableVertexAttribArray(normalAttrib);
-				glBindBuffer(GL_ARRAY_BUFFER, normalAccessor->bufferView->ID);
-				glVertexAttribPointer(
-					normalAttrib, 3, 
-					normalAccessor->componentType, 
-					normalAccessor->normalized,
-					normalAccessor->bufferView->byteStride,
-					(void*)normalAccessor->byteOffset);
-			}
+
 			if (auto indexAccessor = meshPrimitive->getIndeces())
 			{
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexAccessor->bufferView->ID);
@@ -454,18 +355,14 @@ namespace render
 		{
 			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
 
-			if (auto positionAccessor = meshPrimitive->getPositions())
+			for (size_t i = 0; i < mitevox::MeshAttributeSet::attributesCount; ++i)
 			{
-				updateBufferView(positionAccessor->bufferView);
+				if (auto attributeAccessor = meshPrimitive->attributes.byIndex[i])
+				{
+					updateBufferView(attributeAccessor->bufferView);
+				}
 			}
-			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
-			{
-				updateBufferView(textureAccessor->bufferView);
-			}
-			if (auto normalAccessor = meshPrimitive->getNormals())
-			{
-				updateBufferView(normalAccessor->bufferView);
-			}
+
 			if (auto indexAccessor = meshPrimitive->getIndeces())
 			{
 				updateBufferView(indexAccessor->bufferView);
@@ -490,18 +387,14 @@ namespace render
 			mitevox::MeshPrimitive* meshPrimitive = mesh->primitives.getElement(primitiveIndex);
 			glDeleteVertexArrays(1, &meshPrimitive->ID);
 
-			if (auto positionAccessor = meshPrimitive->getPositions())
+			for (size_t i = 0; i < mitevox::MeshAttributeSet::attributesCount; ++i)
 			{
-				removeBufferView(positionAccessor->bufferView);
+				if (auto attributeAccessor = meshPrimitive->attributes.byIndex[i])
+				{
+					removeBufferView(attributeAccessor->bufferView);
+				}
 			}
-			if (auto textureAccessor = meshPrimitive->getTextureCoords_0())
-			{
-				removeBufferView(textureAccessor->bufferView);
-			}
-			if (auto normalsAccessor = meshPrimitive->getNormals())
-			{
-				removeBufferView(normalsAccessor->bufferView);
-			}
+
 			if (auto indexAccessor = meshPrimitive->getIndeces())
 			{
 				removeBufferView(indexAccessor->bufferView);
@@ -525,18 +418,19 @@ namespace render
 		shaders[shaderID]->setInt("hasCubemap", 0);
 		shaders[shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
 
-		const glm::highp_quat rotation(
+		/*const glm::highp_quat rotation(
 			transform->rotation.binary.scalar, 
 			transform->rotation.binary.vector.x(), 
 			transform->rotation.binary.vector.y(), 
 			transform->rotation.binary.vector.z());
 		glm::mat4 rotationMatrix = glm::mat4_cast<float, glm::packed_highp>(rotation);
-		glm::mat4 global = glm::mat4(1.0f);
-		global = glm::translate(global, glm::vec3(transform->translation.x(), transform->translation.y(), transform->translation.z()));
-		global *= rotationMatrix;
-		global = glm::scale(global, glm::vec3(transform->scale.x(), transform->scale.y(), transform->scale.z()));
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(transform->translation.x(), transform->translation.y(), transform->translation.z()));
+		modelMatrix *= rotationMatrix;
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(transform->scale.x(), transform->scale.y(), transform->scale.z()));*/
 
-		shaders[shaderID]->setMat4("model", global);
+		mathem::Matrix4x4 modelMatrix = mathem::transformToMatrix(*transform);
+		shaders[shaderID]->setMatrix4x4("modelMatrix", modelMatrix);
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -544,11 +438,11 @@ namespace render
 		view = glm::rotate(view, -glm::radians(cameraTransform->angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
 		view = glm::translate(view, glm::vec3(-cameraTransform->x, -cameraTransform->y, cameraTransform->z));
 
-		glm::mat4 proj = glm::mat4(1.0f);
-		proj = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
+		glm::mat4 projection = glm::mat4(1.0f);
+		projection = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
 
-		glm::mat4 positionTransform = proj * view * global;
-		shaders[shaderID]->setMat4("positionTransform", positionTransform);
+		glm::mat4 viewProjectionMatrix = projection * view;
+		shaders[shaderID]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
 
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
@@ -566,7 +460,8 @@ namespace render
 			}
 			else
 			{
-				glDrawArrays(GL_TRIANGLES, 0, meshPrimitive->attributes.positionAccessor->count);
+				size_t vertecesCount = meshPrimitive->attributes.byName.positionAccessor->count;
+				glDrawArrays(GL_TRIANGLES, 0, vertecesCount);
 			}
 
 			glBindVertexArray(0);
@@ -574,55 +469,6 @@ namespace render
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 			PRINT_RENDERER_ERRORS;
-		}
-	}
-
-	void uploadNodeRecursively(mitevox::Node* node, int shaderID)
-	{
-		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
-		{
-			render::uploadMesh(meshToRender, shaderID);
-		}
-
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			uploadNodeRecursively(node->children.getElement(i), shaderID);
-		}
-	}
-
-	void removeNodeRecursively(mitevox::Node* node, int shaderID)
-	{
-		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
-		{
-			render::removeMesh(meshToRender, shaderID);
-		}
-
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			removeNodeRecursively(node->children.getElement(i), shaderID);
-		}
-	}
-
-	void renderNodeRecursively(RendererSettings* renderer, int shaderID, mitevox::Node* node, mathem::GeometryTransform* transform, Camera* camera, mathem::Transform* cameraTransform)
-	{
-		mathem::GeometryTransform nodeGlobalTransform = *transform * node->transform;
-		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
-		{
-			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
-		}
-
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			renderNodeRecursively(
-				renderer, 
-				shaderID, 
-				node->children.getElement(i), 
-				&nodeGlobalTransform, 
-				camera, 
-				cameraTransform);
 		}
 	}
 
@@ -637,55 +483,6 @@ namespace render
 	{
 		glDeleteBuffers(1, &skybox->vertexID);
 		glDeleteTextures(1, &skybox->cubemap->textureID);
-	}
-
-
-	// Drawing
-
-	void renderModel3D(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, render::Camera* camera, mathem::Transform* cameraTransform)
-	{
-		if (!shaders[model3D->shaderID]->use())
-			return;
-
-		renderer->amountOfDrawCalls++;
-
-		shaders[model3D->shaderID]->setInt("hasCubemap", 0);
-		shaders[model3D->shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
-
-		glm::mat4 global = glm::mat4(1.0f);
-		global = glm::translate(global, glm::vec3(transform->x, transform->y, transform->z));
-		global = glm::scale(global, glm::vec3(transform->scaleX, transform->scaleY, transform->scaleZ));
-		global = glm::rotate(global, glm::radians(transform->angleX), glm::vec3(1.0, 0.0, 0.0));
-		global = glm::rotate(global, glm::radians(transform->angleY), glm::vec3(0.0, 1.0, 0.0));
-		global = glm::rotate(global, glm::radians(transform->angleZ), glm::vec3(0.0, 0.0, 1.0));
-
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(model3D->transform.x, model3D->transform.y, model3D->transform.z));
-		model = glm::scale(model, glm::vec3(model3D->transform.scaleX, model3D->transform.scaleY, model3D->transform.scaleZ));
-		model = glm::rotate(model, glm::radians(model3D->transform.angleX), glm::vec3(1.0, 0.0, 0.0));
-		model = glm::rotate(model, glm::radians(model3D->transform.angleY), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::rotate(model, glm::radians(model3D->transform.angleZ), glm::vec3(0.0, 0.0, 1.0));
-
-		glm::mat4 modelTransform = glm::mat4(1.0f);
-		modelTransform = global * model;
-		shaders[model3D->shaderID]->setMat4("model", modelTransform);
-
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleY), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
-		view = glm::translate(view, glm::vec3(-cameraTransform->x, -cameraTransform->y, cameraTransform->z));
-
-		glm::mat4 proj = glm::mat4(1.0f);
-		proj = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
-
-		glm::mat4 positionTransform = glm::mat4(1.0f);
-		positionTransform = proj * view * modelTransform;
-		shaders[model3D->shaderID]->setMat4("positionTransform", positionTransform);
-		
-		selectModel3D(model3D);
-
-		glDrawArrays(GL_TRIANGLES, 0, model3D->mesh->polygonsCount * 3);
 	}
 
 	void renderSkybox(RendererSettings* renderer, Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform)

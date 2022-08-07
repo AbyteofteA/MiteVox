@@ -58,7 +58,12 @@ namespace fileio
 
 					animationFramesCount = timeAccessor->count;
 
-					std::string interpolationTypeString = animationSamplerJSON->getField("interpolation")->getString();
+					std::string interpolationTypeString = "LINEAR";
+					if (JSON* interpolationTypeJSON = animationSamplerJSON->getField("interpolation"))
+					{
+						interpolationTypeString = interpolationTypeJSON->getString();
+					}
+
 					if (interpolationTypeString == "LINEAR")
 					{
 						interpolationType = mitevox::InterpolationType::LINEAR;

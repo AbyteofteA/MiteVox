@@ -1,6 +1,6 @@
 #include "SceneCodec.h"
 
-#include "engine/MiteVox/src/Scene.h"
+#include "engine/MiteVox/src/Playground/Scene.h"
 
 namespace fileio
 {

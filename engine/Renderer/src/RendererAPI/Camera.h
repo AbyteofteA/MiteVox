@@ -21,12 +21,12 @@ namespace render
 		std::string _name;
 		float FOV = 45.f;
 		int width, height;
-		float nearCullPlane = 0.f;
+		float nearCullPlane = 0.1f;
 		float farCullPlane = 100000.f;
 
 		Camera() {}
 
-		Camera(float _FOV, int _width, int _height, float _nearCullPlane = 1.f, float _farCullPlane = 10000.f)
+		Camera(float _FOV, int _width, int _height, float _nearCullPlane = 0.1f, float _farCullPlane = 10000.f)
 		{
 			FOV = _FOV;
 			width = _width;

@@ -217,15 +217,16 @@ void main()
 	vec3 result = vec3(1.0, 0.0, 1.0);
 	switch (material.illuminationModel)
 	{
-	case ILLUMINATION_MODEL_CONSTANT_COLOR:
-		result = albedoFragment;
-		break;
-
 	case ILLUMINATION_MODEL_SPECULAR:
 		result = albedoFragment *
 			(calculate_DirectionalLight(norm, viewDir, roughness, metallicity) +
 				calculate_PointLight(norm, viewDir, roughness, metallicity) +
 				calculate_SpotLight(norm, viewDir, roughness, metallicity));
+		break;
+
+	case ILLUMINATION_MODEL_CONSTANT_COLOR:
+	default:
+		result = albedoFragment;
 		break;
 	}
 	outColor = vec4(result, 1.0);

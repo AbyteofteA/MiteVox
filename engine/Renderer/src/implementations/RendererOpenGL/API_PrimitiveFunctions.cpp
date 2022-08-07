@@ -96,8 +96,8 @@ namespace render
 		positionTransform = proj * view;
 		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
-		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "position");
-		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "color");
+		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
+		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
 
 		unsigned int pointsVBO;
 		unsigned int pointsArrayID;
@@ -144,8 +144,8 @@ namespace render
 		positionTransform = proj * view;
 		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
-		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "position");
-		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "color");
+		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
+		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
 
 		unsigned int linesVBO;
 		unsigned int linesArrayID;
@@ -192,8 +192,8 @@ namespace render
 		positionTransform = proj * view;
 		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
-		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "position");
-		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->textureID, "color");
+		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
+		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
 
 		unsigned int trianglesVBO;
 		unsigned int trianglesArrayID;

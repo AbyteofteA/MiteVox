@@ -10,6 +10,7 @@
 #include "engine/FileIO/src/PlaygroundCodec/NodeCodec.h"
 #include "engine/FileIO/src/PlaygroundCodec/SceneCodec.h"
 #include "engine/FileIO/src/AnimationCodec/AnimationCodec.h"
+#include "engine/FileIO/src/SkeletonCodec/NodeBasedSkeletonCodec.h"
 
 #include <string>
 
@@ -28,14 +29,12 @@ namespace fileio
 
 		JSON* camerasArrayJSON = playgroundJSON->getFieldArray("cameras");
 		collectCameras(playgroundResult, camerasArrayJSON);
-
 		JSON* buffersArrayJSON = playgroundJSON->getFieldArray("buffers");
 		collectBuffers(playgroundResult, buffersArrayJSON, filePath);
 		JSON* bufferViewsArrayJSON = playgroundJSON->getFieldArray("bufferViews");
 		collectBufferViews(playgroundResult, bufferViewsArrayJSON);
 		JSON* accessorsArrayJSON = playgroundJSON->getFieldArray("accessors");
 		collectAccessors(playgroundResult, accessorsArrayJSON);
-
 		JSON* imageSamplerJSON = playgroundJSON->getFieldArray("samplers");
 		collectImageSamplers(playgroundResult, imageSamplerJSON);
 		JSON* imagesJSON = playgroundJSON->getFieldArray("images");
@@ -44,17 +43,27 @@ namespace fileio
 		collectTextures(playgroundResult, texturesJSON);
 		JSON* materialsJSON = playgroundJSON->getFieldArray("materials");
 		collectMaterials(playgroundResult, materialsJSON);
-
 		JSON* meshesArrayJSON = playgroundJSON->getFieldArray("meshes");
 		collectMeshes(playgroundResult, meshesArrayJSON);
-
 		JSON* nodesArrayJSON = playgroundJSON->getFieldArray("nodes");
 		collectNodes(playgroundResult, nodesArrayJSON);
 		JSON* scenesArrayJSON = playgroundJSON->getFieldArray("scenes");
 		collectScenes(playgroundResult, scenesArrayJSON);
-
 		JSON* animationsArrayJSON = playgroundJSON->getFieldArray("animations");
 		collectAnimations(playgroundResult, animationsArrayJSON);
+		JSON* skinsArrayJSON = playgroundJSON->getFieldArray("skins");
+		collectSkins(playgroundResult, skinsArrayJSON);
+
+		// Resolve skeletons pointers from indeces
+		size_t nodesCount = playgroundResult->nodes.getElementsCount();
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
+			mitevox::Node* node = playgroundResult->nodes.getElement(i);
+			if (node->skeleton != 0)
+			{
+				node->skeleton = playgroundResult->skeletons.getElement((size_t)node->skeleton - 1);
+			}
+		}
 	}
 
 	void PlaygroundCodecGLTF::collectCameras(mitevox::Playground* playgroundResult, fileio::JSON* camerasArrayJSON)
@@ -346,6 +355,20 @@ namespace fileio
 			mitevox::Scene* scene = new mitevox::Scene();
 			SceneCodec::fromGLTF(scene, sceneJSON, &playgroundResult->nodes);
 			playgroundResult->scenes.setElement((int64_t)i, scene);
+
+			if (scene->activeCameraNode == nullptr)
+			{
+				size_t nodesCount = scene->nodes.getElementsCount();
+				for (size_t i = 0; i < nodesCount; ++i)
+				{
+					mitevox::Node* node = scene->nodes.getElement(i);
+					if (node->camera)
+					{
+						scene->activeCameraNode = node;
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -369,6 +392,29 @@ namespace fileio
 				&playgroundResult->nodes, 
 				&playgroundResult->accessors);
 			playgroundResult->animations.setElement((int64_t)i, animation);
+		}
+	}
+
+	void PlaygroundCodecGLTF::collectSkins(mitevox::Playground* playgroundResult, JSON* skinsArrayJSON)
+	{
+		if (skinsArrayJSON == nullptr)
+		{
+			return;
+		}
+
+		size_t skinsCount = skinsArrayJSON->getArraySize();
+		playgroundResult->skeletons.resize(skinsCount);
+		playgroundResult->skeletons.fillWithZeros();
+
+		for (size_t i = 0; i < skinsCount; ++i)
+		{
+			JSON* skinJSON = skinsArrayJSON->getArrayItem(i);
+			mitevox::NodeBasedSkeleton* skeleton = new mitevox::NodeBasedSkeleton();
+			NodeBasedSkeletonCodec::fromGLTF(
+				skeleton, skinJSON,
+				&playgroundResult->nodes,
+				&playgroundResult->accessors);
+			playgroundResult->skeletons.setElement((int64_t)i, skeleton);
 		}
 	}
 }

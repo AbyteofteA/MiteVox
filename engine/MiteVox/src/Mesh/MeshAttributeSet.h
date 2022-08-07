@@ -9,15 +9,26 @@ namespace mitevox
     {
     public:
 
-        BufferViewAccessor* positionAccessor = nullptr;
-        BufferViewAccessor* normalAccessor = nullptr;
-        BufferViewAccessor* tangentAccessor = nullptr;
-        BufferViewAccessor* textureCoordAccessor_0 = nullptr;
-        BufferViewAccessor* textureCoordAccessor_1 = nullptr;
-        BufferViewAccessor* colorAccessor_0 = nullptr;
-        BufferViewAccessor* jointsAccessor_0 = nullptr;
-        BufferViewAccessor* weightsAccessor_0 = nullptr;
+        static const size_t attributesCount = 8;
 
+        union 
+        {
+            struct
+            {
+                BufferViewAccessor* positionAccessor = nullptr;
+                BufferViewAccessor* normalAccessor = nullptr;
+                BufferViewAccessor* textureCoordAccessor_0 = nullptr;
+                BufferViewAccessor* textureCoordAccessor_1 = nullptr;
+                BufferViewAccessor* colorAccessor_0 = nullptr;
+                BufferViewAccessor* jointsAccessor_0 = nullptr;
+                BufferViewAccessor* weightsAccessor_0 = nullptr;
+                BufferViewAccessor* tangentAccessor = nullptr;
+            } byName;
+            BufferViewAccessor* byIndex[attributesCount];
+        };
+
+        MeshAttributeSet();
+        
         void makeSeparateCopyTo(MeshAttributeSet* resultMeshAttributeSet);
     };
 }

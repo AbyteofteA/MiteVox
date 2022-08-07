@@ -1,8 +1,8 @@
 
 #include "Playground.h"
 
-#include "Scene.h"
-#include "EngineSettings.h"
+#include "engine/MiteVox/src/Playground/Scene.h"
+#include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/Math/src/Generators/UniqueIDGenerator.h"
 
 #include <unordered_map>

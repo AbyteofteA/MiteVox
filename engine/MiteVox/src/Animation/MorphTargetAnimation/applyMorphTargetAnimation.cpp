@@ -8,7 +8,7 @@ namespace mitevox
 		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
 		{
 			MeshPrimitive* meshPrimitive = meshNode->mesh->primitives.getElement(primitiveIndex);
-			MeshPrimitive* meshAnimationTargetPrimitive = meshNode->meshAnimationTarget->primitives.getElement(primitiveIndex);
+			MeshPrimitive* meshAnimationTargetPrimitive = meshNode->morphAnimationTarget->primitives.getElement(primitiveIndex);
 			size_t vertecesCount = meshPrimitive->getVertecesCount();
 			for (size_t vertexIndex = 0; vertexIndex < vertecesCount; ++vertexIndex)
 			{

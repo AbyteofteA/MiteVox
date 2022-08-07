@@ -46,6 +46,7 @@ namespace mitevox
 	mathem::Vector3D Mesh::getVertexPosition(uint32_t index)
 	{
 		mathem::Vector3D resultPoint;
+		resultPoint.setAll(0.0f);
 
 		uint32_t primitivesCount = primitives.getElementsCount();
 		for (uint32_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)

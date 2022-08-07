@@ -1,11 +1,12 @@
 
 #include "Engine.h"
 
-#include "EngineSettings.h"
-#include "Playground.h"
+#include "engine/MiteVox/src/EngineSettings.h"
+#include "engine/MiteVox/src/Playground/Playground.h"
 
 #include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
 #include "engine/MiteVox/src/Animation/MorphTargetAnimation/applyMorphTargetAnimation.h"
+#include "engine/MiteVox/src/Skeleton/SkeletonBase.h"
 
 #include <string>
 #include <vector>
@@ -40,7 +41,7 @@ namespace mitevox
 		primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
 		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
 
-		uploadNodesRecursively(&playground->nodes, basicShader);
+		uploadNodes(&playground->nodes, basicShader);
 
 		onCreate();
 	}
@@ -93,7 +94,7 @@ namespace mitevox
 				scene->update(deltaTime);
 
 				// Execute scripts
-				scene->ECS->updateComponent(scene->NativeScript_Component, scene);
+				scene->ECS->updateComponent(scene->NativeScript_Component, playground);
 
 				// Cleanup
 				scene->timeSinceCleanup += deltaTime;
@@ -151,8 +152,7 @@ namespace mitevox
 					scene->ECS->updateComponent(scene->PointLight_Component, scene);
 					scene->ECS->updateComponent(scene->SpotLight_Component, scene);
 
-					render::Camera* camera =
-						(render::Camera*)scene->ECS->getComponent(scene->activeCamera, scene->Camera_Component);
+					render::Camera* camera = scene->activeCameraNode->camera;
 					mathem::Transform* cameraTransform =
 						(mathem::Transform*)scene->ECS->getComponent(scene->activeCamera, scene->Transform_Component);
 
@@ -168,7 +168,7 @@ namespace mitevox
 					}
 
 					// Render 3D models.
-					renderNodesRecursively(nodesToRender, basicShader, camera, cameraTransform);
+					renderNodes(nodesToRender, basicShader, camera, cameraTransform);
 
 					// Render primitives.
 					render::renderPoints(renderer, camera, cameraTransform);
@@ -187,10 +187,10 @@ namespace mitevox
 	{
 		if (node->mesh)
 		{
-			if (node->isAnimatedMesh())
+			if (node->isMorphableMesh())
 			{
-				node->meshAnimationTarget = new Mesh();
-				node->mesh->makeCopyForAnimationTo(node->meshAnimationTarget);
+				node->morphAnimationTarget = new Mesh();
+				node->mesh->makeCopyForAnimationTo(node->morphAnimationTarget);
 			}
 
 			// Apply default material where needed
@@ -213,6 +213,25 @@ namespace mitevox
 
 	void Engine::preparePlayground()
 	{
+		// Add a default camera to every scene that doesn't have one
+		if (playground->cameras.getElementsCount() == 0)
+		{
+			render::Camera* camera = new render::Camera(50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 100000);
+			Node* cameraNode = new Node();
+			cameraNode->camera = camera;
+			cameraNode->transform.translation = { 0.0f, 0.0f, -30.0f };
+			size_t nodesCount = playground->nodes.getElementsCount();
+			playground->cameras.appendElement(camera);
+			playground->nodes.appendElement(cameraNode);
+
+			size_t scenesCount = playground->scenes.getElementsCount();
+			for (size_t i = 0; i < scenesCount; ++i)
+			{
+				Scene* scene = playground->scenes.getElement(i);
+				scene->activeCameraNode = cameraNode;
+			}
+		}
+
 		size_t nodesCount = playground->nodes.getElementsCount();
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
@@ -250,9 +269,10 @@ namespace mitevox
 			render::updateMesh(node->getMeshToRender(), basicShader);
 		}
 
-		if (0/*node->skinIndex*/)
+		if (node->skeleton)
 		{
-			// TODO: apply skeletal animation to node->resultMesh
+			// TODO: node->skeleton->globalTransform = ;
+			node->skeleton->updateJointMatrices();
 		}
 
 		size_t childrenCount = node->children.getElementsCount();
@@ -281,16 +301,59 @@ namespace mitevox
 		}
 	}
 
-	void Engine::uploadNodesRecursively(safety::SafeArray<Node*>* nodes, int shaderID)
+	void Engine::uploadNodeRecursively(Node* node, int shaderID)
+	{
+		if (Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::uploadMesh(meshToRender, shaderID);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			uploadNodeRecursively(node->children.getElement(i), shaderID);
+		}
+	}
+
+	void Engine::uploadNodes(safety::SafeArray<Node*>* nodes, int shaderID)
 	{
 		size_t nodesCount = nodes->getElementsCount();
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
-			render::uploadNodeRecursively(nodes->getElement(i), shaderID);
+			uploadNodeRecursively(nodes->getElement(i), shaderID);
 		}
 	}
 
-	void Engine::renderNodesRecursively(
+	void Engine::renderNodeRecursively(
+		render::RendererSettings* renderer,
+		int shaderID,
+		Node* node,
+		mathem::GeometryTransform* transform,
+		render::Camera* camera,
+		mathem::Transform* cameraTransform)
+	{
+		mathem::GeometryTransform nodeGlobalTransform = *transform * node->transform;
+
+		if (auto meshToRender = node->getMeshToRender())
+		{
+			render::tryUploadSkeleton(node, shaderID);
+			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			renderNodeRecursively(
+				renderer,
+				shaderID,
+				node->children.getElement(i),
+				&nodeGlobalTransform,
+				camera,
+				cameraTransform);
+		}
+	}
+
+	void Engine::renderNodes(
 		safety::SafeArray<Node*>* nodes, 
 		int shaderID, 
 		render::Camera* camera, 
@@ -300,13 +363,27 @@ namespace mitevox
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
 			mathem::GeometryTransform transform;
-			render::renderNodeRecursively(
+			renderNodeRecursively(
 				settings->renderer, 
 				shaderID, 
 				nodes->getElement(i), 
 				&transform, 
 				camera, 
 				cameraTransform);
+		}
+	}
+
+	void Engine::removeNodeRecursively(Node* node, int shaderID)
+	{
+		if (Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::removeMesh(meshToRender, shaderID);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			removeNodeRecursively(node->children.getElement(i), shaderID);
 		}
 	}
 }

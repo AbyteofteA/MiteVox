@@ -102,7 +102,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t positionAccessorIndex = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->positionAccessor = accessors->getElement(positionAccessorIndex);
+				meshAttributeSet->byName.positionAccessor = accessors->getElement(positionAccessorIndex);
 			}
 		}
 		numberJSON = meshAttributesJSON->getField("NORMAL");
@@ -111,7 +111,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t normalAccessorIndex = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->normalAccessor = accessors->getElement(normalAccessorIndex);
+				meshAttributeSet->byName.normalAccessor = accessors->getElement(normalAccessorIndex);
 			}
 		}
 		numberJSON = meshAttributesJSON->getField("TANGENT");
@@ -120,7 +120,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t tangentAccessorIndex = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->tangentAccessor = accessors->getElement(tangentAccessorIndex);
+				meshAttributeSet->byName.tangentAccessor = accessors->getElement(tangentAccessorIndex);
 			}
 		}
 		numberJSON = meshAttributesJSON->getField("TEXCOORD_0");
@@ -129,7 +129,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t textureCoordAccessorIndex_0 = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->textureCoordAccessor_0 = accessors->getElement(textureCoordAccessorIndex_0);
+				meshAttributeSet->byName.textureCoordAccessor_0 = accessors->getElement(textureCoordAccessorIndex_0);
 			}
 		}
 		numberJSON = meshAttributesJSON->getField("TEXCOORD_1");
@@ -138,7 +138,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t textureCoordAccessorIndex_1 = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->textureCoordAccessor_1 = accessors->getElement(textureCoordAccessorIndex_1);
+				meshAttributeSet->byName.textureCoordAccessor_1 = accessors->getElement(textureCoordAccessorIndex_1);
 			}
 		}
 		numberJSON = meshAttributesJSON->getField("COLOR_0");
@@ -147,7 +147,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t colorAccessorIndex_0 = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->colorAccessor_0 = accessors->getElement(colorAccessorIndex_0);
+				meshAttributeSet->byName.colorAccessor_0 = accessors->getElement(colorAccessorIndex_0);
 			}
 		}
 		numberJSON = meshAttributesJSON->getField("JOINTS_0");
@@ -156,7 +156,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t jointsAccessorIndex_0 = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->jointsAccessor_0 = accessors->getElement(jointsAccessorIndex_0);
+				meshAttributeSet->byName.jointsAccessor_0 = accessors->getElement(jointsAccessorIndex_0);
 			}
 		}
 		numberJSON = meshAttributesJSON->getField("WEIGHTS_0");
@@ -165,7 +165,7 @@ namespace fileio
 			if (numberJSON->isNumber())
 			{
 				int32_t weightsAccessorIndex_0 = (int32_t)numberJSON->getNumber();
-				meshAttributeSet->weightsAccessor_0 = accessors->getElement(weightsAccessorIndex_0);
+				meshAttributeSet->byName.weightsAccessor_0 = accessors->getElement(weightsAccessorIndex_0);
 			}
 		}
 	}

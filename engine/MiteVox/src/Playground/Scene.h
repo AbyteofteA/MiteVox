@@ -3,7 +3,7 @@
 #define MITEVOX_SCENE_H
 
 #include "engine/CodeSafety/src/SafeArray.h"
-#include "engine/MiteVox/src/Node.h"
+#include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/entityID.h"
 #include "engine/Renderer/src/RendererAPI/Skybox.h"
@@ -18,12 +18,11 @@
 
 // Default components IDs //
 
-#define CAMERA_COMPONENT 0
-#define POINTLIGHT_COMPONENT 1
-#define DIRECTEDLIGHT_COMPONENT 2
-#define SPOTLIGHT_COMPONENT 3
-#define TRANSFORM_COMPONENT 4
-#define NATIVE_SCRIPT_COMPONENT 5
+#define POINTLIGHT_COMPONENT 0
+#define DIRECTEDLIGHT_COMPONENT 1
+#define SPOTLIGHT_COMPONENT 2
+#define TRANSFORM_COMPONENT 3
+#define NATIVE_SCRIPT_COMPONENT 4
 
 namespace mitevox
 {
@@ -39,6 +38,7 @@ namespace mitevox
 		std::vector<render::Skybox> skyboxes;
 		long activeSkybox = -1;
 		entityID activeCamera = -1;
+		mitevox::Node* activeCameraNode = nullptr;
 
 		EngineSettings* settings = nullptr;
 
@@ -52,7 +52,6 @@ namespace mitevox
 
 		// Renderer components
 
-		MANAGER_INDEX_TYPE Camera_Component = 0;
 		MANAGER_INDEX_TYPE PointLight_Component = 0;
 		MANAGER_INDEX_TYPE DirectedLight_Component = 0;
 		MANAGER_INDEX_TYPE SpotLight_Component = 0;

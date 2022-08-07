@@ -3,6 +3,9 @@
 #define SHADEROPENGL_H
 
 #include "engine/Renderer/src/RendererAPI/RendererSettings.h"
+#include "engine/Math/src/Vector.h"
+#include "engine/Math/src/Matrix.h"
+#include "engine/CodeSafety/src/SafeArray.h"
 
 #include "dependencies/glm/glm.hpp"
 #include "dependencies/glm/gtc/matrix_transform.hpp"
@@ -20,7 +23,7 @@ namespace render
 
         std::string name;
 
-        unsigned int textureID = 0;
+        unsigned int shaderID = 0;
         unsigned int vertexID = 0;
         unsigned int fragmentID = 0;
         
@@ -69,6 +72,14 @@ namespace render
         void setMat2(const char* name, glm::mat2 mat);
         void setMat3(const char* name, glm::mat3 mat);
         void setMat4(const char* name, glm::mat4 mat);
+        void setVector2D(const char* name, mathem::Vector2D vector);
+        void setVector3D(const char* name, mathem::Vector3D vector);
+        void setVector4D(const char* name, mathem::Vector4D vector);
+        void setUnsignedVector4D(const char* name, mathem::Vector4D vector);
+        void setMatrix2x2(const char* name, mathem::Matrix2x2 matrix);
+        void setMatrix3x3(const char* name, mathem::Matrix3x3 matrix);
+        void setMatrix4x4(const char* name, mathem::Matrix4x4 matrix);
+        void setMatrix4x4Array(const char* name, safety::SafeArray<mathem::Matrix4x4>* matrices);
     };
 }
 

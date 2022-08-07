@@ -11,8 +11,8 @@
 
 #include "engine/MiteVox/src/entityID.h"
 #include "engine/MiteVox/src/NativeScript.h"
-#include "engine/MiteVox/src/Scene.h"
-#include "engine/MiteVox/src/Playground.h"
+#include "engine/MiteVox/src/Playground/Scene.h"
+#include "engine/MiteVox/src/Playground/Playground.h"
 #include "engine/MiteVox/src/Engine.h"
 
 #endif

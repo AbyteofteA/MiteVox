@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Convertations.cpp" />
     <ClCompile Include="src\Quaternion.cpp" />
     <ClCompile Include="src\DataStructures\Graphs\BinarySearchTree.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\BoxGeometry.cpp" />

@@ -11,7 +11,8 @@
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
-#include "engine/MiteVox/src/Node.h"
+#include "engine/MiteVox/src/Skeleton/SkeletonBase.h"
+#include "engine/MiteVox/src/Playground/Node.h"
 #include "Camera.h"
 #include "Mesh3D.h"
 #include "Model3D.h"
@@ -73,11 +74,6 @@ printErrors(__FILE__, __LINE__);
 
 	// Models
 
-	void uploadModel3D(Model3D* model3D);
-	void selectModel3D(Model3D* model3D);
-	void removeModel3D(Model3D* model3D);
-	void renderModel3D(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, Camera* camera, mathem::Transform* cameraTransform);
-	
 	void uploadMaterial(mitevox::Material* material, int shaderID);
 	void selectMaterial(mitevox::Material* material, int shaderID);
 	void removeMaterial(mitevox::Material* material, int shaderID);
@@ -86,24 +82,15 @@ printErrors(__FILE__, __LINE__);
 	void updateBufferView(mitevox::BufferView* bufferView);
 	void removeBufferView(mitevox::BufferView* bufferView);
 
+	mitevox::SkeletonBase* tryUploadSkeleton(mitevox::Node* node, int shaderID);
+
 	void uploadMesh(mitevox::Mesh* mesh, int shaderID);
 	void updateMesh(mitevox::Mesh* mesh, int shaderID);
-	void removeMesh(mitevox::Mesh* mesh);
+	void removeMesh(mitevox::Mesh* mesh, int shaderID);
 	void renderMesh(
 		RendererSettings* renderer, 
 		int shaderID, 
 		mitevox::Mesh* mesh, 
-		mathem::GeometryTransform* transform, 
-		Camera* camera, 
-		mathem::Transform* cameraTransform);
-	
-	void uploadNodeRecursively(mitevox::Node* node, int shaderID);
-	// TODO: void updateNodeRecursively(mitevox::Node* node, int shaderID);
-	void removeNodeRecursively(mitevox::Node* node);
-	void renderNodeRecursively(
-		RendererSettings* renderer, 
-		int shaderID, 
-		mitevox::Node* node, 
 		mathem::GeometryTransform* transform, 
 		Camera* camera, 
 		mathem::Transform* cameraTransform);

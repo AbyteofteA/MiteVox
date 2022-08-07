@@ -1,14 +1,14 @@
 
 #include "Scene.h"
 
-#include "EngineSettings.h"
-#include "entityID.h"
+#include "engine/MiteVox/src/EngineSettings.h"
+#include "engine/MiteVox/src/entityID.h"
 
-#include "callbacks/NativeScript_Callbacks.h"
-#include "callbacks/Transform_Callbacks.h"
-#include "callbacks/DirectedLight_Callbacks.h"
-#include "callbacks/PointLight_Callbacks.h"
-#include "callbacks/SpotLight_Callbacks.h"
+#include "engine/MiteVox/src/callbacks/NativeScript_Callbacks.h"
+#include "engine/MiteVox/src/callbacks/Transform_Callbacks.h"
+#include "engine/MiteVox/src/callbacks/DirectedLight_Callbacks.h"
+#include "engine/MiteVox/src/callbacks/PointLight_Callbacks.h"
+#include "engine/MiteVox/src/callbacks/SpotLight_Callbacks.h"
 
 namespace mitevox
 {
@@ -17,8 +17,6 @@ namespace mitevox
 		ECS = new ecs::EntityComponentSystem((entityID)100);
 
 		// Renderer components
-
-		Camera_Component = ECS->registerComponent("Camera", sizeof(render::Camera));
 
 		PointLight_Component = ECS->registerComponent("PointLight", sizeof(render::PointLight),
 			nullptr, PointLight_onUpdateAll, PointLight_onDelete);

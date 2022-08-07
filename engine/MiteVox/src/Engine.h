@@ -1,9 +1,8 @@
-
 #ifndef MITEVOX_ENGINE_H
 #define MITEVOX_ENGINE_H
 
 #include "EngineSettings.h"
-#include "Playground.h"
+#include "engine/MiteVox/src/Playground/Playground.h"
 #include "engine/Renderer/src/RendererAPI/Color.h"
 
 #include <chrono>
@@ -46,12 +45,24 @@ namespace mitevox
 		void animateNodeRecursively(Node* node, float deltaTime);
 		void animateNodes(safety::SafeArray<Node*>* nodes, float deltaTime);
 
-		void uploadNodesRecursively(safety::SafeArray<Node*>* nodes, int shaderID);
-		void renderNodesRecursively(
+		void uploadNodeRecursively(Node* node, int shaderID);
+		void uploadNodes(safety::SafeArray<Node*>* nodes, int shaderID);
+		
+		void renderNodeRecursively(
+			render::RendererSettings* renderer,
+			int shaderID,
+			Node* node,
+			mathem::GeometryTransform* transform,
+			render::Camera* camera,
+			mathem::Transform* cameraTransform);
+		void renderNodes(
 			safety::SafeArray<Node*>* nodes,
 			int shaderID,
 			render::Camera* camera,
 			mathem::Transform* cameraTransform);
+
+		// TODO: void updateNodeRecursively(mitevox::Node* node, int shaderID);
+		void removeNodeRecursively(Node* node, int shaderID);
 	};
 }
 
