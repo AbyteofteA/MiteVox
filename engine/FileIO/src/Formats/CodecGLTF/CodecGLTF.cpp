@@ -48,6 +48,7 @@ namespace fileio
 
 		result = new mitevox::Playground();
 		PlaygroundCodecGLTF::fromGLTF(result, fileDataJSON, _path);
+		delete fileDataJSON;
 
 		return DeserializationStatus::COMPLETE;
 	}

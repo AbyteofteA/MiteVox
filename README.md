@@ -1,7 +1,7 @@
 
 # MiteVox
 
-MiteVox is a game engine (or rather a game framework so far). 
+MiteVox is a 3D game engine (or rather a game framework so far). 
 The engine is a result of experiments in Computer Graghics, Machine Learning and Computer Science in general.
 
 ## How to build
@@ -15,101 +15,58 @@ The project is built with ``Visual Studio 2022``.
 :robot: AI's virtual playground
 
 ## Screenshots
-Custom scene               | Duck from [glTF 2.0 Sample Models](https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0)
+Custom scene               | 
 ---------------------------|-----------------------------------
-![](docs/mitevox_demo.png) | ![](docs/duck_1.png)
+![](docs/mitevox_demo.png) | 
 
-## Structure, features & TODO
-:warning: - TODO
+## Structure & features
 
-### Custom project(s)
+### Demo project(s)
 The solution contains an example project: `sandbox / DemoProject`
-- engine_config.json
 
 ### engine / MiteVox
 The core of the engine. It defines the **entry point**.
-- Scene
-- Scene serialization: :warning:glTF, :warning:CBOR
-- Scripting: Native (C++), :warning:Lua
+- Skeletal animation
+- Morph target animation (per-vertex animation)
+- engine_config.json
 
-### engine / ECSManager
-A custom Entity-Component-System. It's minimalistic.
-- Entity Component System
-- Prefabs
-- :warning:Hierarchy
+### engine / Renderer
+- Rendering APIs: OpenGL
+- Multiple lights
 
 ### engine / FileIO
-Contains the implementation of an object that reads and parses files asynchronously.
-- Asynchronous file loader & parser
-- Graphics: PNG, :warning:glTF, OBJ, :warning:MTL
-- Data interchange formats: JSON, :warning:CBOR
-- Audio files: :warning:MP3
-- Container formats: :warning:Ogg, :warning:ZIP
+Contains implementation of asynchronous file loader & parser.
 
 ### engine / Math
+- Vectors, Matrices, Quaternions
 - Data structures: Buffer, Half-table
-- Linear algebra: Point3D, Vector3D, :warning:Matrices
 - Numerical analysis:
   - Interpolation: Linear
 - Graphs:
-  - Trees: Binary search tree, Octree, :warning:Quad tree
-- Noise: :warning:Perlin, :warning:OpenSimplex
-
-### engine / Renderer
-Currently supports only OpenGL.
-- Primitives: Point, Line, Triangle
-- :warning:Sprites
-- Skybox
-- Model3D
-- Material:
-  - Texture maps: Albedo, Roughness, Metallic, :warning:Normal, :warning:Glow
-  - :warning:.mtl parser
-- Camera:
-  - :warning:Focal length
-- :warning:Multiple cameras
-- Lights: Ambient, Directional, Point light, :warning:Spot light
-- Multiple lights
-- :warning:PBR
+  - Trees: Binary search tree, Octree
 
 ### engine / AIModels
 - ML-models:
   - Feedforward Neural Networks
     - FullyConnectedLayer (+ backpropagation)
-    - :warning:ConvolutionalLayer2D (:warning:backpropagation)
-    - SubsamplingLayer2D (:warning:backpropagation)
-    - SoftmaxLayer (:warning:backpropagation)
+    - SubsamplingLayer2D
+    - SoftmaxLayer
   - Recurrent Neural Networks
     - HopfieldNetwork
-    - :warning:LongShortTermMemory
-  - Spiking Neural Networks
-    - Electrical
-      - :warning:Hodgkin–Huxley model
-      - Integrate-and-fire: :warning:Leaky, :warning:Adaptive, :warning:Fractional-order leaky, :warning:Exponential, :warning:Adaptive exponential.
-  - NeuralNetwork (class that joins different types of NNs)
-- Pathfinding:
-  - :warning:A*
-- :warning:StateMachine
+  - NeuralNetwork: class that joins different types of NNs
 
 ### engine / Physics
 Has an implementation of AABB collisions and defines rigid body.
-- Colliders:
-  - Primitive collider
-    - AABB intersection
-    - :warning:SAT intersection
-  - :warning:Mesh collider
-- Structures: Rigid body, :warning:Atoms
-- Classical mechanics: Kinematics, :warning:Dynamics, :warning:Statics
 
 ### engine / UIEventHandler
 Has a basic user I/O setup. It definitely needs redesign...
 
 ## :bug: Known bugs & limitations :bug:
-- [X] ~~The project requires switching between release and debug via a flag~~.
-- [ ] If you assign light position to a camera position, z-component needs to be negated (why?).
+- Skinned mesh uses global transform of the node that instantiates the mesh instead of global transform of the skeleton root.
+- [ ] Morph target animation seems to work fine, except for this model: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/MorphPrimitivesTest
 - [ ] .obj parser doesn't support polygon grouping by material.
 - [ ] .obj parser doesn't support polygon grouping by smoothing.
 - [ ] Binary search tree has global variables.
-- [ ] Transform::getDirectionVector() + SpotLight doesn't work as expected.
 - [ ] The project should be built with CMake.
 
 ## External dependencies (included)

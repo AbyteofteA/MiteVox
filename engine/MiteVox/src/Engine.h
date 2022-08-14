@@ -10,6 +10,12 @@
 
 namespace mitevox
 {
+	/// <summary>
+	/// TODO: create default engine_config.json if it doesn't exist
+	/// TODO: add scripting in Native (C++), Lua
+	/// TODO: implement Perlin noise, OpenSimplex noise
+	/// TODO: implement PBR shader
+	/// </summary>
 	class Engine
 	{
 	public:

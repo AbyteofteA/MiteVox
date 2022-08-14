@@ -32,6 +32,10 @@ namespace fileio
 
 namespace mitevox
 {
+	/// <summary>
+	/// TODO: implement serialization to glTF, CBOR
+	/// TODO: implement deserialization from CBOR
+	/// </summary>
 	class Playground
 	{
 		friend class fileio::PlaygroundCodecGLTF;
