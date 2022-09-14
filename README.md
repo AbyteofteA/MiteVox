@@ -15,9 +15,7 @@ The project is built with ``Visual Studio 2022``.
 :robot: AI's virtual playground
 
 ## Screenshots
-Custom scene               | 
----------------------------|-----------------------------------
-![](docs/mitevox_demo.png) | 
+![](docs/mitevox_demo.png)
 
 ## Structure & features
 
@@ -26,8 +24,8 @@ The solution contains an example project: `sandbox / DemoProject`
 
 ### engine / MiteVox
 The core of the engine. It defines the **entry point**.
-- Skeletal animation
-- Morph target animation (per-vertex animation)
+- Skeletal animations
+- Morph target animations (per-vertex animations)
 - engine_config.json
 
 ### engine / Renderer
@@ -62,7 +60,7 @@ Has an implementation of AABB collisions and defines rigid body.
 Has a basic user I/O setup. It definitely needs redesign...
 
 ## :bug: Known bugs & limitations :bug:
-- Skinned mesh uses global transform of the node that instantiates the mesh instead of global transform of the skeleton root.
+- [ ] Skinned mesh uses global transform of the node that instantiates the mesh instead of global transform of the skeleton root.
 - [ ] Morph target animation seems to work fine, except for this model: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/MorphPrimitivesTest
 - [ ] .obj parser doesn't support polygon grouping by material.
 - [ ] .obj parser doesn't support polygon grouping by smoothing.
