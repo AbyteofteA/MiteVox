@@ -2,7 +2,7 @@
 #ifndef MATH_INTERTOLATION_H
 #define MATH_INTERTOLATION_H
 
-#include "engine/Math/src/DataStructures/Buffer.h"
+#include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Math/src/Quaternion.h"
 
 namespace mathem
@@ -32,15 +32,14 @@ namespace mathem
 		return x0 + (x1 - x0) * a;
 	}
 
-	inline void interpolate(float x0, float y0, float x1, float y1, Buffer<float>* buffer)
+	inline void interpolate(float x0, float y0, float x1, float y1, safety::SafeFloatArray* buffer)
 	{
 		x0 = (float)floor(x0);
 		x1 = (float)ceil(x1);
 		if (x0 == x1)
 		{
 			buffer->resize(1);
-			buffer->setSizeData(1);
-			buffer->data[0] = y0;
+			buffer->setElement(0, y0);
 			return;
 		}
 
@@ -51,16 +50,14 @@ namespace mathem
 		if (dx != 0)
 			slope = dy / (float)dx;
 
-		unsigned int iMax = (unsigned int)(x1 - x0);
-		buffer->resize(iMax);
-		buffer->setSizeData(iMax);
-
-		for (unsigned int i = 0; i < buffer->getSizeData(); i++)
+		size_t bufferElementsCount = (unsigned int)(x1 - x0);
+		buffer->resize(bufferElementsCount);
+		for (unsigned int i = 0; i < bufferElementsCount; i++)
 		{
 			if (i == 0)
-				buffer->data[i] = y0;
+				buffer->setElement(i, y0);
 			else
-				buffer->data[i] = buffer->data[i - 1] + slope;
+				buffer->setElement(i, buffer->getElement(i - 1) + slope);
 		}
 	}
 }

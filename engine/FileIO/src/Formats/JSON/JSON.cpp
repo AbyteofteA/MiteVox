@@ -456,7 +456,6 @@ namespace fileio
 			{
 				result = nameStr + std::to_string(_booleanOrNumber.number);
 			}
-
 			break;
 
 		case JSONtype::STRING:

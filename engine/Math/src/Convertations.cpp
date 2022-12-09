@@ -1,10 +1,12 @@
 #include "Convertations.h"
 
+#include "engine/Math/src/MathConstants.h"
+
 namespace mathem
 {
 	float toRadians(float degrees)
 	{
-		return degrees * (float)M_PI / 180;
+		return degrees * (float)mathem::PI / 180;
 	}
 
 	Quaternion matrixToQuaternion(Matrix4x4 matrix)

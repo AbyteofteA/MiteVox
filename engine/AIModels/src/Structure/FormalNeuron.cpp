@@ -1,4 +1,3 @@
-
 #include "FormalNeuron.h"
 
 #include "engine/AIModels/src/Structure/Functions.h"

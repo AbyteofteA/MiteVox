@@ -151,7 +151,7 @@ namespace ecs
 	template <typename entityID>
 	bool ComponentManager<entityID>::remove(entityID ID)
 	{
-		if (not exists(ID))
+		if (exists(ID) == false)
 		{
 			return false;
 		}

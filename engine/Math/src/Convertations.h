@@ -2,8 +2,7 @@
 #ifndef CONVERTATIONS_H
 #define CONVERTATIONS_H
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include "engine/Math/src/Matrix.h"
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Quaternion.h"

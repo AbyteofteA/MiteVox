@@ -1,4 +1,3 @@
-
 #ifndef FORMALNEURON_H
 #define FORMALNEURON_H
 

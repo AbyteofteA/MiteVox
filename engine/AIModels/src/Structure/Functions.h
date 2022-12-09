@@ -2,9 +2,10 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <conio.h>
+
+#include "engine/Math/src/MathConstants.h"
 
 namespace aimods
 {
@@ -63,7 +64,7 @@ namespace aimods
 			break;
 
 		case ActivationFunction::SIGMOID:
-			f = 1.0f / (1.0f + (T)pow((T)M_E, -weightedSum));
+			f = 1.0f / (1.0f + (T)pow((T)mathem::PI, -weightedSum));
 			break;
 
 		case ActivationFunction::TANH:
