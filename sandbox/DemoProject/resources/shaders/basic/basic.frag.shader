@@ -32,28 +32,10 @@ uniform samplerCube reflectionMap;
 uniform vec3 viewPos;
 uniform Material material;
 
-
-struct DirectionalLight
-{
-	vec3 direction;
-	vec3 color;
-
-	float intensity;
-	float range;
-};
-#define MAX_OF_DIRECTIONAL_LIGHTS 8
-uniform int amountOfDirectionalLights;
-uniform DirectionalLight directionalLights[MAX_OF_DIRECTIONAL_LIGHTS];
-
 struct PointLight
 {
 	vec3 pos;
 	vec3 color;
-
-	float constant;
-    float linear;
-    float quadratic;
-
 	float intensity;
 	float range;
 };
@@ -61,56 +43,12 @@ struct PointLight
 uniform int amountOfPointLights;
 uniform PointLight pointLights[MAX_OF_POINT_LIGHTS];
 
-struct SpotLight
-{
-	vec3 pos;
-	vec3 direction;
-	float angle;
-	vec3 color;
-
-	float constant;
-    float linear;
-    float quadratic;
-
-	float intensity;
-	float range;
-};
-#define MAX_OF_SPOT_LIGHTS 64
-uniform int amountOfSpotLights;
-uniform SpotLight spotLights[MAX_OF_SPOT_LIGHTS];
-
 float calculateAttenuation(float currentDistance, float range)
 {
+	// TODO: Recommended formula doesn't work for some reason
 	//float attenuation = max(min(1.0 - pow(currentDistance / range, 4.0), 1.0), 0.0) / pow(currentDistance, 2.0);
 	float attenuation = max(1.0 - pow(currentDistance / range, 2.0), 0.0);
 	return attenuation;
-}
-
-vec3 calculate_DirectionalLight(vec3 norm, vec3 viewDir, float roughnessFragment, float metallicFragment)
-{
-	vec3 result = vec3(0.0, 0.0, 0.0);
-
-	for(int i = 0; i < amountOfDirectionalLights; i++)
-	{
-		vec3 lightDir = normalize(directionalLights[i].direction);
-		float distance = abs(length(lightDir));
-		float attenuation = 1;// calculateAttenuation(distance, directionalLights[i].range);
-
-		float dotNormLightdir = dot(norm, lightDir);
-
-		float diff = max(dotNormLightdir, 0.0);
-		vec3 diffuse = diff * directionalLights[i].color * roughnessFragment;
-
-		vec3 specular = vec3(0.0, 0.0, 0.0);
-		vec3 reflectDir = reflect(-lightDir, norm);  
-		if(dotNormLightdir > 0)
-		{
-			float spec = pow(max(dot(lightDir, reflectDir), 0.0), material.specularExponent);
-			specular = spec * directionalLights[i].color * metallicFragment;
-		}
-		result += attenuation * (diffuse + specular);
-	}
-	return result;
 }
 
 vec3 calculate_PointLight(vec3 norm, vec3 viewDir, float roughnessFragment, float metallicFragment)
@@ -121,11 +59,11 @@ vec3 calculate_PointLight(vec3 norm, vec3 viewDir, float roughnessFragment, floa
 	{
 		vec3 lightDir = pointLights[i].pos - Position;
 		float distance = abs(length(lightDir));
-		//float attenuation = calculateAttenuation(distance, pointLights[i].range);
-		float attenuation =
-			1 / (pointLights[i].constant + 
-			pointLights[i].linear * distance + 
-			pointLights[i].quadratic * distance * distance);
+		float attenuation = 1.0f;
+		if (pointLights[i].range > 0.0f)
+		{
+			attenuation = calculateAttenuation(distance, pointLights[i].range);
+		}
 		lightDir = normalize(lightDir);
 
 		float dotNormLightdir = dot(norm, lightDir);
@@ -144,48 +82,6 @@ vec3 calculate_PointLight(vec3 norm, vec3 viewDir, float roughnessFragment, floa
 	}
 	return result;
 }
-
-vec3 calculate_SpotLight(vec3 norm, vec3 viewDir, float roughnessFragment, float metallicFragment)
-{
-	vec3 result = vec3(0.0, 0.0, 0.0);
-
-	for(int i = 0; i < amountOfSpotLights; i++)
-	{
-		vec3 lightDir = spotLights[i].pos - Position;
-		float distance = abs(length(lightDir));
-		//float attenuation = calculateAttenuation(distance, spotLights[i].range);
-		float attenuation =
-			1 / (spotLights[i].constant + 
-			spotLights[i].linear * distance + 
-			spotLights[i].quadratic * distance * distance);
-		lightDir = normalize(lightDir);
-
-		// Angle calculations.
-		float cutOff = cos(radians(spotLights[i].angle * 0.5));
-		float outerCutOff = cos(radians(spotLights[i].angle));
-		float theta = dot(lightDir, -normalize(spotLights[i].direction));
-		float epsilon = cutOff - outerCutOff;
-		float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
-
-		// Light calculations.
-		float dotNormLightdir = dot(norm, lightDir);
-
-		float diff = max(dotNormLightdir, 0.0);
-		vec3 diffuse = diff * spotLights[i].color * roughnessFragment;
-
-		vec3 specular = vec3(0.0, 0.0, 0.0);
-		vec3 reflectDir = reflect(-lightDir, norm);  
-		if(dotNormLightdir > 0)
-		{
-			float spec = pow(max(dot(lightDir, reflectDir), 0.0), material.specularExponent);
-			specular = spec * spotLights[i].color * metallicFragment;
-		}
-		result += intensity * attenuation * (diffuse + specular);
-		
-	}
-	return result;
-}
-
 
 void main()
 {
@@ -218,10 +114,7 @@ void main()
 	switch (material.illuminationModel)
 	{
 	case ILLUMINATION_MODEL_SPECULAR:
-		result = albedoFragment *
-			(calculate_DirectionalLight(norm, viewDir, roughness, metallicity) +
-				calculate_PointLight(norm, viewDir, roughness, metallicity) +
-				calculate_SpotLight(norm, viewDir, roughness, metallicity));
+		result = albedoFragment * calculate_PointLight(norm, viewDir, roughness, metallicity);
 		break;
 
 	case ILLUMINATION_MODEL_CONSTANT_COLOR:

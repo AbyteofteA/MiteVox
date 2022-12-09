@@ -56,7 +56,6 @@ void mitevox::Engine::onCreate()
 
 	NativeScript_ECS waveScript = { nullptr, waveModel_Script, nullptr };
 	NativeScript_ECS rotateScript = { nullptr, rotateModel_Script, nullptr };
-	NativeScript_ECS rotateLightScript = { nullptr, rotateLight_Script, nullptr };
 
 	//----------------------------------------------------------------------------------------
 
@@ -68,26 +67,6 @@ void mitevox::Engine::onCreate()
 	myECS->attachComponent(subject0, myScene->Transform_Component, &tmpTransform);
 	NativeScript_ECS tmpNativeScript = { nullptr, processInput_Script, nullptr };
 	myECS->attachComponent(subject0, myScene->NativeScript_Component, &tmpNativeScript);
-
-	// Create Light prefab.
-
-	entityID Light = myECS->createPrefab("Light");
-	myECS->getPrefab(Light)->attachComponent(
-		myECS->componentManagers[myScene->Transform_Component]);
-	mitevox::Material* light = new mitevox::Material();
-	light->baseColor = { 1.0, 1.0, 1.0, 1.0 };
-	light->roughness = 1.0;
-	light->metallicity = 1.0;
-	light->specularExponent = 8.0;
-	//light->albedoMap = new fileio::Texture(white);
-	//light->metallicRoughnessMap = new fileio::Texture(white);
-	render::Model3D* cubeLight = new render::Model3D(mCube, light, { 3, 3, 3, 0, 0, 0, 0, 0, 0 });
-	cubeLight->shaderID = basicShader;
-	render::PointLight tmpPointLight = { { 0 }, { 1, 1, 1 },  1, 0.0014f, 0.000007f, 1.0, 200.0 };
-	myECS->getPrefab(Light)->attachComponent(
-		myECS->componentManagers[myScene->PointLight_Component], &tmpPointLight);
-	myECS->getPrefab(Light)->attachComponent(
-		myECS->componentManagers[myScene->NativeScript_Component]);
 
 	// Spawn 9x9 grid of cubes.
 
@@ -105,41 +84,26 @@ void mitevox::Engine::onCreate()
 
 	// Spawn lights.
 
-	float lightPos = 200;
+	Node* redLightNode = new Node();
+	redLightNode->lightType = render::LightType::POINT;
+	redLightNode->light.pointLight.lightBase = { { 1.0, 0.0, 0.0 }, 1.0, 15.0 };
+	redLightNode->transform.translation = { 5.0, 0.0, 0.0 };
 
-	tmpTransform = { 1, 1, 1, 0, 0, 0, 0, 0, 0 };
-	entityID tmpID = myECS->createEntity(Light);
-	tmpTransform.x = lightPos; tmpTransform.y = lightPos; tmpTransform.z = lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
-	tmpID = myECS->createEntity(Light);
-	tmpTransform.x = -lightPos; tmpTransform.y = lightPos; tmpTransform.z = lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
-	tmpID = myECS->createEntity(Light);
-	tmpTransform.x = -lightPos; tmpTransform.y = lightPos; tmpTransform.z = -lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
-	tmpID = myECS->createEntity(Light);
-	tmpTransform.x = lightPos; tmpTransform.y = lightPos; tmpTransform.z = -lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
+	Node* greenLightNode = new Node();
+	greenLightNode->lightType = render::LightType::POINT;
+	greenLightNode->light.pointLight.lightBase = { { 0.0, 1.0, 0.0 }, 1.0, 15.0 };
+	greenLightNode->transform.translation = { 0.0, 5.0, 0.0 };
 
-	/*tmpID = myECS->createEntity(Light);
-	tmpTransform.x = lightPos; tmpTransform.y = -lightPos; tmpTransform.z = lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
-	tmpID = myECS->createEntity(Light);
-	tmpTransform.x = -lightPos; tmpTransform.y = -lightPos; tmpTransform.z = lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
-	tmpID = myECS->createEntity(Light);
-	tmpTransform.x = -lightPos; tmpTransform.y = -lightPos; tmpTransform.z = -lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
-	tmpID = myECS->createEntity(Light);
-	tmpTransform.x = lightPos; tmpTransform.y = -lightPos; tmpTransform.z = -lightPos;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;*/
+	Node* blueLightNode = new Node();
+	blueLightNode->lightType = render::LightType::POINT;
+	blueLightNode->light.pointLight.lightBase = { { 0.0, 0.0, 1.0 }, 1.0, 15.0 };
+	blueLightNode->transform.translation = { 0.0, 0.0, 5.0 };
 
-	tmpID = myECS->createEntity(Light);
-	tmpTransform.x = 0; tmpTransform.y = 150; tmpTransform.z = 0;
-	*(mathem::Transform*)myECS->getComponent(tmpID, myScene->Transform_Component) = tmpTransform;
-	*(NativeScript_ECS*)myECS->getComponent(tmpID, myScene->NativeScript_Component) = rotateScript;
+	Node* rootNode = playground->nodes.getElement(0);
+	rootNode->children.appendElement(redLightNode);
+	rootNode->children.appendElement(greenLightNode);
+	rootNode->children.appendElement(blueLightNode);
 }
-
 
 void mitevox::Engine::onUpdate() {}
 

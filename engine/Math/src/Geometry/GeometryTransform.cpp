@@ -28,7 +28,8 @@ namespace mathem
 
 		// TODO: check rotation
 		Quaternion vectorAsQuaternion(vector);
-		vectorAsQuaternion = vectorAsQuaternion.rotate(rotation);
+		vectorAsQuaternion = rotation.rotate(vectorAsQuaternion);
+		//vectorAsQuaternion = vectorAsQuaternion.rotate(rotation);
 		vector = vectorAsQuaternion.binary.vector;
 
 		vector.x() += translation.x();

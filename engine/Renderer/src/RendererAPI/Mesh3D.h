@@ -14,16 +14,16 @@ namespace render
 
 		char isUploaded = 0;
 
-		mathem::Point3D* positions = nullptr;
+		mathem::Vector3D* positions = nullptr;
 		size_t positionsCount = 0;
 		unsigned int vertexBufferID = -1;
 
-		mathem::Point3D minPosition, maxPosition;
+		mathem::Vector3D minPosition, maxPosition;
 
 		mathem::Vector3D* normals = nullptr;
 		size_t normalsCount = 0;
 
-		mathem::Point3D* textureCoords = nullptr;
+		mathem::Vector3D* textureCoords = nullptr;
 		size_t textureCoordsCount = 0;
 
 		Polygon* polygons = nullptr;

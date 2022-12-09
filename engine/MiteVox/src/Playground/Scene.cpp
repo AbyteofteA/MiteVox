@@ -6,26 +6,15 @@
 
 #include "engine/MiteVox/src/callbacks/NativeScript_Callbacks.h"
 #include "engine/MiteVox/src/callbacks/Transform_Callbacks.h"
-#include "engine/MiteVox/src/callbacks/DirectedLight_Callbacks.h"
-#include "engine/MiteVox/src/callbacks/PointLight_Callbacks.h"
-#include "engine/MiteVox/src/callbacks/SpotLight_Callbacks.h"
 
 namespace mitevox
 {
 	Scene::Scene()
 	{
+		// TODO: add corresponding settings
+		foundation = new SceneFoundation(250.0f, 0.1f, 1, 5, 0, 100);
+
 		ECS = new ecs::EntityComponentSystem((entityID)100);
-
-		// Renderer components
-
-		PointLight_Component = ECS->registerComponent("PointLight", sizeof(render::PointLight),
-			nullptr, PointLight_onUpdateAll, PointLight_onDelete);
-
-		DirectedLight_Component = ECS->registerComponent("DirectedLight", sizeof(render::DirectedLight),
-			nullptr, DirectedLight_onUpdateAll, DirectedLight_onDelete);
-
-		SpotLight_Component = ECS->registerComponent("SpotLight", sizeof(render::SpotLight),
-			nullptr, SpotLight_onUpdateAll, SpotLight_onDelete);
 
 		// Math components
 

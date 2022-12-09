@@ -1,8 +1,6 @@
-
 #ifndef GEOMETRYPRIMITIVEBASE_H
 #define GEOMETRYPRIMITIVEBASE_H
 
-#include "engine/Math/src/Point3D.h"
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 
@@ -13,6 +11,7 @@ namespace mathem
 	enum struct GeometryPrimitiveType : uint8_t 
 	{ 
 		NONE = 0, 		   /// 
+		AXIS_ALIGNED_BOX,  /// 
 		BOX, 			   /// 
 		SPHERE, 		   /// 
 		CAPSULE,  		   /// 
@@ -27,7 +26,7 @@ namespace mathem
 	{
 	public:
 
-		GeometryPrimitiveType type = GeometryPrimitiveType::NONE;
+		GeometryPrimitiveType getType();
 
 		virtual bool isTriangularMesh() = 0;
 		virtual uint32_t getVertecesCount() = 0;
@@ -35,6 +34,10 @@ namespace mathem
 		virtual uint32_t getTrianglesCount() = 0;
 		virtual TriangleGeometry getTrianglePositions(uint32_t index) = 0;
 		virtual bool isIdealGeometry() = 0;
+
+	protected:
+
+		GeometryPrimitiveType type = GeometryPrimitiveType::NONE;
 	};
 }
 

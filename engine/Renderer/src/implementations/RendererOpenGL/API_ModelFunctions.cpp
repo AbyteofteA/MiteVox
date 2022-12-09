@@ -47,6 +47,53 @@ namespace render
 		}
 	}
 
+	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID)
+	{
+		if (!render::shaders[shaderID]->use())
+			return;
+
+		size_t lightsCount = lightsArray->getElementsCount();
+		render::shaders[shaderID]->setInt("amountOfPointLights", lightsCount);
+
+		for (size_t i = 0; i < lightsCount; ++i)
+		{
+			render::PointLight pointLight = lightsArray->getElement(i);
+			
+			std::string indexStr = std::to_string(i);
+			static const std::string pointLights = "pointLights[";
+			static const std::string pos = "].pos";
+			static const std::string color = "].color";
+			static const std::string intensity = "].intensity";
+			static const std::string range = "].range";
+			std::string posResult = pointLights + indexStr + pos;
+			std::string colorResult = pointLights + indexStr + color;
+			std::string intensityResult = pointLights + indexStr + intensity;
+			std::string rangeResult = pointLights + indexStr + range;
+
+			render::shaders[shaderID]->setVec3(
+				posResult.c_str(), 
+				pointLight.position.x(), 
+				pointLight.position.y(), 
+				pointLight.position.z());
+			render::shaders[shaderID]->setVec3(
+				colorResult.c_str(), 
+				pointLight.lightBase.color.r, 
+				pointLight.lightBase.color.g, 
+				pointLight.lightBase.color.b);
+			
+			render::shaders[shaderID]->setFloat(intensityResult.c_str(), pointLight.lightBase.intensity);
+			render::shaders[shaderID]->setFloat(rangeResult.c_str(), pointLight.lightBase.range);
+		}
+	}
+
+	void clearPointLights(int shaderID)
+	{
+		if (!render::shaders[shaderID]->use())
+			return;
+
+		render::shaders[shaderID]->setInt("amountOfPointLights", 0);
+	}
+
 	void uploadMaterial(mitevox::Material* material, int shaderID)
 	{
 		int textureUnit = 0;

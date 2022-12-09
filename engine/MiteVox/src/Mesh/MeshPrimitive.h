@@ -46,8 +46,10 @@ namespace mitevox
         BufferViewAccessor* getWeights_0();
         BufferViewAccessor* getIndeces();
 
-        bool isTriangularMesh();
+        mathem::Vector3D getMinPosition();
+        mathem::Vector3D getMaxPosition();
 
+        bool isTriangularMesh();
         uint32_t getVertecesCount();
         mathem::Vector3D getVertexPosition(uint32_t index);
         /// TODO: mathem::Vector3D getVertexNormal(uint32_t index);

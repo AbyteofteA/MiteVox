@@ -1,4 +1,3 @@
-
 #ifndef COMPLEXGEOMETRY_H
 #define COMPLEXGEOMETRY_H
 
@@ -8,8 +7,10 @@
 
 namespace mathem
 {
-	class ComplexGeometry : public GeometryTransform
+	class ComplexGeometry
 	{
+	public:
+
 		safety::SafeArray<GeometryPrimitiveBase*> primitives;
 	};
 }

@@ -22,6 +22,34 @@ namespace mitevox
 		/// NOTE: We don't copy weights because resultMesh will store only the result of animation.
 	}
 
+	mathem::Vector3D Mesh::getMinPosition()
+	{
+		mathem::Vector3D resultMinPosition = primitives.getElement(0)->getMinPosition();
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 1; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			mathem::Vector3D tmpMinPosition = primitives.getElement(primitiveIndex)->getMinPosition();
+			resultMinPosition.x() = std::min(resultMinPosition.x(), tmpMinPosition.x());
+			resultMinPosition.y() = std::min(resultMinPosition.y(), tmpMinPosition.y());
+			resultMinPosition.z() = std::min(resultMinPosition.z(), tmpMinPosition.z());
+		}
+		return resultMinPosition;
+	}
+
+	mathem::Vector3D Mesh::getMaxPosition()
+	{
+		mathem::Vector3D resultMaxPosition = primitives.getElement(0)->getMaxPosition();
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 1; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			mathem::Vector3D tmpMaxPosition = primitives.getElement(primitiveIndex)->getMaxPosition();
+			resultMaxPosition.x() = std::max(resultMaxPosition.x(), tmpMaxPosition.x());
+			resultMaxPosition.y() = std::max(resultMaxPosition.y(), tmpMaxPosition.y());
+			resultMaxPosition.z() = std::max(resultMaxPosition.z(), tmpMaxPosition.z());
+		}
+		return resultMaxPosition;
+	}
+
 	bool Mesh::isTriangularMesh()
 	{
 		// TODO:

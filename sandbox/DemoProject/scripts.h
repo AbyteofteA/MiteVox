@@ -7,18 +7,6 @@
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Math/src/Math.h"
 
-void rotateLight_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
-{
-	mitevox::Scene* scene = (mitevox::Scene*)data;
-	render::DirectedLight* light =
-		(render::DirectedLight*)_ecs->getComponent(ID, DIRECTEDLIGHT_COMPONENT);
-
-	light->direction.x() = (float)sin(scene->getCurrentTime());
-	light->direction.y() = -0.5f;
-	light->direction.z() = (float)cos(scene->getCurrentTime());
-	light->direction.normalize();
-}
-
 void waveModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
 {
 	mitevox::Scene* scene = (mitevox::Scene*)data;
@@ -62,25 +50,25 @@ void processInput_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_IND
 
 	if (inputHandler->keyW)
 	{
-		transform->x += cos((transform->angleY + 90) * (float)M_PI / 180) * speed * timeForMoves;
-		transform->y -= cos((transform->angleX + 90) * (float)M_PI / 180) * speed * timeForMoves;
-		transform->z += sin((transform->angleY + 90) * (float)M_PI / 180) * speed * timeForMoves;
+		transform->x += cos((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
+		transform->y -= cos((transform->angleX + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
+		transform->z += sin((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
 	}
 	else if (inputHandler->keyS)
 	{
-		transform->x -= cos((transform->angleY + 90) * (float)M_PI / 180) * speed * timeForMoves;
-		transform->y += cos((transform->angleX + 90) * (float)M_PI / 180) * speed * timeForMoves;
-		transform->z -= sin((transform->angleY + 90) * (float)M_PI / 180) * speed * timeForMoves;
+		transform->x -= cos((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
+		transform->y += cos((transform->angleX + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
+		transform->z -= sin((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
 	}
 	if (inputHandler->keyD)
 	{
-		transform->x += cos(transform->angleY * (float)M_PI / 180) * speed * timeForMoves;
-		transform->z += sin(transform->angleY * (float)M_PI / 180) * speed * timeForMoves;
+		transform->x += cos(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
+		transform->z += sin(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
 	}
 	else if (inputHandler->keyA)
 	{
-		transform->x -= cos(transform->angleY * (float)M_PI / 180) * speed * timeForMoves;
-		transform->z -= sin(transform->angleY * (float)M_PI / 180) * speed * timeForMoves;
+		transform->x -= cos(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
+		transform->z -= sin(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
 	}
 
 	if (inputHandler->keySpace)
@@ -96,10 +84,6 @@ void processInput_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_IND
 	inputHandler->getWindowSize(&windowWidth, &windowHeight);
 	transform->angleY += (-(float)inputHandler->mouseDeltaX + windowWidth / 2) * cameraSensitivity;
 	transform->angleX += (-(float)inputHandler->mouseDeltaY + windowHeight / 2) * cameraSensitivity;
-
-	/*render::SpotLight* spotLight = _ecs->getComponent<render::SpotLight>(entityID, SPOTLIGHT_COMPONENT);
-	//spotLight->angle += inputHandler->mouseDeltaScroll;
-	spotLight->direction = transform->getDirectionVector();*/
 }
 
 void rotateCamera_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)

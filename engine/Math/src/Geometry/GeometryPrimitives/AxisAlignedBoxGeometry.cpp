@@ -1,18 +1,18 @@
-#include "BoxGeometry.h"
+#include "AxisAlignedBoxGeometry.h"
 
 namespace mathem
 {
-	BoxGeometry::BoxGeometry()
+	AxisAlignedBoxGeometry::AxisAlignedBoxGeometry()
 	{
-		type = GeometryPrimitiveType::BOX;
+		type = GeometryPrimitiveType::AXIS_ALIGNED_BOX;
 	}
 
-	bool BoxGeometry::isTriangularMesh()
+	bool AxisAlignedBoxGeometry::isTriangularMesh()
 	{
 		return true;
 	}
 
-	uint32_t BoxGeometry::getVertecesCount()
+	uint32_t AxisAlignedBoxGeometry::getVertecesCount()
 	{
 		return 8;
 	}
@@ -29,7 +29,7 @@ namespace mathem
 	/// </summary>
 	/// <param name="index"></param>
 	/// <returns></returns>
-	Vector3D BoxGeometry::getVertexPosition(uint32_t index)
+	Vector3D AxisAlignedBoxGeometry::getVertexPosition(uint32_t index)
 	{
 		Vector3D resultPoint;
 
@@ -64,17 +64,17 @@ namespace mathem
 			break;
 		}
 
-		transform.applyTo(resultPoint);
+		resultPoint += position;
 
 		return resultPoint;
 	}
 
-	uint32_t BoxGeometry::getTrianglesCount()
+	uint32_t AxisAlignedBoxGeometry::getTrianglesCount()
 	{
 		return 12;
 	}
 
-	TriangleGeometry BoxGeometry::getTrianglePositions(uint32_t index)
+	TriangleGeometry AxisAlignedBoxGeometry::getTrianglePositions(uint32_t index)
 	{
 		TriangleGeometry resultTriangle;
 
@@ -155,11 +155,11 @@ namespace mathem
 			resultTriangle.point2 = getVertexPosition(5);
 			resultTriangle.point3 = getVertexPosition(7);
 		}
-		
+
 		return resultTriangle;
 	}
 
-	bool BoxGeometry::isIdealGeometry()
+	bool AxisAlignedBoxGeometry::isIdealGeometry()
 	{
 		return false;
 	}

@@ -2,11 +2,15 @@
 #include "Engine.h"
 
 #include "engine/MiteVox/src/EngineSettings.h"
+#include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/MiteVox/src/Playground/Playground.h"
+#include "engine/MiteVox/src/Rendering/drawCollider.h"
+#include "engine/MiteVox/src/Rendering/drawSceneOctree.h"
+#include "engine/MiteVox/src/Rendering/drawAxes.h"
+#include "engine/MiteVox/src/Rendering/Lighting/collectLights.h"
 
 #include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
 #include "engine/MiteVox/src/Animation/MorphTargetAnimation/applyMorphTargetAnimation.h"
-#include "engine/MiteVox/src/Skeleton/SkeletonBase.h"
 
 #include <string>
 #include <vector>
@@ -24,6 +28,7 @@ namespace mitevox
 		{
 			fileio::CodecGLTF* playgroundGLTF = new fileio::CodecGLTF();
 			playgroundGLTF->readFromFile(std::string(argv[1]));
+			// TODO: add checks
 			playground = playgroundGLTF->result;
 		}
 		else
@@ -138,6 +143,14 @@ namespace mitevox
 					animateNodes(nodesToRender, deltaTime);
 				}*/
 				
+				static safety::SafeArray<render::PointLight> pointLightsArray;
+				static safety::SafeArray<render::DirectionalLight> directionalLightsArray;
+				static safety::SafeArray<render::SpotLight> spotLightsArray;
+				pointLightsArray.clear();
+				directionalLightsArray.clear();
+				spotLightsArray.clear();
+				collectPointLights(nodesToRender, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
+				
 				// Renderer
 				scene->timeSinceRendererUpdate += deltaTime;
 				if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
@@ -148,9 +161,9 @@ namespace mitevox
 					renderer->amountOfDrawCalls = 0;
 
 					// Update lights.
-					scene->ECS->updateComponent(scene->DirectedLight_Component, scene);
-					scene->ECS->updateComponent(scene->PointLight_Component, scene);
-					scene->ECS->updateComponent(scene->SpotLight_Component, scene);
+					render::uploadPointLights(&pointLightsArray, basicShader);
+					// TODO: render::uploadLights(&LightsArray, basicShader);
+					// TODO: render::uploadLights(&LightsArray, basicShader);
 
 					render::Camera* camera = scene->activeCameraNode->camera;
 					mathem::Transform* cameraTransform =
@@ -169,6 +182,16 @@ namespace mitevox
 
 					// Render 3D models.
 					renderNodes(nodesToRender, basicShader, camera, cameraTransform);
+
+					if (settings->debug)
+					{
+						drawAxes(this->settings->renderer);
+
+						if (scene->foundation != nullptr)
+						{
+							drawSceneOctree(this->settings->renderer, scene->foundation->octree);
+						}
+					}
 
 					// Render primitives.
 					render::renderPoints(renderer, camera, cameraTransform);
@@ -214,7 +237,7 @@ namespace mitevox
 	void Engine::preparePlayground()
 	{
 		// Add a default camera to every scene that doesn't have one
-		if (playground->cameras.getElementsCount() == 0)
+		if (1/*playground->cameras.getElementsCount() == 0*/)
 		{
 			render::Camera* camera = new render::Camera(50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 100000);
 			Node* cameraNode = new Node();
@@ -235,7 +258,9 @@ namespace mitevox
 		size_t nodesCount = playground->nodes.getElementsCount();
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
-			prepareNodeRecursively(playground->nodes.getElement(i));
+			Node* node = playground->nodes.getElement(i);
+			prepareNodeRecursively(node);
+			node->tryGenerateHitbox();
 		}
 
 		size_t scenesCount = playground->scenes.getElementsCount();
@@ -338,6 +363,14 @@ namespace mitevox
 		{
 			render::tryUploadSkeleton(node, shaderID);
 			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
+		}
+
+		if (settings->debug)
+		{
+			if (node->collider)
+			{
+				drawCollider(this->settings->renderer, node->collider, &nodeGlobalTransform);
+			}
 		}
 
 		size_t childrenCount = node->children.getElementsCount();

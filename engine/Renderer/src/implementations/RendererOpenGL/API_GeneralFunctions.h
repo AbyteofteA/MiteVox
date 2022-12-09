@@ -80,9 +80,9 @@ namespace render
 			glDisable(GL_CULL_FACE);
 		}
 
-		renderer->points.resize(PRIMITIVE_BUFFER_SIZE);
-		renderer->lines.resize(PRIMITIVE_BUFFER_SIZE * 2);
-		renderer->triangles.resize(PRIMITIVE_BUFFER_SIZE * 3);
+		renderer->points.reserve(PRIMITIVE_BUFFER_SIZE);
+		renderer->lines.reserve(PRIMITIVE_BUFFER_SIZE * 2);
+		renderer->triangles.reserve(PRIMITIVE_BUFFER_SIZE * 3);
 
 		return renderer;
 	}

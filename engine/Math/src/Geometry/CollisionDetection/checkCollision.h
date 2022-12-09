@@ -9,14 +9,14 @@
 #include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/RayGeometry.h"
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
-#include "engine/Math/src/Geometry/CollisionInfo.h"
-#include "engine/Math/src/Point3D.h"
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Vector.h"
 
 namespace mathem
@@ -33,7 +33,13 @@ namespace mathem
 		GeometryTransform* box1Transform,
 		BoxGeometry* box2,
 		GeometryTransform* box2Transform,
-		bool computeCollisionInfo,
+		CollisionInfo* collisionInfo = nullptr,
+		bool isFirstPass = true);
+
+	bool checkCollision(
+		BoxGeometry* box,
+		GeometryTransform* boxTransform,
+		AxisAlignedBoxGeometry* axisAlignedBox,
 		CollisionInfo* collisionInfo = nullptr,
 		bool isFirstPass = true);
 
@@ -42,7 +48,6 @@ namespace mathem
 		GeometryTransform* boxTransform,
 		SphereGeometry* sphere,
 		GeometryTransform* sphereTransform,
-		bool computeCollisionInfo,
 		CollisionInfo* collisionInfo = nullptr);
 
 	bool checkCollision(
@@ -50,11 +55,15 @@ namespace mathem
 		GeometryTransform* boxTransform,
 		CapsuleGeometry* capsule,
 		GeometryTransform* capsuleTransform,
-		bool computeCollisionInfo,
 		CollisionInfo* collisionInfo = nullptr);
 
-	// TODO: checkCollision BOX vs TRUNCATED_PYRAMID
-	// TODO: checkCollision BOX vs RAY
+	bool checkCollision(
+		BoxGeometry* box,
+		GeometryTransform* boxTransform,
+		TruncatedPyramidGeometry* truncatedPyramid,
+		GeometryTransform* truncatedPyramidTransform,
+		CollisionInfo* collisionInfo = nullptr);
+
 	// TODO: checkCollision BOX vs MESH
 
 	bool checkCollision(
@@ -62,7 +71,22 @@ namespace mathem
 		GeometryTransform* boxTransform,
 		GeometryPrimitiveBase* otherGeometry,
 		GeometryTransform* otherGeometryTransform,
-		bool computeCollisionInfo,
+		CollisionInfo* collisionInfo = nullptr);
+
+	bool checkCollision(
+		AxisAlignedBoxGeometry* axisAlignedBox1,
+		AxisAlignedBoxGeometry* axisAlignedBox2,
+		CollisionInfo* collisionInfo = nullptr);
+
+	// TODO: checkCollision AXIS_ALIGNED_BOX vs SPHERE
+	// TODO: checkCollision AXIS_ALIGNED_BOX vs CAPSULE
+	// TODO: checkCollision AXIS_ALIGNED_BOX vs TRUNCATED_PYRAMID
+	// TODO: checkCollision AXIS_ALIGNED_BOX vs MESH
+
+	bool checkCollision(
+		AxisAlignedBoxGeometry* axisAlignedBox,
+		GeometryPrimitiveBase* otherGeometry,
+		GeometryTransform* otherGeometryTransform,
 		CollisionInfo* collisionInfo = nullptr);
 
 	bool checkCollision(
@@ -70,29 +94,21 @@ namespace mathem
 		GeometryTransform* sphere1Transform,
 		SphereGeometry* sphere2,
 		GeometryTransform* sphere2Transform,
-		bool computeCollisionInfo,
 		CollisionInfo* collisionInfo = nullptr);
 
 	// TODO: checkCollision SPHERE vs CAPSULE
 	// TODO: checkCollision SPHERE vs TRUNCATED_PYRAMID
-	// TODO: checkCollision SPHERE vs RAY
 	// TODO: checkCollision SPHERE vs MESH
 	// TODO: checkCollision SPHERE vs GeometryPrimitiveBase
 
 	// TODO: checkCollision CAPSULE vs CAPSULE
 	// TODO: checkCollision CAPSULE vs TRUNCATED_PYRAMID
-	// TODO: checkCollision CAPSULE vs RAY
 	// TODO: checkCollision CAPSULE vs MESH
 	// TODO: checkCollision CAPSULE vs GeometryPrimitiveBase
 
 	// TODO: checkCollision TRUNCATED_PYRAMID vs TRUNCATED_PYRAMID
-	// TODO: checkCollision TRUNCATED_PYRAMID vs RAY
 	// TODO: checkCollision TRUNCATED_PYRAMID vs MESH
 	// TODO: checkCollision TRUNCATED_PYRAMID vs GeometryPrimitiveBase
-
-	// TODO: checkCollision RAY vs RAY
-	// TODO: checkCollision RAY vs MESH
-	// TODO: checkCollision RAY vs GeometryPrimitiveBase
 
 	// TODO: checkCollision MESH vs MESH
 	// TODO: checkCollision MESH vs GeometryPrimitiveBase
@@ -100,6 +116,12 @@ namespace mathem
 	// TODO: checkCollision GeometryPrimitiveBase vs GeometryPrimitiveBase
 
 	// TODO: checkCollision ComplexGeometry vs ComplexGeometry
+
+	bool checkCollision(
+		ComplexGeometry* complexGeometry,
+		GeometryTransform* complexGeometryTransform,
+		AxisAlignedBoxGeometry* axisAlignedBox,
+		CollisionInfo* collisionInfo = nullptr);
 }
 
 #endif

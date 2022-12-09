@@ -4,32 +4,37 @@
 
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
-// TODO: #include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
-// TODO: #include "engine/Math/src/Geometry/GeometryPrimitives/RayGeometry.h"
-// TODO: #include "engine/MiteVox/src/Mesh/Mesh.h"
 
 namespace mathem
 {
+	/// <summary>
+	/// computeProjection for BoxGeometry, TruncatedPyramidGeometry and Mesh
+	/// </summary>
+	/// <param name="triangularMesh"></param>
+	/// <param name="parentTransform"></param>
+	/// <param name="vector"></param>
+	/// <param name="min"></param>
+	/// <param name="max"></param>
 	void computeProjection(
-		BoxGeometry* box, 
-		GeometryTransform* boxTransform, 
+		GeometryPrimitiveBase* triangularMesh,
+		GeometryTransform* parentTransform,
 		Vector3D* vector, 
 		float* min, 
 		float* max);
 
 	void computeProjection(
 		SphereGeometry* sphere,
-		GeometryTransform* sphereTransform,
+		GeometryTransform* parentTransform,
 		Vector3D* vector,
 		float* min,
 		float* max);
 
 	void computeProjection(
 		CapsuleGeometry* capsule,
-		GeometryTransform* capsuleTransform,
+		GeometryTransform* parentTransform,
 		Vector3D* vector,
 		float* min,
 		float* max);

@@ -6,15 +6,23 @@
 
 namespace mathem
 {
-	class TruncatedPyramidGeometry :
-		public GeometryPrimitiveBase,
-		public GeometryTransform
+	class TruncatedPyramidGeometry : public GeometryPrimitiveBase
 	{
 	public:
 
-		// TODO
+		GeometryTransform transform;
+		float FOV = 45.f;
+		float halfWidth, halfHeight;
+		float nearPlane = 0.1f;
+		float farPlane = 100000.f;
 
 		explicit TruncatedPyramidGeometry();
+		bool isTriangularMesh();
+		uint32_t getVertecesCount();
+		Vector3D getVertexPosition(uint32_t index);
+		uint32_t getTrianglesCount();
+		TriangleGeometry getTrianglePositions(uint32_t index);
+		bool isIdealGeometry();
 	};
 }
 

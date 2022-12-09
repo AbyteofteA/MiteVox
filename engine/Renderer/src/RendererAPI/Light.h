@@ -1,44 +1,58 @@
-
 #ifndef RENDERER_LIGHT_H
 #define RENDERER_LIGHT_H
 
+#include "engine/Renderer/src/RendererAPI/Color.h"
+#include "engine/Math/src/Vector.h"
+#include "engine/Math/src/Quaternion.h"
+
 namespace render
 {
-    struct DirectedLight
+    enum class LightType
     {
-        mathem::Vector3D direction;
-        ColorRGBf color;
+        NONE,
+        POINT,
+        DIRECTIONAL,
+        SPOT
+    };
 
+    struct LightBase
+    {
+        ColorRGBf color;
         float intensity;
         float range;
     };
 
     struct PointLight
     {
-        mathem::Point3D position;
-        ColorRGBf color;
+        LightBase lightBase;
 
-        float constant;
-        float linear;
-        float quadratic;
+        mathem::Vector3D position;
+    };
 
-        float intensity;
-        float range;
+    struct DirectionalLight
+    {
+        LightBase lightBase;
+
+        mathem::Quaternion direction;
     };
 
     struct SpotLight
     {
-        mathem::Point3D position;
-        mathem::Vector3D direction;
-        float angle;
-        ColorRGBf color;
+        LightBase lightBase;
 
-        float constant;
-        float linear;
-        float quadratic;
+        mathem::Vector3D position;
+        mathem::Quaternion direction;
+        float innerConeAngle = 0.0f;
+        float outerConeAngle = 45.0f;
+    };
 
-        float intensity;
-        float range;
+    union AnyLight
+    {
+        PointLight pointLight;
+        DirectionalLight directionalLight;
+        SpotLight spotLight;
+
+        AnyLight();
     };
 }
 

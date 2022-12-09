@@ -6,15 +6,20 @@
 
 namespace mathem
 {
-	class SphereGeometry :
-		public GeometryPrimitiveBase,
-		public GeometryTransform
+	class SphereGeometry : public GeometryPrimitiveBase
 	{
 	public:
 
+		GeometryTransform transform;
 		float radius = 0.5f;
 
 		explicit SphereGeometry();
+		bool isTriangularMesh();
+		uint32_t getVertecesCount();
+		Vector3D getVertexPosition(uint32_t index);
+		uint32_t getTrianglesCount();
+		TriangleGeometry getTrianglePositions(uint32_t index);
+		bool isIdealGeometry();
 	};
 }
 

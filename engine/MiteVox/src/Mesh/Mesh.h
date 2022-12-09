@@ -24,6 +24,9 @@ namespace mitevox
 
         void makeCopyForAnimationTo(Mesh* resultMesh);
 
+        mathem::Vector3D getMinPosition();
+        mathem::Vector3D getMaxPosition();
+
         bool isTriangularMesh();
         size_t getVertecesCount();
         mathem::Vector3D getVertexPosition(uint32_t index);

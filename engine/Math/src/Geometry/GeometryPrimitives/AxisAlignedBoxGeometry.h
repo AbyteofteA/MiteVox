@@ -1,20 +1,20 @@
-#ifndef CAPSULEGEOMETRY_H
-#define CAPSULEGEOMETRY_H
+#ifndef AXISALIGNEDBOXGEOMETRY_H
+#define AXISALIGNEDBOXGEOMETRY_H
 
+#include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
 
 namespace mathem
 {
-	class CapsuleGeometry : public GeometryPrimitiveBase
+	class AxisAlignedBoxGeometry : public GeometryPrimitiveBase
 	{
 	public:
 
-		GeometryTransform transform;
-		float halfHeight = 0.5f;
-		float radius = 0.5f;
+		Vector3D position;
+		Vector3D halfSize = { 0.5f, 0.5f, 0.5f };
 
-		explicit CapsuleGeometry();
+		explicit AxisAlignedBoxGeometry();
 		bool isTriangularMesh();
 		uint32_t getVertecesCount();
 		Vector3D getVertexPosition(uint32_t index);
@@ -25,4 +25,3 @@ namespace mathem
 }
 
 #endif
-

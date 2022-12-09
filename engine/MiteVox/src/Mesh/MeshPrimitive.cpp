@@ -64,6 +64,20 @@ namespace mitevox
 		return indecesAccessor;
 	}
 
+	mathem::Vector3D MeshPrimitive::getMinPosition()
+	{
+		safety::SafeFloatArray minArray = getPositions()->min;
+		mathem::Vector3D min(&minArray);
+		return min;
+	}
+
+	mathem::Vector3D MeshPrimitive::getMaxPosition()
+	{
+		safety::SafeFloatArray maxArray = getPositions()->max;
+		mathem::Vector3D max(&maxArray);
+		return max;
+	}
+
 	bool MeshPrimitive::isTriangularMesh()
 	{
 		switch (topologyType)

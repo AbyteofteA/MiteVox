@@ -1,310 +1,349 @@
-
 #ifndef OCTREENODE_H
 #define OCTREENODE_H
 
-#include "OctreeDataPoint.h"
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
+#include "engine/Math/src/Vector.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryTransform.h"
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
+#include "engine/Math/src/Geometry/CollisionDetection/checkCollision.h"
 
 #include <vector>
+#include <cstdint>
 
 namespace mathem
 {
-
 	const float signesX[8] = { -1.f, 1.f, -1.f, 1.f, -1.f, 1.f, -1.f, 1.f };
 	const float signesY[8] = { -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f, 1.f };
 	const float signesZ[8] = { -1.f, -1.f, -1.f, -1.f, 1.f, 1.f, 1.f, 1.f };
 
-
-	template <typename T>
+	template <class T>
 	class OctreeNode
 	{
-		template <typename T>
-		friend class Octree;
 
 	public:
 
-		OctreeNode<T>* subNodes[8];
-		mathem::Point3D origin;
-		float halfSize;
-		bool isLeaf;
+		size_t lifeTime = 0;
+		OctreeNode<T>* subNodes[8] = { nullptr };
+		AxisAlignedBoxGeometry boundingBox;
 
-		std::vector<OctreeDataPoint<T>*> dataPoints;
+		// There lay the dataPoints that fit in the node's bounds and don't fit in the subnodes.
+		std::vector<T*> dataPoints;
 
-		OctreeNode(mathem::Point3D _origin, float _halfSize);
-		~OctreeNode();
-
-	private:
-
-		/// <summary>
-		/// Creates 8 subnodes and moves the data to them sorting by position.
-		/// </summary>
-		void subdivide();
+		inline OctreeNode(mathem::Vector3D position, mathem::Vector3D halfSize);
+		inline ~OctreeNode();
 
 		/// <summary>
 		/// Recursively moves data from the subnodes to the node and deletes the subnodes.
 		/// </summary>
-		void collapse();
+		inline void collapse();
 
 		/// <summary>
 		/// Recursively checks the node and subnodes if they have any OctreeDataPoints.
 		/// </summary>
-		bool isEmpty();
+		inline bool isEmpty();
+
+		inline bool isLeaf();
 
 		/// <summary>
-		/// Checks the subnodes are leaves and if they have any OctreeDataPoints.
+		/// Checks if the node has more data than should.
 		/// </summary>
 		/// <returns></returns>
-		bool shouldCollapse();
+		inline size_t getOverloadCount(const size_t nodeCapacity);
+		inline void tryEliminateOverload(OctreeNode<T>* parentNode, const size_t nodeCapacity, float nodeMinHalfSize);
 
-		OctreeNode<T>* suggestSubnode(OctreeDataPoint<T>* point);
+		inline void tryCreateSubnode(size_t subNodeIndex);
+		inline void tryDeleteSubnode(size_t subNodeIndex);
+		inline OctreeNode<T>* trySuggestSubnode(T* datapoint, const float nodeMinHalfSize);
 
-		void emplace(OctreeDataPoint<T>* point);
-		bool remove(IDtype ID);
-		OctreeDataPoint<T>* get(IDtype ID);
+		inline void emplace(T* datapoint, const size_t nodeCapacity, const float nodeMinHalfSize);
+		inline void clear();
+		inline void getAll(safety::SafeArray<T*>* datapointsStack);
 
 		/// <summary>
 		/// Cuts off empty leaves, subdevides overloaded leaves.
 		/// </summary>
-		/// <param name="nodeCapacity"> - max amount of OctreeDataPoints per node.</param>
-		void update(size_t nodeCapacity);
+		/// <param name="nodeCapacity"> - max amount of OctreeDataPoints per node</param>
+		/// <param name="nodeMaxLifeTime"></param>
+		/// <param name="nodeMinHalfSize"></param>
+		/// <returns>true if the node needs to be deleted, false otherwise</returns>
+		inline bool update(const size_t nodeCapacity, const size_t nodeMaxLifeTime, const float nodeMinHalfSize);
 	};
 
 
 	// IMPLEMENTATION BELOW //
 
 
-	template <typename T>
-	OctreeNode<T>::OctreeNode(mathem::Point3D _origin, float _halfSize)
+	template <class T>
+	inline OctreeNode<T>::OctreeNode(mathem::Vector3D position, mathem::Vector3D halfSize)
 	{
-		origin = _origin;
-		halfSize = _halfSize;
+		boundingBox.position = position;
+		boundingBox.halfSize = halfSize;
 
 		subNodes[8] = { nullptr };
-		isLeaf = true;
 	}
 
-	template <typename T>
-	OctreeNode<T>::~OctreeNode()
+	template <class T>
+	inline OctreeNode<T>::~OctreeNode()
 	{
-		if (not isLeaf)
+		for (size_t i = 0; i < 8; i++)
 		{
-			for (size_t i = 0; i < 8; i++)
+			if (subNodes[i] != nullptr)
 			{
 				delete subNodes[i];
 				subNodes[i] = nullptr;
 			}
-			isLeaf = true;
-		}
-		else
-		{
-			for (OctreeDataPoint<T>* point : dataPoints)
-			{
-				delete point;
-			}
-			dataPoints.clear();
-		}
-	}
-
-	template <typename T>
-	void OctreeNode<T>::subdivide()
-	{
-		float newSize = halfSize / 2.0;
-
-		// Create subnodes (octants).
-		for (size_t i = 0; i < 8; i++)
-		{
-			mathem::Point3D newOrigin;
-			newOrigin.x = origin.x + newSize * signesX[i];
-			newOrigin.y = origin.y + newSize * signesY[i];
-			newOrigin.z = origin.z + newSize * signesZ[i];
-			subNodes[i] = new OctreeNode<T>(newOrigin, halfSize / 2.0);
-		}
-		isLeaf = false;
-
-		// Move the data to the subnodes.
-		for (size_t i = 0; i < dataPoints.size(); i++)
-		{
-			OctreeDataPoint<T>* point = dataPoints[i];
-			OctreeNode<T>* octant = suggestSubnode(point);
-			octant->emplace(point);
 		}
 		dataPoints.clear();
 	}
 
-	template <typename T>
-	void OctreeNode<T>::collapse()
+	template <class T>
+	inline void OctreeNode<T>::collapse()
 	{
 		for (size_t i = 0; i < 8; i++)
 		{
-			subNodes[i]->collapse();
-
-
-			OctreeDataPoint<T>* tmpPoint = nullptr;
-			for (size_t j = 0; j < subNodes[i]->dataPoints.size(); j++)
+			OctreeNode<T>* subNode = subNodes[i];
+			if (subNode == nullptr)
 			{
-				tmpPoint = subNodes[i]->dataPoints[j];
-				tmpPoint->_parentOctreeNode = this;
-				dataPoints.push_back(tmpPoint);
+				continue;
 			}
 
-			delete subNodes[i];
+			subNode->collapse();
+
+			T* tmpDataPoint;
+			for (size_t j = 0; j < subNode->dataPoints.size(); j++)
+			{
+				tmpDataPoint = subNode->dataPoints.at(j);
+				dataPoints.push_back(tmpDataPoint);
+			}
+
+			delete subNode;
 			subNodes[i] = nullptr;
 		}
-		isLeaf = true;
 	}
 
-	template <typename T>
-	bool OctreeNode<T>::isEmpty()
+	template <class T>
+	inline bool OctreeNode<T>::isEmpty()
 	{
-		if (isLeaf)
+		if (this->isLeaf())
 		{
-			if (dataPoints.size() == 0)
+			return dataPoints.size() == 0;
+		}
+		else
+		{
+			for (size_t i = 0; i < 8; i++)
 			{
-				return true;
+				if (subNodes[i]->isEmpty() == false)
+				{
+					return false;
+				}
 			}
-			else
+			return true;
+		}
+	}
+
+	template <class T>
+	inline bool OctreeNode<T>::isLeaf()
+	{
+		for (size_t i = 0; i < 8; ++i)
+		{
+			if (subNodes[i] != nullptr)
 			{
 				return false;
 			}
 		}
-		else
+		return true;
+	}
+
+	template <class T>
+	inline size_t OctreeNode<T>::getOverloadCount(const size_t nodeCapacity)
+	{
+		if (dataPoints.size() > nodeCapacity)
 		{
-			for (size_t i = 0; i < 8; i++)
-			{
-				if (not subNodes[i]->isEmpty())
-				{
-					return false;
-				}
-			}
-			return true;
+			return dataPoints.size() - nodeCapacity;
+		}
+		return 0;
+	}
+
+	template <class T>
+	inline void OctreeNode<T>::tryEliminateOverload(OctreeNode<T>* parentNode, const size_t nodeCapacity, float nodeMinHalfSize)
+	{
+		size_t nodeOverloadedCapacity = getOverloadCount(nodeCapacity);
+		for (size_t i = 0; i < nodeOverloadedCapacity; i++)
+		{
+			T* dataPoint = dataPoints.back();
+			dataPoints.pop_back();
+			this->emplace(dataPoint, nodeCapacity, nodeMinHalfSize);
 		}
 	}
 
-	template <typename T>
-	bool OctreeNode<T>::shouldCollapse()
+	template <class T>
+	inline void OctreeNode<T>::tryCreateSubnode(size_t subNodeIndex)
 	{
-		if (not isLeaf)
+		// CHECK:
+		if (subNodeIndex > 7)
 		{
-			for (size_t i = 0; i < 8; i++)
-			{
-				if (not subNodes[i]->isLeaf || (subNodes[i]->isLeaf && (subNodes[i]->dataPoints.size() != 0)))
-				{
-					return false;
-				}
-			}
-			return true;
+			// TODO: log error
+			return;
 		}
-		else
+
+		if (subNodes[subNodeIndex] == nullptr)
 		{
-			return false;
+			Vector3D newHalfSize = boundingBox.halfSize * 0.5;
+			Vector3D newOrigin;
+			newOrigin.x() = boundingBox.position.x() + newHalfSize.x() * signesX[subNodeIndex];
+			newOrigin.y() = boundingBox.position.y() + newHalfSize.y() * signesY[subNodeIndex];
+			newOrigin.z() = boundingBox.position.z() + newHalfSize.z() * signesZ[subNodeIndex];
+			subNodes[subNodeIndex] = new OctreeNode<T>(newOrigin, newHalfSize);
 		}
 	}
 
-	template <typename T>
-	OctreeNode<T>* OctreeNode<T>::suggestSubnode(OctreeDataPoint<T>* point)
+	template <class T>
+	inline void OctreeNode<T>::tryDeleteSubnode(size_t subNodeIndex)
 	{
-		// Choose where to emplace based on position.
-		int octant = point->pos.compareWith(origin);
-		return subNodes[octant];
+		// CHECK:
+		if (subNodeIndex > 7)
+		{
+			// TODO: log error
+			return;
+		}
+
+		// Nothing to delete
+		if (subNodes[subNodeIndex] == nullptr)
+		{
+			return;
+		}
+
+		subNodes[subNodeIndex]->clear();
+		delete subNodes[subNodeIndex];
+		subNodes[subNodeIndex] = nullptr;
 	}
 
-	template <typename T>
-	void OctreeNode<T>::emplace(OctreeDataPoint<T>* point)
+	template <class T>
+	inline OctreeNode<T>* OctreeNode<T>::trySuggestSubnode(T* datapoint, float nodeMinHalfSize)
 	{
-		if (isLeaf)
+		// Stop subdivision on minimum node size
+		if (this->boundingBox.halfSize.x() <= nodeMinHalfSize)
 		{
-			point->_parentOctreeNode = this;
-			dataPoints.push_back(point);
+			return nullptr;
 		}
-		else
-		{
-			suggestSubnode(point)->emplace(point);
-		}
-	}
 
-	template <typename T>
-	bool OctreeNode<T>::remove(IDtype ID)
-	{
-		if (isLeaf)
-		{
-			for (size_t i = 0; i < dataPoints.size(); i++)
-			{
-				if (dataPoints[i]->ID == ID)
-				{
-					dataPoints[i]->_parentOctreeNode = nullptr;
-					dataPoints.erase(dataPoints.begin() + i);
-					return true;
-				}
-			}
-		}
-		else
-		{
-			for (size_t i = 0; i < 8; i++)
-			{
-				if (subNodes[i]->remove(ID))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+		GeometryTransform* datapointTransform = datapoint->getTransform();
 
-	template <typename T>
-	OctreeDataPoint<T>* OctreeNode<T>::get(IDtype ID)
-	{
-		if (isLeaf)
+		// Choose the subnode (octant) to emplace datapoint based on position
+		int octant = 0;
+		if (datapointTransform->translation.x() > boundingBox.position.x())
 		{
-			for (size_t i = 0; i < dataPoints.size(); i++)
-			{
-				if (dataPoints[i]->ID == ID)
-				{
-					return dataPoints[i];
-				}
-			}
+			octant += 1;
 		}
-		else
+		if (datapointTransform->translation.y() > boundingBox.position.y())
 		{
-			for (size_t i = 0; i < 8; i++)
-			{
-				OctreeDataPoint<T>* tmpPoint = subNodes[i]->get(ID);
-				if (tmpPoint)
-				{
-					return tmpPoint;
-				}
-			}
+			octant += 2;
 		}
+		if (datapointTransform->translation.z() > boundingBox.position.z())
+		{
+			octant += 4;
+		}
+
+		tryCreateSubnode(octant); // It's not ideal to create it at this point, it may not fit
+
+		// Check if the datapoint fits into new subnode
+		CollisionInfo collisionInfo;
+		checkCollision(
+			datapoint->getCollider(),
+			datapoint->getTransform(),
+			&subNodes[octant]->boundingBox,
+			&collisionInfo);
+		if (collisionInfo.type == CollisionType::INSCRIBTION_2_1)
+		{
+			return subNodes[octant];
+		}
+
 		return nullptr;
 	}
 
-	template <typename T>
-	void OctreeNode<T>::update(size_t nodeCapacity)
+	template <class T>
+	inline void OctreeNode<T>::emplace(T* datapoint, const size_t nodeCapacity, const float nodeMinHalfSize)
 	{
-		if (isLeaf)
+		if (dataPoints.size() < nodeCapacity)
 		{
-			if (dataPoints.size() >= nodeCapacity)
+			dataPoints.push_back(datapoint);
+			return;
+		}
+
+		OctreeNode<T>* octant = trySuggestSubnode(datapoint, nodeMinHalfSize);
+		if (octant)
+		{
+			octant->emplace(datapoint, nodeCapacity, nodeMinHalfSize);
+		}
+		else
+		{
+			dataPoints.push_back(datapoint); // Overload may occure here
+		}
+	}
+
+	template <class T>
+	inline void OctreeNode<T>::clear()
+	{
+		dataPoints.clear();
+
+		for (size_t i = 0; i < 8; i++)
+		{
+			tryDeleteSubnode(i);
+		}
+	}
+
+	template <class T>
+	inline void OctreeNode<T>::getAll(safety::SafeArray<T*>* datapointsStack)
+	{
+		datapointsStack->concatenate(&dataPoints);
+
+		for (size_t i = 0; i < 8; i++)
+		{
+			subNodes[i]->getAll(datapointsStack);
+		}
+	}
+
+	template <class T>
+	inline bool OctreeNode<T>::update(const size_t nodeCapacity, const size_t nodeMaxLifeTime, const float nodeMinHalfSize)
+	{
+		if (this->isLeaf())
+		{
+			size_t dataPointsCount = dataPoints.size();
+			if (dataPointsCount == 0)
 			{
-				subdivide();
-				for (size_t i = 0; i < 8; i++)
+				lifeTime += 1;
+
+				if (lifeTime > nodeMaxLifeTime)
 				{
-					subNodes[i]->update();
+					return true;
 				}
+			}
+			else
+			{
+				tryEliminateOverload(this, nodeCapacity, nodeMinHalfSize);
 			}
 		}
 		else
 		{
-			if (shouldCollapse())
+			tryEliminateOverload(this, nodeCapacity, nodeMinHalfSize);
+
+			// Update all subnodes
+			for (size_t i = 0; i < 8; i++)
 			{
-				collapse();
-			}
-			else
-			{
-				for (size_t i = 0; i < 8; i++)
+				OctreeNode<T>* subNode = subNodes[i];
+				if (subNode == nullptr)
 				{
-					subNodes[i]->update();
+					continue;
+				}
+
+				if (bool needToDelete = subNode->update(nodeCapacity, nodeMaxLifeTime, nodeMinHalfSize))
+				{
+					tryDeleteSubnode(i);
 				}
 			}
 		}
+
+		return false;
 	}
 }
 

@@ -7,13 +7,12 @@
 
 namespace mathem
 {
-	class BoxGeometry :
-		public GeometryPrimitiveBase,
-		public GeometryTransform
+	class BoxGeometry : public GeometryPrimitiveBase
 	{
 	public:
 
-		Point3D halfSize = { 0.5f, 0.5f, 0.5f };
+		GeometryTransform transform;
+		Vector3D halfSize = { 0.5f, 0.5f, 0.5f };
 
 		explicit BoxGeometry();
 		bool isTriangularMesh();

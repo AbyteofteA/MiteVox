@@ -19,12 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithAxisAlignedBox.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithBox.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithComplexGeometry.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.cpp" />
     <ClCompile Include="src\Convertations.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\GeometryPrimitiveBase.cpp" />
     <ClCompile Include="src\Quaternion.cpp" />
     <ClCompile Include="src\DataStructures\Graphs\BinarySearchTree.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\BoxGeometry.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\CapsuleGeometry.cpp" />
-    <ClCompile Include="src\Geometry\checkCollision.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithSphere.cpp" />
     <ClCompile Include="src\Geometry\computeClosestPointOnTheLine.cpp" />
     <ClCompile Include="src\Geometry\computeProjection.cpp" />
     <ClCompile Include="src\Geometry\GeometryTransform.cpp" />
@@ -35,9 +40,11 @@
     <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Geometry\CollisionDetection\CollisionType.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.h" />
+    <ClInclude Include="src\MathConstants.h" />
     <ClInclude Include="src\Quaternion.h" />
     <ClInclude Include="src\Calculus\Sequences.h" />
-    <ClInclude Include="src\DataStructures\Buffer.h" />
     <ClInclude Include="src\Convertations.h" />
     <ClInclude Include="src\DataStructures\HalfTable.h" />
     <ClInclude Include="src\DataStructures\HyperData.h" />
@@ -45,12 +52,11 @@
     <ClInclude Include="src\Generators\UniqueIDGenerator.h" />
     <ClInclude Include="src\DataStructures\Graphs\BinarySearchTree.h" />
     <ClInclude Include="src\DataStructures\Graphs\Octree.h" />
-    <ClInclude Include="src\DataStructures\Graphs\OctreeDataPoint.h" />
     <ClInclude Include="src\DataStructures\Graphs\OctreeNode.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\BoxGeometry.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\CapsuleGeometry.h" />
-    <ClInclude Include="src\Geometry\checkCollision.h" />
-    <ClInclude Include="src\Geometry\CollisionInfo.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\checkCollision.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\CollisionInfo.h" />
     <ClInclude Include="src\Geometry\ComplexGeometry.h" />
     <ClInclude Include="src\Geometry\computeClosestPointOnTheLine.h" />
     <ClInclude Include="src\Geometry\computeProjection.h" />
@@ -62,7 +68,6 @@
     <ClInclude Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.h" />
     <ClInclude Include="src\LinearAlgebra\SquareMatrix.h" />
     <ClInclude Include="src\Matrix.h" />
-    <ClInclude Include="src\Point3D.h" />
     <ClInclude Include="src\LinearAlgebra\Transform.h" />
     <ClInclude Include="src\Vector.h" />
     <ClInclude Include="src\Math.h" />

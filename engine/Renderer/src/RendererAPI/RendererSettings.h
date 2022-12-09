@@ -14,7 +14,7 @@
 
 #include "engine/Renderer/src/RendererAPI/Color.h"
 #include "engine/Renderer/src/RendererAPI/Primitives.h"
-#include "engine/Math/src/DataStructures/Buffer.h"
+#include "engine/CodeSafety/src/SafeArray.h"
 
 #define GLEW_STATIC
 #include "dependencies/glew-2.1.0/include/GL/glew.h"
@@ -36,9 +36,9 @@ namespace render
 
 		ColorRGBf clearColor = { 0 };
 
-		mathem::Buffer<Point> points;
-		mathem::Buffer<Point> lines;
-		mathem::Buffer<Point> triangles;
+		safety::SafeArray<Point> points;
+		safety::SafeArray<Point> lines;
+		safety::SafeArray<Point> triangles;
 
 		unsigned int amountOfDrawCalls = 0;
 
@@ -58,9 +58,9 @@ namespace render
 
 		~RendererSettings()
 		{
-			points.wipe();
-			lines.wipe();
-			triangles.wipe();
+			points.deallocate();
+			lines.deallocate();
+			triangles.deallocate();
 		}
 
 		GLFWwindow* getWindow()

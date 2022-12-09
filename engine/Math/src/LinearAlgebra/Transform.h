@@ -2,6 +2,9 @@
 #ifndef MATH_TRANSFORM_H
 #define MATH_TRANSFORM_H
 
+#include <cmath>
+#include "engine/Math/src/MathConstants.h"
+
 namespace mathem
 {
 	struct Transform
@@ -47,38 +50,38 @@ namespace mathem
 			return resultVector;
 		}
 
-		Point3D transformPoint3D(Point3D v)
+		Vector3D transformPoint3D(Vector3D v)
 		{
-			Point3D vNew = { v.x, v.y, v.z };
-			Point3D vTmp = { v.x, v.y, v.z };
+			Vector3D vNew = { v.x(), v.y(), v.z() };
+			Vector3D vTmp = { v.x(), v.y(), v.z() };
 
-			float angle = angleY * (float)M_PI / 180;
-			vTmp.x = (float)cos(angle) * vNew.x + (float)sin(angle) * vNew.z;
-			vTmp.z = (float)-sin(angle) * vNew.x + (float)cos(angle) * vNew.z;
-			vNew.x = vTmp.x;
-			vNew.z = vTmp.z;
+			float angle = angleY * (float)mathem::PI / 180;
+			vTmp.x() = (float)cos(angle) * vNew.x() + (float)sin(angle) * vNew.z();
+			vTmp.z() = (float)-sin(angle) * vNew.x() + (float)cos(angle) * vNew.z();
+			vNew.x() = vTmp.x();
+			vNew.z() = vTmp.z();
 
-			angle = angleX * (float)M_PI / 180;
-			vTmp.y = (float)cos(angle) * vNew.y + (float)sin(angle) * vNew.z;
-			vTmp.z = (float)-sin(angle) * vNew.y + (float)cos(angle) * vNew.z;
-			vNew.y = vTmp.y;
-			vNew.z = vTmp.z;
+			angle = angleX * (float)mathem::PI / 180;
+			vTmp.y() = (float)cos(angle) * vNew.y() + (float)sin(angle) * vNew.z();
+			vTmp.z() = (float)-sin(angle) * vNew.y() + (float)cos(angle) * vNew.z();
+			vNew.y() = vTmp.y();
+			vNew.z() = vTmp.z();
 
-			angle = angleZ * (float)M_PI / 180;
-			vTmp.x = (float)cos(angle) * vNew.x - (float)sin(angle) * vNew.y;
-			vTmp.y = (float)sin(angle) * vNew.x + (float)cos(angle) * vNew.y;
-			vNew.x = vTmp.x;
-			vNew.y = vTmp.y;
+			angle = angleZ * (float)mathem::PI / 180;
+			vTmp.x() = (float)cos(angle) * vNew.x() - (float)sin(angle) * vNew.y();
+			vTmp.y() = (float)sin(angle) * vNew.x() + (float)cos(angle) * vNew.y();
+			vNew.x() = vTmp.x();
+			vNew.y() = vTmp.y();
 
 			// Scale
-			vNew.x *= scaleX;
-			vNew.y *= scaleY;
-			vNew.z *= scaleZ;
+			vNew.x() *= scaleX;
+			vNew.y() *= scaleY;
+			vNew.z() *= scaleZ;
 
 			// Translate
-			vNew.x += x;
-			vNew.y += y;
-			vNew.z += z;
+			vNew.x() += x;
+			vNew.y() += y;
+			vNew.z() += z;
 
 			return vNew;
 		}
@@ -88,26 +91,24 @@ namespace mathem
 			Vector3D vNew = v;
 			Vector3D vTmp = v;
 
-
-			float angle = angleY * (float)M_PI / 180;
+			float angle = angleY * (float)mathem::PI / 180;
 			vTmp.i() = (float)cos(angle) * vNew.i() + (float)sin(angle) * vNew.k();
 			vTmp.k() = (float)-sin(angle) * vNew.i() + (float)cos(angle) * vNew.k();
 			vNew.i() = vTmp.i();
 			vNew.k() = vTmp.k();
 
-			angle = angleX * (float)M_PI / 180;
+			angle = angleX * (float)mathem::PI / 180;
 			vTmp.j() = (float)cos(angle) * vNew.j() - (float)sin(angle) * vNew.k();
 			vTmp.k() = (float)sin(angle) * vNew.j() + (float)cos(angle) * vNew.k();
 			vNew.j() = vTmp.j();
 			vNew.k() = vTmp.k();
 
-			angle = angleZ * (float)M_PI / 180;
+			angle = angleZ * (float)mathem::PI / 180;
 			vTmp.i() = (float)cos(angle) * vNew.i() - (float)sin(angle) * vNew.j();
 			vTmp.j() = (float)sin(angle) * vNew.i() + (float)cos(angle) * vNew.j();
 			vNew.i() = vTmp.i();
 			vNew.j() = vTmp.j();
 
-			
 			return vNew;
 		}
 	};

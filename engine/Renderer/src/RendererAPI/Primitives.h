@@ -2,16 +2,16 @@
 #ifndef RENDERER_PRIMITIVES_H
 #define RENDERER_PRIMITIVES_H
 
-#include "engine/Math/src/Point3D.h"
+#include "engine/Math/src/Vector.h"
 #include "engine/Renderer/src/RendererAPI/Color.h"
 
 namespace render
 {
 	struct Point
 	{
-		mathem::Point3D position;
+		mathem::Vector3D position;
 		//mathem::Vector3D normal;
-		//mathem::Point3D textureCoord;
+		//mathem::Vector3D textureCoord;
 		render::ColorRGBAf color;
 	};
 

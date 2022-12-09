@@ -1,11 +1,10 @@
-
 #ifndef OCTREE_H
 #define OCTREE_H
 
-#include "OctreeDataPoint.h"
-#include "OctreeNode.h"
-
-#include "engine/Math/src/LinearAlgebra/Point3D.h"
+#include "engine/Math/src/DataStructures/Graphs/OctreeNode.h"
+#include "engine/Math/src/Geometry/GeometryTransform.h"
+#include "engine/Math/src/Vector.h"
+#include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Math/src/Generators/UniqueIDGenerator.h"
 
 #include <vector>
@@ -13,95 +12,106 @@
 
 namespace mathem
 {
-	template <typename T>
+	/// <summary>
+	/// The tree only sorts datapoints spaciallyand updates its structure when the datapoints move.
+	/// Simulation code must be abstracted away from the Octree.
+	/// Use cases:
+	/// - sorting game objects
+	/// - sorting mesh polygons
+	/// - gravity simulations
+	/// 
+	/// Datapoint type must define the following methods:
+	/// - GeometryTransform* getTransform();
+	/// - ComplexGeometry* getCollider();
+	/// </summary>
+	/// <typeparam name="T">Datapoint type</typeparam>
+	template <class T>
 	class Octree
 	{
 	public:
 
-		OctreeNode<T>* origin;
+		OctreeNode<T>* origin = nullptr;
 
-		Octree(float halfSize, size_t _nodeCapacity);
-		~Octree();
+		inline Octree(
+			float halfSize, 
+			float nodeMinHalfSize,
+			size_t nodeCapacity, 
+			size_t nodeMaxLifeTime);
+		inline ~Octree();
 
-		OctreeNode<T>* getNearestNode(mathem::Point3D point);
-		IDtype emplace(mathem::Point3D pos, T value);
-		void remove(IDtype ID);
+		inline void emplace(T* datapoint);
+		inline void emplace(safety::SafeArray<T*>* datapointsStack); // TODO: not used
+		// TODO: inline OctreeNode<T>* getNearestNode(mathem::Vector3D point);
+		inline void getAll(safety::SafeArray<T*>* datapointsStack);
+		inline void clear();
+		inline void update();
 
-		/// <summary>
-		/// Cuts off empty leaves, subdevides overloaded leaves.
-		/// </summary>
-		void update();
+		// TODO: void moveDatapoint();
 
 	private:
 
-		mathem::UniqueIDGenerator<IDtype> IDGenerator;
-
-		// Stores OctreeDataPoint pointers for quick access.
-		std::unordered_map<IDtype, OctreeDataPoint<T>*> dataPoints;
-
-		// Max amount of OctreeDataPoints per node.
-		size_t nodeCapacity;
-
+		size_t nodeCapacity = 4; // Max amount of OctreeDataPoints per node.
+		size_t nodeMaxLifeTime;
+		float nodeMinHalfSize;
 	};
 
 
 	// IMPLEMENTATION BELOW //
 
 
-	template <typename T>
-	Octree<T>::Octree(float halfSize, size_t _nodeCapacity)
+	template <class T>
+	inline Octree<T>::Octree(
+		float halfSize,
+		float nodeMinHalfSize,
+		size_t nodeCapacity,
+		size_t nodeMaxLifeTime)
 	{
-		origin = new OctreeNode<T>(mathem::Point3D(), halfSize);
-		nodeCapacity = _nodeCapacity;
+		// TODO: ERROR: vtable crashes here !!!
+		this->origin = new OctreeNode<T>({ 0.0f, 0.0f, 0.0f }, { halfSize, halfSize, halfSize });
+		this->nodeMinHalfSize = nodeMinHalfSize;
+		this->nodeCapacity = nodeCapacity;
+		this->nodeMaxLifeTime = nodeMaxLifeTime;
 	}
 
-	template <typename T>
-	Octree<T>::~Octree()
+	template <class T>
+	inline Octree<T>::~Octree()
 	{
-		dataPoints.clear();
+		origin->clear();
 		delete origin;
-		IDGenerator.reset();
 	}
 
-	template <typename T>
-	OctreeNode<T>* Octree<T>::getNearestNode(mathem::Point3D point)
+	template <class T>
+	inline void Octree<T>::emplace(T* datapoint)
 	{
-		if (origin->isLeaf)
+		origin->emplace(datapoint, nodeCapacity, nodeMinHalfSize);
+	}
+
+	template <class T>
+	inline void Octree<T>::emplace(safety::SafeArray<T*>* datapointsStack)
+	{
+		size_t datapointsElementsCount = datapointsStack->getElementsCount();
+		for (size_t i = 0; i < datapointsElementsCount; i++)
 		{
-			return this;
-		}
-		else
-		{
-			return origin->suggestSubnode(point)->getNearestNode(point);
+			origin->emplace(datapointsStack->getElement(i), nodeCapacity, nodeMinHalfSize);
 		}
 	}
 
-	template <typename T>
-	IDtype Octree<T>::emplace(mathem::Point3D pos, T value)
+	template <class T>
+	inline void Octree<T>::getAll(safety::SafeArray<T*>* datapointsStack)
 	{
-		IDtype newID = IDGenerator.getID();
-		OctreeDataPoint<T>* point = new OctreeDataPoint<T>(newID, pos, value);
-		dataPoints[newID] = point;
-
-		origin->emplace(point);
+		origin->getAll(datapointsStack);
 	}
 
-	template <typename T>
-	void Octree<T>::remove(IDtype ID)
+	template <class T>
+	inline void Octree<T>::clear()
 	{
-		OctreeDataPoint<T>* point = dataPoints[ID];
-
-		OctreeNode<T>* tmpNode = point->node;
-		tmpNode->remove(ID);
-		dataPoints.erase(ID);
-
-		IDGenerator.returnID(ID);
+		origin->clear();
 	}
 
-	template <typename T>
-	void Octree<T>::update()
+	template <class T>
+	inline void Octree<T>::update()
 	{
-		origin->update(nodeCapacity);
+		origin->update(nodeCapacity, nodeMaxLifeTime, nodeMinHalfSize);
 	}
 }
 

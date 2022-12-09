@@ -5,60 +5,62 @@
 namespace mathem
 {
 	void computeProjection(
-		BoxGeometry* box, 
-		GeometryTransform* boxTransform, 
-		Vector3D* vector, 
-		float* min, 
+		GeometryPrimitiveBase* triangularMesh,
+		GeometryTransform* parentTransform,
+		Vector3D* vector,
+		float* min,
 		float* max)
 	{
-		Vector3D tmpPoint = box->getVertexPosition(0);
-		boxTransform->applyTo(tmpPoint);
-		*max = tmpPoint * (*vector);
+		Vector3D boxPoint = triangularMesh->getVertexPosition(0);
+		parentTransform->applyTo(boxPoint);
+		*max = boxPoint * (*vector); // Compute projection of the first point
 		*min = *max;
 		for (uint16_t pointIndex = 1; pointIndex < 8; ++pointIndex)
 		{
-			tmpPoint = box->getVertexPosition(pointIndex);
-			boxTransform->applyTo(tmpPoint);
-			float tmpProjection = tmpPoint * (*vector);
+			boxPoint = triangularMesh->getVertexPosition(pointIndex);
+			parentTransform->applyTo(boxPoint);
+			float pointProjection = boxPoint * (*vector);
 
-			if (tmpProjection < *min)
+			if (pointProjection < *min)
 			{
-				*min = tmpProjection;
+				*min = pointProjection;
 			}
-			if (tmpProjection > *max)
+			if (pointProjection > *max)
 			{
-				*max = tmpProjection;
+				*max = pointProjection;
 			}
 		}
 	}
 
 	void computeProjection(
 		SphereGeometry* sphere, 
-		GeometryTransform* sphereTransform, 
+		GeometryTransform* parentTransform,
 		Vector3D* vector, 
 		float* min, 
 		float* max)
 	{
-		Vector3D spherePosition = sphere->translation;
-		// TODO: transform spherePosition via sphereTransform
+		Vector3D spherePosition = sphere->transform.translation;
+		parentTransform->applyTo(spherePosition);
 		float spherePositionProjection = spherePosition * (*vector);
-		*min = spherePositionProjection - sphere->radius;
-		*max = spherePositionProjection + sphere->radius;
+		float actualSphereRadius = sphere->radius * sphere->transform.scale.x() * parentTransform->scale.x();
+		*min = spherePositionProjection - actualSphereRadius;
+		*max = spherePositionProjection + actualSphereRadius;
 	}
 
 	void computeProjection(
 		CapsuleGeometry* capsule,
-		GeometryTransform* capsuleTransform,
+		GeometryTransform* parentTransform,
 		Vector3D* vector,
 		float* min,
 		float* max)
 	{
-		Vector3D capsulePosition1 = capsule->translation;
-		capsulePosition1.y() += capsule->halfHeight;
-		Vector3D capsulePosition2 = capsule->translation;
-		capsulePosition2.y() -= capsule->halfHeight;
-		capsuleTransform->applyTo(capsulePosition1);
-		capsuleTransform->applyTo(capsulePosition2);
+		float actualCapsuleHalfHeight = capsule->halfHeight * capsule->transform.scale.x();
+		Vector3D capsulePosition1 = capsule->transform.translation;
+		Vector3D capsulePosition2 = capsule->transform.translation;
+		capsulePosition1.y() += actualCapsuleHalfHeight;
+		capsulePosition2.y() -= actualCapsuleHalfHeight;
+		parentTransform->applyTo(capsulePosition1);
+		parentTransform->applyTo(capsulePosition2);
 
 		float spherePositionProjectionMin = capsulePosition1 * (*vector);
 		float spherePositionProjectionMax = capsulePosition2 * (*vector);
@@ -66,7 +68,8 @@ namespace mathem
 		{
 			std::swap(spherePositionProjectionMin, spherePositionProjectionMax);
 		}
-		*min = spherePositionProjectionMin - capsule->radius;
-		*max = spherePositionProjectionMax + capsule->radius;
+		float actualCapsuleRadius = capsule->radius * capsule->transform.scale.x() * parentTransform->scale.x();
+		*min = spherePositionProjectionMin - actualCapsuleRadius;
+		*max = spherePositionProjectionMax + actualCapsuleRadius;
 	}
 }

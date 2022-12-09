@@ -2,12 +2,10 @@
 #ifndef MATH_HEADERS_H
 #define MATH_HEADERS_H
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include "Calculus/Sequences.h"
 
-#include "DataStructures/Buffer.h"
 #include "DataStructures/HalfTable.h"
 #include "DataStructures/HyperData.h"
 #include "DataStructures/Graphs/Octree.h"
@@ -19,7 +17,6 @@
 #include "Generators/UniqueIDGenerator.h"
 #include "Generators/NoiseGenerators/PerlinNoiseGenerator.h"
 
-#include "Point3D.h"
 #include "Vector.h"
 #include "Matrix.h"
 #include "LinearAlgebra/Transform.h"

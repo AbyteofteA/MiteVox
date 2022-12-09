@@ -7,6 +7,7 @@
 #include "engine/Renderer/src/RendererAPI/Camera.h"
 #include "engine/Renderer/src/RendererAPI/Light.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
+#include "engine/Math/src/Geometry/ComplexGeometry.h"
 
 #include <string>
 #include <cstdint>
@@ -26,10 +27,20 @@ namespace mitevox
         std::string name;
         safety::SafeFloatArray weights;
         mathem::GeometryTransform transform;
+        mathem::ComplexGeometry* collider = nullptr;
+        render::LightType lightType = render::LightType::NONE;
+        render::AnyLight light;
         safety::SafeArray<Node*> children;
 
         bool isMorphableMesh();
         Mesh* getMeshToRender();
+
+        void tryGenerateHitbox();
+
+        // Methods that octree requires in order to work
+
+        mathem::GeometryTransform* getTransform();
+        mathem::ComplexGeometry* getCollider();
     };
 }
 

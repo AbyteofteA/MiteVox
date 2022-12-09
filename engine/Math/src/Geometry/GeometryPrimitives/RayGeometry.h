@@ -6,9 +6,7 @@
 
 namespace mathem
 {
-	class RayGeometry :
-		public GeometryPrimitiveBase,
-		public GeometryTransform
+	class RayGeometry : public GeometryPrimitiveBase
 	{
 	public:
 

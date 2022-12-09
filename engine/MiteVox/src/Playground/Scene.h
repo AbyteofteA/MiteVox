@@ -1,9 +1,9 @@
-
 #ifndef MITEVOX_SCENE_H
 #define MITEVOX_SCENE_H
 
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/MiteVox/src/Playground/Node.h"
+#include "engine/MiteVox/src/Playground/SceneFoundation.h"
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/entityID.h"
 #include "engine/Renderer/src/RendererAPI/Skybox.h"
@@ -18,11 +18,8 @@
 
 // Default components IDs //
 
-#define POINTLIGHT_COMPONENT 0
-#define DIRECTEDLIGHT_COMPONENT 1
-#define SPOTLIGHT_COMPONENT 2
-#define TRANSFORM_COMPONENT 3
-#define NATIVE_SCRIPT_COMPONENT 4
+#define TRANSFORM_COMPONENT 0
+#define NATIVE_SCRIPT_COMPONENT 1
 
 namespace mitevox
 {
@@ -31,7 +28,7 @@ namespace mitevox
 	public:
 
 		std::string name = "Untitled";
-		//mathem::Octree<mitevox::Node*>* octree;
+		SceneFoundation* foundation = nullptr;
 		ecs::EntityComponentSystem<entityID>* ECS = nullptr;
 		safety::SafeArray<mitevox::Node*> nodes;
 
@@ -49,12 +46,6 @@ namespace mitevox
 		float currentTime = 0.0f;
 
 		//************************************ Components *****************************************
-
-		// Renderer components
-
-		MANAGER_INDEX_TYPE PointLight_Component = 0;
-		MANAGER_INDEX_TYPE DirectedLight_Component = 0;
-		MANAGER_INDEX_TYPE SpotLight_Component = 0;
 
 		// Math components
 

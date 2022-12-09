@@ -1,4 +1,3 @@
-
 #ifndef PARSEMODEL_OBJ_H
 #define PARSEMODEL_OBJ_H
 
@@ -62,13 +61,13 @@ namespace render
 	}
 
 
-	inline mathem::Point3D readPoint3D(char* str, int& indx)
+	inline mathem::Vector3D readPoint3D(char* str, int& indx)
 	{
-		mathem::Point3D v;
+		mathem::Vector3D v;
 		double* tmpFloats = readFloats3(str, indx);
-		v.x = (float)tmpFloats[0];
-		v.y = (float)tmpFloats[1];
-		v.z = (float)tmpFloats[2];
+		v.x() = (float)tmpFloats[0];
+		v.y() = (float)tmpFloats[1];
+		v.z() = (float)tmpFloats[2];
 
 		return v;
 	}
@@ -216,13 +215,13 @@ namespace render
 		meshTmp->positionsCount = 0;
 		meshTmp->positions = nullptr;
 
-		meshTmp->minPosition.x = 0;
-		meshTmp->minPosition.y = 0;
-		meshTmp->minPosition.z = 0;
+		meshTmp->minPosition.x() = 0;
+		meshTmp->minPosition.y() = 0;
+		meshTmp->minPosition.z() = 0;
 
-		meshTmp->maxPosition.x = 0;
-		meshTmp->maxPosition.y = 0;
-		meshTmp->maxPosition.z = 0;
+		meshTmp->maxPosition.x() = 0;
+		meshTmp->maxPosition.y() = 0;
+		meshTmp->maxPosition.z() = 0;
 
 		meshTmp->textureCoordsCount = 0;
 		meshTmp->textureCoords = nullptr;
@@ -308,22 +307,22 @@ namespace render
 					{
 						i += 2;
 						meshTmp->positionsCount += 1;
-						meshTmp->positions = (mathem::Point3D*)realloc(meshTmp->positions, sizeof(mathem::Point3D) * meshTmp->positionsCount);
+						meshTmp->positions = (mathem::Vector3D*)realloc(meshTmp->positions, sizeof(mathem::Vector3D) * meshTmp->positionsCount);
 						meshTmp->positions[meshTmp->positionsCount - 1] = readPoint3D(fileData, i);
 
-						if (meshTmp->minPosition.x > meshTmp->positions[meshTmp->positionsCount - 1].x)
-							meshTmp->minPosition.x = meshTmp->positions[meshTmp->positionsCount - 1].x;
-						if (meshTmp->minPosition.y > meshTmp->positions[meshTmp->positionsCount - 1].y)
-							meshTmp->minPosition.y = meshTmp->positions[meshTmp->positionsCount - 1].y;
-						if (meshTmp->minPosition.z > meshTmp->positions[meshTmp->positionsCount - 1].z)
-							meshTmp->minPosition.z = meshTmp->positions[meshTmp->positionsCount - 1].z;
+						if (meshTmp->minPosition.x() > meshTmp->positions[meshTmp->positionsCount - 1].x())
+							meshTmp->minPosition.x() = meshTmp->positions[meshTmp->positionsCount - 1].x();
+						if (meshTmp->minPosition.y() > meshTmp->positions[meshTmp->positionsCount - 1].y())
+							meshTmp->minPosition.y() = meshTmp->positions[meshTmp->positionsCount - 1].y();
+						if (meshTmp->minPosition.z() > meshTmp->positions[meshTmp->positionsCount - 1].z())
+							meshTmp->minPosition.z() = meshTmp->positions[meshTmp->positionsCount - 1].z();
 
-						if (meshTmp->maxPosition.x < meshTmp->positions[meshTmp->positionsCount - 1].x)
-							meshTmp->maxPosition.x = meshTmp->positions[meshTmp->positionsCount - 1].x;
-						if (meshTmp->maxPosition.y < meshTmp->positions[meshTmp->positionsCount - 1].y)
-							meshTmp->maxPosition.y = meshTmp->positions[meshTmp->positionsCount - 1].y;
-						if (meshTmp->maxPosition.z < meshTmp->positions[meshTmp->positionsCount - 1].z)
-							meshTmp->maxPosition.z = meshTmp->positions[meshTmp->positionsCount - 1].z;
+						if (meshTmp->maxPosition.x() < meshTmp->positions[meshTmp->positionsCount - 1].x())
+							meshTmp->maxPosition.x() = meshTmp->positions[meshTmp->positionsCount - 1].x();
+						if (meshTmp->maxPosition.y() < meshTmp->positions[meshTmp->positionsCount - 1].y())
+							meshTmp->maxPosition.y() = meshTmp->positions[meshTmp->positionsCount - 1].y();
+						if (meshTmp->maxPosition.z() < meshTmp->positions[meshTmp->positionsCount - 1].z())
+							meshTmp->maxPosition.z() = meshTmp->positions[meshTmp->positionsCount - 1].z();
 
 						break;
 					}
@@ -346,7 +345,7 @@ namespace render
 						{
 							i += 2;
 							meshTmp->textureCoordsCount += 1;
-							meshTmp->textureCoords = (mathem::Point3D*)realloc(meshTmp->textureCoords, sizeof(mathem::Point3D) * meshTmp->textureCoordsCount);
+							meshTmp->textureCoords = (mathem::Vector3D*)realloc(meshTmp->textureCoords, sizeof(mathem::Vector3D) * meshTmp->textureCoordsCount);
 							meshTmp->textureCoords[meshTmp->textureCoordsCount - 1] = readPoint3D(fileData, i);
 						}
 						break;
@@ -363,13 +362,13 @@ namespace render
 
 						if (hasNormals == false)
 						{
-							mathem::Vector3D vectA = { meshTmp->positions[poligon.positions[2] - 1].x - meshTmp->positions[poligon.positions[1] - 1].x,
-											meshTmp->positions[poligon.positions[2] - 1].y - meshTmp->positions[poligon.positions[1] - 1].y,
-											meshTmp->positions[poligon.positions[2] - 1].z - meshTmp->positions[poligon.positions[1] - 1].z };
+							mathem::Vector3D vectA = { meshTmp->positions[poligon.positions[2] - 1].x() - meshTmp->positions[poligon.positions[1] - 1].x(),
+											meshTmp->positions[poligon.positions[2] - 1].y() - meshTmp->positions[poligon.positions[1] - 1].y(),
+											meshTmp->positions[poligon.positions[2] - 1].z() - meshTmp->positions[poligon.positions[1] - 1].z() };
 
-							mathem::Vector3D vectB = { meshTmp->positions[poligon.positions[0] - 1].x - meshTmp->positions[poligon.positions[1] - 1].x,
-											meshTmp->positions[poligon.positions[0] - 1].y - meshTmp->positions[poligon.positions[1] - 1].y,
-											meshTmp->positions[poligon.positions[0] - 1].z - meshTmp->positions[poligon.positions[1] - 1].z };
+							mathem::Vector3D vectB = { meshTmp->positions[poligon.positions[0] - 1].x() - meshTmp->positions[poligon.positions[1] - 1].x(),
+											meshTmp->positions[poligon.positions[0] - 1].y() - meshTmp->positions[poligon.positions[1] - 1].y(),
+											meshTmp->positions[poligon.positions[0] - 1].z() - meshTmp->positions[poligon.positions[1] - 1].z() };
 
 							mathem::Vector3D vectN = { 
 								vectA.j() * vectB.k() - vectB.j() * vectA.k(),
@@ -450,30 +449,30 @@ namespace render
 		unsigned char r, g, b;
 		for (size_t i = 0; i < meshTmp->polygonsCount; i++)
 		{
-			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].x - meshTmp->minPosition.x) /
-				(meshTmp->maxPosition.x - meshTmp->minPosition.x)) * 255;
-			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].y - meshTmp->minPosition.y) /
-				(meshTmp->maxPosition.y - meshTmp->minPosition.y)) * 255;
-			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].z - meshTmp->minPosition.z) /
-				(meshTmp->maxPosition.z - meshTmp->minPosition.z)) * 255;
+			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].x() - meshTmp->minPosition.x()) /
+				(meshTmp->maxPosition.x() - meshTmp->minPosition.x())) * 255;
+			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].y() - meshTmp->minPosition.y()) /
+				(meshTmp->maxPosition.y() - meshTmp->minPosition.y())) * 255;
+			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[0] - 1].z() - meshTmp->minPosition.z()) /
+				(meshTmp->maxPosition.z() - meshTmp->minPosition.z())) * 255;
 
 			meshTmp->polygons[i].colors[0] = { r, g, b };
 
-			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].x - meshTmp->minPosition.x) /
-				(meshTmp->maxPosition.x - meshTmp->minPosition.x)) * 255;
-			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].y - meshTmp->minPosition.y) /
-				(meshTmp->maxPosition.y - meshTmp->minPosition.y)) * 255;
-			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].z - meshTmp->minPosition.z) /
-				(meshTmp->maxPosition.z - meshTmp->minPosition.z)) * 255;
+			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].x() - meshTmp->minPosition.x()) /
+				(meshTmp->maxPosition.x() - meshTmp->minPosition.x())) * 255;
+			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].y() - meshTmp->minPosition.y()) /
+				(meshTmp->maxPosition.y() - meshTmp->minPosition.y())) * 255;
+			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[1] - 1].z() - meshTmp->minPosition.z()) /
+				(meshTmp->maxPosition.z() - meshTmp->minPosition.z())) * 255;
 
 			meshTmp->polygons[i].colors[1] = { r, g, b };
 
-			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].x - meshTmp->minPosition.x) /
-				(meshTmp->maxPosition.x - meshTmp->minPosition.x)) * 255;
-			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].y - meshTmp->minPosition.y) /
-				(meshTmp->maxPosition.y - meshTmp->minPosition.y)) * 255;
-			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].z - meshTmp->minPosition.z) /
-				(meshTmp->maxPosition.z - meshTmp->minPosition.z)) * 255;
+			r = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].x() - meshTmp->minPosition.x()) /
+				(meshTmp->maxPosition.x() - meshTmp->minPosition.x())) * 255;
+			g = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].y() - meshTmp->minPosition.y()) /
+				(meshTmp->maxPosition.y() - meshTmp->minPosition.y())) * 255;
+			b = (unsigned char)abs((meshTmp->positions[meshTmp->polygons[i].positions[2] - 1].z() - meshTmp->minPosition.z()) /
+				(meshTmp->maxPosition.z() - meshTmp->minPosition.z())) * 255;
 
 			meshTmp->polygons[i].colors[2] = { r, g, b };
 		}

@@ -74,6 +74,9 @@ printErrors(__FILE__, __LINE__);
 
 	// Models
 
+	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID);
+	void clearPointLights();
+
 	void uploadMaterial(mitevox::Material* material, int shaderID);
 	void selectMaterial(mitevox::Material* material, int shaderID);
 	void removeMaterial(mitevox::Material* material, int shaderID);
