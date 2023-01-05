@@ -66,7 +66,6 @@ namespace mathem
 		size_t nodeCapacity,
 		size_t nodeMaxLifeTime)
 	{
-		// TODO: ERROR: vtable crashes here !!!
 		this->origin = new OctreeNode<T>({ 0.0f, 0.0f, 0.0f }, { halfSize, halfSize, halfSize });
 		this->nodeMinHalfSize = nodeMinHalfSize;
 		this->nodeCapacity = nodeCapacity;

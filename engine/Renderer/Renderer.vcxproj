@@ -60,6 +60,7 @@
     <ClCompile Include="src\implementations\RendererOpenGL\API_ModelFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\ShaderOpenGL.cpp" />
+    <ClCompile Include="src\RendererAPI\Camera.cpp" />
     <ClCompile Include="src\RendererAPI\Cubemap.cpp" />
     <ClCompile Include="src\RendererAPI\Light.cpp" />
     <ClCompile Include="src\RendererAPI\Primitives.cpp" />

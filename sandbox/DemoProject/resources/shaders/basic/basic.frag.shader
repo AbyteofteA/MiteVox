@@ -3,6 +3,7 @@
 in vec2 Texcoord;
 in vec3 Normal;
 in vec3 Position;
+in mat3 TangentBitangentNormal;
 
 out vec4 outColor;
 
@@ -15,6 +16,8 @@ struct Material
 
 	bool hasAlbedoMap;
 	bool hasMetallicRoughnessMap;
+	bool hasNormalMap;
+
 	bool hasReflectionMap;
 
 	int illuminationModel;
@@ -27,6 +30,7 @@ struct Material
 
 uniform sampler2D albedoMap;
 uniform sampler2D metallicRoughnessMap;
+uniform sampler2D normalMap;
 uniform samplerCube reflectionMap;
 
 uniform vec3 viewPos;
@@ -85,9 +89,18 @@ vec3 calculate_PointLight(vec3 norm, vec3 viewDir, float roughnessFragment, floa
 
 void main()
 {
+	// Normal mapping
 	vec3 norm = normalize(Normal);
+	if (material.hasNormalMap)
+	{
+		norm = vec3(texture(normalMap, Texcoord));
+		norm = normalize(norm * 2.0 - 1.0);
+		norm = normalize(TangentBitangentNormal * norm);
+	}
+	
 	vec3 viewDir = normalize(viewPos - Position);
 
+	// 
 	vec3 albedoFragment = material.baseColor;
 	if (material.hasAlbedoMap)
 	{

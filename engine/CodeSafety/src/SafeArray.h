@@ -175,6 +175,8 @@ namespace safety
         if (index >= _elementsCount)
         {
             // TODO: log ERROR message.
+
+            return T();
         }
         return _elements[index];
     }
@@ -182,6 +184,12 @@ namespace safety
     template <typename T>
     inline T SafeArray<T>::getLastElement() const
     {
+        if (_elementsCount == 0)
+        {
+            // TODO: log ERROR message.
+
+            return T();
+        }
         return _elements[_elementsCount - 1];
     }
 
@@ -371,6 +379,7 @@ namespace safety
         if (index >= _elementsCount)
         {
             // TODO: log ERROR message.
+
         }
         return _elements[index];
     }

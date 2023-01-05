@@ -37,11 +37,20 @@ namespace mitevox
 
 	void SceneFoundation::update()
 	{
-		for (size_t i = 0; i < maxEmplacedDatapointsPerUpdate; i++)
+		size_t emplacedDatapointsCount = waitingDatapointsStack.getElementsCount();
+		if (emplacedDatapointsCount > maxEmplacedDatapointsPerUpdate)
+		{
+			emplacedDatapointsCount = maxEmplacedDatapointsPerUpdate;
+		}
+
+		for (size_t i = 0; i < emplacedDatapointsCount; i++)
 		{
 			Node* datapoint = waitingDatapointsStack.getLastElement();
 			waitingDatapointsStack.removeLastElement();
-			octree->emplace(datapoint);
+			if (datapoint->collider)
+			{
+				octree->emplace(datapoint);
+			}
 		}
 
 		octree->update();

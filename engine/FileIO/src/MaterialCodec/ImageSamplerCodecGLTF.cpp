@@ -4,43 +4,27 @@ namespace fileio
 {
 	void ImageSamplerCodec::fromGLTF(mitevox::ImageSampler* imageSamplerResult, JSON* imageSamplerJSON)
 	{
-		imageSamplerResult->name = imageSamplerJSON->getFieldString("name");
+		imageSamplerResult->name = imageSamplerJSON->getFieldStringOrDefault("name", "Untitled");
 
-		JSON* numberJSON = imageSamplerJSON->getField("magFilter");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = imageSamplerJSON->getField("magFilter"))
 		{
-			if (numberJSON->isNumber())
-			{
-				imageSamplerResult->magnificationFilter =
-					(mitevox::ImageSampler::FilterType)numberJSON->getNumber();
-			}
+			imageSamplerResult->magnificationFilter =
+				(mitevox::ImageSampler::FilterType)numberJSON->getNumberOrDefault((double)mitevox::ImageSampler::FilterType::LINEAR);
 		}
-		numberJSON = imageSamplerJSON->getField("minFilter");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = imageSamplerJSON->getField("minFilter"))
 		{
-			if (numberJSON->isNumber())
-			{
-				imageSamplerResult->minificationFilter =
-					(mitevox::ImageSampler::FilterType)numberJSON->getNumber();
-			}
+			imageSamplerResult->minificationFilter =
+				(mitevox::ImageSampler::FilterType)numberJSON->getNumberOrDefault((double)mitevox::ImageSampler::FilterType::LINEAR);
 		}
-		numberJSON = imageSamplerJSON->getField("wrapS");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = imageSamplerJSON->getField("wrapS"))
 		{
-			if (numberJSON->isNumber())
-			{
-				imageSamplerResult->wrappingModeU =
-					(mitevox::ImageSampler::WrappingMode)numberJSON->getNumber();
-			}
+			imageSamplerResult->wrappingModeU =
+				(mitevox::ImageSampler::WrappingMode)numberJSON->getNumberOrDefault((double)mitevox::ImageSampler::WrappingMode::REPEAT);
 		}
-		numberJSON = imageSamplerJSON->getField("wrapT");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = imageSamplerJSON->getField("wrapT"))
 		{
-			if (numberJSON->isNumber())
-			{
-				imageSamplerResult->wrappingModeV =
-					(mitevox::ImageSampler::WrappingMode)numberJSON->getNumber();
-			}
+			imageSamplerResult->wrappingModeV =
+				(mitevox::ImageSampler::WrappingMode)numberJSON->getNumberOrDefault((double)mitevox::ImageSampler::WrappingMode::REPEAT);
 		}
 	}
 }

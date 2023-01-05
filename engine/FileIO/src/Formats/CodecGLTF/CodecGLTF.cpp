@@ -35,10 +35,10 @@ namespace fileio
 		fileDataJSON->deserialize(fileData);
 
 		JSON* assetJSON = fileDataJSON->getFieldObject("asset");
-		_asset.version = assetJSON->getFieldString("version");
-		_asset.minVersion = assetJSON->getFieldString("minVersion");
-		_asset.generator = assetJSON->getFieldString("generator");
-		_asset.copyright = assetJSON->getFieldString("copyright");
+		_asset.version = assetJSON->getFieldStringOrDefault("version", "");
+		_asset.minVersion = assetJSON->getFieldStringOrDefault("minVersion", "");
+		_asset.generator = assetJSON->getFieldStringOrDefault("generator", "");
+		_asset.copyright = assetJSON->getFieldStringOrDefault("copyright", "");
 
 		collectExtensions(fileDataJSON);
 		if (extensionsAreSupported() == false)
@@ -63,13 +63,13 @@ namespace fileio
 		fileio::JSON* extensionsUsedJSON = glTFJSON->getFieldArray("extensionsUsed");
 		if (extensionsUsedJSON != nullptr)
 		{
-			extensionsUsedJSON->toStringArray(&_extensionsUsed);
+			extensionsUsedJSON->toStringArrayOrDefault(&_extensionsUsed, "ERROR");
 		}
 
 		fileio::JSON* extensionsRequiredJSON = glTFJSON->getFieldArray("extensionsRequired");
 		if (extensionsRequiredJSON != nullptr)
 		{
-			extensionsRequiredJSON->toStringArray(&_extensionsRequired);
+			extensionsRequiredJSON->toStringArrayOrDefault(&_extensionsRequired, "ERROR");
 		}
 	}
 

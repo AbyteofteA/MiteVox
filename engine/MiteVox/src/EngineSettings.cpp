@@ -21,7 +21,7 @@ namespace mitevox
 
 		fromJSON(engineConfig);
 
-		inputHandler = new InputHandler(renderer->getWindow());
+		inputHandler = InputHandler::getInstance(renderer->getWindow());
 
 		delete engineConfig;
 	}
@@ -33,11 +33,6 @@ namespace mitevox
 			render::closeRenderer(renderer);
 			delete renderer;
 		}
-
-		if (inputHandler)
-		{
-			delete inputHandler;
-		}
 	}
 
 	void EngineSettings::fromJSON(fileio::JSON* json)
@@ -47,31 +42,31 @@ namespace mitevox
 		fileio::JSON* pathsConfig = json->getFieldObject("paths");
 		fileio::JSON* rendererConfig = json->getFieldObject("renderer");
 
-		debug = generalConfig->getFieldBoolean("debug");
-		setCleanupPeriod(generalConfig->getFieldNumber("cleanup_period"));
-		setPhysicsPeriod(generalConfig->getFieldNumber("physics_period"));
-		setRendererPeriod(generalConfig->getFieldNumber("renderer_period"));
+		debug = generalConfig->getFieldBooleanOrDefault("debug", true);
+		setCleanupPeriod(generalConfig->getFieldNumberOrDefault("cleanup_period", 0.5));
+		setPhysicsPeriod(generalConfig->getFieldNumberOrDefault("physics_period", 0.06));
+		setRendererPeriod(generalConfig->getFieldNumberOrDefault("renderer_period", 0.017));
 
 		fs::path _executionPath = fs::path(executionDir);
 		fs::current_path(_executionPath);
 
-		logConsole = loggingConfig->getFieldBoolean("log_console");
-		logFile = loggingConfig->getFieldBoolean("log_file");
-		fs::path _logPath = fs::path(loggingConfig->getFieldString("log_dir"));
+		logConsole = loggingConfig->getFieldBooleanOrDefault("log_console", true);
+		logFile = loggingConfig->getFieldBooleanOrDefault("log_file", true);
+		fs::path _logPath = fs::path(loggingConfig->getFieldStringOrDefault("log_dir", ""));
 		logDir = fs::relative(_logPath, _executionPath).string();
 
-		fs::path _configPath = fs::path(pathsConfig->getFieldString("config_dir"));
+		fs::path _configPath = fs::path(pathsConfig->getFieldStringOrDefault("config_dir", ""));
 		configDir = fs::relative(_configPath, _executionPath).string();
-		fs::path _resourcePath = fs::path(pathsConfig->getFieldString("resource_dir"));
+		fs::path _resourcePath = fs::path(pathsConfig->getFieldStringOrDefault("resource_dir", ""));
 		resourceDir = fs::relative(_resourcePath, _executionPath).string();
-		fs::path _savesPath = fs::path(pathsConfig->getFieldString("saves_dir"));
+		fs::path _savesPath = fs::path(pathsConfig->getFieldStringOrDefault("saves_dir", ""));
 		_savesPath = fs::relative(_savesPath, _executionPath).string();
 
 		logger = profile::Logger(profile::LoggerMode::LOG_IN_CONSOLE, logDir);
 
-		int screenWidth = (int)rendererConfig->getFieldNumber("screen_width");
-		int screenHeight = (int)rendererConfig->getFieldNumber("screen_height");
-		bool backfaceCulling = rendererConfig->getFieldBoolean("back_culling");
+		int screenWidth = (int)rendererConfig->getFieldNumberOrDefault("screen_width", 720.0);
+		int screenHeight = (int)rendererConfig->getFieldNumberOrDefault("screen_height", 480.0);
+		bool backfaceCulling = rendererConfig->getFieldBooleanOrDefault("back_culling", true);
 
 		// TODO: move clearColor to engine_config.json .
 		renderer = render::initRenderer(screenWidth, screenHeight, false, backfaceCulling, { 0.05f, 0.05f, 0.05f });

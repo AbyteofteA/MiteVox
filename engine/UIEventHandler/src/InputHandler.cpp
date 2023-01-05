@@ -4,22 +4,17 @@
 #include <chrono>
 #include <thread>
 
-InputHandler::InputHandler(GLFWwindow* _window)
+InputHandler* InputHandler::instance{ nullptr };
+std::mutex InputHandler::mutex;
+
+InputHandler* InputHandler::getInstance(GLFWwindow* _window)
 {
-	lastUpdate = std::chrono::high_resolution_clock::now();
-	now = std::chrono::high_resolution_clock::now();
-	window = _window;
-
-	resetMouseInfo();
-
-	attach();
-	update();
-	detach();
-
-	setMousePositionCenter();
-
-	//glfwSetCursorPosCallback(window, cursor_position_callback);
-	//glfwSetScrollCallback(window, scroll_callback);
+	std::lock_guard<std::mutex> lock(mutex);
+	if (instance == nullptr)
+	{
+		instance = new InputHandler(_window);
+	}
+	return instance;
 }
 
 void InputHandler::getWindowSize(int* x, int* y)
@@ -48,10 +43,6 @@ void InputHandler::setMousePositionCenter()
 	getWindowSize(&windowWidth, &windowHeight);
 	setMousePosition(windowWidth / 2, windowHeight / 2);
 }
-void InputHandler::getMouseScroll(int* s)
-{
-
-}
 
 void InputHandler::attach()
 {
@@ -62,6 +53,8 @@ void InputHandler::attach()
 void InputHandler::detach()
 {
 	isAttached = false;
+	//mouseDeltaX = 0.0;
+	//mouseDeltaY = 0.0;
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	setMousePositionCenter();
 }
@@ -73,18 +66,17 @@ void InputHandler::processMouse()
 		return;
 	}
 
-	getMousePosition(&mouseDeltaX, &mouseDeltaY);
+	int windowWidth, windowHeight;
+	getWindowSize(&windowWidth, &windowHeight); // TODO: store windowWidth, windowHeight
+
+	double currentMousePositionX = 0.0, currentMousePositionY = 0.0;
+	getMousePosition(&currentMousePositionX, &currentMousePositionY);
+	mouseDeltaX = windowWidth / 2 - currentMousePositionX;
+	mouseDeltaY = windowHeight / 2 - currentMousePositionY;
+
 	setMousePositionCenter();
 
 	glfwPollEvents();
-	/*if (event.type == sf::Event::MouseWheelScrolled)
-	{
-		this->mouseDeltaScroll = event.mouseWheelScroll.delta;
-	}
-	else
-	{
-		this->mouseDeltaScroll = 0;
-	}*/
 }
 
 void InputHandler::processKeys()
@@ -134,10 +126,32 @@ void InputHandler::update()
 	processKeys();
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	InputHandler* inputHandler = InputHandler::getInstance(window);
+	inputHandler->mouseDeltaScroll = yoffset;
+}
+
+InputHandler::InputHandler(GLFWwindow* _window)
+{
+	lastUpdate = std::chrono::high_resolution_clock::now();
+	now = std::chrono::high_resolution_clock::now();
+	window = _window;
+
+	resetMouseInfo();
+
+	attach();
+	update();
+	detach();
+
+	setMousePositionCenter();
+
+	//glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+}
+
 void InputHandler::resetMouseInfo()
 {
-	prevMouseX = 0;
-	prevMouseY = 0;
 	mouseDeltaX = 0.0;
 	mouseDeltaY = 0.0;
 	mouseDeltaScroll = 0.0f;

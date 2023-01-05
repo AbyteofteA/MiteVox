@@ -12,7 +12,7 @@ namespace fileio
 		safety::SafeArray<mitevox::Node*>* nodes,
 		safety::SafeArray<mitevox::BufferViewAccessor*>* accessors)
 	{
-		animationResult->_name = animationJSON->getFieldString("name");
+		animationResult->_name = animationJSON->getFieldStringOrDefault("name", "Untitled");
 
 		JSON* animationSamplersArrayJSON = animationJSON->getFieldArray("samplers");
 		size_t animationSamplersCount = 0;
@@ -21,8 +21,7 @@ namespace fileio
 			animationSamplersCount = animationSamplersArrayJSON->getArraySize();
 		}
 
-		JSON* animationChannelsArrayJSON = animationJSON->getFieldArray("channels");
-		if (animationChannelsArrayJSON != nullptr)
+		if (JSON* animationChannelsArrayJSON = animationJSON->getFieldArray("channels"))
 		{
 			size_t animationChannelsCount = animationChannelsArrayJSON->getArraySize();
 			// TODO: reserve animationChannels
@@ -32,36 +31,36 @@ namespace fileio
 				JSON* animationChannelJSON = animationChannelsArrayJSON->getArrayItem(i);
 
 				int32_t samplerIndex = -1;
-				JSON* numberJSON = animationChannelJSON->getField("sampler");
-				if ((numberJSON != nullptr) && (numberJSON->isNumber()))
+				if (JSON* numberJSON = animationChannelJSON->getField("sampler"))
 				{
-					samplerIndex = (int32_t)numberJSON->getNumber();
+					samplerIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
 				}
 				mitevox::BufferViewAccessor* timeAccessor = nullptr;
 				mitevox::BufferViewAccessor* dataAccessor = nullptr;
 				mitevox::InterpolationType interpolationType = mitevox::InterpolationType::LINEAR;
 				size_t animationFramesCount = 0;
-				JSON* animationSamplerJSON = animationSamplersArrayJSON->getArrayItem(samplerIndex);
-				if (animationSamplerJSON != nullptr)
+				if (JSON* animationSamplerJSON = animationSamplersArrayJSON->getArrayItem(samplerIndex))
 				{
-					numberJSON = animationSamplerJSON->getField("input");
-					if ((numberJSON != nullptr) && (numberJSON->isNumber()))
+					if (JSON* numberJSON = animationSamplerJSON->getField("input"))
 					{
-						timeAccessor = accessors->getElement((size_t)numberJSON->getNumber());
+						timeAccessor = accessors->getElement((size_t)numberJSON->getNumberOrDefault(-1.0));
+						animationFramesCount = timeAccessor->count;
 					}
 
-					numberJSON = animationSamplerJSON->getField("output");
-					if ((numberJSON != nullptr) && (numberJSON->isNumber()))
+					if (JSON* numberJSON = animationSamplerJSON->getField("output"))
 					{
-						dataAccessor = accessors->getElement((size_t)numberJSON->getNumber());
+						dataAccessor = accessors->getElement((size_t)numberJSON->getNumberOrDefault(-1.0));
+						if (animationFramesCount != dataAccessor->count)
+						{
+							animationFramesCount = 0;
+							// TODO: log error
+						}
 					}
-
-					animationFramesCount = timeAccessor->count;
 
 					std::string interpolationTypeString = "LINEAR";
 					if (JSON* interpolationTypeJSON = animationSamplerJSON->getField("interpolation"))
 					{
-						interpolationTypeString = interpolationTypeJSON->getString();
+						interpolationTypeString = interpolationTypeJSON->getStringOrDefault("LINEAR");
 					}
 
 					if (interpolationTypeString == "LINEAR")
@@ -84,13 +83,15 @@ namespace fileio
 
 				mitevox::AnimationChannelBase* animationChannelBase = nullptr;
 				JSON* animationTargetJSON = animationChannelJSON->getField("target");
-				std::string animationTargetPath = animationTargetJSON->getField("path")->getString();
-				numberJSON = animationTargetJSON->getField("node");
-				if ((numberJSON != nullptr) && (numberJSON->isNumber()))
+				std::string animationTargetPath = animationTargetJSON->getField("path")->getStringOrDefault("ERROR");
+
+				if (JSON* animationTargetNodeJSON = animationTargetJSON->getField("node"))
 				{
+					int32_t animationTargetNodeIndex = (int32_t)animationTargetNodeJSON->getNumberOrDefault(-1.0);
+					mitevox::Node* node = nodes->getElement(animationTargetNodeIndex);
+
 					if (animationTargetPath == "translation")
 					{
-						mitevox::Node* node = nodes->getElement((size_t)numberJSON->getNumber());
 						auto animationChannel = new mitevox::AnimationChannel<mathem::Vector3D>(
 							&node->transform.translation, interpolationType, animationFramesCount);
 
@@ -107,7 +108,6 @@ namespace fileio
 					}
 					else if (animationTargetPath == "rotation")
 					{
-						mitevox::Node* node = nodes->getElement((size_t)numberJSON->getNumber());
 						auto animationChannel = new mitevox::AnimationChannel<mathem::Quaternion>(
 							&node->transform.rotation, interpolationType, animationFramesCount);
 						for (size_t i = 0; i < animationFramesCount; ++i)
@@ -124,7 +124,6 @@ namespace fileio
 					}
 					else if (animationTargetPath == "scale")
 					{
-						mitevox::Node* node = nodes->getElement((size_t)numberJSON->getNumber());
 						auto animationChannel = new mitevox::AnimationChannel<mathem::Vector3D>(
 							&node->transform.scale, interpolationType, animationFramesCount);
 						for (size_t i = 0; i < animationFramesCount; ++i)
@@ -140,7 +139,6 @@ namespace fileio
 					}
 					else if (animationTargetPath == "weights")
 					{
-						mitevox::Node* node = nodes->getElement((size_t)numberJSON->getNumber());
 						auto animationChannel = new mitevox::AnimationChannel<safety::SafeFloatArray>(
 							&node->mesh->weights, interpolationType, animationFramesCount);
 						for (size_t i = 0; i < animationFramesCount; ++i)
@@ -158,7 +156,7 @@ namespace fileio
 					}
 					else
 					{
-						// TODO: error
+						// TODO: log error
 					}
 
 					animationResult->addChannel(animationChannelBase);

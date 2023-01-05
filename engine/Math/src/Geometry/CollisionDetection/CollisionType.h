@@ -7,10 +7,10 @@ namespace mathem
 {
 	enum struct CollisionType : uint8_t 
 	{ 
-		NONE, 
-		INTERSECTION, 
+		NONE = 0, 
 		INSCRIBTION_1_2, 
-		INSCRIBTION_2_1 
+		INSCRIBTION_2_1,
+		INTERSECTION
 	};
 }
 

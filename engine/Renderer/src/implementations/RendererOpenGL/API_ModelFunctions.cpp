@@ -97,8 +97,7 @@ namespace render
 	void uploadMaterial(mitevox::Material* material, int shaderID)
 	{
 		int textureUnit = 0;
-		mitevox::Texture* albedoMap = material->albedoMap;
-		if (albedoMap != nullptr)
+		if (mitevox::Texture* albedoMap = material->albedoMap)
 		{
 			if (albedoMap->ID == 0)
 			{
@@ -118,8 +117,7 @@ namespace render
 			}
 			textureUnit++;
 		}
-		mitevox::Texture* metallicRoughnessMap = material->metallicRoughnessMap;
-		if (metallicRoughnessMap != nullptr)
+		if (mitevox::Texture* metallicRoughnessMap = material->metallicRoughnessMap)
 		{
 			if (metallicRoughnessMap->ID == 0)
 			{
@@ -139,6 +137,28 @@ namespace render
 			}
 			textureUnit++;
 		}
+		if (mitevox::Texture* normalMap = material->normalMap)
+		{
+			if (normalMap->ID == 0)
+			{
+				glGenTextures(1, &normalMap->ID);
+				glActiveTexture(GL_TEXTURE0 + textureUnit);
+				glBindTexture(GL_TEXTURE_2D, normalMap->ID);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, normalMap->sampler.wrappingModeU);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, normalMap->sampler.wrappingModeV);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, normalMap->sampler.minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, normalMap->sampler.magnificationFilter);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+					normalMap->getWidth(),
+					normalMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+					normalMap->image->imageData);
+				glGenerateMipmap(GL_TEXTURE_2D);
+				glUniform1i(glGetUniformLocation(shaders[shaderID]->shaderID, "normalMap"), textureUnit);
+			}
+			textureUnit++;
+		}
+		// TODO: occlusion map
+		// TODO: emission map
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		PRINT_RENDERER_ERRORS;
@@ -177,6 +197,22 @@ namespace render
 			shaders[shaderID]->setBool("material.hasMetallicRoughnessMap", false);
 		}
 
+		if (material->normalMap != nullptr)
+		{
+			shaders[shaderID]->setBool("material.hasNormalMap", true);
+			glActiveTexture(GL_TEXTURE0 + textureUnit);
+			glBindTexture(GL_TEXTURE_2D, material->normalMap->ID);
+			textureUnit++;
+		}
+		else
+		{
+			shaders[shaderID]->setBool("material.hasNormalMap", false);
+		}
+
+
+		// TODO: occlusion map
+		// TODO: emission map
+
 		shaders[shaderID]->setInt("material.illuminationModel", material->illuminationModel);
 
 		PRINT_RENDERER_ERRORS;
@@ -186,6 +222,9 @@ namespace render
 	{
 		glDeleteTextures(1, &material->albedoMap->ID);
 		glDeleteTextures(1, &material->metallicRoughnessMap->ID);
+		glDeleteTextures(1, &material->normalMap->ID);
+		// TODO: occlusion map
+		// TODO: emission map
 	}
 
 	void uploadBufferView(mitevox::BufferView* bufferView)
@@ -223,11 +262,15 @@ namespace render
 			if (bufferView->target == mitevox::BufferView::ARRAY_BUFFER)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, bufferView->ID);
+				GLint size = 0;
+				glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, bufferView->byteLength, bufferViewData);
 			}
 			else if (bufferView->target == mitevox::BufferView::ELEMENT_ARRAY_BUFFER)
 			{
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferView->ID);
+				GLint size = 0;
+				glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, bufferView->byteLength, bufferViewData);
 			}
 		}
@@ -253,6 +296,7 @@ namespace render
 				{
 					std::cout << "GL_ARRAY_BUFFER " << bufferView->ID << " byteLength == " << size << std::endl;
 				}
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 			else if (bufferView->target == mitevox::BufferView::ELEMENT_ARRAY_BUFFER)
 			{
@@ -264,6 +308,7 @@ namespace render
 				{
 					std::cout << "GL_ELEMENT_ARRAY_BUFFER " << bufferView->ID << " byteLength == " << size << std::endl;
 				}
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			}
 		}
 	}
@@ -455,7 +500,7 @@ namespace render
 		mitevox::Mesh* mesh,
 		mathem::GeometryTransform* transform,
 		Camera* camera,
-		mathem::Transform* cameraTransform)
+		mathem::GeometryTransform* cameraTransform)
 	{
 		if (!shaders[shaderID]->use())
 			return;
@@ -463,32 +508,15 @@ namespace render
 		checkMeshBuffers(mesh);
 
 		shaders[shaderID]->setInt("hasCubemap", 0);
-		shaders[shaderID]->setVec3("viewPos", cameraTransform->x, cameraTransform->y, cameraTransform->z);
-
-		/*const glm::highp_quat rotation(
-			transform->rotation.binary.scalar, 
-			transform->rotation.binary.vector.x(), 
-			transform->rotation.binary.vector.y(), 
-			transform->rotation.binary.vector.z());
-		glm::mat4 rotationMatrix = glm::mat4_cast<float, glm::packed_highp>(rotation);
-		glm::mat4 modelMatrix = glm::mat4(1.0f);
-		modelMatrix = glm::translate(modelMatrix, glm::vec3(transform->translation.x(), transform->translation.y(), transform->translation.z()));
-		modelMatrix *= rotationMatrix;
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(transform->scale.x(), transform->scale.y(), transform->scale.z()));*/
+		shaders[shaderID]->setVec3("viewPos", 
+			cameraTransform->translation.x(), 
+			cameraTransform->translation.y(), 
+			cameraTransform->translation.z());
 
 		mathem::Matrix4x4 modelMatrix = mathem::transformToMatrix(*transform);
 		shaders[shaderID]->setMatrix4x4("modelMatrix", modelMatrix);
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleY), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
-		view = glm::translate(view, glm::vec3(-cameraTransform->x, -cameraTransform->y, cameraTransform->z));
-
-		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
-
-		glm::mat4 viewProjectionMatrix = projection * view;
+		glm::mat4 viewProjectionMatrix = camera->getViewProjectionMatrix(cameraTransform);
 		shaders[shaderID]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
 
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
@@ -531,34 +559,4 @@ namespace render
 		glDeleteBuffers(1, &skybox->vertexID);
 		glDeleteTextures(1, &skybox->cubemap->textureID);
 	}
-
-	void renderSkybox(RendererSettings* renderer, Skybox* skybox, render::Camera* camera, mathem::Transform* cameraTransform)
-	{
-		if (!shaders[skybox->shaderID]->use())
-			return;
-
-		renderer->amountOfDrawCalls++;
-
-		selectSkybox(skybox);
-
-		GLenum error = glGetError();
-
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleY), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
-		view = glm::translate(view, glm::vec3(-cameraTransform->x, -cameraTransform->y, cameraTransform->z));
-		view = glm::mat4(glm::mat3(view));
-
-		glm::mat4 proj = glm::mat4(1.0f);
-		proj = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
-
-		glm::mat4 positionTransform = glm::mat4(1.0f);
-		positionTransform = proj * view;
-
-		shaders[skybox->shaderID]->setMat4("positionTransform", positionTransform);
-
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
-
 }

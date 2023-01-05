@@ -13,12 +13,11 @@ namespace fileio
 {
 	void ImageCodec::fromGLTF(mitevox::Image* imageResult, JSON* imageJSON, std::string JSONPath)
 	{
-		imageResult->name = imageJSON->getFieldString("name");
+		imageResult->name = imageJSON->getFieldStringOrDefault("name", "Untitled");
 
-		JSON* imageURIJSON = imageJSON->getField("uri");
-		if (imageURIJSON != nullptr)
+		if (JSON* imageURIJSON = imageJSON->getField("uri"))
 		{
-			std::string uri = imageJSON->getFieldString("uri");
+			std::string uri = imageURIJSON->getStringOrDefault("ERROR");
 			if (fs::path(uri).is_absolute() == false)
 			{
 				uri = fs::path(JSONPath).parent_path().string() + "\\" + uri;
@@ -32,14 +31,10 @@ namespace fileio
 		}
 		else
 		{
-			std::string mimeType = imageJSON->getFieldString("mimeType");
-			JSON* numberJSON = imageJSON->getField("bufferView");
-			if (numberJSON != nullptr)
+			std::string mimeType = imageJSON->getFieldStringOrDefault("mimeType", "ERROR");
+			if (JSON* numberJSON = imageJSON->getField("bufferView"))
 			{
-				if (numberJSON->isNumber())
-				{
-					imageResult->bufferViewIndex = (int32_t)numberJSON->getNumber();
-				}
+				imageResult->bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
 			}
 		}
 	}

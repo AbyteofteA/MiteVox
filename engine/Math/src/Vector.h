@@ -188,7 +188,7 @@ namespace mathem
 		T lengthSquared = (T)0;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
-			lengthSquared += std::pow(this->data[i], 2);
+			lengthSquared += (T)std::pow(this->data[i], 2);
 		}
 		return lengthSquared;
 	}

@@ -22,6 +22,16 @@ namespace mitevox
 		/// NOTE: We don't copy weights because resultMesh will store only the result of animation.
 	}
 
+	void Mesh::tryGenerateTangents()
+	{
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			primitive->tryGenerateTangents();
+		}
+	}
+
 	mathem::Vector3D Mesh::getMinPosition()
 	{
 		mathem::Vector3D resultMinPosition = primitives.getElement(0)->getMinPosition();
@@ -105,11 +115,11 @@ namespace mitevox
 		return resultTrianglesCount;
 	}
 
-	mathem::TriangleGeometry Mesh::getTrianglePositions(uint32_t index)
+	mathem::TriangleGeometry3D Mesh::getTrianglePositions(uint32_t index)
 	{
 		// TODO:
 
-		return mathem::TriangleGeometry();
+		return mathem::TriangleGeometry3D();
 	}
 
 	bool Mesh::isIdealGeometry()

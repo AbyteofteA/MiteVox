@@ -27,9 +27,9 @@ namespace mathem
 		return 0;
 	}
 
-	TriangleGeometry CapsuleGeometry::getTrianglePositions(uint32_t index)
+	TriangleGeometry3D CapsuleGeometry::getTrianglePositions(uint32_t index)
 	{
-		return TriangleGeometry();
+		return TriangleGeometry3D();
 	}
 
 	bool CapsuleGeometry::isIdealGeometry()

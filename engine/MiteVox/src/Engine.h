@@ -42,7 +42,6 @@ namespace mitevox
 		int primitiveShader = -1;
 		int skyboxShader = -1;
 
-		void prepareNodeRecursively(Node* node);
 		void preparePlayground();
 
 		void simulateNode(Node* node);
@@ -60,12 +59,12 @@ namespace mitevox
 			Node* node,
 			mathem::GeometryTransform* transform,
 			render::Camera* camera,
-			mathem::Transform* cameraTransform);
+			mathem::GeometryTransform* cameraTransform);
 		void renderNodes(
 			safety::SafeArray<Node*>* nodes,
 			int shaderID,
 			render::Camera* camera,
-			mathem::Transform* cameraTransform);
+			mathem::GeometryTransform* cameraTransform);
 
 		// TODO: void updateNodeRecursively(mitevox::Node* node, int shaderID);
 		void removeNodeRecursively(Node* node, int shaderID);

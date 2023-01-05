@@ -7,63 +7,96 @@ namespace fileio
 		JSON* materialJSON,
 		safety::SafeArray<mitevox::Texture*>* textures)
 	{
-		materialResult->name = materialJSON->getFieldString("name");
+		materialResult->name = materialJSON->getFieldStringOrDefault("name", "Untitled");
 
-		JSON* pbrMetallicRoughnessJSON = materialJSON->getField("pbrMetallicRoughness");
-		if (pbrMetallicRoughnessJSON != nullptr)
+		if (JSON* numberJSON = materialJSON->getField("doubleSided"))
 		{
-			JSON* baseColorFactorArrayJSON = pbrMetallicRoughnessJSON->getField("baseColorFactor");
-			if (baseColorFactorArrayJSON != nullptr)
+			materialResult->isDoubleSided = numberJSON->getBooleanOrDefault(false);
+		}
+
+		if (JSON* numberJSON = materialJSON->getField("alphaMode"))
+		{
+			materialResult->alphaMode = numberJSON->getStringOrDefault("OPAQUE");
+		}
+
+		if (JSON* numberJSON = materialJSON->getField("alphaCutoff"))
+		{
+			materialResult->alphaCutoff = numberJSON->getNumberOrDefault(0.5);
+		}
+
+		if (JSON* pbrMetallicRoughnessJSON = materialJSON->getField("pbrMetallicRoughness"))
+		{
+			if (JSON* baseColorFactorArrayJSON = pbrMetallicRoughnessJSON->getField("baseColorFactor"))
 			{
-				materialResult->baseColor.r = (float)baseColorFactorArrayJSON->getArrayItem(0)->getNumber();
-				materialResult->baseColor.g = (float)baseColorFactorArrayJSON->getArrayItem(1)->getNumber();
-				materialResult->baseColor.b = (float)baseColorFactorArrayJSON->getArrayItem(2)->getNumber();
-				materialResult->baseColor.a = (float)baseColorFactorArrayJSON->getArrayItem(3)->getNumber();
+				materialResult->baseColor.r = (float)baseColorFactorArrayJSON->getArrayItemNumberOrDefault(0, 1.0);
+				materialResult->baseColor.g = (float)baseColorFactorArrayJSON->getArrayItemNumberOrDefault(1, 1.0);
+				materialResult->baseColor.b = (float)baseColorFactorArrayJSON->getArrayItemNumberOrDefault(2, 1.0);
+				materialResult->baseColor.a = (float)baseColorFactorArrayJSON->getArrayItemNumberOrDefault(3, 1.0);
 			}
-			JSON* baseColorTextureJSON = pbrMetallicRoughnessJSON->getField("baseColorTexture");
-			if (baseColorTextureJSON != nullptr)
+			if (JSON* baseColorTextureJSON = pbrMetallicRoughnessJSON->getField("baseColorTexture"))
 			{
 				JSON* numberJSON = baseColorTextureJSON->getField("index");
 				if (numberJSON != nullptr)
 				{
-					if (numberJSON->isNumber())
-					{
-						int32_t baseColorTextureIndex = (int32_t)numberJSON->getNumber();
-						mitevox::Texture* texture = textures->getElement(baseColorTextureIndex);
-						materialResult->albedoMap = texture;
-					}
+					int32_t baseColorTextureIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+					mitevox::Texture* texture = textures->getElement(baseColorTextureIndex);
+					materialResult->albedoMap = texture;
 				}
 			}
-			JSON* numberJSON = pbrMetallicRoughnessJSON->getField("metallicFactor");
-			if (numberJSON != nullptr)
+			if (JSON* numberJSON = pbrMetallicRoughnessJSON->getField("metallicFactor"))
 			{
-				if (numberJSON->isNumber())
+				materialResult->metallicity = (float)numberJSON->getNumberOrDefault(1.0);
+			}
+			if (JSON* numberJSON = pbrMetallicRoughnessJSON->getField("roughnessFactor"))
+			{
+				materialResult->roughness = (float)numberJSON->getNumberOrDefault(1.0);
+			}
+			if (JSON* pbrMetallicRoughnessTextureJSON =
+				pbrMetallicRoughnessJSON->getField("pbrMetallicRoughnessTexture"))
+			{
+				if (JSON* numberJSON = pbrMetallicRoughnessTextureJSON->getField("index"))
 				{
-					materialResult->metallicity = (float)numberJSON->getNumber();
+					int32_t pbrMetallicRoughnessTextureIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+					mitevox::Texture* texture = textures->getElement(pbrMetallicRoughnessTextureIndex);
+					materialResult->metallicRoughnessMap = texture;
 				}
 			}
-			numberJSON = pbrMetallicRoughnessJSON->getField("roughnessFactor");
-			if (numberJSON != nullptr)
+		}
+
+		if (JSON* normalMapJSON = materialJSON->getField("normalTexture"))
+		{
+			if (JSON* numberJSON = normalMapJSON->getField("index"))
 			{
-				if (numberJSON->isNumber())
-				{
-					materialResult->roughness = (float)numberJSON->getNumber();
-				}
+				int32_t normalTextureIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				mitevox::Texture* texture = textures->getElement(normalTextureIndex);
+				materialResult->normalMap = texture;
 			}
-			JSON* pbrMetallicRoughnessTextureJSON = 
-				pbrMetallicRoughnessJSON->getField("pbrMetallicRoughnessTexture");
-			if (pbrMetallicRoughnessTextureJSON != nullptr)
+		}
+
+		if (JSON* occlusionTextureJSON = materialJSON->getField("occlusionTexture"))
+		{
+			if (JSON* numberJSON = occlusionTextureJSON->getField("index"))
 			{
-				JSON* numberJSON = pbrMetallicRoughnessTextureJSON->getField("index");
-				if (numberJSON != nullptr)
-				{
-					if (numberJSON->isNumber())
-					{
-						int32_t pbrMetallicRoughnessTextureIndex = (int32_t)numberJSON->getNumber();
-						mitevox::Texture* texture = textures->getElement(pbrMetallicRoughnessTextureIndex);
-						materialResult->metallicRoughnessMap = texture;
-					}
-				}
+				int32_t occlusionTextureIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				mitevox::Texture* texture = textures->getElement(occlusionTextureIndex);
+				materialResult->occlusionMap = texture;
+			}
+		}
+
+		if (JSON* emmisiveFactorArrayJSON = materialJSON->getField("emissiveFactor"))
+		{
+			materialResult->emission.r = (float)emmisiveFactorArrayJSON->getArrayItemNumberOrDefault(0, 0.0);
+			materialResult->emission.g = (float)emmisiveFactorArrayJSON->getArrayItemNumberOrDefault(1, 0.0);
+			materialResult->emission.b = (float)emmisiveFactorArrayJSON->getArrayItemNumberOrDefault(2, 0.0);
+		}
+
+		if (JSON* emmisiveTextureJSON = materialJSON->getField("baseColorTexture"))
+		{
+			if (JSON* numberJSON = emmisiveTextureJSON->getField("index"))
+			{
+				int32_t emmisiveTextureIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				mitevox::Texture* texture = textures->getElement(emmisiveTextureIndex);
+				materialResult->emissiveMap = texture;
 			}
 		}
 	}

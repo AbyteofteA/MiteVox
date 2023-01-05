@@ -12,6 +12,16 @@ namespace mitevox
 		_animationType = animationType;
 	}
 
+	Animation::~Animation()
+	{
+		size_t channelsCount = _channels.getElementsCount();
+		for (size_t i = 0; i < channelsCount; ++i)
+		{
+			delete _channels.getElement(i);
+		}
+		_channels.deallocate();
+	}
+
 	void Animation::setType(AnimationType animationType)
 	{
 		_animationType = animationType;
@@ -73,8 +83,8 @@ namespace mitevox
 			return;
 		}
 
-		int64_t channelsCount = _channels.getElementsCount();
-		for (int64_t i = 0; i < channelsCount; ++i)
+		size_t channelsCount = _channels.getElementsCount();
+		for (size_t i = 0; i < channelsCount; ++i)
 		{
 			_channels.getElement(i)->apply(_currentTime);
 		}

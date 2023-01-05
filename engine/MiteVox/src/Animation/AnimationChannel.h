@@ -28,6 +28,7 @@ namespace mitevox
     public:
 
         inline AnimationChannel(T* target, InterpolationType interpolationType, size_t framesCount);
+        inline ~AnimationChannel();
         inline void setFrame(int64_t frameIndex, float time, T data);
 
         // AnimationChannelBase
@@ -54,6 +55,12 @@ namespace mitevox
     }
 
     template <typename T>
+    inline AnimationChannel<T>::~AnimationChannel()
+    {
+        _frames.deallocate();
+    }
+
+    template <typename T>
     inline void AnimationChannel<T>::setFrame(int64_t frameIndex, float time, T data)
     {
         AnimationFrame<T> frame = { time, data };
@@ -70,12 +77,12 @@ namespace mitevox
     inline void AnimationChannel<T>::apply(float time)
     {
         int64_t currentFrameIndex = -1; // -1 means no animation frame, no changes to the target
-        int64_t frameCount = _frames.getElementsCount();
-        for (int64_t i = 0; i < frameCount; ++i)
+        size_t frameCount = _frames.getElementsCount();
+        for (size_t i = 0; i < frameCount; ++i)
         {
             if (time < _frames.getElement(i).time)
             {
-                currentFrameIndex = i - 1;
+                currentFrameIndex = (int64_t)i - 1;
                 break;
             }
         }
@@ -111,7 +118,13 @@ namespace mitevox
     template <typename T>
     inline float AnimationChannel<T>::getPeriod()
     {
-        int64_t framesCount = _frames.getElementsCount();
+        size_t framesCount = _frames.getElementsCount();
+
+        if (framesCount == 0)
+        {
+            return 0.0f;
+        }
+
         AnimationFrame<T> lastFrame = _frames.getElement(framesCount - 1);
         return lastFrame.time;
     }

@@ -65,7 +65,7 @@ namespace render
 		render::drawLine(renderer, point4, point7);
 	}
 
-	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
+	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform)
 	{
 		unsigned int shaderIndex = renderer->primitiveShaderID;
 		if (!shaders[shaderIndex]->use())
@@ -77,31 +77,24 @@ namespace render
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleY), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
-		view = glm::translate(view, glm::vec3(-cameraTransform->x, -cameraTransform->y, cameraTransform->z));
-
-		glm::mat4 proj = glm::mat4(1.0f);
-		proj = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
-
-		glm::mat4 positionTransform = glm::mat4(1.0f);
-		positionTransform = proj * view;
+		glm::mat4 positionTransform = camera->getViewProjectionMatrix(cameraTransform);
 		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
 		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
 		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
 
 		unsigned int pointsVBO;
-		unsigned int pointsArrayID;
-		glGenVertexArrays(1, &pointsArrayID);
 		glGenBuffers(1, &pointsVBO);
-		glBindVertexArray(pointsArrayID);
 		glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfPoints,
 			renderer->points.getElementsArray(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+		unsigned int pointsArrayID;
+		glGenVertexArrays(1, &pointsArrayID);
+		glBindVertexArray(pointsArrayID);
+
+		glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 		glEnableVertexAttribArray(colorAttrib);
@@ -109,11 +102,17 @@ namespace render
 
 		glDrawArrays(GL_POINTS, 0, amountOfPoints * 7);
 
-		glDeleteBuffers(1, &pointsArrayID);
+		glDeleteVertexArrays(1, &pointsArrayID);
+		glDeleteBuffers(1, &pointsVBO);
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 		renderer->points.clear();
 	}
 
-	void renderLines(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
+	void renderLines(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform)
 	{
 		unsigned int shaderIndex = renderer->primitiveShaderID;
 		if (!shaders[shaderIndex]->use())
@@ -125,31 +124,24 @@ namespace render
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleY), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
-		view = glm::translate(view, glm::vec3(-cameraTransform->x, -cameraTransform->y, cameraTransform->z));
-
-		glm::mat4 proj = glm::mat4(1.0f);
-		proj = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
-
-		glm::mat4 positionTransform = glm::mat4(1.0f);
-		positionTransform = proj * view;
-		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
+		glm::mat4 viewProjectionMatrix = camera->getViewProjectionMatrix(cameraTransform);
+		shaders[shaderIndex]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
 
 		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
 		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
 
 		unsigned int linesVBO;
-		unsigned int linesArrayID;
-		glGenVertexArrays(1, &linesArrayID);
 		glGenBuffers(1, &linesVBO);
-		glBindVertexArray(linesArrayID);
 		glBindBuffer(GL_ARRAY_BUFFER, linesVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfLines,
 			renderer->lines.getElementsArray(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+		unsigned int linesArrayID;
+		glGenVertexArrays(1, &linesArrayID);
+		glBindVertexArray(linesArrayID);
+
+		glBindBuffer(GL_ARRAY_BUFFER, linesVBO);
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 		glEnableVertexAttribArray(colorAttrib);
@@ -157,11 +149,17 @@ namespace render
 
 		glDrawArrays(GL_LINES, 0, amountOfLines * 14);
 
-		glDeleteBuffers(1, &linesArrayID);
+		glDeleteVertexArrays(1, &linesArrayID);
+		glDeleteBuffers(1, &linesVBO);
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 		renderer->lines.clear();
 	}
 
-	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform)
+	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform)
 	{
 		unsigned int shaderIndex = renderer->primitiveShaderID;
 		if (!shaders[shaderIndex]->use())
@@ -173,31 +171,24 @@ namespace render
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleX), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleY), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::rotate(view, -glm::radians(cameraTransform->angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
-		view = glm::translate(view, glm::vec3(-cameraTransform->x, -cameraTransform->y, cameraTransform->z));
-
-		glm::mat4 proj = glm::mat4(1.0f);
-		proj = glm::perspective(glm::radians(camera->FOV), (float)camera->width / camera->height, camera->nearCullPlane, camera->farCullPlane);
-
-		glm::mat4 positionTransform = glm::mat4(1.0f);
-		positionTransform = proj * view;
+		glm::mat4 positionTransform = camera->getViewProjectionMatrix(cameraTransform);
 		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
 
 		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
 		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
 
 		unsigned int trianglesVBO;
-		unsigned int trianglesArrayID;
-		glGenVertexArrays(1, &trianglesArrayID);
 		glGenBuffers(1, &trianglesVBO);
-		glBindVertexArray(trianglesArrayID);
 		glBindBuffer(GL_ARRAY_BUFFER, trianglesVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfTriangles,
 			renderer->triangles.getElementsArray(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+		unsigned int trianglesArrayID;
+		glGenVertexArrays(1, &trianglesArrayID);
+		glBindVertexArray(trianglesArrayID);
+
+		glBindBuffer(GL_ARRAY_BUFFER, trianglesVBO);
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
 		glEnableVertexAttribArray(colorAttrib);
@@ -214,7 +205,13 @@ namespace render
 			glDisable(GL_CULL_FACE);
 		}
 
-		glDeleteBuffers(1, &trianglesArrayID);
+		glDeleteVertexArrays(1, &trianglesArrayID);
+		glDeleteBuffers(1, &trianglesVBO);
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 		renderer->triangles.clear();
 	}
 }

@@ -74,9 +74,9 @@ namespace mathem
 		return 12;
 	}
 
-	TriangleGeometry BoxGeometry::getTrianglePositions(uint32_t index)
+	TriangleGeometry3D BoxGeometry::getTrianglePositions(uint32_t index)
 	{
-		TriangleGeometry resultTriangle;
+		TriangleGeometry3D resultTriangle;
 
 		if (index >= 12)
 		{

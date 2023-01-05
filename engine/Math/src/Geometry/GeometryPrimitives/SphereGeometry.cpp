@@ -27,9 +27,9 @@ namespace mathem
 		return 0;
 	}
 
-	TriangleGeometry SphereGeometry::getTrianglePositions(uint32_t index)
+	TriangleGeometry3D SphereGeometry::getTrianglePositions(uint32_t index)
 	{
-		return TriangleGeometry();
+		return TriangleGeometry3D();
 	}
 
 	bool SphereGeometry::isIdealGeometry()

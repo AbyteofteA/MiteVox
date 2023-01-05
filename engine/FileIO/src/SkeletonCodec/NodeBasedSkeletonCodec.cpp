@@ -12,11 +12,10 @@ namespace fileio
 		safety::SafeArray<mitevox::Node*>* nodes,
 		safety::SafeArray<mitevox::BufferViewAccessor*>* accessors)
     {
-		skeletonResult->name = skeletonJSON->getFieldString("name");
+		skeletonResult->name = skeletonJSON->getFieldStringOrDefault("name", "Untitled");
 
-		JSON* jointsArrayJSON = skeletonJSON->getField("joints");
 		size_t jointsCount = 0;
-		if (jointsArrayJSON != nullptr)
+		if (JSON* jointsArrayJSON = skeletonJSON->getField("joints"))
 		{
 			jointsCount = jointsArrayJSON->getArraySize();
 			skeletonResult->init(jointsCount);
@@ -26,26 +25,22 @@ namespace fileio
 
 			for (size_t i = 0; i < jointsCount; ++i)
 			{
-				int32_t jointNodeIndex = (int32_t)jointsArrayJSON->getArrayItemNumber(i);
+				int32_t jointNodeIndex = (int32_t)jointsArrayJSON->getArrayItemNumberOrDefault(i, -1.0);
 				skeletonResult->joints.setElement(i, nodes->getElement(jointNodeIndex));
 			}
 		}
 
-		JSON* numberJSON = skeletonJSON->getField("inverseBindMatrices");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = skeletonJSON->getField("inverseBindMatrices"))
 		{
-			if (numberJSON->isNumber())
-			{
-				int32_t inverseBindMatricesAccessorIndex = (int32_t)numberJSON->getNumber();
-				mitevox::BufferViewAccessor* inverseBindMatricesAccessor = accessors->getElement(inverseBindMatricesAccessorIndex);
+			int32_t inverseBindMatricesAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			mitevox::BufferViewAccessor* inverseBindMatricesAccessor = accessors->getElement(inverseBindMatricesAccessorIndex);
 
-				for (size_t i = 0; i < jointsCount; ++i)
-				{
-					mathem::GeometryTransform inverseBindTransform = mathem::matrixToTransform(inverseBindMatricesAccessor->getMatrix4x4(i));
-					skeletonResult->inverseBindTransforms.setElement(i, inverseBindTransform);
-				}
+			for (size_t i = 0; i < jointsCount; ++i)
+			{
+				mathem::Matrix4x4 inverseBindMatrix = inverseBindMatricesAccessor->getMatrix4x4(i);
+				mathem::GeometryTransform inverseBindTransform = mathem::matrixToTransform(inverseBindMatrix);
+				skeletonResult->inverseBindTransforms.setElement(i, inverseBindTransform);
 			}
 		}
-
     }
 }

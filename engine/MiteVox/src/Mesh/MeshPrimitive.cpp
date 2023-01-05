@@ -18,6 +18,25 @@ namespace mitevox
 		/// only the result of animation.
 	}
 
+	void MeshPrimitive::tryGenerateTangents()
+	{
+		return;
+
+		if (attributes.byName.normalAccessor == nullptr ||
+			attributes.byName.tangentAccessor != nullptr ||
+			topologyType != TopologyType::TRIANGLES)
+		{
+			return;
+		}
+
+		attributes.byName.tangentAccessor = new BufferViewAccessor();
+		attributes.byName.tangentAccessor->count = attributes.byName.normalAccessor->count;
+		attributes.byName.tangentAccessor->componentType = attributes.byName.normalAccessor->componentType;
+		attributes.byName.tangentAccessor->type = BufferViewAccessor::Type::VEC4;
+		
+		// TODO: tryGenerateTangents()
+	}
+
 	mitevox::BufferViewAccessor* MeshPrimitive::getPositions()
 	{
 		return attributes.byName.positionAccessor;
@@ -117,6 +136,32 @@ namespace mitevox
 		}
 	}
 
+	mathem::Vector2D MeshPrimitive::getVertexTextureCoords_0(uint32_t index)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			return getTextureCoords_0()->getVector2D(actualPointIndex);
+		}
+		else
+		{
+			return getTextureCoords_0()->getVector2D(index);
+		}
+	}
+
+	mathem::Vector2D MeshPrimitive::getVertexTextureCoords_1(uint32_t index)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			return getTextureCoords_1()->getVector2D(actualPointIndex);
+		}
+		else
+		{
+			return getTextureCoords_1()->getVector2D(index);
+		}
+	}
+
 	uint32_t MeshPrimitive::getTrianglesCount()
 	{
 		uint32_t pointsCount = getVertecesCount();
@@ -137,47 +182,76 @@ namespace mitevox
 		return 0;
 	}
 
-	mathem::TriangleGeometry MeshPrimitive::getTrianglePositions(uint32_t index)
+	void MeshPrimitive::getTriangleVertexIndeces(uint32_t triangleIndex, uint32_t* vertex1, uint32_t* vertex2, uint32_t* vertex3)
 	{
-		mathem::TriangleGeometry resultTriangle;
-
 		switch (topologyType)
 		{
 		case mitevox::TRIANGLES:
 		{
-			uint32_t firstPointIndex = index * 3;
-			resultTriangle.point1 = getVertexPosition(firstPointIndex);
-			resultTriangle.point2 = getVertexPosition(firstPointIndex + 1);
-			resultTriangle.point3 = getVertexPosition(firstPointIndex + 2);
+			uint32_t firstPointIndex = triangleIndex * 3;
+			*vertex1 = firstPointIndex;
+			*vertex2 = firstPointIndex + 1;
+			*vertex3 = firstPointIndex + 2;
 			break;
 		}
 		case mitevox::TRIANGLE_STRIP:
 		{
-			resultTriangle.point1 = getVertexPosition(index);
-			if (index & 1)
+			*vertex1 = triangleIndex;
+			if (triangleIndex & 1)
 			{
-				resultTriangle.point2 = getVertexPosition(index + 2);
-				resultTriangle.point3 = getVertexPosition(index + 1);
+				*vertex2 = triangleIndex + 2;
+				*vertex3 = triangleIndex + 1;
 			}
 			else
 			{
-				resultTriangle.point2 = getVertexPosition(index + 1);
-				resultTriangle.point3 = getVertexPosition(index + 2);
+				*vertex2 = triangleIndex + 1;
+				*vertex3 = triangleIndex + 2;
 			}
 			break;
 		}
 		case mitevox::TRIANGLE_FAN:
 		{
-			uint32_t secondPointIndex = index * 2 + 1;
-			resultTriangle.point1 = getVertexPosition(secondPointIndex);
-			resultTriangle.point2 = getVertexPosition(secondPointIndex + 1);
-			resultTriangle.point3 = getVertexPosition(0);
+			uint32_t secondPointIndex = triangleIndex * 2 + 1;
+			*vertex1 = secondPointIndex;
+			*vertex2 = secondPointIndex + 1;
+			*vertex3 = 0;
 			break;
 		}
 		default:
 			break;
 		}
+	}
 
+	mathem::TriangleGeometry3D MeshPrimitive::getTrianglePositions(uint32_t index)
+	{
+		mathem::TriangleGeometry3D resultTriangle;
+		uint32_t vertex1, vertex2, vertex3;
+		getTriangleVertexIndeces(index, &vertex1, &vertex2, &vertex3);
+		resultTriangle.point1 = getVertexPosition(vertex1);
+		resultTriangle.point2 = getVertexPosition(vertex2);
+		resultTriangle.point3 = getVertexPosition(vertex3);
+		return resultTriangle;
+	}
+
+	mathem::TriangleGeometry2D MeshPrimitive::getTriangleTextureCoords_0(uint32_t index)
+	{
+		mathem::TriangleGeometry2D resultTriangle;
+		uint32_t vertex1, vertex2, vertex3;
+		getTriangleVertexIndeces(index, &vertex1, &vertex2, &vertex3);
+		resultTriangle.point1 = getVertexTextureCoords_0(vertex1);
+		resultTriangle.point2 = getVertexTextureCoords_0(vertex2);
+		resultTriangle.point3 = getVertexTextureCoords_0(vertex3);
+		return resultTriangle;
+	}
+
+	mathem::TriangleGeometry2D MeshPrimitive::getTriangleTextureCoords_1(uint32_t index)
+	{
+		mathem::TriangleGeometry2D resultTriangle;
+		uint32_t vertex1, vertex2, vertex3;
+		getTriangleVertexIndeces(index, &vertex1, &vertex2, &vertex3);
+		resultTriangle.point1 = getVertexTextureCoords_1(vertex1);
+		resultTriangle.point2 = getVertexTextureCoords_1(vertex2);
+		resultTriangle.point3 = getVertexTextureCoords_1(vertex3);
 		return resultTriangle;
 	}
 

@@ -96,10 +96,7 @@ namespace mitevox
 			if (activeScene < playground->scenes.getElementsCount())
 			{
 				Scene* scene = playground->getActiveScene();
-				scene->update(deltaTime);
-
-				// Execute scripts
-				scene->ECS->updateComponent(scene->NativeScript_Component, playground);
+				scene->update(deltaTime); // Scripts are executed here
 
 				// Cleanup
 				scene->timeSinceCleanup += deltaTime;
@@ -166,8 +163,7 @@ namespace mitevox
 					// TODO: render::uploadLights(&LightsArray, basicShader);
 
 					render::Camera* camera = scene->activeCameraNode->camera;
-					mathem::Transform* cameraTransform =
-						(mathem::Transform*)scene->ECS->getComponent(scene->activeCamera, scene->Transform_Component);
+					mathem::GeometryTransform* cameraTransform = scene->activeCameraNode->getTransform();
 
 					render::clearBufferXY(renderer->clearColor);
 					render::clearBufferZ();
@@ -206,43 +202,15 @@ namespace mitevox
 		}
 	}
 
-	void Engine::prepareNodeRecursively(Node* node)
-	{
-		if (node->mesh)
-		{
-			if (node->isMorphableMesh())
-			{
-				node->morphAnimationTarget = new Mesh();
-				node->mesh->makeCopyForAnimationTo(node->morphAnimationTarget);
-			}
-
-			// Apply default material where needed
-			size_t meshPrimitivesCount = node->mesh->primitives.getElementsCount();
-			for (size_t i = 0; i < meshPrimitivesCount; ++i)
-			{
-				MeshPrimitive* meshPrimitive = node->mesh->primitives.getElement(i);
-				if (meshPrimitive->material == nullptr)
-				{
-					meshPrimitive->material = new Material();
-				}
-			}
-		}
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			prepareNodeRecursively(node->children.getElement(i));
-		}
-	}
-
 	void Engine::preparePlayground()
 	{
 		// Add a default camera to every scene that doesn't have one
 		if (1/*playground->cameras.getElementsCount() == 0*/)
 		{
-			render::Camera* camera = new render::Camera(50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 100000);
+			render::Camera* camera = new render::Camera(50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.001f, 100000);
 			Node* cameraNode = new Node();
 			cameraNode->camera = camera;
-			cameraNode->transform.translation = { 0.0f, 0.0f, -30.0f };
+			cameraNode->transform.translation = { 0.0f, 0.0f, 1.0f };
 			size_t nodesCount = playground->nodes.getElementsCount();
 			playground->cameras.appendElement(camera);
 			playground->nodes.appendElement(cameraNode);
@@ -255,12 +223,14 @@ namespace mitevox
 			}
 		}
 
-		size_t nodesCount = playground->nodes.getElementsCount();
-		for (size_t i = 0; i < nodesCount; ++i)
+		// TODO: create load/unload system
+		Scene* activeScene = playground->getActiveScene();
+		size_t activeNodesCount = activeScene->nodes.getElementsCount();
+		for (size_t i = 0; i < activeNodesCount; ++i)
 		{
-			Node* node = playground->nodes.getElement(i);
-			prepareNodeRecursively(node);
+			Node* node = activeScene->nodes.getElement(i);
 			node->tryGenerateHitbox();
+			activeScene->foundation->emplace(node);
 		}
 
 		size_t scenesCount = playground->scenes.getElementsCount();
@@ -355,7 +325,7 @@ namespace mitevox
 		Node* node,
 		mathem::GeometryTransform* transform,
 		render::Camera* camera,
-		mathem::Transform* cameraTransform)
+		mathem::GeometryTransform* cameraTransform)
 	{
 		mathem::GeometryTransform nodeGlobalTransform = *transform * node->transform;
 
@@ -390,7 +360,7 @@ namespace mitevox
 		safety::SafeArray<Node*>* nodes, 
 		int shaderID, 
 		render::Camera* camera, 
-		mathem::Transform* cameraTransform)
+		mathem::GeometryTransform* cameraTransform)
 	{
 		size_t nodesCount = nodes->getElementsCount();
 		for (size_t i = 0; i < nodesCount; ++i)

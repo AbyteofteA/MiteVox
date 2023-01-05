@@ -1,5 +1,7 @@
 #include "Quaternion.h"
 
+#include "engine/Math/src/Convertations.h"
+
 namespace mathem
 {
 	Quaternion::Quaternion()
@@ -9,7 +11,7 @@ namespace mathem
 
 	Quaternion::Quaternion(Vector3D vector)
 	{
-		binary.scalar = 0;
+		binary.scalar = 0.0f;
 		binary.vector = vector;
 	}
 
@@ -68,6 +70,56 @@ namespace mathem
 		return resultQuaternion / getLengthSquared();
 	}
 
+	void Quaternion::rotateByEulers(float x, float y, float z)
+	{
+		Quaternion rotation;
+		rotation.fromEulers(x, y, z);
+		this->multiply(rotation);
+	}
+
+	void Quaternion::fromEulers(float x, float y, float z)
+	{
+		x = toRadians(x) * 0.5f;
+		y = toRadians(y) * 0.5f;
+		z = toRadians(z) * 0.5f;
+
+		float cosXcosY = cos(x) * cos(y);
+		float cosXsinY = cos(x) * sin(y);
+		float sinXsinY = sin(x) * sin(y);
+		float sinXcosY = sin(x) * cos(y);
+
+		components.s() = cosXcosY * cos(z) + sinXsinY * sin(z);
+		components.x() = sinXcosY * cos(z) - cosXsinY * sin(z);
+		components.y() = cosXsinY * cos(z) + sinXcosY * sin(z);
+		components.z() = cosXcosY * sin(z) - sinXsinY * cos(z);
+	}
+
+	void Quaternion::toEulersRadians(float* x, float* y, float* z)
+	{
+		float q0q1 = components.s() * components.x();
+		float q2q3 = components.y() * components.z();
+		float q2Squared = pow(components.y(), 2.0f);
+
+		*x = atan2(
+			2.0f * (q0q1 + q2q3),
+			1.0f - 2.0f * (pow(components.x(), 2.0f) + q2Squared));
+
+		*y = asin(2.0f * (components.s() * components.y() - components.x() * components.z()));
+
+		*z = atan2(
+			2.0f * (components.s() * components.z() + components.x() * components.y()),
+			1.0f - 2.0f * (q2Squared + pow(components.z(), 2.0f)));
+	}
+
+	void Quaternion::toEulers(float* x, float* y, float* z)
+	{
+		toEulersRadians(x, y, z);
+
+		*x = toDegrees(*x);
+		*y = toDegrees(*y);
+		*z = toDegrees(*z);
+	}
+
 	Quaternion Quaternion::operator*(float multiplier)
 	{
 		Quaternion resultQuaternion = *this;
@@ -122,6 +174,38 @@ namespace mathem
 		Quaternion thisQuaternionReciprocal = this->getReciprocal();
 		resultQuaternion.multiply(thisQuaternionReciprocal);
 		return resultQuaternion;
+	}
+
+	Vector3D Quaternion::rotate(Vector3D& vector)
+	{
+		Quaternion vectorAsQuaternion(vector);
+		vectorAsQuaternion = rotate(vectorAsQuaternion);
+		return vectorAsQuaternion.binary.vector;
+	}
+
+	Quaternion Quaternion::lookRotation(Vector3D& upDirection)
+	{
+		mathem::Vector3D forward = { 0.0f, 0.0f, 1.0f };
+		forward = rotate(forward);
+		forward.normalize();
+		mathem::Vector3D right = mathem::crossProduct(upDirection, forward);
+		right.normalize();
+		mathem::Vector3D actualUpDirection = mathem::crossProduct(forward, right);
+		actualUpDirection.normalize();
+
+		mathem::Matrix4x4 rotation;
+		rotation.makeIdentity();
+		rotation.m00() = right.x();
+		rotation.m01() = right.y();
+		rotation.m02() = right.z();
+		rotation.m10() = actualUpDirection.x();
+		rotation.m11() = actualUpDirection.y();
+		rotation.m12() = actualUpDirection.z();
+		rotation.m20() = forward.x();
+		rotation.m21() = forward.y();
+		rotation.m22() = forward.z();
+
+		return matrixToQuaternion(rotation);
 	}
 
 	Quaternion Quaternion::operator/(float divider)

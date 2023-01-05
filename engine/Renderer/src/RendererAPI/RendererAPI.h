@@ -68,9 +68,9 @@ printErrors(__FILE__, __LINE__);
 	void drawCross(RendererSettings* renderer, Point point, float size);
 	void drawSnowflake(RendererSettings* renderer, Point point, float size);
 
-	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform);
-	void renderLines(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform);
-	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::Transform* cameraTransform);
+	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform);
+	void renderLines(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform);
+	void renderTriangles(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform);
 
 	// Models
 
@@ -96,7 +96,7 @@ printErrors(__FILE__, __LINE__);
 		mitevox::Mesh* mesh, 
 		mathem::GeometryTransform* transform, 
 		Camera* camera, 
-		mathem::Transform* cameraTransform);
+		mathem::GeometryTransform* cameraTransform);
 
 	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 

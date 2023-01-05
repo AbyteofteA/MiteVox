@@ -60,7 +60,6 @@ Has an implementation of AABB collisions and defines rigid body.
 Has a basic user I/O setup. It definitely needs redesign...
 
 ## :bug: Known bugs & limitations :bug:
-- [ ] Coordinate system is broken (maybe in shaders).
 - [ ] Skinned mesh uses global transform of the node that instantiates the mesh instead of global transform of the skeleton root.
 - [ ] Morph target animation seems to work fine, except for this model: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/MorphPrimitivesTest
 - [ ] .obj parser doesn't support polygon grouping by material.

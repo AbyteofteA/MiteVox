@@ -16,7 +16,7 @@ namespace mathem
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry tmpTriangle = box1->getTrianglePositions(0);
+		TriangleGeometry3D tmpTriangle = box1->getTrianglePositions(0);
 		box1Transform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
@@ -144,7 +144,7 @@ namespace mathem
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry tmpTriangle = box->getTrianglePositions(0);
+		TriangleGeometry3D tmpTriangle = box->getTrianglePositions(0);
 		boxTransform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
@@ -260,7 +260,7 @@ namespace mathem
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry tmpTriangle = box->getTrianglePositions(0);
+		TriangleGeometry3D tmpTriangle = box->getTrianglePositions(0);
 		boxTransform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
@@ -401,7 +401,7 @@ namespace mathem
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry tmpTriangle = box->getTrianglePositions(0);
+		TriangleGeometry3D tmpTriangle = box->getTrianglePositions(0);
 		boxTransform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;

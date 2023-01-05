@@ -2,102 +2,67 @@
 #ifndef SCRIPTS_H
 #define SCRIPTS_H
 
-#include "engine/MiteVox/src/Playground/Playground.h"
-#include "engine/ECSManager/src/EntityComponentSystem.h"
+#include "engine/MiteVox/src/Playground/Scene.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Math/src/Math.h"
 
-void waveModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
-{
-	mitevox::Scene* scene = (mitevox::Scene*)data;
-	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
-
-	//transform->angleX += 30 * scene->dt;
-	//transform->angleY += 60 * scene->dt;
-	transform->y = 50 * (float)sin(scene->getCurrentTime() * 4 + transform->x + transform->z);
-}
-
-void rotateModel_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
-{
-	mitevox::Scene* scene = (mitevox::Scene*)data;
-	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
-
-	transform->x = 200 * (float)sin(scene->getCurrentTime() * 2);
-	transform->y = 200.0f * (float)cos(scene->getCurrentTime() * 2);
-	transform->z = 0;// 200 * (float)cos(scene->currentTime * 2);
-}
-
-
-void processInput_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
+void processInput_Script(mitevox::Scene* scene)
 {
 	float cameraSensitivity = 0.1f;
-	float speed = 5;
+	float speed = 0.5f;
 
-	mitevox::Playground* playground = (mitevox::Playground*)data;
-	mitevox::Scene* scene = playground->getActiveScene();
-
-	InputHandler* inputHandler = playground->getActiveScene()->settings->getInputHandler();
-
-	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
-
+	InputHandler* inputHandler = scene->settings->getInputHandler();
+	mathem::GeometryTransform* cameraTransform = scene->activeCameraNode->getTransform();
 	render::Camera* camera = scene->activeCameraNode->camera;
-	camera->FOV += inputHandler->mouseDeltaScroll;
-
-	float timeForMoves = (float)inputHandler->dt;
-
-	if (inputHandler->keyW)
-	{
-		transform->x += cos((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
-		transform->y -= cos((transform->angleX + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
-		transform->z += sin((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
-	}
-	else if (inputHandler->keyS)
-	{
-		transform->x -= cos((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
-		transform->y += cos((transform->angleX + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
-		transform->z -= sin((transform->angleY + 90) * (float)mathem::PI / 180) * speed * timeForMoves;
-	}
-	if (inputHandler->keyD)
-	{
-		transform->x += cos(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
-		transform->z += sin(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
-	}
-	else if (inputHandler->keyA)
-	{
-		transform->x -= cos(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
-		transform->z -= sin(transform->angleY * (float)mathem::PI / 180) * speed * timeForMoves;
-	}
-
-	if (inputHandler->keySpace)
-	{
-		transform->y += speed * timeForMoves;
-	}
-	else if (inputHandler->keyLShift)
-	{
-		transform->y -= speed * timeForMoves;
-	}
 
 	int windowWidth, windowHeight;
 	inputHandler->getWindowSize(&windowWidth, &windowHeight);
-	transform->angleY += (-(float)inputHandler->mouseDeltaX + windowWidth / 2) * cameraSensitivity;
-	transform->angleX += (-(float)inputHandler->mouseDeltaY + windowHeight / 2) * cameraSensitivity;
-}
+	cameraTransform->rotation.rotateByEulers(
+		((float)inputHandler->mouseDeltaY) * cameraSensitivity,
+		((float)inputHandler->mouseDeltaX) * cameraSensitivity,
+		0.0f);
 
-void rotateCamera_Script(ecs::EntityComponentSystem<entityID>* _ecs, MANAGER_INDEX_TYPE _managerIndex, entityID ID, void* data)
-{
-	mitevox::Scene* scene = (mitevox::Scene*)data;
-	mathem::Transform* transform =
-		(mathem::Transform*)_ecs->getComponent(ID, TRANSFORM_COMPONENT);
+	float cameraRotationX, cameraRotationY, cameraRotationZ = 0.0f;
+	cameraTransform->rotation.toEulers(&cameraRotationX, &cameraRotationY, &cameraRotationZ);
+	camera->FOV -= inputHandler->mouseDeltaScroll;
+	inputHandler->mouseDeltaScroll = 0.0f; // TODO:
 
-	float angle = (float)scene->getCurrentTime() * 50 + 180;
+	float movementStep = speed * (float)inputHandler->dt;
 
-	transform->x = 800 * sin(mathem::toRadians(angle));
-	transform->z = 800 * cos(mathem::toRadians(angle));
+	mathem::Vector3D movementVector = { 0.0f, 0.0f, 0.0f };
+	if (inputHandler->keyW)
+	{
+		movementVector.z() = -1.0f;
+	}
+	else if (inputHandler->keyS)
+	{
+		movementVector.z() = 1.0f;
+	}
+	if (inputHandler->keyD)
+	{
+		movementVector.x() = 1.0f;
+	}
+	else if (inputHandler->keyA)
+	{
+		movementVector.x() = -1.0f;
+	}
+	if (inputHandler->keySpace)
+	{
+		movementVector.y() = 1.0f;
+	}
+	else if (inputHandler->keyLShift)
+	{
+		movementVector.y() -= 1.0f;
+	}
+	movementVector.normalize();
+	movementVector *= movementStep;
+	movementVector = cameraTransform->rotation.rotate(movementVector);
+	cameraTransform->translation.x() += movementVector.x();
+	cameraTransform->translation.y() += movementVector.y();
+	cameraTransform->translation.z() += movementVector.z();
 
-	transform->angleY = -angle + 180;
+	/*mitevox::Node* zeroNode = scene->nodes.getElement(0);
+	zeroNode->transform.rotation.rotateByEulers(0.0f, 90.0f * (float)inputHandler->dt, 0.0f);*/
 }
 
 #endif

@@ -32,12 +32,20 @@ namespace mathem
 		Quaternion getConjugate();
 		Quaternion getReciprocal();
 
+		void rotateByEulers(float x, float y, float z);
+		void fromEulers(float x, float y, float z);
+		void toEulersRadians(float* x, float* y, float* z);
+		void toEulers(float* x, float* y, float* z);
+
 		Quaternion operator*(float multiplier);
 		void operator*=(float multiplier);
 		float operator*(Quaternion& otherQuaternion);
 		Quaternion multiplyCopy(Quaternion& otherQuaternion);
 		void multiply(Quaternion& otherQuaternion);
 		Quaternion rotate(Quaternion& otherQuaternion);
+		Vector3D rotate(Vector3D& vector);
+
+		Quaternion lookRotation(Vector3D& upDirection);
 
 		Quaternion operator/(float divider);
 		void operator/=(float divider);

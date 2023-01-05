@@ -12,6 +12,7 @@ layout (location = 7) in vec4 tangent;
 out vec2 Texcoord;
 out vec3 Normal;
 out vec3 Position;
+out mat3 TangentBitangentNormal;
 
 uniform mat4 viewProjectionMatrix;
 uniform mat4 modelMatrix;
@@ -34,7 +35,10 @@ void main()
 	mat4 poseModelMatrix = modelMatrix * poseMatrix;
 
 	Texcoord = texcoord_0;
-	Normal = vec3(transpose(inverse(poseModelMatrix)) * vec4(normal, 1.0));
+	Normal = normalize(vec3(transpose(inverse(poseModelMatrix)) * vec4(normal, 1.0)));
+	vec3 bitangent = cross(Normal, tangent.xyz);
+	TangentBitangentNormal = mat3(tangent.xyz, bitangent, Normal);
+
 	Position = vec3(poseModelMatrix * vec4(position, 1.0));
 	gl_Position = viewProjectionMatrix * vec4(Position, 1.0);
 }

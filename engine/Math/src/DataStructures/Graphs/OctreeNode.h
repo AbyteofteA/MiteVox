@@ -78,8 +78,6 @@ namespace mathem
 	{
 		boundingBox.position = position;
 		boundingBox.halfSize = halfSize;
-
-		subNodes[8] = { nullptr };
 	}
 
 	template <class T>
@@ -247,13 +245,11 @@ namespace mathem
 		tryCreateSubnode(octant); // It's not ideal to create it at this point, it may not fit
 
 		// Check if the datapoint fits into new subnode
-		CollisionInfo collisionInfo;
-		checkCollision(
+		CollisionType ñollisionType = checkCollision(
 			datapoint->getCollider(),
 			datapoint->getTransform(),
-			&subNodes[octant]->boundingBox,
-			&collisionInfo);
-		if (collisionInfo.type == CollisionType::INSCRIBTION_2_1)
+			&subNodes[octant]->boundingBox);
+		if (ñollisionType == CollisionType::INSCRIBTION_2_1)
 		{
 			return subNodes[octant];
 		}

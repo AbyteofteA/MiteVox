@@ -4,6 +4,7 @@
 
 #include "dependencies/glfw-3.3.2.bin.WIN32/include/GLFW/glfw3.h"
 #include <chrono>
+#include <mutex>
 
 class InputHandler
 {
@@ -11,8 +12,6 @@ public:
 
 	GLFWwindow* window;
 
-	int prevMouseX;
-	int prevMouseY;
 	double mouseDeltaX;
 	double mouseDeltaY;
 	float mouseDeltaScroll;
@@ -27,14 +26,15 @@ public:
 	double dt = 0;
 	std::chrono::high_resolution_clock::time_point now;
 
-	InputHandler(GLFWwindow* _window);
+	InputHandler(InputHandler& other) = delete;
+	void operator=(const InputHandler&) = delete;
+	static InputHandler* getInstance(GLFWwindow* _window);
 
 	void getWindowSize(int* x, int* y);
 	void setWindowSize(int x, int y);
 	void getMousePosition(double* x, double* y);
 	void setMousePosition(double x, double y);
 	void setMousePositionCenter();
-	void getMouseScroll(int* s);
 
 	void attach();
 	void detach();
@@ -44,6 +44,12 @@ public:
 	void update();
 
 private:
+
+	static InputHandler* instance;
+	static std::mutex mutex;
+
+	InputHandler(GLFWwindow* _window);
+	~InputHandler();
 
 	void resetMouseInfo();
 	void afterPushDelay();

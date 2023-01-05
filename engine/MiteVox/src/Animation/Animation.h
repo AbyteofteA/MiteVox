@@ -26,6 +26,7 @@ namespace mitevox
 	public:
 
 		Animation(AnimationType animationType = AnimationType::REPEATED);
+		~Animation();
 		void setType(AnimationType animationType);
 		void start();
 		void pause();

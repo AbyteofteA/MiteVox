@@ -11,74 +11,58 @@ namespace fileio
 		safety::SafeArray<mitevox::Mesh*>* meshes,
 		safety::SafeArray<mitevox::Node*>* nodes)
 	{
-		nodeResult->name = nodeJSON->getFieldString("name");
+		nodeResult->name = nodeJSON->getFieldStringOrDefault("name", "Untitled");
 
-		JSON* numberJSON = nodeJSON->getField("camera");
-		if (numberJSON != nullptr)
+		
+		if (JSON* numberJSON = nodeJSON->getField("camera"))
 		{
-			if (numberJSON->isNumber())
-			{
-				int32_t cameraIndex = (int32_t)numberJSON->getNumber();
-				nodeResult->camera = cameras->getElement(cameraIndex);
-			}
+			int32_t cameraIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			nodeResult->camera = cameras->getElement(cameraIndex);
 		}
-		numberJSON = nodeJSON->getField("skin");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = nodeJSON->getField("skin"))
 		{
-			if (numberJSON->isNumber())
-			{
-				size_t skeletonIndex = (size_t)numberJSON->getNumber() + 1;
-				nodeResult->skeleton = (mitevox::SkeletonBase*)skeletonIndex;
-			}
+			int32_t skeletonIndex = (int32_t)numberJSON->getNumberOrDefault(-2.0) + 1;
+			nodeResult->skeleton = (mitevox::SkeletonBase*)skeletonIndex;
 		}
-		numberJSON = nodeJSON->getField("mesh");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = nodeJSON->getField("mesh"))
 		{
-			if (numberJSON->isNumber())
-			{
-				int32_t meshIndex = (int32_t)numberJSON->getNumber();
-				nodeResult->mesh = meshes->getElement(meshIndex);
-			}
+			int32_t meshIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			nodeResult->mesh = meshes->getElement(meshIndex);
 		}
-		JSON* weightsArrayJSON = nodeJSON->getFieldArray("weights");
-		if (weightsArrayJSON != nullptr)
+		if (JSON* weightsArrayJSON = nodeJSON->getFieldArray("weights"))
 		{
 			weightsArrayJSON->toNumberArray<float>(&nodeResult->weights);
 		}
 
 		nodeResult->transform.reset();
 
-		JSON* scaleArrayJSON = nodeJSON->getFieldArray("scale");
-		if (scaleArrayJSON != nullptr)
+		if (JSON* scaleArrayJSON = nodeJSON->getFieldArray("scale"))
 		{
 			safety::SafeFloatArray scaleArray;
 			scaleArrayJSON->toNumberArray<float>(&scaleArray);
 			nodeResult->transform.scale = mathem::Vector3D(&scaleArray);
 		}
-		JSON* rotationArrayJSON = nodeJSON->getFieldArray("rotation");
-		if (rotationArrayJSON != nullptr)
+		if (JSON* rotationArrayJSON = nodeJSON->getFieldArray("rotation"))
 		{
 			safety::SafeFloatArray rotationArray;
 			rotationArrayJSON->toNumberArray<float>(&rotationArray);
 			nodeResult->transform.rotation = mathem::Quaternion(&rotationArray);
 		}
-		JSON* translationArrayJSON = nodeJSON->getFieldArray("translation");
-		if (translationArrayJSON != nullptr)
+		if (JSON* translationArrayJSON = nodeJSON->getFieldArray("translation"))
 		{
 			safety::SafeFloatArray translationArray;
 			translationArrayJSON->toNumberArray<float>(&translationArray);
 			nodeResult->transform.translation = mathem::Vector3D(&translationArray);
 		}
-		JSON* matrixArrayJSON = nodeJSON->getFieldArray("matrix");
-		if (matrixArrayJSON != nullptr)
+		if (JSON* matrixArrayJSON = nodeJSON->getFieldArray("matrix"))
 		{
 			safety::SafeFloatArray transformationMatrixArray;
 			matrixArrayJSON->toNumberArray<float>(&transformationMatrixArray);
-			nodeResult->transform = mathem::matrixToTransform(mathem::Matrix4x4(&transformationMatrixArray));
+			mathem::Matrix4x4 nodeTransformMatrix = mathem::Matrix4x4(&transformationMatrixArray);
+			nodeResult->transform = mathem::matrixToTransform(nodeTransformMatrix);
 		}
 
-		JSON* childrenArrayJSON = nodeJSON->getFieldArray("children");
-		if (childrenArrayJSON != nullptr)
+		if (JSON* childrenArrayJSON = nodeJSON->getFieldArray("children"))
 		{
 			size_t childrenCount = childrenArrayJSON->getArraySize();
 			nodeResult->children.resize(childrenCount);
@@ -86,7 +70,7 @@ namespace fileio
 
 			for (size_t i = 0; i < childrenCount; ++i)
 			{
-				int32_t childIndex = (int32_t)childrenArrayJSON->getArrayItemNumber(i);
+				int32_t childIndex = (int32_t)childrenArrayJSON->getArrayItemNumberOrDefault(i, -1.0);
 				nodeResult->children.setElement(i, nodes->getElement(childIndex));
 			}
 		}

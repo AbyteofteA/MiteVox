@@ -46,6 +46,8 @@ namespace mathem
 		inline T& m31();
 		inline T& m32();
 		inline T& m33();
+
+		inline void makeIdentity();
 	};
 
 	typedef Matrix<float, 2, 2> Matrix2x2;
@@ -194,6 +196,21 @@ namespace mathem
 	inline T& MATRIX::m33()
 	{
 		return at(3, 3);
+	}
+
+	MATRIX_TEMPLATE
+	inline void MATRIX::makeIdentity()
+	{
+		size_t minDimension = DimensionX;
+		if (DimensionX > DimensionY)
+		{
+			minDimension = DimensionY;
+		}
+
+		for (size_t index = 0; index < minDimension; ++index)
+		{
+			at(index, index) = 1.0f;
+		}
 	}
 }
 

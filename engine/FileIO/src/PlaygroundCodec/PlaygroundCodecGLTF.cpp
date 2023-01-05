@@ -18,13 +18,9 @@ namespace fileio
 {
 	void PlaygroundCodecGLTF::fromGLTF(mitevox::Playground* playgroundResult, JSON* playgroundJSON, std::string filePath)
 	{
-		JSON* numberJSON = playgroundJSON->getField("scene");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = playgroundJSON->getField("scene"))
 		{
-			if (numberJSON->isNumber())
-			{
-				playgroundResult->activeScene = (int32_t)numberJSON->getNumber();
-			}
+			playgroundResult->activeScene = (int32_t)numberJSON->getNumberOrDefault(-1.0);
 		}
 
 		JSON* camerasArrayJSON = playgroundJSON->getFieldArray("cameras");
@@ -54,16 +50,7 @@ namespace fileio
 		JSON* skinsArrayJSON = playgroundJSON->getFieldArray("skins");
 		collectSkins(playgroundResult, skinsArrayJSON);
 
-		// Resolve skeletons pointers from indeces
-		size_t nodesCount = playgroundResult->nodes.getElementsCount();
-		for (size_t i = 0; i < nodesCount; ++i)
-		{
-			mitevox::Node* node = playgroundResult->nodes.getElement(i);
-			if (node->skeleton != 0)
-			{
-				node->skeleton = playgroundResult->skeletons.getElement((size_t)node->skeleton - 1);
-			}
-		}
+		preparePlayground(playgroundResult);
 	}
 
 	void PlaygroundCodecGLTF::collectCameras(mitevox::Playground* playgroundResult, fileio::JSON* camerasArrayJSON)
@@ -81,37 +68,34 @@ namespace fileio
 			JSON* cameraJSON = camerasArrayJSON->getArrayItem(i);
 
 			render::Camera* camera = new render::Camera();
-			camera->_name = cameraJSON->getFieldString("name");
-			std::string cameraType = cameraJSON->getFieldString("type");
+			camera->_name = cameraJSON->getFieldStringOrDefault("name", "Untitled");
+			std::string cameraType = cameraJSON->getFieldStringOrDefault("type", "ERROR");
 			if (cameraType == "perspective")
 			{
 				camera->_type = render::CameraType::PERPECTIVE;
 				JSON* perspectiveCameraJSON = cameraJSON->getFieldObject("perspective");
 
-				double aspectRatio = cameraJSON->getFieldNumber("aspectRatio");
-				camera->FOV = (float)cameraJSON->getFieldNumber("yfov");
-				camera->farCullPlane = (float)cameraJSON->getFieldNumber("zfar");
-				camera->nearCullPlane = (float)cameraJSON->getFieldNumber("znear");
+				double aspectRatio = perspectiveCameraJSON->getFieldNumberOrDefault("aspectRatio", 1.0);
+				camera->FOV = (float)perspectiveCameraJSON->getFieldNumberOrDefault("yfov", 1.0);
+				camera->farCullPlane = (float)perspectiveCameraJSON->getFieldNumberOrDefault("zfar", 100.0);
+				camera->nearCullPlane = (float)perspectiveCameraJSON->getFieldNumberOrDefault("znear", 0.001);
 			}
 			else if (cameraType == "orthographic")
 			{
 				camera->_type = render::CameraType::ORTHOGRAPHIC;
 				JSON* orthographicCameraJSON = cameraJSON->getFieldObject("orthographic");
 
-				double xMagnification = cameraJSON->getFieldNumber("xmag");
-				double yMagnification = cameraJSON->getFieldNumber("ymag");
-				camera->farCullPlane = (float)cameraJSON->getFieldNumber("zfar");
-				camera->nearCullPlane = (float)cameraJSON->getFieldNumber("znear");
+				double xMagnification = orthographicCameraJSON->getFieldNumberOrDefault("xmag", 1.0);
+				double yMagnification = orthographicCameraJSON->getFieldNumberOrDefault("ymag", 1.0);
+				camera->farCullPlane = (float)orthographicCameraJSON->getFieldNumberOrDefault("zfar", 100.0);
+				camera->nearCullPlane = (float)orthographicCameraJSON->getFieldNumberOrDefault("znear", 0.001);
 			}
 
 			playgroundResult->cameras.setElement(i, camera);
 		}
 	}
 
-	void PlaygroundCodecGLTF::collectBuffers(
-		mitevox::Playground* playgroundResult, 
-		fileio::JSON* buffersArrayJSON, 
-		std::string filePath)
+	void PlaygroundCodecGLTF::collectBuffers(mitevox::Playground* playgroundResult, fileio::JSON* buffersArrayJSON, std::string filePath)
 	{
 		if (buffersArrayJSON == nullptr)
 		{
@@ -126,13 +110,12 @@ namespace fileio
 		{
 			JSON* bufferJSON = buffersArrayJSON->getArrayItem(i);
 
-			int64_t byteLength = (int64_t)bufferJSON->getFieldNumber("byteLength");
+			size_t byteLength = (size_t)bufferJSON->getFieldNumberOrDefault("byteLength", 0.0);
 			safety::SafeByteArray* buffer = new safety::SafeByteArray();
 
-			JSON* bufferURIJSON = bufferJSON->getField("uri");
-			if (bufferURIJSON != nullptr)
+			std::string uri = bufferJSON->getFieldStringOrDefault("uri", "ERROR");
+			if (uri != "ERROR")
 			{
-				std::string uri = bufferURIJSON->getString();
 				if (fs::path(uri).is_absolute() == false)
 				{
 					uri = fs::path(filePath).parent_path().string() + "\\" + uri;
@@ -205,10 +188,7 @@ namespace fileio
 		}
 	}
 
-	void PlaygroundCodecGLTF::collectImages(
-		mitevox::Playground* playgroundResult, 
-		fileio::JSON* imagesArrayJSON, 
-		std::string filePath)
+	void PlaygroundCodecGLTF::collectImages(mitevox::Playground* playgroundResult, fileio::JSON* imagesArrayJSON, std::string filePath)
 	{
 		if (imagesArrayJSON == nullptr)
 		{
@@ -245,24 +225,16 @@ namespace fileio
 
 			mitevox::Texture* texture = new mitevox::Texture();
 
-			JSON* numberJSON = textureJSON->getField("sampler");
-			if (numberJSON != nullptr)
+			if (JSON* numberJSON = textureJSON->getField("sampler"))
 			{
-				if (numberJSON->isNumber())
-				{
-					int32_t samplerIndex = (int32_t)numberJSON->getNumber();
-					texture->sampler = playgroundResult->imageSamplers.getElement(samplerIndex);
-				}
+				int32_t samplerIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				texture->sampler = playgroundResult->imageSamplers.getElement(samplerIndex);
 			}
 
-			numberJSON = textureJSON->getField("source");
-			if (numberJSON != nullptr)
+			if (JSON* numberJSON = textureJSON->getField("source"))
 			{
-				if (numberJSON->isNumber())
-				{
-					int32_t imageIndex = (int32_t)numberJSON->getNumber();
-					texture->image = playgroundResult->images.getElement(imageIndex);
-				}
+				int32_t imageIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				texture->image = playgroundResult->images.getElement(imageIndex);
 			}
 
 			playgroundResult->textures.setElement(i, texture);
@@ -415,6 +387,63 @@ namespace fileio
 				&playgroundResult->nodes,
 				&playgroundResult->accessors);
 			playgroundResult->skeletons.setElement((int64_t)i, skeleton);
+		}
+	}
+
+	void PlaygroundCodecGLTF::prepareNodeRecursively(mitevox::Playground* playgroundResult, mitevox::Node* node)
+	{
+		if (node->mesh)
+		{
+			if (node->isMorphableMesh())
+			{
+				node->morphAnimationTarget = new mitevox::Mesh();
+				node->mesh->makeCopyForAnimationTo(node->morphAnimationTarget);
+			}
+
+			// Apply default material where needed
+			size_t meshPrimitivesCount = node->mesh->primitives.getElementsCount();
+			for (size_t i = 0; i < meshPrimitivesCount; ++i)
+			{
+				mitevox::MeshPrimitive* meshPrimitive = node->mesh->primitives.getElement(i);
+				if (meshPrimitive->material == nullptr)
+				{
+					meshPrimitive->material = new mitevox::Material();
+				}
+			}
+		}
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			prepareNodeRecursively(playgroundResult, node->children.getElement(i));
+		}
+	}
+
+	void PlaygroundCodecGLTF::preparePlayground(mitevox::Playground* playgroundResult)
+	{
+		// Resolve skeletons pointers from indeces
+		size_t nodesCount = playgroundResult->nodes.getElementsCount();
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
+			mitevox::Node* node = playgroundResult->nodes.getElement(i);
+			if (node->skeleton != 0)
+			{
+				node->skeleton = playgroundResult->skeletons.getElement((size_t)node->skeleton - 1);
+			}
+		}
+
+		// Prepare nodes
+		for (size_t i = 0; i < nodesCount; ++i)
+		{
+			mitevox::Node* node = playgroundResult->nodes.getElement(i);
+			prepareNodeRecursively(playgroundResult, node);
+		}
+
+		// Generate tangents if needed
+		size_t meshesCount = playgroundResult->meshes.getElementsCount();
+		for (size_t i = 0; i < meshesCount; ++i)
+		{
+			mitevox::Mesh* mesh = playgroundResult->meshes.getElement(i);
+			mesh->tryGenerateTangents();
 		}
 	}
 }

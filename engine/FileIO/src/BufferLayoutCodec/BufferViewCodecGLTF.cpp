@@ -7,28 +7,21 @@ namespace fileio
 		JSON* bufferViewJSON,
 		safety::SafeArray<safety::SafeByteArray*>* buffers)
 	{
-		bufferViewResult->name = bufferViewJSON->getFieldString("name");
-		bufferViewResult->byteOffset = (uint64_t)bufferViewJSON->getFieldNumber("byteOffset");
-		bufferViewResult->byteLength = (uint64_t)bufferViewJSON->getFieldNumber("byteLength");
-		bufferViewResult->byteStride = (uint16_t)bufferViewJSON->getFieldNumber("byteStride");
+		bufferViewResult->name = bufferViewJSON->getFieldStringOrDefault("name", "Untitled");
+		bufferViewResult->byteOffset = (uint64_t)bufferViewJSON->getFieldNumberOrDefault("byteOffset", 0.0);
+		bufferViewResult->byteLength = (uint64_t)bufferViewJSON->getFieldNumberOrDefault("byteLength", 0.0);
+		bufferViewResult->byteStride = (uint16_t)bufferViewJSON->getFieldNumberOrDefault("byteStride", 0.0);
 
-		JSON* numberJSON = bufferViewJSON->getField("buffer");
-		if (numberJSON != nullptr)
+		if (JSON* numberJSON = bufferViewJSON->getField("buffer"))
 		{
-			if (numberJSON->isNumber())
-			{
-				int32_t bufferIndex = (int32_t)numberJSON->getNumber();
-				bufferViewResult->buffer = buffers->getElement(bufferIndex);
-			}
+			int32_t bufferIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			bufferViewResult->buffer = buffers->getElement(bufferIndex);
 		}
 
-		JSON* targetJSON = bufferViewJSON->getField("target");
-		if (targetJSON != nullptr)
+		if (JSON* targetJSON = bufferViewJSON->getField("target"))
 		{
-			if (targetJSON->isNumber())
-			{
-				bufferViewResult->target = (mitevox::BufferView::TargetBufferType)targetJSON->getNumber();
-			}
+			bufferViewResult->target = (mitevox::BufferView::TargetBufferType)targetJSON->getNumberOrDefault(
+				(double)mitevox::BufferView::TargetBufferType::ARRAY_BUFFER);
 		}
 	}
 }

@@ -40,22 +40,22 @@ namespace fileio
 		void set(std::string value);
 		void set(bool value);
 
-		double getNumber();
-		std::string getString();
-		bool getBoolean();
+		double getNumberOrDefault(double defaultValue);
+		std::string getStringOrDefault(std::string defaultValue);
+		bool getBooleanOrDefault(bool defaultValue);
 
 		template <typename T>
 		inline void toNumberArray(safety::SafeArray<T>* resultArray);
 
-		void toStringArray(safety::SafeArray<std::string>* resultArray);
+		void toStringArrayOrDefault(safety::SafeArray<std::string>* resultArray, std::string defaultValue);
 
 		// Field methods //
 
 		JSON* getField(std::string fieldName);
 		std::vector<JSON*> getFields();
-		double getFieldNumber(std::string fieldName);
-		std::string getFieldString(std::string fieldName);
-		bool getFieldBoolean(std::string fieldName);
+		double getFieldNumberOrDefault(std::string fieldName, double defaultValue);
+		std::string getFieldStringOrDefault(std::string fieldName, std::string defaultValue);
+		bool getFieldBooleanOrDefault(std::string fieldName, bool defaultValue);
 		JSON* getFieldArray(std::string fieldName);
 		JSON* getFieldObject(std::string fieldName);
 
@@ -75,9 +75,9 @@ namespace fileio
 		size_t addArrayItem(JSON* newItem);
 
 		JSON* getArrayItem(size_t itemIndex);
-		double getArrayItemNumber(size_t itemIndex);
-		std::string getArrayItemString(size_t itemIndex);
-		bool getArrayItemBool(size_t itemIndex);
+		double getArrayItemNumberOrDefault(size_t itemIndex, double defaultValue);
+		std::string getArrayItemStringOrDefault(size_t itemIndex, std::string defaultValue);
+		bool getArrayItemBoolOrDefault(size_t itemIndex, bool defaultValue);
 
 		SerializationStatus serialize(safety::SafeByteArray* fileData);
 		DeserializationStatus deserialize(safety::SafeByteArray* fileData);
@@ -121,7 +121,7 @@ namespace fileio
 			JSON* numberField = _fields[index];
 			if (numberField->isNumber())
 			{
-				resultArray->setElement(numberIndex, (T)numberField->getNumber());
+				resultArray->setElement(numberIndex, (T)numberField->getNumberOrDefault(0.0));
 				++numberIndex;
 			}
 		}

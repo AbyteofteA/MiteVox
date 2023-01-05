@@ -7,7 +7,7 @@
 
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
@@ -117,11 +117,10 @@ namespace mathem
 
 	// TODO: checkCollision ComplexGeometry vs ComplexGeometry
 
-	bool checkCollision(
+	CollisionType checkCollision(
 		ComplexGeometry* complexGeometry,
 		GeometryTransform* complexGeometryTransform,
-		AxisAlignedBoxGeometry* axisAlignedBox,
-		CollisionInfo* collisionInfo = nullptr);
+		AxisAlignedBoxGeometry* axisAlignedBox);
 }
 
 #endif

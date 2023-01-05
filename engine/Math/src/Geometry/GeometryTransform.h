@@ -5,7 +5,7 @@
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Quaternion.h"
 #include "engine/Math/src/Matrix.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 #include "engine/CodeSafety/src/SafeArray.h"
 
 namespace mathem
@@ -24,8 +24,8 @@ namespace mathem
 
 		void applyTo(Vector3D& vector);
 		Vector3D applyToCopy(Vector3D vector);
-		void applyTo(TriangleGeometry& triangle);
-		TriangleGeometry applyToCopy(TriangleGeometry triangle);
+		void applyTo(TriangleGeometry3D& triangle);
+		TriangleGeometry3D applyToCopy(TriangleGeometry3D triangle);
 
 		void operator*=(GeometryTransform& otherTransform);
 		GeometryTransform operator*(GeometryTransform& otherTransform);

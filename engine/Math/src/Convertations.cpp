@@ -6,10 +6,15 @@ namespace mathem
 {
 	float toRadians(float degrees)
 	{
-		return degrees * (float)mathem::PI / 180;
+		return degrees * (float)mathem::PI / 180.0f;
 	}
 
-	Quaternion matrixToQuaternion(Matrix4x4 matrix)
+	float toDegrees(float radians)
+	{
+		return radians * 180.0f / (float)mathem::PI;
+	}
+
+	Quaternion matrixToQuaternion(Matrix4x4& matrix)
 	{
 		Quaternion resultQuaternion;
 
@@ -54,7 +59,7 @@ namespace mathem
 		return resultQuaternion;
 	}
 
-	GeometryTransform matrixToTransform(Matrix4x4 matrix)
+	GeometryTransform matrixToTransform(Matrix4x4& matrix)
 	{
 		GeometryTransform resultTransform;
 
@@ -90,7 +95,7 @@ namespace mathem
 		return resultTransform;
 	}
 
-	Matrix4x4 quaternionToMatrix(Quaternion quaternion)
+	Matrix4x4 quaternionToMatrix(Quaternion& quaternion)
 	{
 		Matrix4x4 resultMatrix4x4;
 		float quaternionX_Squared = std::pow(quaternion.components.x(), 2.0f);
@@ -115,32 +120,16 @@ namespace mathem
 		return resultMatrix4x4;
 	}
 
-	Matrix4x4 transformToMatrix(GeometryTransform transform)
+	Matrix4x4 transformToMatrix(GeometryTransform& transform)
 	{
 		Matrix4x4 resultMatrix4x4;
 
 		// Encode rotation
 		resultMatrix4x4 = quaternionToMatrix(transform.rotation);
 
-		// TODO:
+		// TODO: ERROR: matrix multiplication needed
 
 		// Encode scale
-		/*Vector3D tmpVector;
-		tmpVector = { matrix.at(0, 0), matrix.at(0, 1), matrix.at(0, 2) };
-		resultTransform.scale.x() = tmpVector.getLength();
-		tmpVector = { matrix.at(1, 0), matrix.at(1, 1), matrix.at(1, 2) };
-		resultTransform.scale.y() = tmpVector.getLength();
-		tmpVector = { matrix.at(2, 0), matrix.at(2, 1), matrix.at(2, 2) };
-		resultTransform.scale.z() = tmpVector.getLength();
-		resultMatrix4x4.at(0, 0) /= transform.scale.x();
-		resultMatrix4x4.at(0, 1) /= transform.scale.x();
-		resultMatrix4x4.at(0, 2) /= transform.scale.x();
-		resultMatrix4x4.at(1, 0) /= transform.scale.y();
-		resultMatrix4x4.at(1, 1) /= transform.scale.y();
-		resultMatrix4x4.at(1, 2) /= transform.scale.y();
-		resultMatrix4x4.at(2, 0) /= transform.scale.z();
-		resultMatrix4x4.at(2, 1) /= transform.scale.z();
-		resultMatrix4x4.at(2, 2) /= transform.scale.z();*/
 		resultMatrix4x4.at(0, 0) *= transform.scale.x();
 		resultMatrix4x4.at(1, 1) *= transform.scale.y();
 		resultMatrix4x4.at(2, 2) *= transform.scale.z();

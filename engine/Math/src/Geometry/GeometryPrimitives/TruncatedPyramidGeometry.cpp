@@ -77,9 +77,9 @@ namespace mathem
 		return 12;
 	}
 
-	TriangleGeometry TruncatedPyramidGeometry::getTrianglePositions(uint32_t index)
+	TriangleGeometry3D TruncatedPyramidGeometry::getTrianglePositions(uint32_t index)
 	{
-		TriangleGeometry resultTriangle;
+		TriangleGeometry3D resultTriangle;
 
 		if (index >= 12)
 		{

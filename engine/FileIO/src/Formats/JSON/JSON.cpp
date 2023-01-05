@@ -77,22 +77,34 @@ namespace fileio
 		_booleanOrNumber.boolean = value;
 	}
 
-	double JSON::getNumber()
+	double JSON::getNumberOrDefault(double defaultValue)
 	{
-		return _booleanOrNumber.number;
+		if (isNumber())
+		{
+			return _booleanOrNumber.number;
+		}
+		return defaultValue;
 	}
 
-	std::string JSON::getString()
+	std::string JSON::getStringOrDefault(std::string defaultValue)
 	{
-		return _string;
+		if (isString())
+		{
+			return _string;
+		}
+		return defaultValue;
 	}
 
-	bool JSON::getBoolean()
+	bool JSON::getBooleanOrDefault(bool defaultValue)
 	{
-		return _booleanOrNumber.boolean;
+		if (isBoolean())
+		{
+			return _booleanOrNumber.boolean;
+		}
+		return defaultValue;
 	}
 
-	void JSON::toStringArray(safety::SafeArray<std::string>* resultArray)
+	void JSON::toStringArrayOrDefault(safety::SafeArray<std::string>* resultArray, std::string defaultValue)
 	{
 		if (_type != JSONtype::ARRAY)
 		{
@@ -108,7 +120,7 @@ namespace fileio
 			JSON* stringField = _fields[index];
 			if (stringField->isString())
 			{
-				resultArray->setElement(stringIndex, stringField->getString());
+				resultArray->setElement(stringIndex, stringField->getStringOrDefault(defaultValue));
 				++stringIndex;
 			}
 		}
@@ -190,41 +202,32 @@ namespace fileio
 		return _fields;
 	}
 
-	double JSON::getFieldNumber(std::string fieldName)
+	double JSON::getFieldNumberOrDefault(std::string fieldName, double defaultValue)
 	{
 		JSON* field = getField(fieldName);
 		if (field)
 		{
-			if (field->isNumber())
-			{
-				return field->_booleanOrNumber.number;
-			}
+			return field->getNumberOrDefault(defaultValue);
 		}
 		return -0.0;
 	}
 
-	std::string JSON::getFieldString(std::string fieldName)
+	std::string JSON::getFieldStringOrDefault(std::string fieldName, std::string defaultValue)
 	{
 		JSON* field = getField(fieldName);
 		if (field)
 		{
-			if (field->isString())
-			{
-				return field->_string;
-			}
+			return field->getStringOrDefault(defaultValue);
 		}
 		return "";
 	}
 
-	bool JSON::getFieldBoolean(std::string fieldName)
+	bool JSON::getFieldBooleanOrDefault(std::string fieldName, bool defaultValue)
 	{
 		JSON* field = getField(fieldName);
 		if (field)
 		{
-			if (field->isBoolean())
-			{
-				return field->_booleanOrNumber.boolean;
-			}
+			return field->getBooleanOrDefault(defaultValue);
 		}
 		return false;
 	}
@@ -387,22 +390,22 @@ namespace fileio
 		return _fields[itemIndex];
 	}
 
-	double JSON::getArrayItemNumber(size_t itemIndex)
+	double JSON::getArrayItemNumberOrDefault(size_t itemIndex, double defaultValue)
 	{
 		JSON* numberJSON = getArrayItem(itemIndex);
-		return numberJSON->getNumber();
+		return numberJSON->getNumberOrDefault(defaultValue);
 	}
 
-	std::string JSON::getArrayItemString(size_t itemIndex)
+	std::string JSON::getArrayItemStringOrDefault(size_t itemIndex, std::string defaultValue)
 	{
 		JSON* stringJSON = getArrayItem(itemIndex);
-		return stringJSON->getString();
+		return stringJSON->getStringOrDefault(defaultValue);
 	}
 
-	bool JSON::getArrayItemBool(size_t itemIndex)
+	bool JSON::getArrayItemBoolOrDefault(size_t itemIndex, bool defaultValue)
 	{
 		JSON* boolJSON = getArrayItem(itemIndex);
-		return boolJSON->getBoolean();
+		return boolJSON->getBooleanOrDefault(defaultValue);
 	}
 
 	SerializationStatus JSON::serialize(safety::SafeByteArray* fileData)

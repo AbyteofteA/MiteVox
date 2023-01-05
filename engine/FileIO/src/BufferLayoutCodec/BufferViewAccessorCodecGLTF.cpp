@@ -10,30 +10,25 @@ namespace fileio
         JSON* accessorJSON,
         safety::SafeArray<mitevox::BufferView*>* bufferViews)
     {
-        bufferViewAccessorResult->name = accessorJSON->getFieldString("name");
-        bufferViewAccessorResult->byteOffset = (uint64_t)accessorJSON->getFieldNumber("byteOffset");
+        bufferViewAccessorResult->name = accessorJSON->getFieldStringOrDefault("name", "Untitled");
+        bufferViewAccessorResult->byteOffset = (uint64_t)accessorJSON->getFieldNumberOrDefault("byteOffset", 0.0);
         bufferViewAccessorResult->componentType = 
-            (mitevox::ComponentDataType)accessorJSON->getFieldNumber("componentType");
-        bufferViewAccessorResult->count = (uint64_t)accessorJSON->getFieldNumber("count");
-        bufferViewAccessorResult->normalized = accessorJSON->getFieldBoolean("normalized");
+            (mitevox::ComponentDataType)accessorJSON->getFieldNumberOrDefault("componentType", (double)mitevox::ComponentDataType::FLOAT);
+        bufferViewAccessorResult->count = (uint64_t)accessorJSON->getFieldNumberOrDefault("count", 0.0);
+        bufferViewAccessorResult->normalized = accessorJSON->getFieldBooleanOrDefault("normalized", false);
         
-        JSON* numberJSON = accessorJSON->getField("bufferView");
-        if (numberJSON != nullptr)
+        if (JSON* numberJSON = accessorJSON->getField("bufferView"))
         {
-            if (numberJSON->isNumber())
-            {
-                int32_t bufferViewIndex = (int32_t)numberJSON->getNumber();
-                bufferViewAccessorResult->bufferView = bufferViews->getElement(bufferViewIndex);
-            }
+            int32_t bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+            bufferViewAccessorResult->bufferView = bufferViews->getElement(bufferViewIndex);
         }
 
-        std::string typeName = accessorJSON->getFieldString("type");
+        std::string typeName = accessorJSON->getFieldStringOrDefault("type", "SCALAR");
         bufferViewAccessorResult->type = mitevox::BufferViewAccessor::mapTypeNameToType(typeName);
 
         collectMinMaxFromGLTF(bufferViewAccessorResult, accessorJSON);
 
-        JSON* accessorSparseJSON = accessorJSON->getField("sparse");
-        if (accessorSparseJSON != nullptr)
+        if (JSON* accessorSparseJSON = accessorJSON->getField("sparse"))
         {
             sparseFromGLTF(bufferViewAccessorResult, accessorSparseJSON);
         }
@@ -43,14 +38,12 @@ namespace fileio
         mitevox::BufferViewAccessor* bufferViewAccessor, 
         JSON* accessorJSON)
     {
-        JSON* minArrayJSON = accessorJSON->getFieldArray("min");
-        if (minArrayJSON != nullptr)
+        if (JSON* minArrayJSON = accessorJSON->getFieldArray("min"))
         {
             minArrayJSON->toNumberArray<float>(&bufferViewAccessor->min);
         }
 
-        JSON* maxArrayJSON = accessorJSON->getFieldArray("max");
-        if (maxArrayJSON != nullptr)
+        if (JSON* maxArrayJSON = accessorJSON->getFieldArray("max"))
         {
             maxArrayJSON->toNumberArray<float>(&bufferViewAccessor->max);
         }
@@ -61,63 +54,37 @@ namespace fileio
         JSON* accessorSparseJSON)
     {
         mitevox::BufferViewAccessorSparse* bufferViewAccessorSparse = new mitevox::BufferViewAccessorSparse();
-        JSON* numberJSON = accessorSparseJSON->getField("count");
-        if (numberJSON != nullptr)
+        if (JSON* numberJSON = accessorSparseJSON->getField("count"))
         {
-            if (numberJSON->isNumber())
+            bufferViewAccessorSparse->count = (uint64_t)numberJSON->getNumberOrDefault(0.0);
+        }
+
+        if (JSON* indicesJSON = accessorSparseJSON->getField("indices"))
+        {
+            if (JSON* numberJSON = indicesJSON->getField("bufferView"))
             {
-                bufferViewAccessorSparse->count = (uint64_t)numberJSON->getNumber();
+                bufferViewAccessorSparse->indices.bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+            }
+            if (JSON* numberJSON = indicesJSON->getField("byteOffset"))
+            {
+                bufferViewAccessorSparse->indices.byteOffset = (uint64_t)numberJSON->getNumberOrDefault(0.0);
+            }
+            if (JSON* numberJSON = indicesJSON->getField("componentType"))
+            {
+                bufferViewAccessorSparse->indices.componentType =
+                    (mitevox::ComponentDataType)numberJSON->getNumberOrDefault((double)mitevox::ComponentDataType::UNSIGNED_SHORT);
             }
         }
 
-        JSON* indicesJSON = accessorSparseJSON->getField("indices");
-        if (indicesJSON != nullptr)
+        if (JSON* valuesJSON = accessorSparseJSON->getField("values"))
         {
-            numberJSON = indicesJSON->getField("bufferView");
-            if (numberJSON != nullptr)
+            if (JSON* numberJSON = valuesJSON->getField("bufferView"))
             {
-                if (numberJSON->isNumber())
-                {
-                    bufferViewAccessorSparse->indices.bufferViewIndex = (int32_t)numberJSON->getNumber();
-                }
+                bufferViewAccessorSparse->values.bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
             }
-            numberJSON = indicesJSON->getField("byteOffset");
-            if (numberJSON != nullptr)
+            if (JSON* numberJSON = valuesJSON->getField("byteOffset"))
             {
-                if (numberJSON->isNumber())
-                {
-                    bufferViewAccessorSparse->indices.byteOffset = (uint64_t)numberJSON->getNumber();
-                }
-            }
-            numberJSON = indicesJSON->getField("componentType");
-            if (numberJSON != nullptr)
-            {
-                if (numberJSON->isNumber())
-                {
-                    bufferViewAccessorSparse->indices.componentType =
-                        (mitevox::ComponentDataType)numberJSON->getNumber();
-                }
-            }
-        }
-
-        JSON* valuesJSON = accessorSparseJSON->getField("values");
-        if (valuesJSON != nullptr)
-        {
-            numberJSON = valuesJSON->getField("bufferView");
-            if (numberJSON != nullptr)
-            {
-                if (numberJSON->isNumber())
-                {
-                    bufferViewAccessorSparse->values.bufferViewIndex = (int32_t)numberJSON->getNumber();
-                }
-            }
-            numberJSON = valuesJSON->getField("byteOffset");
-            if (numberJSON != nullptr)
-            {
-                if (numberJSON->isNumber())
-                {
-                    bufferViewAccessorSparse->values.byteOffset = (uint64_t)numberJSON->getNumber();
-                }
+                bufferViewAccessorSparse->values.byteOffset = (uint64_t)numberJSON->getNumberOrDefault(0.0);
             }
         }
 

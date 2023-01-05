@@ -27,10 +27,7 @@ namespace mathem
 		vector.z() *= scale.z();
 
 		// TODO: check rotation
-		Quaternion vectorAsQuaternion(vector);
-		vectorAsQuaternion = rotation.rotate(vectorAsQuaternion);
-		//vectorAsQuaternion = vectorAsQuaternion.rotate(rotation);
-		vector = vectorAsQuaternion.binary.vector;
+		vector = rotation.rotate(vector);
 
 		vector.x() += translation.x();
 		vector.y() += translation.y();
@@ -44,16 +41,16 @@ namespace mathem
 		return resultVector;
 	}
 
-	void GeometryTransform::applyTo(TriangleGeometry& triangle)
+	void GeometryTransform::applyTo(TriangleGeometry3D& triangle)
 	{
 		this->applyTo(triangle.point1);
 		this->applyTo(triangle.point2);
 		this->applyTo(triangle.point3);
 	}
 
-	TriangleGeometry GeometryTransform::applyToCopy(TriangleGeometry triangle)
+	TriangleGeometry3D GeometryTransform::applyToCopy(TriangleGeometry3D triangle)
 	{
-		TriangleGeometry resultTriangle = triangle;
+		TriangleGeometry3D resultTriangle = triangle;
 		this->applyTo(resultTriangle);
 		return resultTriangle;
 	}

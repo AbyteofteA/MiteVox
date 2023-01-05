@@ -20,7 +20,7 @@ namespace mathem
 		MESH			   /// 
 	};
 
-	class TriangleGeometry;
+	class TriangleGeometry3D;
 
 	class GeometryPrimitiveBase
 	{
@@ -32,7 +32,7 @@ namespace mathem
 		virtual uint32_t getVertecesCount() = 0;
 		virtual Vector3D getVertexPosition(uint32_t index) = 0;
 		virtual uint32_t getTrianglesCount() = 0;
-		virtual TriangleGeometry getTrianglePositions(uint32_t index) = 0;
+		virtual TriangleGeometry3D getTrianglePositions(uint32_t index) = 0;
 		virtual bool isIdealGeometry() = 0;
 
 	protected:
