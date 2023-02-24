@@ -19,9 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Geometry\CollisionDetection\checkCollision.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithAxisAlignedBox.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithBox.cpp" />
-    <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithComplexGeometry.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithPoint.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\CollisionInfo.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\computeContactPoints.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\computeContactPointsWithBox.cpp" />
+    <ClCompile Include="src\Geometry\computePenetration.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\contains.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.cpp" />
     <ClCompile Include="src\Convertations.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\GeometryPrimitiveBase.cpp" />
@@ -35,12 +41,19 @@
     <ClCompile Include="src\Geometry\GeometryTransform.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\RayGeometry.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\SphereGeometry.cpp" />
-    <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry3D.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.cpp" />
     <ClCompile Include="src\Vector.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\almostEqual.h" />
+    <ClInclude Include="src\DataStructures\PileAllocator.h" />
+    <ClInclude Include="src\DataStructures\PileOfContainers.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\CollisionType.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\computeContactPoints.h" />
+    <ClInclude Include="src\Geometry\computePenetration.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\contains.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.h" />
     <ClInclude Include="src\MathConstants.h" />
     <ClInclude Include="src\Quaternion.h" />
@@ -64,7 +77,7 @@
     <ClInclude Include="src\Geometry\GeometryTransform.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\RayGeometry.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\SphereGeometry.h" />
-    <ClInclude Include="src\Geometry\GeometryPrimitives\TriangleGeometry.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\TriangleGeometry3D.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.h" />
     <ClInclude Include="src\LinearAlgebra\SquareMatrix.h" />
     <ClInclude Include="src\Matrix.h" />
@@ -73,6 +86,8 @@
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\NumericalAnalysis\Intertolation.h" />
     <ClInclude Include="src\Generators\RandomNumberGenerators\CongruentialGenerator.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\TriangleGeometry2D.h" />
+    <ClInclude Include="src\DataStructures\UnorderedSet.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

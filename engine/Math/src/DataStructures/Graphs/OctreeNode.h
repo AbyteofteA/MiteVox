@@ -5,7 +5,10 @@
 #include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
+#include "engine/Math/src/Geometry/CollisionDetection/contains.h"
 #include "engine/Math/src/Geometry/CollisionDetection/checkCollision.h"
+#include "engine/Math/src/DataStructures/PileOfContainers.h"
+#include "engine/Math/src/DataStructures/PileAllocator.h"
 
 #include <vector>
 #include <cstdint>
@@ -19,7 +22,6 @@ namespace mathem
 	template <class T>
 	class OctreeNode
 	{
-
 	public:
 
 		size_t lifeTime = 0;
@@ -27,10 +29,14 @@ namespace mathem
 		AxisAlignedBoxGeometry boundingBox;
 
 		// There lay the dataPoints that fit in the node's bounds and don't fit in the subnodes.
-		std::vector<T*> dataPoints;
+		safety::SafeArray<T> dataPoints;
 
-		inline OctreeNode(mathem::Vector3D position, mathem::Vector3D halfSize);
+		static PileAllocator<OctreeNode<T>>* nodesAllocator;
+
+		inline OctreeNode();
 		inline ~OctreeNode();
+
+		inline void setBoundingBox(Vector3D position, Vector3D halfSize);
 
 		/// <summary>
 		/// Recursively moves data from the subnodes to the node and deletes the subnodes.
@@ -49,15 +55,17 @@ namespace mathem
 		/// </summary>
 		/// <returns></returns>
 		inline size_t getOverloadCount(const size_t nodeCapacity);
-		inline void tryEliminateOverload(OctreeNode<T>* parentNode, const size_t nodeCapacity, float nodeMinHalfSize);
+		inline void tryEliminateOverload(const size_t nodeCapacity, safety::SafeArray<T>* datapointsToMove);
 
 		inline void tryCreateSubnode(size_t subNodeIndex);
 		inline void tryDeleteSubnode(size_t subNodeIndex);
-		inline OctreeNode<T>* trySuggestSubnode(T* datapoint, const float nodeMinHalfSize);
+		inline OctreeNode<T>* trySuggestSubnode(T datapoint, const float nodeMinHalfSize);
 
-		inline void emplace(T* datapoint, const size_t nodeCapacity, const float nodeMinHalfSize);
+		inline void emplaceAtLevel(T datapoint, int32_t level, const size_t nodeCapacity, const float nodeMinHalfSize);
 		inline void clear();
-		inline void getAll(safety::SafeArray<T*>* datapointsStack);
+		inline void getAll(safety::SafeArray<T>* datapointsStack);
+
+		inline void getCollisions(safety::SafeArray<CollisionInfo<T>>* collisions, PileOfSafeArrays<T>* dataPointsContainers, float equalityTolerance);
 
 		/// <summary>
 		/// Cuts off empty leaves, subdevides overloaded leaves.
@@ -66,7 +74,14 @@ namespace mathem
 		/// <param name="nodeMaxLifeTime"></param>
 		/// <param name="nodeMinHalfSize"></param>
 		/// <returns>true if the node needs to be deleted, false otherwise</returns>
-		inline bool update(const size_t nodeCapacity, const size_t nodeMaxLifeTime, const float nodeMinHalfSize);
+		inline bool update(OctreeNode<T>* origin, int32_t level, const size_t nodeCapacity, const size_t nodeMaxLifeTime, const float nodeMinHalfSize, safety::SafeArray<T>* datapointsToMove);
+
+	private:
+
+		inline void getCollisionsRecursively(
+			safety::SafeArray<T>* dataPointsFromParentNodes,
+			safety::SafeArray<CollisionInfo<T>>* collisions,
+			PileOfSafeArrays<T>* dataPointsContainers, float equalityTolerance);
 	};
 
 
@@ -74,24 +89,25 @@ namespace mathem
 
 
 	template <class T>
-	inline OctreeNode<T>::OctreeNode(mathem::Vector3D position, mathem::Vector3D halfSize)
+	PileAllocator<OctreeNode<T>>* OctreeNode<T>::nodesAllocator;
+
+	template <class T>
+	inline OctreeNode<T>::OctreeNode()
 	{
-		boundingBox.position = position;
-		boundingBox.halfSize = halfSize;
+
 	}
 
 	template <class T>
 	inline OctreeNode<T>::~OctreeNode()
 	{
-		for (size_t i = 0; i < 8; i++)
-		{
-			if (subNodes[i] != nullptr)
-			{
-				delete subNodes[i];
-				subNodes[i] = nullptr;
-			}
-		}
-		dataPoints.clear();
+		clear();
+	}
+
+	template <class T>
+	inline void OctreeNode<T>::setBoundingBox(Vector3D position, Vector3D halfSize)
+	{
+		boundingBox.position = position;
+		boundingBox.halfSize = halfSize;
 	}
 
 	template <class T>
@@ -99,44 +115,19 @@ namespace mathem
 	{
 		for (size_t i = 0; i < 8; i++)
 		{
-			OctreeNode<T>* subNode = subNodes[i];
-			if (subNode == nullptr)
+			if (OctreeNode<T>* subNode = subNodes[i])
 			{
-				continue;
+				subNode->collapse();
+				dataPoints.concatenate(subNode->dataPoints);
+				tryDeleteSubnode(i);
 			}
-
-			subNode->collapse();
-
-			T* tmpDataPoint;
-			for (size_t j = 0; j < subNode->dataPoints.size(); j++)
-			{
-				tmpDataPoint = subNode->dataPoints.at(j);
-				dataPoints.push_back(tmpDataPoint);
-			}
-
-			delete subNode;
-			subNodes[i] = nullptr;
 		}
 	}
 
 	template <class T>
 	inline bool OctreeNode<T>::isEmpty()
 	{
-		if (this->isLeaf())
-		{
-			return dataPoints.size() == 0;
-		}
-		else
-		{
-			for (size_t i = 0; i < 8; i++)
-			{
-				if (subNodes[i]->isEmpty() == false)
-				{
-					return false;
-				}
-			}
-			return true;
-		}
+		return dataPoints.getElementsCount() == 0;
 	}
 
 	template <class T>
@@ -155,22 +146,22 @@ namespace mathem
 	template <class T>
 	inline size_t OctreeNode<T>::getOverloadCount(const size_t nodeCapacity)
 	{
-		if (dataPoints.size() > nodeCapacity)
+		if (dataPoints.getElementsCount() > nodeCapacity)
 		{
-			return dataPoints.size() - nodeCapacity;
+			return dataPoints.getElementsCount() - nodeCapacity;
 		}
 		return 0;
 	}
 
 	template <class T>
-	inline void OctreeNode<T>::tryEliminateOverload(OctreeNode<T>* parentNode, const size_t nodeCapacity, float nodeMinHalfSize)
+	inline void OctreeNode<T>::tryEliminateOverload(const size_t nodeCapacity, safety::SafeArray<T>* datapointsToMove)
 	{
 		size_t nodeOverloadedCapacity = getOverloadCount(nodeCapacity);
 		for (size_t i = 0; i < nodeOverloadedCapacity; i++)
 		{
-			T* dataPoint = dataPoints.back();
-			dataPoints.pop_back();
-			this->emplace(dataPoint, nodeCapacity, nodeMinHalfSize);
+			T dataPoint = dataPoints.getLastElement();
+			dataPoints.removeLastElement();
+			datapointsToMove->appendElement(dataPoint);
 		}
 	}
 
@@ -191,7 +182,8 @@ namespace mathem
 			newOrigin.x() = boundingBox.position.x() + newHalfSize.x() * signesX[subNodeIndex];
 			newOrigin.y() = boundingBox.position.y() + newHalfSize.y() * signesY[subNodeIndex];
 			newOrigin.z() = boundingBox.position.z() + newHalfSize.z() * signesZ[subNodeIndex];
-			subNodes[subNodeIndex] = new OctreeNode<T>(newOrigin, newHalfSize);
+			subNodes[subNodeIndex] = nodesAllocator->useElement();
+			subNodes[subNodeIndex]->setBoundingBox(newOrigin, newHalfSize);
 		}
 	}
 
@@ -205,19 +197,16 @@ namespace mathem
 			return;
 		}
 
-		// Nothing to delete
-		if (subNodes[subNodeIndex] == nullptr)
+		if (OctreeNode<T>* subNode = subNodes[subNodeIndex])
 		{
-			return;
+			subNode->clear();
+			nodesAllocator->returnUsedElement(subNode);
+			subNodes[subNodeIndex] = nullptr;
 		}
-
-		subNodes[subNodeIndex]->clear();
-		delete subNodes[subNodeIndex];
-		subNodes[subNodeIndex] = nullptr;
 	}
 
 	template <class T>
-	inline OctreeNode<T>* OctreeNode<T>::trySuggestSubnode(T* datapoint, float nodeMinHalfSize)
+	inline OctreeNode<T>* OctreeNode<T>::trySuggestSubnode(T datapoint, float nodeMinHalfSize)
 	{
 		// Stop subdivision on minimum node size
 		if (this->boundingBox.halfSize.x() <= nodeMinHalfSize)
@@ -243,43 +232,41 @@ namespace mathem
 		}
 
 		tryCreateSubnode(octant); // It's not ideal to create it at this point, it may not fit
-
-		// Check if the datapoint fits into new subnode
-		CollisionType ñollisionType = checkCollision(
-			datapoint->getCollider(),
-			datapoint->getTransform(),
-			&subNodes[octant]->boundingBox);
-		if (ñollisionType == CollisionType::INSCRIBTION_2_1)
-		{
-			return subNodes[octant];
-		}
-
-		return nullptr;
+		return subNodes[octant];
 	}
 
 	template <class T>
-	inline void OctreeNode<T>::emplace(T* datapoint, const size_t nodeCapacity, const float nodeMinHalfSize)
+	inline void OctreeNode<T>::emplaceAtLevel(T datapoint, int32_t level, const size_t nodeCapacity, const float nodeMinHalfSize)
 	{
-		if (dataPoints.size() < nodeCapacity)
+		if (dataPoints.getElementsCount() < nodeCapacity &&
+			level <= 0)
 		{
-			dataPoints.push_back(datapoint);
+			dataPoints.appendElement(datapoint);
 			return;
 		}
 
-		OctreeNode<T>* octant = trySuggestSubnode(datapoint, nodeMinHalfSize);
-		if (octant)
+		if (OctreeNode<T>* octant = trySuggestSubnode(datapoint, nodeMinHalfSize))
 		{
-			octant->emplace(datapoint, nodeCapacity, nodeMinHalfSize);
+			// Check if the datapoint fits into new subnode
+			GeometryTransform zeroTransform;
+			bool datapointFits = contains(
+				datapoint->getCollider(),
+				datapoint->getTransform(),
+				(GeometryPrimitiveBase*)&octant->boundingBox,
+				&zeroTransform);
+			if (datapointFits)
+			{
+				octant->emplaceAtLevel(datapoint, level - 1, nodeCapacity, nodeMinHalfSize);
+				return;
+			}
 		}
-		else
-		{
-			dataPoints.push_back(datapoint); // Overload may occure here
-		}
+		dataPoints.appendElement(datapoint); // Overload may occure here
 	}
 
 	template <class T>
 	inline void OctreeNode<T>::clear()
 	{
+		lifeTime = 0;
 		dataPoints.clear();
 
 		for (size_t i = 0; i < 8; i++)
@@ -289,22 +276,61 @@ namespace mathem
 	}
 
 	template <class T>
-	inline void OctreeNode<T>::getAll(safety::SafeArray<T*>* datapointsStack)
+	inline void OctreeNode<T>::getAll(safety::SafeArray<T>* datapointsStack)
 	{
 		datapointsStack->concatenate(&dataPoints);
 
 		for (size_t i = 0; i < 8; i++)
 		{
-			subNodes[i]->getAll(datapointsStack);
+			if (OctreeNode<T>* subNode = subNodes[i])
+			{
+				subNode->getAll(datapointsStack);
+			}
 		}
 	}
 
 	template <class T>
-	inline bool OctreeNode<T>::update(const size_t nodeCapacity, const size_t nodeMaxLifeTime, const float nodeMinHalfSize)
+	inline void OctreeNode<T>::getCollisions(safety::SafeArray<CollisionInfo<T>>* collisions, PileOfSafeArrays<T>* dataPointsContainers, float equalityTolerance)
 	{
+		safety::SafeArray<T>* newDataPointsContainer = dataPointsContainers->useContainer();
+		getCollisionsRecursively(newDataPointsContainer, collisions, dataPointsContainers, equalityTolerance);
+	}
+
+	template <class T>
+	inline bool OctreeNode<T>::update(
+		OctreeNode<T>* origin, 
+		int32_t level, 
+		const size_t nodeCapacity, 
+		const size_t nodeMaxLifeTime, 
+		const float nodeMinHalfSize, 
+		safety::SafeArray<T>* datapointsToMove)
+	{
+		// Move datapoints
+		size_t dataPointsCount = dataPoints.getElementsCount();
+		for (int32_t i = 0; i < dataPointsCount; i++)
+		{
+			T dataPoint = dataPoints.getElement(i);
+			if (dataPoint->getIsMoved())
+			{
+				GeometryTransform zeroTransform;
+				bool datapointFits = contains(
+					dataPoint->getCollider(),
+					dataPoint->getTransform(),
+					(GeometryPrimitiveBase*)&boundingBox,
+					&zeroTransform);
+				if (datapointFits == false)
+				{
+					dataPoints.removeElementAndSwapWithLast(i);
+					i -= 1;
+					dataPointsCount -= 1;
+					datapointsToMove->appendElement(dataPoint);
+					dataPoint->getTransformForMove();
+				}
+			}
+		}
+
 		if (this->isLeaf())
 		{
-			size_t dataPointsCount = dataPoints.size();
 			if (dataPointsCount == 0)
 			{
 				lifeTime += 1;
@@ -316,12 +342,14 @@ namespace mathem
 			}
 			else
 			{
-				tryEliminateOverload(this, nodeCapacity, nodeMinHalfSize);
+				lifeTime = 0;
+				tryEliminateOverload(nodeCapacity, datapointsToMove);
 			}
 		}
 		else
 		{
-			tryEliminateOverload(this, nodeCapacity, nodeMinHalfSize);
+			lifeTime = 0;
+			tryEliminateOverload(nodeCapacity, datapointsToMove);
 
 			// Update all subnodes
 			for (size_t i = 0; i < 8; i++)
@@ -332,7 +360,7 @@ namespace mathem
 					continue;
 				}
 
-				if (bool needToDelete = subNode->update(nodeCapacity, nodeMaxLifeTime, nodeMinHalfSize))
+				if (bool needToDelete = subNode->update(origin, level, nodeCapacity, nodeMaxLifeTime, nodeMinHalfSize, datapointsToMove))
 				{
 					tryDeleteSubnode(i);
 				}
@@ -340,6 +368,44 @@ namespace mathem
 		}
 
 		return false;
+	}
+
+	template <class T>
+	inline void OctreeNode<T>::getCollisionsRecursively(
+		safety::SafeArray<T>* dataPointsFromParentNodes,
+		safety::SafeArray<CollisionInfo<T>>* collisions,
+		PileOfSafeArrays<T>* dataPointsContainers,
+		float equalityTolerance)
+	{
+		// dataPoints[i] vs dataPointsFromParentNodes
+		size_t dataPointsCount = dataPoints.getElementsCount();
+		for (size_t i = 0; i < dataPointsCount; i++)
+		{
+			size_t dataPointsFromParentNodesCount = dataPointsFromParentNodes->getElementsCount();
+			for (size_t j = 0; j < dataPointsFromParentNodesCount; j++)
+			{
+				CollisionInfo<T> collisionInfo;
+				if (checkCollision<T>(dataPoints.getElement(i), dataPointsFromParentNodes->getElement(j), &collisionInfo, equalityTolerance) != CollisionType::NONE)
+				{
+					collisions->appendElement(collisionInfo);
+				}
+			}
+		}
+		// dataPoints[i] vs dataPoints[i]
+		checkCollisions<T>(&dataPoints, collisions, equalityTolerance);
+		
+		dataPointsFromParentNodes->concatenate(&dataPoints);
+
+		for (size_t i = 0; i < 8; i++)
+		{
+			if (OctreeNode<T>* subNode = subNodes[i])
+			{
+				subNode->getCollisionsRecursively(dataPointsFromParentNodes, collisions, dataPointsContainers, equalityTolerance);
+				safety::SafeArray<T>* previousDataPointsFromParentNodes = dataPointsFromParentNodes;
+				dataPointsFromParentNodes = dataPointsContainers->useContainer();
+				previousDataPointsFromParentNodes->copyTo(dataPointsFromParentNodes);
+			}
+		}
 	}
 }
 

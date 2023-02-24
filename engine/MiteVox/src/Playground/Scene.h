@@ -3,6 +3,7 @@
 
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/MiteVox/src/Playground/Node.h"
+#include "engine/MiteVox/src/Playground/Entity.h"
 #include "engine/MiteVox/src/Playground/SceneFoundation.h"
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/NativeScript.h"
@@ -19,13 +20,13 @@ namespace mitevox
 
 		std::string name = "Untitled";
 		SceneFoundation* foundation = nullptr;
-		safety::SafeArray<mitevox::Node*> nodes;
+		safety::SafeArray<Entity*> entities;
 
 		std::vector<render::Skybox> skyboxes;
 		long activeSkybox = -1;
-		mitevox::Node* activeCameraNode = nullptr;
+		Node* activeCameraNode = nullptr;
 
-		safety::SafeArray<mitevox::NativeScript> scripts;
+		safety::SafeArray<NativeScript> scripts;
 
 		EngineSettings* settings = nullptr;
 

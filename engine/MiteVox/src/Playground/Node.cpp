@@ -25,42 +25,37 @@ namespace mitevox
 		return mesh;
 	}
 
-	void Node::tryGenerateHitbox()
+	void Node::getMinMaxRecursively(mathem::GeometryTransform* parentTransform, mathem::Vector3D* min, mathem::Vector3D* max)
 	{
-		if (mesh == nullptr)
+		mathem::GeometryTransform rootTransform = *parentTransform * transform;
+
+		if (skeleton)
 		{
-			// TODO: create collider based on the transform
-			return;
+			// TODO: 
 		}
 
-		if (collider == nullptr)
+		if (mesh)
 		{
-			collider = new mathem::ComplexGeometry();
+			size_t vertecesCount = mesh->getVertecesCount();
+			for (size_t i = 0; i < vertecesCount; ++i)
+			{
+				mathem::Vector3D vertexPosition = mesh->getVertexPosition(i);
+				rootTransform.applyTo(vertexPosition);
+				*min = mathem::Vector3D::min(min, &vertexPosition);
+				*max = mathem::Vector3D::max(max, &vertexPosition);
+			}
 		}
 
-		if (collider->primitives.getElementsCount() != 0)
+		if (morphAnimationTarget)
 		{
-			return;
+			// TODO: 
 		}
 
-		// TODO: calculate min and max recursively
-		mathem::Vector3D min = mesh->getMinPosition();
-		mathem::Vector3D max = mesh->getMaxPosition();
-
-		mathem::BoxGeometry* boundingBox = new mathem::BoxGeometry();
-		boundingBox->halfSize = (max - min) * 0.5f;
-		boundingBox->transform.translation = (max + min) * 0.5f;
-
-		collider->primitives.appendElement(boundingBox);
-	}
-
-	mathem::GeometryTransform* Node::getTransform()
-	{
-		return &transform;
-	}
-
-	mathem::ComplexGeometry* Node::getCollider()
-	{
-		return collider;
+		size_t childrenNodesCount = children.getElementsCount();
+		for (size_t i = 0; i < childrenNodesCount; ++i)
+		{
+			Node* node = children.getElement(i);
+			node->getMinMaxRecursively(&rootTransform, min, max);
+		}
 	}
 }

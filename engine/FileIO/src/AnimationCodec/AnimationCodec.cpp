@@ -50,11 +50,6 @@ namespace fileio
 					if (JSON* numberJSON = animationSamplerJSON->getField("output"))
 					{
 						dataAccessor = accessors->getElement((size_t)numberJSON->getNumberOrDefault(-1.0));
-						if (animationFramesCount != dataAccessor->count)
-						{
-							animationFramesCount = 0;
-							// TODO: log error
-						}
 					}
 
 					std::string interpolationTypeString = "LINEAR";

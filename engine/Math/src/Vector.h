@@ -4,6 +4,8 @@
 #include "engine/CodeSafety/src/SafeArray.h"
 
 #include <cmath>
+#include <algorithm>
+#include <limits>
 #include <cassert>
 #include <initializer_list>
 
@@ -26,11 +28,17 @@ namespace mathem
 
 		T data[Dimension];
 
+		static VECTOR min(VECTOR* vector1, VECTOR* vector2);
+		static VECTOR max(VECTOR* vector1, VECTOR* vector2);
+
+		inline void setMin();
+		inline void setMax();
+
 		explicit inline Vector();
 		explicit inline Vector(safety::SafeFloatArray* values);
 		inline Vector(std::initializer_list<T> initializerList);
 
-		void setAll(T value);
+		inline void setAll(T value);
 
 		inline T& u();
 		inline T& v();
@@ -48,6 +56,8 @@ namespace mathem
 		inline T getLength();
 		inline T getLengthSquared();
 		inline void normalize();
+
+		inline void reflect(VECTOR normal);
 
 		inline void operator=(T values[Dimension]);
 		inline T& operator[](size_t index);
@@ -70,13 +80,65 @@ namespace mathem
 		inline void operator-=(T value);
 		inline VECTOR operator-(VECTOR& otherVector);
 		inline void operator-=(VECTOR& otherVector);
+
+		inline bool operator==(VECTOR& otherVector);
+		inline bool operator!=(VECTOR& otherVector);
 	};
 
 	Vector3D crossProduct(Vector3D vectorA, Vector3D vectorB);
 
+	VECTOR_TEMPLATE
+	T distanceSquared(VECTOR vectorA, VECTOR vectorB);
+
+	VECTOR_TEMPLATE
+	T distance(VECTOR vectorA, VECTOR vectorB);
+
 
 	// IMPLEMENTATION BELOW //
 
+	VECTOR_TEMPLATE
+	inline VECTOR VECTOR::min(VECTOR* vector1, VECTOR* vector2)
+	{
+		VECTOR vectorMin;
+		for (size_t index = 0; index < Dimension; ++index)
+		{
+			T vector1Component = (*vector1)[index];
+			T vector2Component = (*vector2)[index];
+			vectorMin[index] = (T)std::min(vector1Component, vector2Component);
+		}
+		return vectorMin;
+	}
+
+	VECTOR_TEMPLATE
+	inline VECTOR VECTOR::max(VECTOR* vector1, VECTOR* vector2)
+	{
+		VECTOR vectorMax;
+		for (size_t index = 0; index < Dimension; ++index)
+		{
+			T vector1Component = (*vector1)[index];
+			T vector2Component = (*vector2)[index];
+			vectorMax[index] = (T)std::max(vector1Component, vector2Component);
+		}
+		return vectorMax;
+	}
+
+	VECTOR_TEMPLATE
+	inline void VECTOR::setMin()
+	{
+		for (size_t index = 0; index < Dimension; ++index)
+		{
+			data[index] = std::numeric_limits<T>::min();
+		}
+	}
+
+	VECTOR_TEMPLATE
+	inline void VECTOR::setMax()
+	{
+		for (size_t index = 0; index < Dimension; ++index)
+		{
+			data[index] = std::numeric_limits<T>::max();
+		}
+	}
 
 	VECTOR_TEMPLATE
 	inline VECTOR::Vector()
@@ -111,7 +173,7 @@ namespace mathem
 	}
 
 	VECTOR_TEMPLATE
-	void VECTOR::setAll(T value)
+	inline void VECTOR::setAll(T value)
 	{
 		for (size_t index = 0; index < Dimension; ++index)
 		{
@@ -209,6 +271,13 @@ namespace mathem
 	}
 
 	VECTOR_TEMPLATE
+	inline void VECTOR::reflect(VECTOR normal)
+	{
+		VECTOR vectorDelta = (normal * (*this * normal)) * (T)2;
+		*this -= vectorDelta;
+	}
+
+	VECTOR_TEMPLATE
 	inline void VECTOR::operator=(T values[Dimension])
 	{
 		for (size_t i = 0; i < Dimension; ++i)
@@ -227,11 +296,12 @@ namespace mathem
 	VECTOR_TEMPLATE
 	inline VECTOR VECTOR::operator-()
 	{
+		VECTOR resultVector;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
-			this->data[i] = -this->data[i];
+			resultVector.data[i] = -this->data[i];
 		}
-		return *this;
+		return resultVector;
 	}
 
 	VECTOR_TEMPLATE
@@ -373,6 +443,44 @@ namespace mathem
 		{
 			this->data[i] -= otherVector[i];
 		}
+	}
+
+	VECTOR_TEMPLATE
+	inline bool VECTOR::operator==(VECTOR& otherVector)
+	{
+		for (size_t i = 0; i < Dimension; ++i)
+		{
+			if (this->data[i] != otherVector[i])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	VECTOR_TEMPLATE
+	inline bool VECTOR::operator!=(VECTOR& otherVector)
+	{
+		bool areEqual = *this == otherVector;
+		return !areEqual;
+	}
+
+	VECTOR_TEMPLATE
+	T distanceSquared(VECTOR vectorA, VECTOR vectorB)
+	{
+		VECTOR distanceVector = vectorB - vectorA;
+		T distanceSquared = (T)0.0f;
+		for (size_t i = 0; i < Dimension; ++i)
+		{
+			distanceSquared += distanceVector[i] * distanceVector[i];
+		}
+		return distanceSquared;
+	}
+
+	VECTOR_TEMPLATE
+	T distance(VECTOR vectorA, VECTOR vectorB)
+	{
+		return (T)std::sqrt(distanceSquared(vectorA, vectorB));
 	}
 }
 

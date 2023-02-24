@@ -14,10 +14,13 @@ namespace mathem
 	float toDegrees(float radians);
 
 	Quaternion matrixToQuaternion(Matrix4x4& matrix);
-	GeometryTransform matrixToTransform(Matrix4x4& matrix);
+	GeometryTransform matrixToTransform(Matrix4x4 matrix);
 
 	Matrix4x4 quaternionToMatrix(Quaternion& quaternion);
 	Matrix4x4 transformToMatrix(GeometryTransform& transform);
+
+	Matrix4x4 toMatrix4x4(Matrix3x3 matrix);
+	Matrix3x3 toMatrix3x3(Matrix4x4 matrix);
 }
 
 #endif

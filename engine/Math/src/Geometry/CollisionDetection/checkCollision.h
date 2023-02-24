@@ -21,106 +21,141 @@
 
 namespace mathem
 {
-	/// checkCollision - BOX vs BOX
-	/// 
-	/// Algorithm:
-	/// 1. Get (transformed) triangles 0, 2, 4 from box1
-	/// 2. Extract normals from the triangles
-	/// 3. Compute the box1's & box2's projections onto the normals (via dot product)
-	/// 4. Check if the projections overlap
-	bool checkCollision(
-		BoxGeometry* box1,
-		GeometryTransform* box1Transform,
-		BoxGeometry* box2,
-		GeometryTransform* box2Transform,
-		CollisionInfo* collisionInfo = nullptr,
-		bool isFirstPass = true);
-
-	bool checkCollision(
+	CollisionType checkCollision(
+		Vector3D* point,
 		BoxGeometry* box,
-		GeometryTransform* boxTransform,
+		GeometryTransform* boxTransform);
+
+	CollisionType checkCollision(
+		Vector3D* point,
 		AxisAlignedBoxGeometry* axisAlignedBox,
-		CollisionInfo* collisionInfo = nullptr,
-		bool isFirstPass = true);
+		GeometryTransform* axisAlignedBoxTransform);
 
-	bool checkCollision(
+	CollisionType checkCollision(
+		Vector3D* point,
+		SphereGeometry* sphere,
+		GeometryTransform* sphereTransform);
+
+	CollisionType checkCollision(
+		Vector3D* point,
+		CapsuleGeometry* capsule,
+		GeometryTransform* capsuleTransform);
+
+	// TODO: checkCollision POINT vs TRUNCATED_PYRAMID
+	// TODO: checkCollision POINT vs MESH
+
+	CollisionType checkCollision(
+		Vector3D* point,
+		GeometryPrimitiveBase* otherGeometry,
+		GeometryTransform* otherGeometryTransform,
+		CollisionProperties* collisionProperties);
+
+	CollisionType checkCollision(
 		BoxGeometry* box,
 		GeometryTransform* boxTransform,
+		GeometryPrimitiveBase* otherGeometry,
+		GeometryTransform* otherGeometryTransform,
+		CollisionProperties* collisionProperties);
+
+	CollisionType checkCollision(
+		AxisAlignedBoxGeometry* axisAlignedBox,
+		GeometryTransform* axisAlignedBoxTransform,
+		GeometryPrimitiveBase* otherGeometry,
+		GeometryTransform* otherGeometryTransform,
+		CollisionProperties* collisionProperties);
+
+	CollisionType checkCollision(
 		SphereGeometry* sphere,
 		GeometryTransform* sphereTransform,
-		CollisionInfo* collisionInfo = nullptr);
-
-	bool checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		CapsuleGeometry* capsule,
-		GeometryTransform* capsuleTransform,
-		CollisionInfo* collisionInfo = nullptr);
-
-	bool checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		TruncatedPyramidGeometry* truncatedPyramid,
-		GeometryTransform* truncatedPyramidTransform,
-		CollisionInfo* collisionInfo = nullptr);
-
-	// TODO: checkCollision BOX vs MESH
-
-	bool checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
 		GeometryPrimitiveBase* otherGeometry,
 		GeometryTransform* otherGeometryTransform,
-		CollisionInfo* collisionInfo = nullptr);
-
-	bool checkCollision(
-		AxisAlignedBoxGeometry* axisAlignedBox1,
-		AxisAlignedBoxGeometry* axisAlignedBox2,
-		CollisionInfo* collisionInfo = nullptr);
-
-	// TODO: checkCollision AXIS_ALIGNED_BOX vs SPHERE
-	// TODO: checkCollision AXIS_ALIGNED_BOX vs CAPSULE
-	// TODO: checkCollision AXIS_ALIGNED_BOX vs TRUNCATED_PYRAMID
-	// TODO: checkCollision AXIS_ALIGNED_BOX vs MESH
-
-	bool checkCollision(
-		AxisAlignedBoxGeometry* axisAlignedBox,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
-		CollisionInfo* collisionInfo = nullptr);
-
-	bool checkCollision(
-		SphereGeometry* sphere1,
-		GeometryTransform* sphere1Transform,
-		SphereGeometry* sphere2,
-		GeometryTransform* sphere2Transform,
-		CollisionInfo* collisionInfo = nullptr);
-
-	// TODO: checkCollision SPHERE vs CAPSULE
-	// TODO: checkCollision SPHERE vs TRUNCATED_PYRAMID
-	// TODO: checkCollision SPHERE vs MESH
-	// TODO: checkCollision SPHERE vs GeometryPrimitiveBase
+		CollisionProperties* collisionProperties);
 
 	// TODO: checkCollision CAPSULE vs CAPSULE
 	// TODO: checkCollision CAPSULE vs TRUNCATED_PYRAMID
 	// TODO: checkCollision CAPSULE vs MESH
+	// TODO: checkCollision CAPSULE vs RAY
 	// TODO: checkCollision CAPSULE vs GeometryPrimitiveBase
 
 	// TODO: checkCollision TRUNCATED_PYRAMID vs TRUNCATED_PYRAMID
 	// TODO: checkCollision TRUNCATED_PYRAMID vs MESH
+	// TODO: checkCollision TRUNCATED_PYRAMID vs RAY
 	// TODO: checkCollision TRUNCATED_PYRAMID vs GeometryPrimitiveBase
 
 	// TODO: checkCollision MESH vs MESH
+	// TODO: checkCollision MESH vs RAY
 	// TODO: checkCollision MESH vs GeometryPrimitiveBase
 
-	// TODO: checkCollision GeometryPrimitiveBase vs GeometryPrimitiveBase
-
-	// TODO: checkCollision ComplexGeometry vs ComplexGeometry
-
 	CollisionType checkCollision(
-		ComplexGeometry* complexGeometry,
-		GeometryTransform* complexGeometryTransform,
-		AxisAlignedBoxGeometry* axisAlignedBox);
+		GeometryPrimitiveBase* geometryPrimitive1,
+		GeometryTransform* geometryPrimitive1Transform,
+		GeometryPrimitiveBase* geometryPrimitive2,
+		GeometryTransform* geometryPrimitive2Transform,
+		CollisionProperties* collisionProperties,
+		float equalityTolerance);
+
+	template <class T>
+	inline CollisionType checkCollision(T object1, T object2, CollisionInfo<T>* collisionInfo, float equalityTolerance)
+	{
+		collisionInfo->object1 = object1;
+		collisionInfo->object2 = object2;
+		collisionInfo->properties.type = CollisionType::NONE;
+
+		ComplexGeometry* complexGeometry1 = object1->getCollider();
+		GeometryTransform* complexGeometryTransform1 = object1->getTransform();
+		ComplexGeometry* complexGeometry2 = object2->getCollider();
+		GeometryTransform* complexGeometryTransform2 = object2->getTransform();
+
+		size_t objectPrimitivesCount1 = complexGeometry1->primitives.getElementsCount();
+		for (size_t primitiveIndex1 = 0; primitiveIndex1 < objectPrimitivesCount1; primitiveIndex1++)
+		{
+			GeometryPrimitiveBase* geometryPrimitive1 = complexGeometry1->primitives.getElement(primitiveIndex1);
+			size_t objectPrimitivesCount2 = complexGeometry2->primitives.getElementsCount();
+			for (size_t primitiveIndex2 = 0; primitiveIndex2 < objectPrimitivesCount2; primitiveIndex2++)
+			{
+				GeometryPrimitiveBase* geometryPrimitive2 = complexGeometry2->primitives.getElement(primitiveIndex2);
+				CollisionProperties collisionProperties;
+				checkCollision(
+					geometryPrimitive1, complexGeometryTransform1, geometryPrimitive2, complexGeometryTransform2, &collisionProperties, equalityTolerance);
+				collisionInfo->properties.concatenate(collisionProperties, equalityTolerance);
+			}
+		}
+		return collisionInfo->properties.type;
+	}
+
+	template <class T>
+	inline void checkCollisions(std::vector<T>* objects, safety::SafeArray<CollisionInfo<T>>* collisions, float equalityTolerance)
+	{
+		size_t objectsCount = objects->size();
+		for (size_t i = 0; i < objectsCount; i++)
+		{
+			for (size_t j = i + 1; j < objectsCount; j++)
+			{
+				CollisionInfo<T> collisionInfo;
+				if (checkCollision<T>(objects->at(i), objects->at(j), &collisionInfo, equalityTolerance) != CollisionType::NONE)
+				{
+					collisions->appendElement(collisionInfo);
+				}
+			}
+		}
+	}
+
+	template <class T>
+	inline void checkCollisions(safety::SafeArray<T>* objects, safety::SafeArray<CollisionInfo<T>>* collisions, float equalityTolerance)
+	{
+		size_t objectsCount = objects->getElementsCount();
+		for (size_t i = 0; i < objectsCount; i++)
+		{
+			for (size_t j = i + 1; j < objectsCount; j++)
+			{
+				CollisionInfo<T> collisionInfo;
+				if (checkCollision<T>(objects->getElement(i), objects->getElement(j), &collisionInfo, equalityTolerance) != CollisionType::NONE)
+				{
+					collisions->appendElement(collisionInfo);
+				}
+			}
+		}
+	}
 }
 
 #endif

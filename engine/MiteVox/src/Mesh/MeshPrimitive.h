@@ -54,7 +54,7 @@ namespace mitevox
         bool isTriangularMesh();
         uint32_t getVertecesCount();
         mathem::Vector3D getVertexPosition(uint32_t index);
-        /// TODO: mathem::Vector3D getVertexNormal(uint32_t index);
+        mathem::Vector3D getVertexNormal(uint32_t index);
         /// TODO: mathem::Vector3D getVertexTangent(uint32_t index);
         mathem::Vector2D getVertexTextureCoords_0(uint32_t index);
         mathem::Vector2D getVertexTextureCoords_1(uint32_t index);
@@ -66,7 +66,7 @@ namespace mitevox
         uint32_t getTrianglesCount();
         void getTriangleVertexIndeces(uint32_t triangleIndex, uint32_t* vertex1, uint32_t* vertex2, uint32_t* vertex3);
         mathem::TriangleGeometry3D getTrianglePositions(uint32_t index);
-        /// TODO: mathem::TriangleGeometry3D getTriangleNormals(uint32_t index);
+        mathem::TriangleGeometry3D getTriangleNormals(uint32_t index);
         /// TODO: mathem::TriangleGeometry3D getTriangleTangents(uint32_t index);
         mathem::TriangleGeometry2D getTriangleTextureCoords_0(uint32_t index);
         mathem::TriangleGeometry2D getTriangleTextureCoords_1(uint32_t index);
@@ -76,7 +76,7 @@ namespace mitevox
         /// TODO: getTriangleIndeces(uint32_t index);
         
         void setVertexPosition(uint32_t index, mathem::Vector3D position);
-        /// TODO: void setVertexNormal(uint32_t index);
+        void setVertexNormal(uint32_t index, mathem::Vector3D normal);
         /// TODO: void setVertexTangent(uint32_t index);
         /// TODO: void setVertexTextureCoords_0(uint32_t index);
         /// TODO: void setVertexTextureCoords_1(uint32_t index);
@@ -86,7 +86,9 @@ namespace mitevox
         /// TODO: void setVertexIndeces(uint32_t index);
         
         mathem::Vector3D getMorphVertexPosition(uint32_t morphIndex, uint32_t index);
+        mathem::Vector3D getMorphVertexNormal(uint32_t morphIndex, uint32_t index);
         void setMorphVertexPosition(uint32_t morphIndex, uint32_t index, mathem::Vector3D position);
+        void setMorphVertexNormal(uint32_t morphIndex, uint32_t index, mathem::Vector3D normal);
     };
 }
 

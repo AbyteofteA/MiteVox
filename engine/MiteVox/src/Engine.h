@@ -3,17 +3,19 @@
 
 #include "EngineSettings.h"
 #include "engine/MiteVox/src/Playground/Playground.h"
+#include "engine/MiteVox/src/Playground/Entity.h"
 #include "engine/Renderer/src/RendererAPI/Color.h"
+#include "engine/Math/src/DataStructures/PileOfContainers.h"
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 
 #include <chrono>
-#include <unordered_map>
 
 namespace mitevox
 {
 	/// <summary>
 	/// TODO: create default engine_config.json if it doesn't exist
 	/// TODO: add scripting in Native (C++), Lua
-	/// TODO: implement Perlin noise, OpenSimplex noise
+	/// TODO: implement Perlin noise
 	/// TODO: implement PBR shader
 	/// </summary>
 	class Engine
@@ -42,16 +44,23 @@ namespace mitevox
 		int primitiveShader = -1;
 		int skyboxShader = -1;
 
+		safety::SafeArray<render::PointLight> pointLightsArray;
+		safety::SafeArray<render::DirectionalLight> directionalLightsArray;
+		safety::SafeArray<render::SpotLight> spotLightsArray;
+		safety::SafeArray<Entity*> entitiesToSimulate;
+		safety::SafeArray<mathem::CollisionInfo<Entity*>> collisions;
+		mathem::PileOfSafeArrays<Entity*>* dataPointsContainers;
+
 		void preparePlayground();
 
-		void simulateNode(Node* node);
-		void simulateNodes(safety::SafeArray<Node*>* nodes);
+		void computePhysics(float deltaTime);
+		void computeKinematics(float deltaTime);
 
 		void animateNodeRecursively(Node* node, float deltaTime);
-		void animateNodes(safety::SafeArray<Node*>* nodes, float deltaTime);
+		void animateNodes(safety::SafeArray<Entity*>* entities, float deltaTime);
 
 		void uploadNodeRecursively(Node* node, int shaderID);
-		void uploadNodes(safety::SafeArray<Node*>* nodes, int shaderID);
+		void uploadScene(Scene* scene, int shaderID);
 		
 		void renderNodeRecursively(
 			render::RendererSettings* renderer,
@@ -60,14 +69,11 @@ namespace mitevox
 			mathem::GeometryTransform* transform,
 			render::Camera* camera,
 			mathem::GeometryTransform* cameraTransform);
-		void renderNodes(
-			safety::SafeArray<Node*>* nodes,
-			int shaderID,
+		void renderEntities(
+			float deltaTime,
+			render::RendererSettings* renderer,
 			render::Camera* camera,
 			mathem::GeometryTransform* cameraTransform);
-
-		// TODO: void updateNodeRecursively(mitevox::Node* node, int shaderID);
-		void removeNodeRecursively(Node* node, int shaderID);
 	};
 }
 

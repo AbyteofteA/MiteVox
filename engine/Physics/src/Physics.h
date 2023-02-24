@@ -10,10 +10,7 @@
 
 #include "engine/Math/src/Math.h"
 
-#include "MovementProps.h"
+#include "MovementProperties.h"
 #include "RigidBody.h"
-
-#include "ClassicalMechanics/Kinematics.h"
-#include "ClassicalMechanics/Dynamics.h"
 
 #endif

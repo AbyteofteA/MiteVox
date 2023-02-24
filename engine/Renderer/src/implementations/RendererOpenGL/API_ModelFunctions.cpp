@@ -547,6 +547,49 @@ namespace render
 		}
 	}
 
+	void renderNodeRecursively(
+		RendererSettings* renderer,
+		int shaderID,
+		mitevox::Node* node,
+		mathem::GeometryTransform* transform,
+		Camera* camera,
+		mathem::GeometryTransform* cameraTransform)
+	{
+		mathem::GeometryTransform nodeGlobalTransform = *transform * node->transform;
+
+		if (auto meshToRender = node->getMeshToRender())
+		{
+			tryUploadSkeleton(node, shaderID);
+			renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			renderNodeRecursively(
+				renderer,
+				shaderID,
+				node->children.getElement(i),
+				&nodeGlobalTransform,
+				camera,
+				cameraTransform);
+		}
+	}
+
+	void removeNodeRecursively(mitevox::Node* node, int shaderID)
+	{
+		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::removeMesh(meshToRender, shaderID);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			removeNodeRecursively(node->children.getElement(i), shaderID);
+		}
+	}
+
 	void selectSkybox(Skybox* skybox)
 	{
 		glBindVertexArray(skybox->vertexID);

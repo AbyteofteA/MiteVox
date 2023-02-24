@@ -1,5 +1,7 @@
 #include "GeometryTransform.h"
 
+#include "engine/Math/src/Convertations.h"
+
 namespace mathem
 {
 	void GeometryTransform::reset()
@@ -57,32 +59,14 @@ namespace mathem
 
 	void GeometryTransform::operator*=(GeometryTransform& otherTransform)
 	{
-		this->scale.x() *= otherTransform.scale.x();
-		this->scale.y() *= otherTransform.scale.y();
-		this->scale.z() *= otherTransform.scale.z();
-
-		this->rotation.multiply(otherTransform.rotation);
-
-		Quaternion translationQuaternion(otherTransform.translation);
-		translationQuaternion = this->rotation.rotate(translationQuaternion);
-		this->translation += translationQuaternion.binary.vector;
+		*this = *this * otherTransform;
 	}
 
 	GeometryTransform GeometryTransform::operator*(GeometryTransform& otherTransform)
 	{
-		GeometryTransform resultTransform;
-		resultTransform.scale.x() = this->scale.x() * otherTransform.scale.x();
-		resultTransform.scale.y() = this->scale.y() * otherTransform.scale.y();
-		resultTransform.scale.z() = this->scale.z() * otherTransform.scale.z();
-
-		resultTransform.rotation = this->rotation.multiplyCopy(otherTransform.rotation);
-
-		Quaternion translationQuaternion(otherTransform.translation);
-		translationQuaternion = this->rotation.rotate(translationQuaternion);
-		resultTransform.translation = this->translation + translationQuaternion.binary.vector;
-		
-		// BUG: scale may influence translation like rotation does
-
-		return resultTransform;
+		Matrix4x4 thisMatrix = mathem::transformToMatrix(*this);
+		Matrix4x4 otherMatrix = mathem::transformToMatrix(otherTransform);
+		Matrix4x4 resultMatrix = mathem::multiply(otherMatrix, thisMatrix);
+		return mathem::matrixToTransform(resultMatrix);
 	}
 }

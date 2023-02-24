@@ -43,12 +43,13 @@ namespace fileio
 		collectMeshes(playgroundResult, meshesArrayJSON);
 		JSON* nodesArrayJSON = playgroundJSON->getFieldArray("nodes");
 		collectNodes(playgroundResult, nodesArrayJSON);
+		JSON* skinsArrayJSON = playgroundJSON->getFieldArray("skins");
+		collectSkins(playgroundResult, skinsArrayJSON);
+		resolveSkeletonsPointers(playgroundResult);
 		JSON* scenesArrayJSON = playgroundJSON->getFieldArray("scenes");
 		collectScenes(playgroundResult, scenesArrayJSON);
 		JSON* animationsArrayJSON = playgroundJSON->getFieldArray("animations");
 		collectAnimations(playgroundResult, animationsArrayJSON);
-		JSON* skinsArrayJSON = playgroundJSON->getFieldArray("skins");
-		collectSkins(playgroundResult, skinsArrayJSON);
 
 		preparePlayground(playgroundResult);
 	}
@@ -330,10 +331,10 @@ namespace fileio
 
 			if (scene->activeCameraNode == nullptr)
 			{
-				size_t nodesCount = scene->nodes.getElementsCount();
-				for (size_t i = 0; i < nodesCount; ++i)
+				size_t entitiesCount = scene->entities.getElementsCount();
+				for (size_t i = 0; i < entitiesCount; ++i)
 				{
-					mitevox::Node* node = scene->nodes.getElement(i);
+					mitevox::Node* node = &scene->entities.getElement(i)->renderableNode;
 					if (node->camera)
 					{
 						scene->activeCameraNode = node;
@@ -390,37 +391,8 @@ namespace fileio
 		}
 	}
 
-	void PlaygroundCodecGLTF::prepareNodeRecursively(mitevox::Playground* playgroundResult, mitevox::Node* node)
+	void PlaygroundCodecGLTF::resolveSkeletonsPointers(mitevox::Playground* playgroundResult)
 	{
-		if (node->mesh)
-		{
-			if (node->isMorphableMesh())
-			{
-				node->morphAnimationTarget = new mitevox::Mesh();
-				node->mesh->makeCopyForAnimationTo(node->morphAnimationTarget);
-			}
-
-			// Apply default material where needed
-			size_t meshPrimitivesCount = node->mesh->primitives.getElementsCount();
-			for (size_t i = 0; i < meshPrimitivesCount; ++i)
-			{
-				mitevox::MeshPrimitive* meshPrimitive = node->mesh->primitives.getElement(i);
-				if (meshPrimitive->material == nullptr)
-				{
-					meshPrimitive->material = new mitevox::Material();
-				}
-			}
-		}
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			prepareNodeRecursively(playgroundResult, node->children.getElement(i));
-		}
-	}
-
-	void PlaygroundCodecGLTF::preparePlayground(mitevox::Playground* playgroundResult)
-	{
-		// Resolve skeletons pointers from indeces
 		size_t nodesCount = playgroundResult->nodes.getElementsCount();
 		for (size_t i = 0; i < nodesCount; ++i)
 		{
@@ -430,20 +402,16 @@ namespace fileio
 				node->skeleton = playgroundResult->skeletons.getElement((size_t)node->skeleton - 1);
 			}
 		}
+	}
 
-		// Prepare nodes
-		for (size_t i = 0; i < nodesCount; ++i)
-		{
-			mitevox::Node* node = playgroundResult->nodes.getElement(i);
-			prepareNodeRecursively(playgroundResult, node);
-		}
-
+	void PlaygroundCodecGLTF::preparePlayground(mitevox::Playground* playgroundResult)
+	{
 		// Generate tangents if needed
 		size_t meshesCount = playgroundResult->meshes.getElementsCount();
 		for (size_t i = 0; i < meshesCount; ++i)
 		{
 			mitevox::Mesh* mesh = playgroundResult->meshes.getElement(i);
-			mesh->tryGenerateTangents();
+			// TODO: mesh->tryGenerateTangents();
 		}
 	}
 }

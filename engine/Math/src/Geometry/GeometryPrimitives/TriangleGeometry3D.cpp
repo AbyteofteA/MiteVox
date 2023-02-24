@@ -16,8 +16,8 @@ namespace mathem
 
 	Vector3D TriangleGeometry3D::computeNormal()
 	{
-		Vector3D vectorA = point3 - point2;
-		Vector3D vectorB = point1 - point2;
+		Vector3D vectorA = point2 - point1;
+		Vector3D vectorB = point3 - point1;
 
 		Vector3D normal = crossProduct(vectorA, vectorB);
 		normal.normalize();

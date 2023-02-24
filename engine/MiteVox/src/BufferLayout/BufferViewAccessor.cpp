@@ -37,12 +37,14 @@ namespace mitevox
         if (bufferView->byteStride == 0)
         {
             actualIndex = elementIndex * getComponentsCount() + componentIndex;
+            actualIndex *= sizeof(T);
         }
         else
         {
-            actualIndex = elementIndex * bufferView->byteStride + componentIndex;
+            actualIndex = elementIndex * bufferView->byteStride + componentIndex * sizeof(T);
         }
-        return ((T*)getDataStart())[actualIndex];
+        uint8_t* componentPointer = (uint8_t*)getDataStart() + actualIndex;
+        return *((T*)componentPointer);
     }
 
     float BufferViewAccessor::getElementsComponentAsFloat(int64_t elementIndex, int64_t componentIndex)
@@ -167,12 +169,14 @@ namespace mitevox
         if (bufferView->byteStride == 0)
         {
             actualIndex = elementIndex * getComponentsCount() + componentIndex;
+            actualIndex *= sizeof(T);
         }
         else
         {
-            actualIndex = elementIndex * bufferView->byteStride + componentIndex;
+            actualIndex = elementIndex * bufferView->byteStride + componentIndex * sizeof(T);
         }
-        ((T*)getDataStart())[actualIndex] = value;
+        uint8_t* componentPointer = (uint8_t*)getDataStart() + actualIndex;
+        *((T*)componentPointer) = value;
     }
 
     void BufferViewAccessor::setElementsComponentAsFloat(int64_t elementIndex, int64_t componentIndex, float value)

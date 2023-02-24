@@ -24,7 +24,7 @@ namespace mathem
 	/// 6-----4 |
 	/// | 0---|-3   y z
 	/// |/    |/    |/
-	/// 7-----5     *---x
+	/// 7-----5  x--*
 	/// 
 	/// </summary>
 	/// <param name="index"></param>
@@ -36,28 +36,28 @@ namespace mathem
 		switch (index)
 		{
 		case 0:
-			resultPoint = { -halfSize.x(), -halfSize.y(), halfSize.z() };
-			break;
-		case 1:
-			resultPoint = { -halfSize.x(), halfSize.y(), halfSize.z() };
-			break;
-		case 2:
-			resultPoint = { halfSize.x(), halfSize.y(), halfSize.z() };
-			break;
-		case 3:
 			resultPoint = { halfSize.x(), -halfSize.y(), halfSize.z() };
 			break;
+		case 1:
+			resultPoint = { halfSize.x(), halfSize.y(), halfSize.z() };
+			break;
+		case 2:
+			resultPoint = { -halfSize.x(), halfSize.y(), halfSize.z() };
+			break;
+		case 3:
+			resultPoint = { -halfSize.x(), -halfSize.y(), halfSize.z() };
+			break;
 		case 4:
-			resultPoint = { halfSize.x(), halfSize.y(), -halfSize.z() };
-			break;
-		case 5:
-			resultPoint = { halfSize.x(), -halfSize.y(), -halfSize.z() };
-			break;
-		case 6:
 			resultPoint = { -halfSize.x(), halfSize.y(), -halfSize.z() };
 			break;
-		case 7:
+		case 5:
 			resultPoint = { -halfSize.x(), -halfSize.y(), -halfSize.z() };
+			break;
+		case 6:
+			resultPoint = { halfSize.x(), halfSize.y(), -halfSize.z() };
+			break;
+		case 7:
+			resultPoint = { halfSize.x(), -halfSize.y(), -halfSize.z() };
 			break;
 		default:
 			resultPoint = Vector3D();
@@ -122,38 +122,38 @@ namespace mathem
 		else if (index == 6)
 		{
 			resultTriangle.point1 = getVertexPosition(0);
-			resultTriangle.point2 = getVertexPosition(7);
-			resultTriangle.point3 = getVertexPosition(5);
+			resultTriangle.point2 = getVertexPosition(5);
+			resultTriangle.point3 = getVertexPosition(7);
 		}
 		else if (index == 7)
 		{
 			resultTriangle.point1 = getVertexPosition(5);
-			resultTriangle.point2 = getVertexPosition(3);
-			resultTriangle.point3 = getVertexPosition(0);
+			resultTriangle.point2 = getVertexPosition(0);
+			resultTriangle.point3 = getVertexPosition(3);
 		}
 		else if (index == 8)
 		{
 			resultTriangle.point1 = getVertexPosition(0);
-			resultTriangle.point2 = getVertexPosition(1);
-			resultTriangle.point3 = getVertexPosition(6);
+			resultTriangle.point2 = getVertexPosition(6);
+			resultTriangle.point3 = getVertexPosition(1);
 		}
 		else if (index == 9)
 		{
 			resultTriangle.point1 = getVertexPosition(6);
-			resultTriangle.point2 = getVertexPosition(7);
-			resultTriangle.point3 = getVertexPosition(0);
+			resultTriangle.point2 = getVertexPosition(0);
+			resultTriangle.point3 = getVertexPosition(7);
 		}
 		else if (index == 10)
 		{
 			resultTriangle.point1 = getVertexPosition(7);
-			resultTriangle.point2 = getVertexPosition(6);
-			resultTriangle.point3 = getVertexPosition(4);
+			resultTriangle.point2 = getVertexPosition(4);
+			resultTriangle.point3 = getVertexPosition(6);
 		}
 		else if (index == 11)
 		{
 			resultTriangle.point1 = getVertexPosition(4);
-			resultTriangle.point2 = getVertexPosition(5);
-			resultTriangle.point3 = getVertexPosition(7);
+			resultTriangle.point2 = getVertexPosition(7);
+			resultTriangle.point3 = getVertexPosition(5);
 		}
 		
 		return resultTriangle;

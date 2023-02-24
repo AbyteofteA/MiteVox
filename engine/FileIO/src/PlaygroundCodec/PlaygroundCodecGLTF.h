@@ -28,7 +28,7 @@ namespace fileio
         static void collectAnimations(mitevox::Playground* playgroundResult, JSON* animationsArrayJSON);
         static void collectSkins(mitevox::Playground* playgroundResult, JSON* skinsArrayJSON);
 
-        static void prepareNodeRecursively(mitevox::Playground* playgroundResult, mitevox::Node* node);
+        static void resolveSkeletonsPointers(mitevox::Playground* playgroundResult);
         static void preparePlayground(mitevox::Playground* playgroundResult);
 	};
 }

@@ -26,40 +26,6 @@ namespace safety
         return value;
     }
 
-    /// <summary>
-    /// Ensures that the value is at least minimumValue.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="value"></param>
-    /// <param name="minimumValue"></param>
-    /// <returns></returns>
-    template <typename T>
-    T ensureMinimum(T value, T minimumValue)
-    {
-        if (value < minimumValue)
-        {
-            value = minimumValue;
-        }
-        return value;
-    }
-
-    /// <summary>
-    /// Ensures that the value doesn't exceed maximumValue.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="value"></param>
-    /// <param name="maximumValue"></param>
-    /// <returns></returns>
-    template <typename T>
-    T ensureMaximum(T value, T maximumValue)
-    {
-        if (value > maximumValue)
-        {
-            value = maximumValue;
-        }
-        return value;
-    }
-
     template <typename T>
     T ensureOddDown(T value)
     {

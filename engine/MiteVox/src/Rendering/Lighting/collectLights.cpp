@@ -48,16 +48,16 @@ namespace mitevox
 	}
 
 	void collectPointLights(
-		safety::SafeArray<Node*>* nodes,
+		safety::SafeArray<Entity*>* entities,
 		safety::SafeArray<render::PointLight>* resultPointLightsArray,
 		safety::SafeArray<render::DirectionalLight>* resultDirectionalLightsArray,
 		safety::SafeArray<render::SpotLight>* resultSpotLightsArray)
 	{
-		size_t nodesCount = nodes->getElementsCount();
-		for (size_t i = 0; i < nodesCount; ++i)
+		size_t entitiesCount = entities->getElementsCount();
+		for (size_t i = 0; i < entitiesCount; ++i)
 		{
 			collectPointLightsRecursively(
-				nodes->getElement(i),
+				&entities->getElement(i)->renderableNode,
 				resultPointLightsArray,
 				resultDirectionalLightsArray,
 				resultSpotLightsArray);

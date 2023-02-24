@@ -4,15 +4,15 @@ namespace mathem
 {
 	Vector3D computeClosestPointOnTheLine(Vector3D lineStart, Vector3D lineEnd, Vector3D point)
 	{
-		Vector3D resultClosestPoint;
 		Vector3D lineVector = lineEnd - lineStart;
-		lineVector.normalize();
-		Vector3D pointVector = point - lineStart;
-
-		float pointProjection = pointVector * lineVector;
 		float lineLength = lineVector.getLength();
+		lineVector.normalize();
 
-		if (pointProjection <= 0)
+		Vector3D pointVector = point - lineStart;
+		float pointProjection = pointVector * lineVector;
+
+		Vector3D resultClosestPoint;
+		if (pointProjection <= 0.0f)
 		{
 			resultClosestPoint = lineStart;
 		}

@@ -142,10 +142,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\ClassicalMechanics\Dynamics.h" />
-    <ClInclude Include="src\ClassicalMechanics\Kinematics.h" />
     <ClInclude Include="src\Physics.h" />
-    <ClInclude Include="src\MovementProps.h" />
+    <ClInclude Include="src\MovementProperties.h" />
     <ClInclude Include="src\RigidBody.h" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\a.cpp" />
+    <ClCompile Include="src\MovementProperties.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

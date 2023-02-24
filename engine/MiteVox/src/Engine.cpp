@@ -5,8 +5,10 @@
 #include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/MiteVox/src/Playground/Playground.h"
 #include "engine/MiteVox/src/Rendering/drawCollider.h"
+#include "engine/MiteVox/src/Rendering/drawCollisions.h"
 #include "engine/MiteVox/src/Rendering/drawSceneOctree.h"
 #include "engine/MiteVox/src/Rendering/drawAxes.h"
+#include "engine/MiteVox/src/Rendering/drawLightSource.h"
 #include "engine/MiteVox/src/Rendering/Lighting/collectLights.h"
 
 #include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
@@ -21,8 +23,19 @@ namespace mitevox
 {
 	Engine::Engine(int argc, char* argv[])
 	{
+		prevCycleTime = std::chrono::steady_clock::now();
+
 		std::string executionDir = fs::path(argv[0]).parent_path().string();
 		settings = new EngineSettings(executionDir);
+
+		entitiesToSimulate.reserve(64); // TODO: add to EngineSettings
+		pointLightsArray.reserve(64); // TODO: add to EngineSettings
+		directionalLightsArray.reserve(64); // TODO: add to EngineSettings
+		spotLightsArray.reserve(64); // TODO: add to EngineSettings
+		collisions.reserve(64); // TODO: add to EngineSettings
+		dataPointsContainers = new mathem::PileOfSafeArrays<Entity*>(32, 8); // TODO: add to EngineSettings
+
+		// TODO: add to EngineSettings
 
 		if (argc > 1)
 		{
@@ -46,7 +59,7 @@ namespace mitevox
 		primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
 		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
 
-		uploadNodes(&playground->nodes, basicShader);
+		uploadScene(playground->scenes.getElement(0), basicShader);
 
 		onCreate();
 	}
@@ -88,6 +101,12 @@ namespace mitevox
 			float deltaTime = std::chrono::duration_cast<std::chrono::duration<float>>(now - prevCycleTime).count();
 			prevCycleTime = now;
 
+			// Skip large time steps (TODO: add to EngineSettings)
+			if (deltaTime > 1.0f)
+			{
+				continue;
+			}
+
 			onUpdate();
 
 			settings->getInputHandler()->update();
@@ -98,95 +117,64 @@ namespace mitevox
 				Scene* scene = playground->getActiveScene();
 				scene->update(deltaTime); // Scripts are executed here
 
+				// Space culling
+				entitiesToSimulate.clear();
+				if (settings->spaceCulling)
+				{
+					// TODO: 
+					scene->foundation->getAll(&entitiesToSimulate);
+				}
+				else
+				{
+					scene->foundation->getAll(&entitiesToSimulate);
+				}
+
 				// Cleanup
 				scene->timeSinceCleanup += deltaTime;
 				if (scene->timeSinceCleanup > settings->getCleanupPeriod())
 				{
 					scene->timeSinceCleanup = 0.0f;
-
+					std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
 					// TODO: Implement cleanup.
 				}
 
-				// Space culling
-				safety::SafeArray<Node*>* nodesToSimulate;
-				safety::SafeArray<Node*>* nodesToRender;
-				if (settings->spaceCulling)
-				{
-					nodesToSimulate = new safety::SafeArray<Node*>();
-					nodesToRender = new safety::SafeArray<Node*>();
-					// TODO: 
-				}
-				else
-				{
-					nodesToSimulate = &scene->nodes;
-					nodesToRender = &scene->nodes;
-				}
-
 				// Physics and Transform
-				scene->timeSincePhysicsUpdate += deltaTime;
-				if (scene->timeSincePhysicsUpdate > settings->getPhysicsPeriod())
-				{
-					scene->timeSincePhysicsUpdate = 0.0f;
-
-					// TODO: Implement physics update.
-				}
-
-				animateNodes(nodesToRender, deltaTime);
-				// Accumulate deltaTime to work properly.
-				/*scene->timeSinceAnimationsUpdate += deltaTime;
-				if (scene->timeSinceAnimationsUpdate > settings->getAnimationsPeriod())
-				{
-					scene->timeSinceAnimationsUpdate = 0.0f;
-					animateNodes(nodesToRender, deltaTime);
-				}*/
+				collisions.clear();
+				dataPointsContainers->returnAllContainers();
+				computePhysics(deltaTime);
 				
-				static safety::SafeArray<render::PointLight> pointLightsArray;
-				static safety::SafeArray<render::DirectionalLight> directionalLightsArray;
-				static safety::SafeArray<render::SpotLight> spotLightsArray;
-				pointLightsArray.clear();
-				directionalLightsArray.clear();
-				spotLightsArray.clear();
-				collectPointLights(nodesToRender, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
+				animateNodes(&entitiesToSimulate, deltaTime);
 				
 				// Renderer
 				scene->timeSinceRendererUpdate += deltaTime;
 				if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
 				{
-					scene->timeSinceRendererUpdate = 0.0f;
-
 					render::RendererSettings* renderer = settings->getRendererSettings();
+					scene->timeSinceRendererUpdate = 0.0f;
 					renderer->amountOfDrawCalls = 0;
 
-					// Update lights.
-					render::uploadPointLights(&pointLightsArray, basicShader);
-					// TODO: render::uploadLights(&LightsArray, basicShader);
-					// TODO: render::uploadLights(&LightsArray, basicShader);
+					pointLightsArray.clear();
+					directionalLightsArray.clear();
+					spotLightsArray.clear();
 
 					render::Camera* camera = scene->activeCameraNode->camera;
-					mathem::GeometryTransform* cameraTransform = scene->activeCameraNode->getTransform();
+					mathem::GeometryTransform* cameraTransform = &scene->activeCameraNode->transform;
 
 					render::clearBufferXY(renderer->clearColor);
 					render::clearBufferZ();
-					if (renderer->backfaceCulling)
-					{
-						glEnable(GL_CULL_FACE);
-					}
-					else
-					{
-						glDisable(GL_CULL_FACE);
-					}
 
-					// Render 3D models.
-					renderNodes(nodesToRender, basicShader, camera, cameraTransform);
+					renderEntities(deltaTime, renderer, camera, cameraTransform);
 
 					if (settings->debug)
 					{
-						drawAxes(this->settings->renderer);
+						drawAxes(renderer);
 
 						if (scene->foundation != nullptr)
 						{
-							drawSceneOctree(this->settings->renderer, scene->foundation->octree);
+							drawSceneOctree(renderer, scene->foundation->octree);
 						}
+
+						drawCollisions(renderer, &collisions);
 					}
 
 					// Render primitives.
@@ -210,7 +198,7 @@ namespace mitevox
 			render::Camera* camera = new render::Camera(50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.001f, 100000);
 			Node* cameraNode = new Node();
 			cameraNode->camera = camera;
-			cameraNode->transform.translation = { 0.0f, 0.0f, 1.0f };
+			cameraNode->transform.translation = {0.0f, 0.0f, 20.0f};
 			size_t nodesCount = playground->nodes.getElementsCount();
 			playground->cameras.appendElement(camera);
 			playground->nodes.appendElement(cameraNode);
@@ -225,12 +213,11 @@ namespace mitevox
 
 		// TODO: create load/unload system
 		Scene* activeScene = playground->getActiveScene();
-		size_t activeNodesCount = activeScene->nodes.getElementsCount();
-		for (size_t i = 0; i < activeNodesCount; ++i)
+		size_t activeEntitiesCount = activeScene->entities.getElementsCount();
+		for (size_t i = 0; i < activeEntitiesCount; ++i)
 		{
-			Node* node = activeScene->nodes.getElement(i);
-			node->tryGenerateHitbox();
-			activeScene->foundation->emplace(node);
+			Entity* entity = activeScene->entities.getElement(i);
+			entity->tryGenerateHitbox();
 		}
 
 		size_t scenesCount = playground->scenes.getElementsCount();
@@ -246,12 +233,12 @@ namespace mitevox
 		}
 	}
 
-	void Engine::simulateNode(Node* node)
+	void Engine::computePhysics(float deltaTime)
 	{
 
 	}
 
-	void Engine::simulateNodes(safety::SafeArray<Node*>* nodes)
+	void Engine::computeKinematics(float deltaTime)
 	{
 
 	}
@@ -277,7 +264,7 @@ namespace mitevox
 		}
 	}
 
-	void Engine::animateNodes(safety::SafeArray<Node*>* nodes, float deltaTime)
+	void Engine::animateNodes(safety::SafeArray<Entity*>* entities, float deltaTime)
 	{
 		size_t animationsCount = playground->animations.getElementsCount();
 		for (size_t i = 0; i < animationsCount; ++i)
@@ -289,10 +276,10 @@ namespace mitevox
 			}
 		}
 
-		size_t nodesCount = nodes->getElementsCount();
-		for (size_t i = 0; i < nodesCount; ++i)
+		size_t entitiesCount = entities->getElementsCount();
+		for (size_t i = 0; i < entitiesCount; ++i)
 		{
-			animateNodeRecursively(nodes->getElement(i), deltaTime);
+			animateNodeRecursively(&entities->getElement(i)->renderableNode, deltaTime);
 		}
 	}
 
@@ -310,83 +297,47 @@ namespace mitevox
 		}
 	}
 
-	void Engine::uploadNodes(safety::SafeArray<Node*>* nodes, int shaderID)
+	void Engine::uploadScene(Scene* scene, int shaderID)
 	{
-		size_t nodesCount = nodes->getElementsCount();
-		for (size_t i = 0; i < nodesCount; ++i)
+		size_t entitiesCount = scene->entities.getElementsCount();
+		for (size_t i = 0; i < entitiesCount; ++i)
 		{
-			uploadNodeRecursively(nodes->getElement(i), shaderID);
+			uploadNodeRecursively(&scene->entities.getElement(i)->renderableNode, shaderID);
 		}
 	}
 
-	void Engine::renderNodeRecursively(
+	void Engine::renderEntities(
+		float deltaTime,
 		render::RendererSettings* renderer,
-		int shaderID,
-		Node* node,
-		mathem::GeometryTransform* transform,
 		render::Camera* camera,
 		mathem::GeometryTransform* cameraTransform)
 	{
-		mathem::GeometryTransform nodeGlobalTransform = *transform * node->transform;
+		collectPointLights(&entitiesToSimulate, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
+		render::uploadPointLights(&pointLightsArray, basicShader);
+		// TODO: render::uploadLights(&LightsArray, basicShader);
+		// TODO: render::uploadLights(&LightsArray, basicShader);
 
-		if (auto meshToRender = node->getMeshToRender())
+		if (renderer->backfaceCulling)
 		{
-			render::tryUploadSkeleton(node, shaderID);
-			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
+			glEnable(GL_CULL_FACE);
+		}
+		else
+		{
+			glDisable(GL_CULL_FACE);
 		}
 
-		if (settings->debug)
-		{
-			if (node->collider)
-			{
-				drawCollider(this->settings->renderer, node->collider, &nodeGlobalTransform);
-			}
-		}
-
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			renderNodeRecursively(
-				renderer,
-				shaderID,
-				node->children.getElement(i),
-				&nodeGlobalTransform,
-				camera,
-				cameraTransform);
-		}
-	}
-
-	void Engine::renderNodes(
-		safety::SafeArray<Node*>* nodes, 
-		int shaderID, 
-		render::Camera* camera, 
-		mathem::GeometryTransform* cameraTransform)
-	{
-		size_t nodesCount = nodes->getElementsCount();
-		for (size_t i = 0; i < nodesCount; ++i)
+		// Render 3D models.
+		size_t entitiesCount = entitiesToSimulate.getElementsCount();
+		for (size_t i = 0; i < entitiesCount; ++i)
 		{
 			mathem::GeometryTransform transform;
-			renderNodeRecursively(
+			render::renderNodeRecursively(
 				settings->renderer, 
-				shaderID, 
-				nodes->getElement(i), 
+				basicShader,
+				&entitiesToSimulate.getElement(i)->renderableNode,
 				&transform, 
 				camera, 
 				cameraTransform);
-		}
-	}
-
-	void Engine::removeNodeRecursively(Node* node, int shaderID)
-	{
-		if (Mesh* meshToRender = node->getMeshToRender())
-		{
-			render::removeMesh(meshToRender, shaderID);
-		}
-
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			removeNodeRecursively(node->children.getElement(i), shaderID);
 		}
 	}
 }

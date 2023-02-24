@@ -33,9 +33,12 @@ namespace mathem
 		Quaternion getReciprocal();
 
 		void rotateByEulers(float x, float y, float z);
+		void rotateByEulersRadians(float x, float y, float z);
 		void fromEulers(float x, float y, float z);
-		void toEulersRadians(float* x, float* y, float* z);
+		void fromEulersRadians(float x, float y, float z);
 		void toEulers(float* x, float* y, float* z);
+		void toEulersRadians(float* x, float* y, float* z);
+		Vector3D toEulersRadians();
 
 		Quaternion operator*(float multiplier);
 		void operator*=(float multiplier);

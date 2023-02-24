@@ -83,22 +83,22 @@ namespace mitevox
 
 	mathem::Vector3D Mesh::getVertexPosition(uint32_t index)
 	{
-		mathem::Vector3D resultPoint;
-		resultPoint.setAll(0.0f);
-
 		uint32_t primitivesCount = primitives.getElementsCount();
 		for (uint32_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
 		{
 			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
-
-			// TODO:
-			/*if ()
+			uint32_t primitiveVertecesCount = primitive->getVertecesCount();
+			
+			if (index >= primitiveVertecesCount)
 			{
-
-			}*/
+				index -= primitiveVertecesCount;
+			}
+			else
+			{
+				return primitive->getVertexPosition(index);
+			}
 		}
-
-		return resultPoint;
+		return mathem::Vector3D();
 	}
 
 	size_t Mesh::getTrianglesCount()

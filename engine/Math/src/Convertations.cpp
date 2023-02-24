@@ -59,7 +59,7 @@ namespace mathem
 		return resultQuaternion;
 	}
 
-	GeometryTransform matrixToTransform(Matrix4x4& matrix)
+	GeometryTransform matrixToTransform(Matrix4x4 matrix)
 	{
 		GeometryTransform resultTransform;
 
@@ -79,15 +79,18 @@ namespace mathem
 		resultTransform.scale.y() = tmpVector.getLength();
 		tmpVector = { matrix.m20(), matrix.m21(), matrix.m22() };
 		resultTransform.scale.z() = tmpVector.getLength();
-		matrix.m00() /= resultTransform.scale.x();
-		matrix.m01() /= resultTransform.scale.x();
-		matrix.m02() /= resultTransform.scale.x();
-		matrix.m10() /= resultTransform.scale.y();
-		matrix.m11() /= resultTransform.scale.y();
-		matrix.m12() /= resultTransform.scale.y();
-		matrix.m20() /= resultTransform.scale.z();
-		matrix.m21() /= resultTransform.scale.z();
-		matrix.m22() /= resultTransform.scale.z();
+		float oneOverScaleX = 1.0f / resultTransform.scale.x();
+		matrix.m00() *= oneOverScaleX;
+		matrix.m01() *= oneOverScaleX;
+		matrix.m02() *= oneOverScaleX;
+		float oneOverScaleY = 1.0f / resultTransform.scale.y();
+		matrix.m10() *= oneOverScaleY;
+		matrix.m11() *= oneOverScaleY;
+		matrix.m12() *= oneOverScaleY;
+		float oneOverScaleZ = 1.0f / resultTransform.scale.z();
+		matrix.m20() *= oneOverScaleZ;
+		matrix.m21() *= oneOverScaleZ;
+		matrix.m22() *= oneOverScaleZ;
 
 		// Extract rotation
 		resultTransform.rotation = matrixToQuaternion(matrix);
@@ -98,6 +101,7 @@ namespace mathem
 	Matrix4x4 quaternionToMatrix(Quaternion& quaternion)
 	{
 		Matrix4x4 resultMatrix4x4;
+		resultMatrix4x4.makeIdentity();
 		float quaternionX_Squared = std::pow(quaternion.components.x(), 2.0f);
 		float quaternionY_Squared = std::pow(quaternion.components.y(), 2.0f);
 		float quaternionZ_Squared = std::pow(quaternion.components.z(), 2.0f);
@@ -122,24 +126,56 @@ namespace mathem
 
 	Matrix4x4 transformToMatrix(GeometryTransform& transform)
 	{
-		Matrix4x4 resultMatrix4x4;
-
 		// Encode rotation
-		resultMatrix4x4 = quaternionToMatrix(transform.rotation);
-
-		// TODO: ERROR: matrix multiplication needed
+		Matrix4x4 rotationMatrix4x4 = quaternionToMatrix(transform.rotation);
 
 		// Encode scale
-		resultMatrix4x4.at(0, 0) *= transform.scale.x();
-		resultMatrix4x4.at(1, 1) *= transform.scale.y();
-		resultMatrix4x4.at(2, 2) *= transform.scale.z();
-		resultMatrix4x4.at(3, 3) = 1.0f;
+		Matrix4x4 scaleMatrix;
+		scaleMatrix.makeIdentity();
+		scaleMatrix.m00() = transform.scale.x();
+		scaleMatrix.m11() = transform.scale.y();
+		scaleMatrix.m22() = transform.scale.z();
+		scaleMatrix.m33() = 1.0f;
+
+		Matrix4x4 resultMatrix4x4;
+		resultMatrix4x4 = multiply(scaleMatrix, rotationMatrix4x4);
 
 		// Encode translation
-		resultMatrix4x4.at(3, 0) = transform.translation.x();
-		resultMatrix4x4.at(3, 1) = transform.translation.y();
-		resultMatrix4x4.at(3, 2) = transform.translation.z();
+		resultMatrix4x4.at(3, 0) += transform.translation.x();
+		resultMatrix4x4.at(3, 1) += transform.translation.y();
+		resultMatrix4x4.at(3, 2) += transform.translation.z();
 
 		return resultMatrix4x4;
+	}
+
+	Matrix4x4 toMatrix4x4(Matrix3x3 matrix)
+	{
+		Matrix4x4 resultMatrix;
+		resultMatrix.makeIdentity();
+		resultMatrix.m00() = matrix.m00();
+		resultMatrix.m01() = matrix.m01();
+		resultMatrix.m02() = matrix.m02();
+		resultMatrix.m10() = matrix.m10();
+		resultMatrix.m11() = matrix.m11();
+		resultMatrix.m12() = matrix.m12();
+		resultMatrix.m20() = matrix.m20();
+		resultMatrix.m21() = matrix.m21();
+		resultMatrix.m22() = matrix.m22();
+		return resultMatrix;
+	}
+
+	Matrix3x3 toMatrix3x3(Matrix4x4 matrix)
+	{
+		Matrix3x3 resultMatrix;
+		resultMatrix.m00() = matrix.m00();
+		resultMatrix.m01() = matrix.m01();
+		resultMatrix.m02() = matrix.m02();
+		resultMatrix.m10() = matrix.m10();
+		resultMatrix.m11() = matrix.m11();
+		resultMatrix.m12() = matrix.m12();
+		resultMatrix.m20() = matrix.m20();
+		resultMatrix.m21() = matrix.m21();
+		resultMatrix.m22() = matrix.m22();
+		return resultMatrix;
 	}
 }

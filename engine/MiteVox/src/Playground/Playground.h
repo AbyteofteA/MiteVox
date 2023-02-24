@@ -22,7 +22,6 @@
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Renderer/src/RendererAPI/Camera.h"
 
-#include <unordered_map>
 #include <string>
 
 namespace fileio

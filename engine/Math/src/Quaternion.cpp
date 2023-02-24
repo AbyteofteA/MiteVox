@@ -1,5 +1,6 @@
 #include "Quaternion.h"
 
+#include "engine/Math/src/MathConstants.h"
 #include "engine/Math/src/Convertations.h"
 
 namespace mathem
@@ -77,21 +78,44 @@ namespace mathem
 		this->multiply(rotation);
 	}
 
+	void Quaternion::rotateByEulersRadians(float x, float y, float z)
+	{
+		Quaternion rotation;
+		rotation.fromEulersRadians(x, y, z);
+		this->multiply(rotation);
+	}
+
 	void Quaternion::fromEulers(float x, float y, float z)
 	{
-		x = toRadians(x) * 0.5f;
-		y = toRadians(y) * 0.5f;
-		z = toRadians(z) * 0.5f;
+		x = toRadians(x);
+		y = toRadians(y);
+		z = toRadians(z);
 
+		fromEulersRadians(x, y, z);
+	}
+
+	void Quaternion::fromEulersRadians(float x, float y, float z)
+	{
+		x *= 0.5f;
+		y *= 0.5f;
+		z *= 0.5f;
 		float cosXcosY = cos(x) * cos(y);
 		float cosXsinY = cos(x) * sin(y);
 		float sinXsinY = sin(x) * sin(y);
 		float sinXcosY = sin(x) * cos(y);
-
 		components.s() = cosXcosY * cos(z) + sinXsinY * sin(z);
 		components.x() = sinXcosY * cos(z) - cosXsinY * sin(z);
 		components.y() = cosXsinY * cos(z) + sinXcosY * sin(z);
 		components.z() = cosXcosY * sin(z) - sinXsinY * cos(z);
+	}
+
+	void Quaternion::toEulers(float* x, float* y, float* z)
+	{
+		toEulersRadians(x, y, z);
+
+		*x = toDegrees(*x);
+		*y = toDegrees(*y);
+		*z = toDegrees(*z);
 	}
 
 	void Quaternion::toEulersRadians(float* x, float* y, float* z)
@@ -103,21 +127,21 @@ namespace mathem
 		*x = atan2(
 			2.0f * (q0q1 + q2q3),
 			1.0f - 2.0f * (pow(components.x(), 2.0f) + q2Squared));
-
-		*y = asin(2.0f * (components.s() * components.y() - components.x() * components.z()));
+		
+		*y = 2.0f * std::atan2(
+			std::sqrt(1.0f + 2.0f * (components.s() * components.y() - components.x() * components.z())),
+			std::sqrt(1.0f - 2.0f * (components.s() * components.y() - components.x() * components.z()))) - PI / 2.0f;
 
 		*z = atan2(
 			2.0f * (components.s() * components.z() + components.x() * components.y()),
 			1.0f - 2.0f * (q2Squared + pow(components.z(), 2.0f)));
 	}
 
-	void Quaternion::toEulers(float* x, float* y, float* z)
+	Vector3D Quaternion::toEulersRadians()
 	{
-		toEulersRadians(x, y, z);
-
-		*x = toDegrees(*x);
-		*y = toDegrees(*y);
-		*z = toDegrees(*z);
+		Vector3D resultEulersRadians;
+		toEulersRadians(&resultEulersRadians.x(), &resultEulersRadians.y(), &resultEulersRadians.z());
+		return resultEulersRadians;
 	}
 
 	Quaternion Quaternion::operator*(float multiplier)
@@ -139,7 +163,7 @@ namespace mathem
 
 	Quaternion Quaternion::multiplyCopy(Quaternion& otherQuaternion)
 	{
-		Quaternion resultQuaternion = *this;
+		Quaternion resultQuaternion;
 		float scalar =
 			this->binary.scalar * otherQuaternion.binary.scalar -
 			this->binary.vector * otherQuaternion.binary.vector;

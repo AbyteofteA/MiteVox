@@ -20,14 +20,14 @@ namespace mitevox
     {
     public:
 
+        std::string name;
+        mathem::GeometryTransform transform;
         render::Camera* camera = nullptr;
         SkeletonBase* skeleton = nullptr;
         Mesh* mesh = nullptr;
         Mesh* morphAnimationTarget = nullptr;
-        std::string name;
         safety::SafeFloatArray weights;
-        mathem::GeometryTransform transform;
-        mathem::ComplexGeometry* collider = nullptr;
+
         render::LightType lightType = render::LightType::NONE;
         render::AnyLight light;
         safety::SafeArray<Node*> children;
@@ -35,12 +35,7 @@ namespace mitevox
         bool isMorphableMesh();
         Mesh* getMeshToRender();
 
-        void tryGenerateHitbox();
-
-        // Methods that octree requires in order to work
-
-        mathem::GeometryTransform* getTransform();
-        mathem::ComplexGeometry* getCollider();
+        void getMinMaxRecursively(mathem::GeometryTransform* parentTransform, mathem::Vector3D* min, mathem::Vector3D* max);
     };
 }
 

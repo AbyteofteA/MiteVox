@@ -66,7 +66,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)engine\FileIO\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Math\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Physics\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Renderer\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\UIEventHandler\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\AIModels\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Math.lib;Renderer.lib;FileIO.lib;AIModels.lib;UIEventHandler.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Math.lib;Physics.lib;Renderer.lib;FileIO.lib;AIModels.lib;UIEventHandler.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,8 +89,12 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Playground\Entity.cpp" />
+    <ClCompile Include="src\Rendering\drawCollisions.cpp" />
     <ClCompile Include="src\Rendering\drawAxes.cpp" />
     <ClCompile Include="src\Rendering\drawCollider.cpp" />
+    <ClCompile Include="src\Rendering\drawGeometryPrimitive.cpp" />
+    <ClCompile Include="src\Rendering\drawLightSource.cpp" />
     <ClCompile Include="src\Rendering\drawSceneOctree.cpp" />
     <ClCompile Include="src\Rendering\Lighting\collectLights.cpp" />
     <ClCompile Include="src\Playground\SceneFoundation.cpp" />
@@ -113,8 +117,12 @@
     <ClCompile Include="src\Playground\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Playground\Entity.h" />
+    <ClInclude Include="src\Rendering\drawCollisions.h" />
     <ClInclude Include="src\Rendering\drawAxes.h" />
     <ClInclude Include="src\Rendering\drawCollider.h" />
+    <ClInclude Include="src\Rendering\drawGeometryPrimitive.h" />
+    <ClInclude Include="src\Rendering\drawLightSource.h" />
     <ClInclude Include="src\Rendering\drawSceneOctree.h" />
     <ClInclude Include="src\Rendering\Lighting\collectLights.h" />
     <ClInclude Include="src\Playground\SceneFoundation.h" />

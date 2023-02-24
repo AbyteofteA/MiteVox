@@ -2,9 +2,9 @@
     "general":
     {
         "debug" : true,
-        "cleanup_period" : 0.5,
-        "physics_period" : 0.06,
-        "renderer_period" : 0.017
+        "cleanup_period" : 1.0,
+        "physics_period" : 0.00,
+        "renderer_period" : 0.00
     },
     "logging":
     {

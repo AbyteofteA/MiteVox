@@ -209,7 +209,7 @@ namespace fileio
 		{
 			return field->getNumberOrDefault(defaultValue);
 		}
-		return -0.0;
+		return defaultValue;
 	}
 
 	std::string JSON::getFieldStringOrDefault(std::string fieldName, std::string defaultValue)
@@ -219,7 +219,7 @@ namespace fileio
 		{
 			return field->getStringOrDefault(defaultValue);
 		}
-		return "";
+		return defaultValue;
 	}
 
 	bool JSON::getFieldBooleanOrDefault(std::string fieldName, bool defaultValue)
@@ -229,7 +229,7 @@ namespace fileio
 		{
 			return field->getBooleanOrDefault(defaultValue);
 		}
-		return false;
+		return defaultValue;
 	}
 
 	JSON* JSON::getFieldArray(std::string fieldName)

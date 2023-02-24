@@ -44,7 +44,7 @@ namespace mitevox
 	{
 		int32_t actualJointIndex = getJointIndex(jointNode);
 
-		parentTransform = parentTransform * jointNode->transform;
+		parentTransform *= jointNode->transform;
 
 		size_t nodesProcessed = 0;
 		if (actualJointIndex >= 0)

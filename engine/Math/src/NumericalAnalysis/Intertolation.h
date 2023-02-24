@@ -10,7 +10,8 @@ namespace mathem
 	template <typename T>
 	inline T lerp(T x1, T x2, float slope)
 	{
-		T result = x2 - x1;
+		T result = x2;
+		result -= x1;
 		result *= slope;
 		result += x1;
 		return result;

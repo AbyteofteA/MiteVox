@@ -5,12 +5,63 @@
 
 namespace mathem
 {
-	bool checkCollision(
+	CollisionType checkCollision(
+		SphereGeometry* sphere1,
+		GeometryTransform* sphere1Transform,
+		SphereGeometry* sphere2,
+		GeometryTransform* sphere2Transform,
+		CollisionProperties* collisionProperties);
+
+	// TODO: checkCollision SPHERE vs CAPSULE
+	// TODO: checkCollision SPHERE vs TRUNCATED_PYRAMID
+	// TODO: checkCollision SPHERE vs MESH
+	// TODO: checkCollision SPHERE vs RAY
+
+	CollisionType checkCollision(
+		SphereGeometry* sphere,
+		GeometryTransform* sphereTransform,
+		GeometryPrimitiveBase* otherGeometry,
+		GeometryTransform* otherGeometryTransform,
+		CollisionProperties* collisionProperties)
+	{
+		switch (otherGeometry->getType())
+		{
+		case GeometryPrimitiveType::BOX:
+		{
+			CollisionType collisionType = checkCollision((BoxGeometry*)otherGeometry, otherGeometryTransform, sphere, sphereTransform, collisionProperties);
+			collisionProperties->invert();
+			return collisionType;
+		}
+		case GeometryPrimitiveType::AXIS_ALIGNED_BOX:
+		{
+			CollisionType collisionType = checkCollision((AxisAlignedBoxGeometry*)otherGeometry, otherGeometryTransform, sphere, sphereTransform, collisionProperties);
+			collisionProperties->invert();
+			return collisionType;
+		}
+		case GeometryPrimitiveType::SPHERE:
+			return checkCollision(sphere, sphereTransform, (SphereGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::CAPSULE:
+			// TODO: return checkCollision(sphere, sphereTransform, (CapsuleGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::TRUNCATED_PYRAMID:
+			// TODO: return checkCollision(sphere, sphereTransform, (TruncatedPyramidGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::MESH:
+			// TODO: return checkCollision(sphere, sphereTransform, (mitevox::Mesh*)otherGeometry, otherGeometryTransform, collisionInfo);
+
+		default:
+			break;
+		}
+		return CollisionType::NONE;
+	}
+
+	CollisionType checkCollision(
 		SphereGeometry* sphere1, 
 		GeometryTransform* sphere1Transform,
 		SphereGeometry* sphere2,
 		GeometryTransform* sphere2Transform,
-		CollisionInfo* collisionInfo)
+		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
@@ -39,16 +90,11 @@ namespace mathem
 
 		if (thereMayBeACollision == false)
 		{
-			return false;
+			return CollisionType::NONE;
 		}
 
-		if (collisionInfo)
-		{
-			collisionInfo->object1 = sphere1;
-			collisionInfo->object2 = sphere2;
-			collisionInfo->type = CollisionType::INTERSECTION;
-			// TODO: compute collision info
-		}
-		return true;
+		collisionProperties->type = CollisionType::INTERSECTION;
+		// TODO: compute collision properties
+		return CollisionType::INTERSECTION;
 	}
 }

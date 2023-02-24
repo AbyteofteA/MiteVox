@@ -7,7 +7,12 @@ namespace mitevox
 	Scene::Scene()
 	{
 		// TODO: add corresponding settings
-		foundation = new SceneFoundation(250.0f, 0.1f, 1, 5, 0, 100);
+		foundation = new SceneFoundation(11.0f, 0.1f, 1, 60, 0, 100);
+		timeSinceCleanup = 0.0f;
+		timeSincePhysicsUpdate = 0.0f;
+		timeSinceAnimationsUpdate = 0.0f;
+		timeSinceRendererUpdate = 0.0f;
+		currentTime = 0.0f;
 	}
 
 	Scene::Scene(EngineSettings* _settings) : Scene()

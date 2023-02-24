@@ -51,7 +51,7 @@ namespace mitevox
 	private:
 
 		bool debug = true;
-		bool spaceCulling = false;
+		bool spaceCulling = true; // TODO: add to EngineSettings
 		float cleanupPeriod = 0.5;
 		float physicsPeriod = 0.06;
 		float animationPeriod = 0.06;
@@ -65,6 +65,8 @@ namespace mitevox
 		std::string resourceDir = "";
 		std::string configDir = "";
 		std::string savesDir = "";
+
+		float equalityTolerance = 0.001f; // TODO: add to EngineSettings
 
 		render::RendererSettings* renderer = nullptr;
 		InputHandler* inputHandler = nullptr;

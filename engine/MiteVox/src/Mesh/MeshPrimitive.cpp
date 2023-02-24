@@ -136,6 +136,19 @@ namespace mitevox
 		}
 	}
 
+	mathem::Vector3D MeshPrimitive::getVertexNormal(uint32_t index)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			return getNormals()->getVector3D(actualPointIndex);
+		}
+		else
+		{
+			return getNormals()->getVector3D(index);
+		}
+	}
+
 	mathem::Vector2D MeshPrimitive::getVertexTextureCoords_0(uint32_t index)
 	{
 		if (indecesAccessor != nullptr)
@@ -233,6 +246,17 @@ namespace mitevox
 		return resultTriangle;
 	}
 
+	mathem::TriangleGeometry3D MeshPrimitive::getTriangleNormals(uint32_t index)
+	{
+		mathem::TriangleGeometry3D resultTriangle;
+		uint32_t vertex1, vertex2, vertex3;
+		getTriangleVertexIndeces(index, &vertex1, &vertex2, &vertex3);
+		resultTriangle.point1 = getVertexNormal(vertex1);
+		resultTriangle.point2 = getVertexNormal(vertex2);
+		resultTriangle.point3 = getVertexNormal(vertex3);
+		return resultTriangle;
+	}
+
 	mathem::TriangleGeometry2D MeshPrimitive::getTriangleTextureCoords_0(uint32_t index)
 	{
 		mathem::TriangleGeometry2D resultTriangle;
@@ -268,6 +292,19 @@ namespace mitevox
 		}
 	}
 
+	void MeshPrimitive::setVertexNormal(uint32_t index, mathem::Vector3D normal)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			getNormals()->setVector3D(actualPointIndex, normal);
+		}
+		else
+		{
+			getNormals()->setVector3D(index, normal);
+		}
+	}
+
 	mathem::Vector3D MeshPrimitive::getMorphVertexPosition(uint32_t morphIndex, uint32_t index)
 	{
 		if (indecesAccessor != nullptr)
@@ -281,6 +318,19 @@ namespace mitevox
 		}
 	}
 
+	mathem::Vector3D MeshPrimitive::getMorphVertexNormal(uint32_t morphIndex, uint32_t index)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			return morphTargets.getElement(morphIndex)->byName.normalAccessor->getVector3D(actualPointIndex);
+		}
+		else
+		{
+			return morphTargets.getElement(morphIndex)->byName.normalAccessor->getVector3D(index);
+		}
+	}
+
 	void MeshPrimitive::setMorphVertexPosition(uint32_t morphIndex, uint32_t index, mathem::Vector3D position)
 	{
 		if (indecesAccessor != nullptr)
@@ -291,6 +341,19 @@ namespace mitevox
 		else
 		{
 			morphTargets.getElement(morphIndex)->byName.positionAccessor->setVector3D(index, position);
+		}
+	}
+
+	void MeshPrimitive::setMorphVertexNormal(uint32_t morphIndex, uint32_t index, mathem::Vector3D normal)
+	{
+		if (indecesAccessor != nullptr)
+		{
+			uint32_t actualPointIndex = getIndeces()->getElementsComponentAsUint(index, 0);
+			morphTargets.getElement(morphIndex)->byName.normalAccessor->setVector3D(actualPointIndex, normal);
+		}
+		else
+		{
+			morphTargets.getElement(morphIndex)->byName.normalAccessor->setVector3D(index, normal);
 		}
 	}
 }

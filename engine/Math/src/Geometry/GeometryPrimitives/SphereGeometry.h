@@ -1,6 +1,7 @@
 #ifndef SPHEREGEOMETRY_H
 #define SPHEREGEOMETRY_H
 
+#include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 

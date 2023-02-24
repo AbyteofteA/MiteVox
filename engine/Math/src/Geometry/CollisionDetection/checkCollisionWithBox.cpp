@@ -1,17 +1,98 @@
 #include "checkCollision.h"
 
 #include "engine/Math/src/Geometry/computeProjection.h"
+#include "engine/Math/src/Geometry/computePenetration.h"
 #include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Vector.h"
 
 namespace mathem
 {
-	bool checkCollision(
+	/// checkCollision - BOX vs BOX
+	/// 
+	/// Algorithm:
+	/// 1. Get (transformed) triangles 0, 2, 4 from box1
+	/// 2. Extract normals from the triangles
+	/// 3. Compute the box1's & box2's projections onto the normals (via dot product)
+	/// 4. Check if the projections overlap
+	CollisionType checkCollision(
 		BoxGeometry* box1,
 		GeometryTransform* box1Transform,
 		BoxGeometry* box2,
 		GeometryTransform* box2Transform,
-		CollisionInfo* collisionInfo,
+		CollisionProperties* collisionProperties,
+		bool isFirstPass = true);
+
+	CollisionType checkCollision(
+		BoxGeometry* box,
+		GeometryTransform* boxTransform,
+		AxisAlignedBoxGeometry* axisAlignedBox,
+		GeometryTransform* axisAlignedBoxTransform,
+		CollisionProperties* collisionProperties,
+		bool isFirstPass = true);
+
+	CollisionType checkCollision(
+		BoxGeometry* box,
+		GeometryTransform* boxTransform,
+		SphereGeometry* sphere,
+		GeometryTransform* sphereTransform,
+		CollisionProperties* collisionProperties);
+
+	CollisionType checkCollision(
+		BoxGeometry* box,
+		GeometryTransform* boxTransform,
+		CapsuleGeometry* capsule,
+		GeometryTransform* capsuleTransform,
+		CollisionProperties* collisionProperties);
+
+	CollisionType checkCollision(
+		BoxGeometry* box,
+		GeometryTransform* boxTransform,
+		TruncatedPyramidGeometry* truncatedPyramid,
+		GeometryTransform* truncatedPyramidTransform,
+		CollisionProperties* collisionProperties);
+
+	// TODO: checkCollision BOX vs MESH
+	// TODO: checkCollision BOX vs RAY
+
+	CollisionType checkCollision(
+		BoxGeometry* box,
+		GeometryTransform* boxTransform,
+		GeometryPrimitiveBase* otherGeometry,
+		GeometryTransform* otherGeometryTransform,
+		CollisionProperties* collisionProperties)
+	{
+		switch (otherGeometry->getType())
+		{
+		case GeometryPrimitiveType::BOX:
+			return checkCollision(box, boxTransform, (BoxGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::AXIS_ALIGNED_BOX:
+			return checkCollision(box, boxTransform, (AxisAlignedBoxGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::SPHERE:
+			return checkCollision(box, boxTransform, (SphereGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::CAPSULE:
+			return checkCollision(box, boxTransform, (CapsuleGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::TRUNCATED_PYRAMID:
+			return checkCollision(box, boxTransform, (TruncatedPyramidGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
+
+		case GeometryPrimitiveType::MESH:
+			// TODO: return checkCollision(box, boxTransform, (mitevox::Mesh*)otherGeometry, otherGeometryTransform, collisionInfo);
+
+		default:
+			break;
+		}
+		return CollisionType::NONE;
+	}
+
+	CollisionType checkCollision(
+		BoxGeometry* box1,
+		GeometryTransform* box1Transform,
+		BoxGeometry* box2,
+		GeometryTransform* box2Transform,
+		CollisionProperties* collisionProperties,
 		bool isFirstPass)
 	{
 		bool thereMayBeACollision = true;
@@ -23,6 +104,12 @@ namespace mathem
 		Vector3D tmpNormal = tmpTriangle.computeNormal();
 		float tmpBox1ProjectionMin = 0.0f, tmpBox1ProjectionMax = 0.0f;
 		float tmpBox2ProjectionMin = 0.0f, tmpBox2ProjectionMax = 0.0f;
+
+		float penetrationSign = 1.0f;
+		if (isFirstPass == false)
+		{
+			penetrationSign = -1.0f;
+		}
 
 		// Check box1's local Z-axis
 		{
@@ -37,22 +124,27 @@ namespace mathem
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
 			}
 			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
-			if (tmpBox1ProjectionMax < tmpBox2ProjectionMin ||
-				tmpBox2ProjectionMax < tmpBox1ProjectionMin)
+			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
+			if (penetration == 0.0f)
 			{
 				thereMayBeACollision = false;
+				collisionProperties->penetrationDepth = 0.0f;
+			}
+			else
+			{
+				collisionProperties->recomputePenetrationAndNormal(penetrationSign * penetration, tmpNormal, isFirstPass);
 			}
 		}
 
 		// Check box1's local X-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box1->getTrianglePositions(2);
+			tmpTriangle = box1->getTrianglePositions(8);
 			box1Transform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box1->getVertexPosition(0);
+			tmpPositionMin = box1->getVertexPosition(3);
 			box1Transform->applyTo(tmpPositionMin);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
@@ -62,10 +154,15 @@ namespace mathem
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
 			}
 			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
-			if (tmpBox1ProjectionMax < tmpBox2ProjectionMin ||
-				tmpBox2ProjectionMax < tmpBox1ProjectionMin)
+			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
+			if (penetration == 0.0f)
 			{
 				thereMayBeACollision = false;
+				collisionProperties->penetrationDepth = 0.0f;
+			}
+			else
+			{
+				collisionProperties->recomputePenetrationAndNormal(penetrationSign * penetration, tmpNormal, isFirstPass);
 			}
 		}
 
@@ -87,60 +184,64 @@ namespace mathem
 				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
 			}
 			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
-			if (tmpBox1ProjectionMax < tmpBox2ProjectionMin ||
-				tmpBox2ProjectionMax < tmpBox1ProjectionMin)
+			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
+			if (penetration == 0.0f)
 			{
 				thereMayBeACollision = false;
+				collisionProperties->penetrationDepth = 0.0f;
+			}
+			else
+			{
+				collisionProperties->recomputePenetrationAndNormal(penetrationSign * penetration, tmpNormal, isFirstPass);
 			}
 		}
 
 		if (thereMayBeACollision == false)
 		{
-			return false;
+			return CollisionType::NONE;
 		}
 
 		if (isFirstPass)
 		{
-			return checkCollision(box2, box2Transform, box1, box1Transform, collisionInfo, false);
+			checkCollision(box2, box2Transform, box1, box1Transform, collisionProperties, false);
 		}
 		else
 		{
-			if (collisionInfo)
+			collisionProperties->type = CollisionType::INTERSECTION;
+
+			Vector3D firstPosition = box1Transform->applyToCopy(box1->transform.translation);
+			Vector3D secondPosition = box2Transform->applyToCopy(box2->transform.translation);
+			Vector3D fromSecondToFirstDirection = secondPosition - firstPosition;
+			if (fromSecondToFirstDirection * collisionProperties->normal < 0.0f)
 			{
-				collisionInfo->object1 = box1;
-				collisionInfo->object2 = box2;
-				collisionInfo->type = CollisionType::INTERSECTION;
-				// TODO: compute collision info
+				collisionProperties->normal = -collisionProperties->normal;
+				collisionProperties->penetrationDepth = -collisionProperties->penetrationDepth;
 			}
-			return true;
 		}
 	}
 
-	bool checkCollision(
+	CollisionType checkCollision(
 		BoxGeometry* box,
 		GeometryTransform* boxTransform,
 		AxisAlignedBoxGeometry* axisAlignedBox,
-		CollisionInfo* collisionInfo,
+		GeometryTransform* axisAlignedBoxTransform,
+		CollisionProperties* collisionProperties,
 		bool isFirstPass)
 	{
 		// TODO: optimize (currently redirects to another function)
 
-		GeometryTransform* box2Transform = new GeometryTransform();
-		BoxGeometry* box2 = new BoxGeometry();
-		box2->halfSize = axisAlignedBox->halfSize;
-		box2->transform.translation = axisAlignedBox->position;
-		bool result = checkCollision(box, boxTransform, box2, box2Transform, collisionInfo);
-		delete box2Transform;
-		delete box2;
-		return result;
+		BoxGeometry box2;
+		box2.halfSize = axisAlignedBox->halfSize;
+		box2.transform.translation = axisAlignedBox->position;
+		return checkCollision(box, boxTransform, &box2, axisAlignedBoxTransform, collisionProperties);
 	}
 
-	bool checkCollision(
+	CollisionType checkCollision(
 		BoxGeometry* box,
 		GeometryTransform* boxTransform,
 		SphereGeometry* sphere,
 		GeometryTransform* sphereTransform,
-		CollisionInfo* collisionInfo)
+		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
@@ -232,31 +333,26 @@ namespace mathem
 			if (tmpBoxProjectionMax < tmpSphereProjectionMin ||
 				tmpSphereProjectionMax < tmpBoxProjectionMin)
 			{
-				return false;
+				thereMayBeACollision = false;
 			}
 		}
 
 		if (thereMayBeACollision == false)
 		{
-			return false;
+			return CollisionType::NONE;
 		}
 
-		if (collisionInfo)
-		{
-			collisionInfo->object1 = box;
-			collisionInfo->object2 = sphere;
-			collisionInfo->type = CollisionType::INTERSECTION;
-			// TODO: compute collision info
-		}
-		return true;
+		collisionProperties->type = CollisionType::INTERSECTION;
+		// TODO: compute collision properties
+		return CollisionType::INTERSECTION;
 	}
 
-	bool checkCollision(
+	CollisionType checkCollision(
 		BoxGeometry* box,
 		GeometryTransform* boxTransform,
 		CapsuleGeometry* capsule,
 		GeometryTransform* capsuleTransform,
-		CollisionInfo* collisionInfo)
+		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
@@ -379,25 +475,20 @@ namespace mathem
 
 		if (thereMayBeACollision == false)
 		{
-			return false;
+			return CollisionType::NONE;
 		}
 
-		if (collisionInfo)
-		{
-			collisionInfo->object1 = box;
-			collisionInfo->object2 = capsule;
-			collisionInfo->type = CollisionType::INTERSECTION;
-			// TODO: compute collision info
-		}
-		return true;
+		collisionProperties->type = CollisionType::INTERSECTION;
+		// TODO: compute collision properties
+		return CollisionType::INTERSECTION;
 	}
 
-	bool checkCollision(
+	CollisionType checkCollision(
 		BoxGeometry* box,
 		GeometryTransform* boxTransform,
 		TruncatedPyramidGeometry* truncatedPyramid,
 		GeometryTransform* truncatedPyramidTransform,
-		CollisionInfo* collisionInfo)
+		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
@@ -562,68 +653,11 @@ namespace mathem
 
 		if (thereMayBeACollision == false)
 		{
-			return false;
+			return CollisionType::NONE;
 		}
 
-		if (collisionInfo)
-		{
-			collisionInfo->object1 = box;
-			collisionInfo->object2 = truncatedPyramid;
-			collisionInfo->type = CollisionType::INTERSECTION;
-			// TODO: compute collision info
-		}
-		return true;
-	}
-
-	bool checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
-		CollisionInfo* collisionInfo)
-	{
-		Vector3D collisionPoint;
-
-		switch (otherGeometry->getType())
-		{
-		case GeometryPrimitiveType::BOX:
-		{
-			BoxGeometry* otherBox = (BoxGeometry*)otherGeometry;
-			Vector3D tmpCollisionPoint;
-			return checkCollision(box, boxTransform, otherBox, otherGeometryTransform, collisionInfo);
-		}
-
-		case GeometryPrimitiveType::SPHERE:
-		{
-			SphereGeometry* otherSphere = (SphereGeometry*)otherGeometry;
-			Vector3D tmpCollisionPoint;
-			return checkCollision(box, boxTransform, otherSphere, otherGeometryTransform, collisionInfo);
-		}
-
-		case GeometryPrimitiveType::CAPSULE:
-		{
-			CapsuleGeometry* otherCapsule = (CapsuleGeometry*)otherGeometry;
-			Vector3D tmpCollisionPoint;
-			return checkCollision(box, boxTransform, otherCapsule, otherGeometryTransform, collisionInfo);
-		}
-
-		case GeometryPrimitiveType::TRUNCATED_PYRAMID:
-		{
-			TruncatedPyramidGeometry* otherTruncatedPyramid = (TruncatedPyramidGeometry*)otherGeometry;
-			Vector3D tmpCollisionPoint;
-			return checkCollision(box, boxTransform, otherTruncatedPyramid, otherGeometryTransform, collisionInfo);
-		}
-
-		case GeometryPrimitiveType::MESH:
-		{
-			mitevox::Mesh* otherMesh = (mitevox::Mesh*)otherGeometry;
-			Vector3D tmpCollisionPoint;
-			// TODO: return checkCollision(box, boxTransform, otherMesh, otherGeometryTransform, collisionInfo);
-		}
-
-		default:
-			break;
-		}
-		return false;
+		collisionProperties->type = CollisionType::INTERSECTION;
+		// TODO: compute collision properties
+		return CollisionType::INTERSECTION;
 	}
 }

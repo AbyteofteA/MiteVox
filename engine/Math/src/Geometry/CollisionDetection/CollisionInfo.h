@@ -2,23 +2,44 @@
 #define COLLISIONINFO_H
 
 #include "engine/Math/src/Vector.h"
-#include "engine/Math/src/Geometry/ComplexGeometry.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionType.h"
 
 #include <cstdint>
+#include <limits>
+
+#define MAX_CONTACT_POINTS_COUNT 4
 
 namespace mathem
 {
-	struct CollisionInfo
+	struct CollisionProperties
 	{
 		CollisionType type = CollisionType::NONE;
+		float penetrationDepth = std::numeric_limits<float>::max();
+		bool normalBelongsToTheFirst = true;
+		Vector3D normal;
+		uint16_t contactPointsCount = 0;
+		Vector3D contactPoints[MAX_CONTACT_POINTS_COUNT];
+		Vector3D forces[MAX_CONTACT_POINTS_COUNT];
+		float contactPointsDistancesSquared[MAX_CONTACT_POINTS_COUNT] = { 
+			std::numeric_limits<float>::max(),
+			std::numeric_limits<float>::max(),
+			std::numeric_limits<float>::max(),
+			std::numeric_limits<float>::max() };
 
-		GeometryPrimitiveBase* object1 = nullptr;
-		GeometryPrimitiveBase* object2 = nullptr;
+		void invert();
+		void recomputePenetrationAndNormal(float penetrationDepth, Vector3D normal, bool normalBelongsToTheFirst);
+		void resetContactPoints();
+		void tryAddNewContactPoint(Vector3D contactPoint, float distancesSquared, float equalityTolerance);
+		void concatenate(CollisionProperties& other, float equalityTolerance);
+	};
 
-		mathem::Vector3D position;
-		mathem::Vector3D normal;
-		float penetrationDepth = 0.0f;
+	template <class T>
+	struct CollisionInfo
+	{
+		CollisionProperties properties;
+
+		T object1 = nullptr;
+		T object2 = nullptr;
 	};
 }
 

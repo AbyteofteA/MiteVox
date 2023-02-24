@@ -7,10 +7,19 @@
 
 namespace mathem
 {
+	enum struct GeometryType : uint8_t
+	{
+		POINT = 0,			/// 
+		PRIMITIVES,			///
+		MESH,				/// 
+		SKELETON			/// 
+	};
+
 	class ComplexGeometry
 	{
 	public:
 
+		GeometryType type = GeometryType::POINT;
 		safety::SafeArray<GeometryPrimitiveBase*> primitives;
 	};
 }

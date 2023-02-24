@@ -139,13 +139,13 @@ namespace mitevox
 
 	void EngineSettings::setCleanupPeriod(float value)
 	{
-		if (value > 10 || value < 0)
+		if (value > 10.0f || value < 0.0f)
 		{
-			cleanupPeriod = value;
+			cleanupPeriod = 0.5f;
 		}
 		else
 		{
-			cleanupPeriod = 0.5;
+			cleanupPeriod = value;
 		}
 	}
 
@@ -156,13 +156,13 @@ namespace mitevox
 
 	void EngineSettings::setPhysicsPeriod(float value)
 	{
-		if (value > 0.5 || value < 0)
+		if (value > 0.5f || value < 0.0f)
 		{
-			physicsPeriod = value;
+			physicsPeriod = 0.06f;
 		}
 		else
 		{
-			physicsPeriod = 0.06;
+			physicsPeriod = value;
 		}
 	}
 
@@ -173,13 +173,13 @@ namespace mitevox
 
 	void EngineSettings::setAnimationsPeriod(float value)
 	{
-		if (value > 0.5 || value < 0)
+		if (value > 0.5 || value < 0.0f)
 		{
-			animationPeriod = value;
+			animationPeriod = 0.06f;
 		}
 		else
 		{
-			animationPeriod = 0.06;
+			animationPeriod = value;
 		}
 	}
 
@@ -190,13 +190,13 @@ namespace mitevox
 
 	void EngineSettings::setRendererPeriod(float value)
 	{
-		if (value > 0.1 || value < 0)
+		if (value > 0.1f || value < 0.0f)
 		{
-			rendererPeriod = value;
+			rendererPeriod = 0.0f;
 		}
 		else
 		{
-			rendererPeriod = 0;
+			rendererPeriod = value;
 		}
 	}
 

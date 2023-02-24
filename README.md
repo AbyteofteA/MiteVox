@@ -61,7 +61,7 @@ Has a basic user I/O setup. It definitely needs redesign...
 
 ## :bug: Known bugs & limitations :bug:
 - [ ] Skinned mesh uses global transform of the node that instantiates the mesh instead of global transform of the skeleton root.
-- [ ] Morph target animation seems to work fine, except for this model: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/MorphPrimitivesTest
+- [ ] InterpolationTest : collider calculation anomaly
 - [ ] .obj parser doesn't support polygon grouping by material.
 - [ ] .obj parser doesn't support polygon grouping by smoothing.
 - [ ] Binary search tree has global variables.

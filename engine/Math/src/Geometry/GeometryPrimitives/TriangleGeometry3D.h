@@ -5,7 +5,7 @@
 
 namespace mathem
 {
-	class TriangleGeometry3D
+	class TriangleGeometry3D // TODO: make it template
 	{
 	public:
 

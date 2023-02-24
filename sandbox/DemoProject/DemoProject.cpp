@@ -24,37 +24,33 @@ void mitevox::Engine::onCreate()
 {
 	this->playground->name = "Demo";
 
-	Node* whiteLightNode = new Node();
-	whiteLightNode->lightType = render::LightType::POINT;
-	whiteLightNode->light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 20.0 };
-	whiteLightNode->transform.translation = { 5.0, 5.0, 5.0 };
-
-	Node* redLightNode = new Node();
-	redLightNode->lightType = render::LightType::POINT;
-	redLightNode->light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 10.0 };
-	redLightNode->transform.translation = { 0.0, 0.0, -5.0 };
-
-	Node* greenLightNode = new Node();
-	greenLightNode->lightType = render::LightType::POINT;
-	greenLightNode->light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 10.0 };
-	greenLightNode->transform.translation = { 0.0, 5.0, 0.0 };
-
-	Node* blueLightNode = new Node();
-	blueLightNode->lightType = render::LightType::POINT;
-	blueLightNode->light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 10.0 };
-	blueLightNode->transform.translation = { 0.0, 0.0, 5.0 };
-
-	playground->nodes.appendElement(redLightNode);
-	playground->nodes.appendElement(greenLightNode);
-	playground->nodes.appendElement(blueLightNode);
-
-	mitevox::Scene* activeScene = this->playground->getActiveScene();
-	activeScene->nodes.appendElement(whiteLightNode);
-	/*activeScene->nodes.appendElement(redLightNode);
-	activeScene->nodes.appendElement(greenLightNode);
-	activeScene->nodes.appendElement(blueLightNode);*/
-
+	Scene* activeScene = this->playground->getActiveScene();
+	if (activeScene == nullptr)
+	{
+		return;
+	}
+	
 	activeScene->scripts.appendElement(processInput_Script);
+
+	Entity* entity = activeScene->entities.getElement(0);
+	entity->movementProperties.inverseMass = 1.0f;
+	entity->movementProperties.inverseMomentOfInertia = 0.5f;
+	entity->movementProperties.restitution = 1.0f;
+	//node->movementProperties->angularVelocity = { 0.1f, 0.0f, 0.0f };
+	
+	Entity* whiteLightEntity = new Entity();
+	whiteLightEntity->renderableNode.lightType = render::LightType::POINT;
+	whiteLightEntity->renderableNode.light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 40.0 };
+	whiteLightEntity->setTranslation({ 11.0, 11.0, 11.0 });
+	whiteLightEntity->collider = entity->collider;
+
+	activeScene->entities.appendElement(whiteLightEntity);
+
+	size_t activeEntitiesCount = activeScene->entities.getElementsCount();
+	for (size_t i = 0; i < activeEntitiesCount; ++i)
+	{
+		activeScene->foundation->emplace(activeScene->entities.getElement(i));
+	}
 }
 
 void mitevox::Engine::onUpdate() {}

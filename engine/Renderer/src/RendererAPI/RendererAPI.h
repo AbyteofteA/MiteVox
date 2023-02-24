@@ -98,6 +98,18 @@ printErrors(__FILE__, __LINE__);
 		Camera* camera, 
 		mathem::GeometryTransform* cameraTransform);
 
+	// Nodes
+
+	void renderNodeRecursively(
+		RendererSettings* renderer,
+		int shaderID,
+		mitevox::Node* node,
+		mathem::GeometryTransform* transform,
+		Camera* camera,
+		mathem::GeometryTransform* cameraTransform);
+
+	void removeNodeRecursively(mitevox::Node* node, int shaderID);
+
 	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 
 	void uploadSkybox(Skybox* skybox);

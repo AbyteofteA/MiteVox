@@ -10,9 +10,11 @@ namespace mitevox
 		size_t chunkLevel,
 		size_t maxEmplacedDatapointsPerUpdate)
 	{
-		octree = new mathem::Octree<Node>(halfSize, nodeMinHalfSize, nodeCapacity, nodeMaxLifeTime);
+		octree = new mathem::Octree<Entity*>(halfSize, nodeMinHalfSize, nodeCapacity, nodeMaxLifeTime);
 		this->chunkLevel = chunkLevel;
 		this->maxEmplacedDatapointsPerUpdate = maxEmplacedDatapointsPerUpdate;
+		waitingDatapointsStack.reserve(64); // TODO: add to settings
+		datapointsToMove.reserve(64); // TODO: add to settings
 	}
 
 	SceneFoundation::~SceneFoundation()
@@ -20,23 +22,32 @@ namespace mitevox
 		delete octree;
 	}
 
-	void SceneFoundation::emplace(Node* node)
+	void SceneFoundation::emplace(Entity* entity)
 	{
-		waitingDatapointsStack.appendElement(node);
+		waitingDatapointsStack.appendElement(entity);
 	}
 
-	void SceneFoundation::emplace(safety::SafeArray<Node*>* nodesStack)
+	void SceneFoundation::emplace(safety::SafeArray<Entity*>* entitiesStack)
 	{
-		waitingDatapointsStack.concatenate(nodesStack);
+		waitingDatapointsStack.concatenate(entitiesStack);
 	}
 
-	void SceneFoundation::getAll(safety::SafeArray<Node*>* nodesStack)
+	void SceneFoundation::getAll(safety::SafeArray<Entity*>* entitiesStack)
 	{
-		octree->getAll(nodesStack);
+		octree->getAll(entitiesStack);
+	}
+
+	void SceneFoundation::getCollisions(safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions, mathem::PileOfSafeArrays<Entity*>* dataPointsContainers, float equalityTolerance)
+	{
+		octree->getCollisions(collisions, dataPointsContainers, equalityTolerance);
 	}
 
 	void SceneFoundation::update()
 	{
+		octree->update(preferredLevel, &datapointsToMove);
+		waitingDatapointsStack.concatenate(&datapointsToMove);
+		datapointsToMove.clear();
+
 		size_t emplacedDatapointsCount = waitingDatapointsStack.getElementsCount();
 		if (emplacedDatapointsCount > maxEmplacedDatapointsPerUpdate)
 		{
@@ -45,14 +56,9 @@ namespace mitevox
 
 		for (size_t i = 0; i < emplacedDatapointsCount; i++)
 		{
-			Node* datapoint = waitingDatapointsStack.getLastElement();
+			Entity* datapoint = waitingDatapointsStack.getLastElement();
 			waitingDatapointsStack.removeLastElement();
-			if (datapoint->collider)
-			{
-				octree->emplace(datapoint);
-			}
+			octree->emplaceAtLevel(datapoint, preferredLevel);
 		}
-
-		octree->update();
 	}
 }
