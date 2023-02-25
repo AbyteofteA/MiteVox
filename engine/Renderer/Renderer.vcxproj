@@ -36,7 +36,6 @@
     <ClInclude Include="src\RendererAPI\Model3D.h" />
     <ClInclude Include="src\RendererAPI\Primitives.h" />
     <ClInclude Include="src\RendererAPI\RendererSettings.h" />
-    <ClInclude Include="src\RendererAPI\Skybox.h" />
     <ClInclude Include="src\RendererImplementations\RendererCPU\PrimitivesCPU.h" />
     <ClInclude Include="src\RendererImplementations\RendererCPU\RendererCPU.h" />
     <ClInclude Include="src\RendererImplementations\RendererOpenGL\RendererOpenGL.h" />
@@ -64,7 +63,6 @@
     <ClCompile Include="src\RendererAPI\Cubemap.cpp" />
     <ClCompile Include="src\RendererAPI\Light.cpp" />
     <ClCompile Include="src\RendererAPI\Primitives.cpp" />
-    <ClCompile Include="src\RendererAPI\Skybox.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

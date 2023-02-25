@@ -14,39 +14,6 @@
 
 namespace render
 {
-	extern float skyboxVert[];
-
-	void uploadSkybox(Skybox* skybox)
-	{
-		GLint posAttrib = glGetAttribLocation(shaders[1]->shaderID, "position");
-
-		unsigned int skyboxVBO;
-		glGenVertexArrays(1, &skybox->vertexID);
-		glGenBuffers(1, &skyboxVBO);
-		glBindVertexArray(skybox->vertexID);
-		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 108, skyboxVert, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(posAttrib);
-		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-
-		glGenTextures(1, &skybox->cubemap->textureID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemap->textureID);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
-
-		for (int i = 0; i < 6; i++)
-		{
-			char* image = (char*)skybox->cubemap->textures[i].imageData;
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, 
-				skybox->cubemap->textures[i].width, 
-				skybox->cubemap->textures[i].height, 
-				0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-		}
-	}
-
 	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID)
 	{
 		if (!render::shaders[shaderID]->use())
@@ -590,16 +557,74 @@ namespace render
 		}
 	}
 
-	void selectSkybox(Skybox* skybox)
+	extern float skyboxVertices[];
+
+	void uploadSkybox(Cubemap* skybox, int shaderID)
+	{
+		if (skybox->vertexID == 0)
+		{
+			GLint posAttrib = glGetAttribLocation(shaders[1]->shaderID, "position");
+
+			unsigned int skyboxVBO;
+			glGenVertexArrays(1, &skybox->vertexID);
+			glGenBuffers(1, &skyboxVBO);
+			glBindVertexArray(skybox->vertexID);
+			glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 108, skyboxVertices, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(posAttrib);
+			glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+
+			glGenTextures(1, &skybox->textureID);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+			for (size_t i = 0; i < 6; i++)
+			{
+				char* image = (char*)skybox->textures[i].imageData;
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA,
+					skybox->textures[i].width,
+					skybox->textures[i].height,
+					0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+			}
+		}
+	}
+
+	void selectSkybox(Cubemap* skybox, int shaderID)
 	{
 		glBindVertexArray(skybox->vertexID);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemap->textureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
 	}
 
-	void removeSkybox(Skybox* skybox)
+	void removeSkybox(Cubemap* skybox, int shaderID)
 	{
 		glDeleteBuffers(1, &skybox->vertexID);
-		glDeleteTextures(1, &skybox->cubemap->textureID);
+		glDeleteTextures(1, &skybox->textureID);
+	}
+
+	void renderSkybox(RendererSettings* renderer, int shaderID, Cubemap* skybox, Camera* camera, mathem::GeometryTransform* cameraTransform)
+	{
+		if (!shaders[shaderID]->use())
+			return;
+
+		mathem::GeometryTransform cameraTransformOrientationOnly;
+		cameraTransformOrientationOnly.rotation = cameraTransform->rotation;
+		glm::mat4 viewProjectionMatrix = camera->getViewProjectionMatrix(&cameraTransformOrientationOnly);
+		shaders[shaderID]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
+
+		renderer->amountOfDrawCalls++;
+
+		selectSkybox(skybox, shaderID);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		PRINT_RENDERER_ERRORS;
 	}
 }

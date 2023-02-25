@@ -163,6 +163,12 @@ namespace mitevox
 					render::clearBufferXY(renderer->clearColor);
 					render::clearBufferZ();
 
+					if (scene->activeSkybox >= 0)
+					{
+						render::Cubemap* skybox = &scene->skyboxes.at(scene->activeSkybox);
+						render::renderSkybox(renderer, skybox->shaderID, skybox, camera, cameraTransform);
+					}
+
 					renderEntities(deltaTime, renderer, camera, cameraTransform);
 
 					if (settings->debug)

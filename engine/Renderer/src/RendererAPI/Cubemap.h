@@ -6,26 +6,25 @@
 
 namespace render
 {
+	enum struct CubemapType
+	{
+
+	};
 
 	struct Cubemap
 	{
-		Cubemap()
-		{
+		Cubemap();
+		~Cubemap();
+		void deallocate();
 
-		}
-		~Cubemap()
-		{
-			for (int i = 0; i < 6; i++)
-			{
-				delete &textures[i];
-			}
-		}
-
+		CubemapType type;
+		int shaderID = 0;
+		unsigned int vertexID = 0;
+		unsigned int textureID = 0;
 		mitevox::Image textures[6];
-		unsigned int textureID;
 	};
 
-	void loadCubemap(std::string dirname, void** cubemap, char* flag);
+	void loadCubemap(std::string dirname, Cubemap* cubemap, char* flag);
 }
 
 #endif

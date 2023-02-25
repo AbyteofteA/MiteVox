@@ -7,7 +7,7 @@
 #include "Cubemap.h"
 #include "Color.h"
 #include "Primitives.h"
-#include "Skybox.h"
+#include "Cubemap.h"
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
@@ -112,10 +112,10 @@ printErrors(__FILE__, __LINE__);
 
 	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 
-	void uploadSkybox(Skybox* skybox);
-	void selectSkybox(Skybox* skybox);
-	void removeSkybox(Skybox* skybox);
-	void renderSkybox(RendererSettings* renderer, Skybox* skybox, Camera* camera, mathem::Transform* cameraTransform);
+	void uploadSkybox(Cubemap* skybox, int shaderID);
+	void selectSkybox(Cubemap* skybox, int shaderID);
+	void removeSkybox(Cubemap* skybox, int shaderID);
+	void renderSkybox(RendererSettings* renderer, int shaderID, Cubemap* skybox, Camera* camera, mathem::GeometryTransform* cameraTransform);
 }
 
 //==================================================================

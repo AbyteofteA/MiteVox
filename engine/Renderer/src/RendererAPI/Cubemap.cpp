@@ -1,15 +1,78 @@
+#include "Cubemap.h"
 
 #include "engine/FileIO/src/FileLoaderAsync.h"
 #include <filesystem>
+#include <string>
+#include <algorithm>
+#include <cctype>
 namespace fs = std::filesystem;
-
-#include "Skybox.h"
 
 namespace render
 {
-	void loadCubemap(std::string dirName, void** cubemap, char* flag)
+	float skyboxVertices[] =
 	{
-		*cubemap = nullptr;
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	Cubemap::Cubemap()
+	{
+
+	}
+	Cubemap::~Cubemap()
+	{
+
+	}
+
+	void Cubemap::deallocate()
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			delete& textures[i];
+		}
+	}
+
+	void loadCubemap(std::string dirName, Cubemap* cubemap, char* flag)
+	{
 		*flag = 0;
 
 		std::string frontPath;
@@ -23,33 +86,30 @@ namespace render
 
 		for (fs::directory_entry de : fs::directory_iterator(currentPath))
 		{
-			char texType[3];
-			texType[2] = '\0';
-			std::string tmpPath = de.path().filename().replace_extension("").string();
-			texType[1] = std::tolower(tmpPath[tmpPath.length() - 1]);
-			texType[0] = std::tolower(tmpPath[tmpPath.length() - 2]);
-
-			if (texType[0] == 'f' && texType[1] == 't')
+			std::string cubemapSideName = de.path().filename().replace_extension("").string();
+			cubemapSideName = cubemapSideName.substr(cubemapSideName.length() - 2, 2);
+			std::transform(cubemapSideName.begin(), cubemapSideName.end(), cubemapSideName.begin(), [](unsigned char c) { return std::tolower(c); });
+			if (cubemapSideName == "ft")
 			{
 				frontPath = de.path().string();
 			}
-			else if (texType[0] == 'b' && texType[1] == 'k')
+			else if (cubemapSideName == "bk")
 			{
 				backPath = de.path().string();
 			}
-			else if (texType[0] == 'u' && texType[1] == 'p')
+			else if (cubemapSideName == "up")
 			{
 				upPath = de.path().string();
 			}
-			else if (texType[0] == 'd' && texType[1] == 'n')
+			else if (cubemapSideName == "dn")
 			{
 				downPath = de.path().string();
 			}
-			else if (texType[0] == 'r' && texType[1] == 't')
+			else if (cubemapSideName == "rt")
 			{
 				rightPath = de.path().string();
 			}
-			else if (texType[0] == 'l' && texType[1] == 'f')
+			else if (cubemapSideName == "lf")
 			{
 				leftPath = de.path().string();
 			}
@@ -63,38 +123,25 @@ namespace render
 		}
 		else
 		{
-			Cubemap* tmpCubemap = new Cubemap();
-
-			mitevox::Image* front;
-			mitevox::Image* back;
-			mitevox::Image* up;
-			mitevox::Image* down;
 			mitevox::Image* right;
 			mitevox::Image* left;
-
-			fileio::fileLoader.loadAndParseAsync(frontPath, (void**)&front, mitevox::loadImage);
-			fileio::fileLoader.loadAndParseAsync(backPath, (void**)&back, mitevox::loadImage);
-			fileio::fileLoader.loadAndParseAsync(upPath, (void**)&up, mitevox::loadImage);
-			fileio::fileLoader.loadAndParseAsync(downPath, (void**)&down, mitevox::loadImage);
+			mitevox::Image* up;
+			mitevox::Image* down;
+			mitevox::Image* back;
+			mitevox::Image* front;
 			fileio::fileLoader.loadAndParseAsync(rightPath, (void**)&right, mitevox::loadImage);
 			fileio::fileLoader.loadAndParseAsync(leftPath, (void**)&left, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(upPath, (void**)&up, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(downPath, (void**)&down, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(backPath, (void**)&back, mitevox::loadImage);
+			fileio::fileLoader.loadAndParseAsync(frontPath, (void**)&front, mitevox::loadImage);
 			fileio::fileLoader.awaitAll();
-
-			tmpCubemap->textures[0] = *right;
-			tmpCubemap->textures[1] = *left;
-			tmpCubemap->textures[2] = *up;
-			tmpCubemap->textures[3] = *down;
-			tmpCubemap->textures[4] = *back;
-			tmpCubemap->textures[5] = *front;
-
-			delete front;
-			delete back;
-			delete up;
-			delete down;
-			delete right;
-			delete left;
-
-			(*cubemap) = (void*)tmpCubemap;
+			cubemap->textures[0] = *right;
+			cubemap->textures[1] = *left;
+			cubemap->textures[2] = *up;
+			cubemap->textures[3] = *down;
+			cubemap->textures[4] = *back;
+			cubemap->textures[5] = *front;
 
 			*flag = 1;
 		}

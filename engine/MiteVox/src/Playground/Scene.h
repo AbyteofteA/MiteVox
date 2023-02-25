@@ -7,7 +7,7 @@
 #include "engine/MiteVox/src/Playground/SceneFoundation.h"
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/NativeScript.h"
-#include "engine/Renderer/src/RendererAPI/Skybox.h"
+#include "engine/Renderer/src/RendererAPI/Cubemap.h"
 #include <vector>
 #include <string>
 #include <chrono>
@@ -22,7 +22,7 @@ namespace mitevox
 		SceneFoundation* foundation = nullptr;
 		safety::SafeArray<Entity*> entities;
 
-		std::vector<render::Skybox> skyboxes;
+		std::vector<render::Cubemap> skyboxes;
 		long activeSkybox = -1;
 		Node* activeCameraNode = nullptr;
 
