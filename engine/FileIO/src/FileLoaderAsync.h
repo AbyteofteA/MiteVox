@@ -22,9 +22,6 @@ namespace fileio
 
 		void (*parseFunction)(std::string filename, void** objectDestination, std::atomic<FileStatus>* flag);
 
-		// Temporary storage for the parsed object.
-		void* objectData = nullptr;
-
 		// Destination is assigned with data only when/if the data is ready.
 		void** destination = nullptr;
 	};
@@ -58,7 +55,6 @@ namespace fileio
 			fileInfo->filename = _filename;
 			fileInfo->parseFunction = _parseFunction;
 
-			fileInfo->objectData = nullptr;
 			fileInfo->destination = _destination;
 
 			if (_parseFunction == nullptr) // there is no load/parse function
@@ -69,12 +65,12 @@ namespace fileio
 				fileInfo->loaderThread = std::thread(
 					loadBinary, 
 					fileInfo->filename, 
-					&fileInfo->objectData, 
+					fileInfo->destination,
 					&fileInfo->fileStatus);
 			}
 			else // there is a load/parse function
 			{
-				fileInfo->loaderThread = std::thread(fileInfo->parseFunction, fileInfo->filename, &fileInfo->objectData, &fileInfo->fileStatus);
+				fileInfo->loaderThread = std::thread(fileInfo->parseFunction, fileInfo->filename, fileInfo->destination, &fileInfo->fileStatus);
 			}
 			fileRecords.push_back(fileInfo);
 		}
@@ -89,7 +85,6 @@ namespace fileio
 				if (fileRecords[i]->fileStatus.load() == FileStatus::READY)
 				{
 					fileRecords[i]->loaderThread.join();
-					*fileRecords[i]->destination = fileRecords[i]->objectData;
 					fileRecords.erase(fileRecords.begin() + i);
 					i--;
 				}

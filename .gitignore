@@ -24,15 +24,8 @@ ipch/
 # Git files and folders 
 .git/
 
-*.sai2
-*.odt
-**/assets_hidden/**
+**/secret/**
 Backup/**
-engine/NeuralNetworkBuilderUI/**
-engine/NeuralNetworkDatabaseWrapper/**
-engine/NeuralNetworkWrapper/**
-engine/AIModels/src/s/**
-engine/FileIO/src/Formats/glTF_2.0/extensions/**
 
 # Necessary files and folders
 !dependencies/**

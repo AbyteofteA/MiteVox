@@ -1,9 +1,14 @@
+#include "FileInputOutput.h"
 
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <vector>
 
-#include "FileInputOutput.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "dependencies/stb/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "dependencies/stb/stb_image_write.h"
 
 namespace fileio
 {
@@ -125,6 +130,50 @@ namespace fileio
 
         fclose(file);
         return FileStatus::READY;
+    }
+
+    FileStatus FileInputOutput::loadImage(std::string filePath, mitevox::Image* image)
+    {
+        int initialImageFormat = 0;
+        image->imageData = stbi_load(filePath.c_str(), &image->width, &image->height, &initialImageFormat, (int)mitevox::ImageFormat::RED_GREEN_BLUE_ALPHA);
+        if (image->imageData == nullptr)
+        {
+            return FileStatus::ERROR;
+        }
+        image->filePath = filePath;
+        image->format = mitevox::ImageFormat::RED_GREEN_BLUE_ALPHA;
+        return FileStatus::READY;
+    }
+
+    void FileInputOutput::loadImage(std::string filePath, void** image, std::atomic<FileStatus>* fileStatus)
+    {
+        fileStatus->store(FileStatus::LOADING);
+        mitevox::Image* imageObject = (mitevox::Image*)*image;
+        FileStatus result = FileInputOutput::loadImage(filePath, imageObject);
+        fileStatus->store(result);
+    }
+
+    FileStatus FileInputOutput::saveImage(mitevox::Image* image, std::string filePath)
+    {
+        int result = stbi_write_png(filePath.c_str(), image->width, image->height, (int)image->format, (const void*)image->imageData, 0);
+        if (result == 0)
+        {
+            return FileStatus::ERROR;
+        }
+        return FileStatus::READY;
+    }
+
+    void FileInputOutput::saveImage(void** image, std::string filePath, std::atomic<FileStatus>* fileStatus)
+    {
+        fileStatus->store(FileStatus::SAVING);
+        mitevox::Image* imageObject = (mitevox::Image*)*image;
+        FileStatus result = FileInputOutput::saveImage(imageObject, filePath);
+        fileStatus->store(result);
+    }
+
+    void FileInputOutput::freeImageData(mitevox::Image* image)
+    {
+        stbi_image_free(image->imageData);
     }
 
     FileStatus FileInputOutput::loadText(std::string filePath, std::string* text)

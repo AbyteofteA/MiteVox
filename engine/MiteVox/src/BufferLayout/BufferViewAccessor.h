@@ -76,6 +76,7 @@ namespace mitevox
         void makeSparse(BufferViewAccessorSparse* sparseAccessor);
         void makeNotSparse();
         static Type mapTypeNameToType(std::string typeName);
+        static std::string mapTypeToTypeName(Type type);
 
         void makeSeparateCopyTo(BufferViewAccessor* resultBufferViewAccessor);
 

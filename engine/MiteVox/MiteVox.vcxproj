@@ -108,7 +108,6 @@
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\EngineSettings.cpp" />
     <ClCompile Include="src\Mesh\Mesh.cpp" />
-    <ClCompile Include="src\Material\Image.cpp" />
     <ClCompile Include="src\Material\Texture.cpp" />
     <ClCompile Include="src\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="src\MiteVox_main.h" />

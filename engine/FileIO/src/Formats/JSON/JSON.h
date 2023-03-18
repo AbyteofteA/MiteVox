@@ -47,6 +47,9 @@ namespace fileio
 		template <typename T>
 		inline void toNumberArray(safety::SafeArray<T>* resultArray);
 
+		template <typename T>
+		inline void fromNumberArray(safety::SafeArray<T>* numberArray);
+
 		void toStringArrayOrDefault(safety::SafeArray<std::string>* resultArray, std::string defaultValue);
 
 		// Field methods //
@@ -124,6 +127,24 @@ namespace fileio
 				resultArray->setElement(numberIndex, (T)numberField->getNumberOrDefault(0.0));
 				++numberIndex;
 			}
+		}
+	}
+
+	template <typename T>
+	inline void JSON::fromNumberArray(safety::SafeArray<T>* numberArray)
+	{
+		_type = JSONtype::ARRAY;
+		_fields.clear();
+
+		size_t arraySize = numberArray->getElementsCount();
+		_fields.reserve(arraySize);
+
+		for (int64_t index = 0; index < arraySize; ++index)
+		{
+			JSON* numberField = new JSON();
+			numberField->setType(JSONtype::NUMBER);
+			numberField->set((double)numberArray->getElement(index));
+			_fields.push_back(numberField);
 		}
 	}
 }

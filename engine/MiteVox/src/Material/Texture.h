@@ -13,7 +13,8 @@ namespace mitevox
 	{
 	public:
 
-		ImageSampler sampler;
+		std::string name;
+		ImageSampler* sampler;
 		Image* image = nullptr;
 		uint32_t ID = 0;
 

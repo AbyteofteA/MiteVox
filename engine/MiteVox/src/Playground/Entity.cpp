@@ -11,13 +11,13 @@ namespace mitevox
 {
 	mathem::GeometryTransform* Entity::getTransform()
 	{
-		return &renderableNode.transform;
+		return &transform;
 	}
 
 	mathem::GeometryTransform* Entity::getTransformForMove()
 	{
 		isMoved = false;
-		return &renderableNode.transform;
+		return &transform;
 	}
 
 	bool Entity::getIsMoved()
@@ -28,37 +28,37 @@ namespace mitevox
 	void Entity::resetTransform()
 	{
 		isMoved = true;
-		renderableNode.transform.reset();
+		transform.reset();
 	}
 
 	void Entity::setTransform(mathem::GeometryTransform transform)
 	{
 		isMoved = true;
-		renderableNode.transform = transform;
+		transform = transform;
 	}
 
 	void Entity::setTranslation(mathem::Vector3D translation)
 	{
 		isMoved = true;
-		renderableNode.transform.translation = translation;
+		transform.translation = translation;
 	}
 
 	void Entity::setRotation(mathem::Quaternion quaternion)
 	{
 		isMoved = true;
-		renderableNode.transform.rotation = quaternion;
+		transform.rotation = quaternion;
 	}
 
 	void Entity::setRotation(mathem::Vector3D eulersRadians)
 	{
 		isMoved = true;
-		renderableNode.transform.rotation.fromEulersRadians(eulersRadians.x(), eulersRadians.y(), eulersRadians.z());
+		transform.rotation.fromEulersRadians(eulersRadians.x(), eulersRadians.y(), eulersRadians.z());
 	}
 
 	void Entity::setScale(mathem::Vector3D scale)
 	{
 		isMoved = true;
-		renderableNode.transform.scale = scale;
+		transform.scale = scale;
 	}
 
 	mathem::Matrix3x3 Entity::getInverseMomentOfInertia()
@@ -102,11 +102,11 @@ namespace mitevox
 			return;
 		}
 
-		mathem::GeometryTransform inverseTransform = renderableNode.transform.getInverse(); // 
+		mathem::GeometryTransform zeroTransform; // 
 		mathem::Vector3D min, max;
 		min.setMax();
 		max.setMin();
-		renderableNode.getMinMaxRecursively(&inverseTransform, &min, &max);
+		renderableNode->getMinMaxRecursively(&zeroTransform, &min, &max);
 
 		mathem::BoxGeometry* boundingBox = new mathem::BoxGeometry();
 		boundingBox->halfSize = (max - min) * 0.5f;

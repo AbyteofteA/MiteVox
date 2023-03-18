@@ -22,7 +22,9 @@ namespace mitevox
 		SceneFoundation* foundation = nullptr;
 		safety::SafeArray<Entity*> entities;
 
+		mathem::Vector3D ambientLight = { 0.1f, 0.1f, 0.1f };
 		std::vector<render::Cubemap> skyboxes;
+		mathem::Vector3D globalGravity = { 0.0f, 0.0f, 0.0f };
 		long activeSkybox = -1;
 		Node* activeCameraNode = nullptr;
 

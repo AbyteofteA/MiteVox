@@ -8,7 +8,6 @@
 #include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 
 #include <string>
-#include <cstdio>
 
 namespace mitevox
 {

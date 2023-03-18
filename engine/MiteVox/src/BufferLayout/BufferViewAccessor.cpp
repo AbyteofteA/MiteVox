@@ -407,6 +407,31 @@ namespace mitevox
         return Type::INVALID;
     }
 
+    std::string BufferViewAccessor::mapTypeToTypeName(Type type)
+    {
+        switch (type)
+        {
+        case mitevox::BufferViewAccessor::Type::SCALAR:
+            return "SCALAR";
+        case mitevox::BufferViewAccessor::Type::VEC2:
+            return "VEC2";
+        case mitevox::BufferViewAccessor::Type::VEC3:
+            return "VEC3";
+        case mitevox::BufferViewAccessor::Type::VEC4:
+            return "VEC4";
+        case mitevox::BufferViewAccessor::Type::MAT2:
+            return "MAT2";
+        case mitevox::BufferViewAccessor::Type::MAT3:
+            return "MAT3";
+        case mitevox::BufferViewAccessor::Type::MAT4:
+            return "MAT4";
+        case mitevox::BufferViewAccessor::Type::INVALID:
+        default:
+            break;
+        }
+        return "ERROR";
+    }
+
     void BufferViewAccessor::makeSeparateCopyTo(BufferViewAccessor* resultBufferViewAccessor)
     {
         *resultBufferViewAccessor = *this;

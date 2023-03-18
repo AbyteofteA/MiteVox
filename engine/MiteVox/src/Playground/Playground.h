@@ -42,6 +42,7 @@ namespace mitevox
 	public:
 
 		std::string name;
+		std::string file;
 		size_t activeScene = 0;
 
 		Playground(std::string _name = "Untitled");
@@ -53,14 +54,25 @@ namespace mitevox
 
 	// TODO: make private:
 
+		struct AssetInfo
+		{
+			std::string version;
+			std::string minVersion;
+			std::string generator;
+			std::string copyright;
+		} assetInfo;
+
+		safety::SafeArray<std::string> extensionsUsed;
+		safety::SafeArray<std::string> extensionsRequired;
+
 		safety::SafeArray<safety::SafeByteArray*> buffers;
 		safety::SafeArray<BufferView*> bufferViews;
 		safety::SafeArray<BufferViewAccessor*> accessors;
 		safety::SafeArray<render::Camera*> cameras;
 		safety::SafeArray<ImageSampler> imageSamplers;
-		safety::SafeArray<Image*> images;
-		safety::SafeArray<Texture*> textures;
-		safety::SafeArray<Material*> materials;
+		safety::SafeArray<Image> images;
+		safety::SafeArray<Texture> textures;
+		safety::SafeArray<Material> materials;
 		safety::SafeArray<Mesh*> meshes;
 		safety::SafeArray<Node*> nodes;
 		safety::SafeArray<Scene*> scenes;

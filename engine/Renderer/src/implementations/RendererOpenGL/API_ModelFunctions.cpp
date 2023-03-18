@@ -14,6 +14,15 @@
 
 namespace render
 {
+	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID)
+	{
+		if (!render::shaders[shaderID]->use())
+			return;
+
+		render::shaders[shaderID]->setVector3D("ambientLight", ambientLightColor);
+		PRINT_RENDERER_ERRORS;
+	}
+
 	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID)
 	{
 		if (!render::shaders[shaderID]->use())
@@ -71,10 +80,10 @@ namespace render
 				glGenTextures(1, &albedoMap->ID);
 				glActiveTexture(GL_TEXTURE0 + textureUnit);
 				glBindTexture(GL_TEXTURE_2D, albedoMap->ID);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, albedoMap->sampler.wrappingModeU);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, albedoMap->sampler.wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, albedoMap->sampler.minificationFilter);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, albedoMap->sampler.magnificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, albedoMap->sampler->wrappingModeU);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, albedoMap->sampler->wrappingModeV);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, albedoMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, albedoMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					albedoMap->getWidth(),
 					albedoMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 
@@ -91,10 +100,10 @@ namespace render
 				glGenTextures(1, &metallicRoughnessMap->ID);
 				glActiveTexture(GL_TEXTURE0 + textureUnit);
 				glBindTexture(GL_TEXTURE_2D, metallicRoughnessMap->ID);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, metallicRoughnessMap->sampler.wrappingModeU);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, metallicRoughnessMap->sampler.wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, metallicRoughnessMap->sampler.minificationFilter);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, metallicRoughnessMap->sampler.magnificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, metallicRoughnessMap->sampler->wrappingModeU);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, metallicRoughnessMap->sampler->wrappingModeV);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, metallicRoughnessMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, metallicRoughnessMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					metallicRoughnessMap->getWidth(),
 					metallicRoughnessMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 
@@ -111,10 +120,10 @@ namespace render
 				glGenTextures(1, &normalMap->ID);
 				glActiveTexture(GL_TEXTURE0 + textureUnit);
 				glBindTexture(GL_TEXTURE_2D, normalMap->ID);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, normalMap->sampler.wrappingModeU);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, normalMap->sampler.wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, normalMap->sampler.minificationFilter);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, normalMap->sampler.magnificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, normalMap->sampler->wrappingModeU);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, normalMap->sampler->wrappingModeV);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, normalMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, normalMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					normalMap->getWidth(),
 					normalMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE,

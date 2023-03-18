@@ -12,6 +12,7 @@ namespace mitevox
 	{
 	public:
 
+		Node* root = nullptr;
 		safety::SafeArray<Node*> joints;
 
 		NodeBasedSkeleton();

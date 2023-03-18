@@ -25,6 +25,7 @@ namespace mathem
 		explicit Quaternion(Vector3D vector);
 		explicit Quaternion(float x, float y, float z, float s);
 		explicit Quaternion(safety::SafeFloatArray* quaternionArray);
+		bool isIdentity();
 		void reset();
 		float getLength();
 		float getLengthSquared();

@@ -9,7 +9,7 @@ namespace mitevox
 		safety::SafeArray<render::PointLight>* resultPointLightsArray,
 		safety::SafeArray<render::DirectionalLight>* resultDirectionalLightsArray,
 		safety::SafeArray<render::SpotLight>* resultSpotLightsArray,
-		mathem::GeometryTransform transform = mathem::GeometryTransform())
+		mathem::GeometryTransform transform)
 	{
 		transform *= node->transform;
 
@@ -56,11 +56,13 @@ namespace mitevox
 		size_t entitiesCount = entities->getElementsCount();
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
+			Entity* entity = entities->getElement(i);
 			collectPointLightsRecursively(
-				&entities->getElement(i)->renderableNode,
+				entity->renderableNode,
 				resultPointLightsArray,
 				resultDirectionalLightsArray,
-				resultSpotLightsArray);
+				resultSpotLightsArray,
+				entity->transform);
 		}
 	}
 }

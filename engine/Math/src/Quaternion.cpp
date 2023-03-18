@@ -35,6 +35,21 @@ namespace mathem
 		}
 	}
 
+	bool Quaternion::isIdentity()
+	{
+		mathem::Vector3D zero = { 0.0f, 0.0f, 0.0f };
+		
+		if (binary.vector != zero)
+		{
+			return false;
+		}
+		if (binary.scalar != 1.0f)
+		{
+			return false;
+		}
+		return true;
+	}
+
 	void Quaternion::reset()
 	{
 		binary.vector.x() = 0.0f;

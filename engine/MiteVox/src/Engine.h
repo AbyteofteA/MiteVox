@@ -72,6 +72,7 @@ namespace mitevox
 		void renderEntities(
 			float deltaTime,
 			render::RendererSettings* renderer,
+			Scene* scene,
 			render::Camera* camera,
 			mathem::GeometryTransform* cameraTransform);
 	};

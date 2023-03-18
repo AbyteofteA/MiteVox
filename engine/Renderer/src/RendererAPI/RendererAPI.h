@@ -74,6 +74,7 @@ printErrors(__FILE__, __LINE__);
 
 	// Models
 
+	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID);
 	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID);
 	void clearPointLights();
 

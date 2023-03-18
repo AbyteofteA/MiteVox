@@ -89,7 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)dependencies\Simple OpenGL Image Library\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -99,8 +99,9 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Simple OpenGL Image Library\lib</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Simple OpenGL Image Library\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SOIL.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -151,48 +152,48 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\SkeletonCodec\NodeBasedSkeletonCodec.h" />
-    <ClInclude Include="src\AnimationCodec\AnimationCodec.h" />
-    <ClInclude Include="src\PlaygroundCodec\PlaygroundCodecGLTF.h" />
-    <ClInclude Include="src\BufferLayoutCodec\BufferViewAccessorCodec.h" />
-    <ClInclude Include="src\BufferLayoutCodec\BufferViewCodec.h" />
-    <ClInclude Include="src\PlaygroundCodec\NodeCodec.h" />
-    <ClInclude Include="src\MaterialCodec\MaterialCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\SkeletonCodec\NodeBasedSkeletonCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\AnimationCodec\AnimationCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\PlaygroundCodec\PlaygroundCodecGLTF.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\BufferLayoutCodec\BufferViewAccessorCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\BufferLayoutCodec\BufferViewCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\PlaygroundCodec\NodeCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\MaterialCodec\MaterialCodec.h" />
     <ClInclude Include="src\Formats\CodecGLTF\CodecGLTF.h" />
     <ClInclude Include="src\FileInputOutput.h" />
     <ClInclude Include="src\FileLoaderAsync.h" />
     <ClInclude Include="src\FileStatus.h" />
     <ClInclude Include="src\Formats\FileFormatBase.h" />
-    <ClInclude Include="src\MaterialCodec\ImageSamplerCodec.h" />
-    <ClInclude Include="src\MeshCodec\MeshCodec.h" />
-    <ClInclude Include="src\PlaygroundCodec\SceneCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\MaterialCodec\ImageSamplerCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\MeshCodec\MeshCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\PlaygroundCodec\SceneCodec.h" />
     <ClInclude Include="src\Formats\JSON\JSONRegex.h" />
     <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJ.h" />
     <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJRegexPack.h" />
-    <ClInclude Include="src\MaterialCodec\ImageCodec.h" />
+    <ClInclude Include="src\Formats\CodecGLTF\MaterialCodec\ImageCodec.h" />
     <ClInclude Include="src\Formats\JSON\JSON.h" />
     <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJRegex.h" />
     <ClInclude Include="src\SerializationStatus.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\SkeletonCodec\NodeBasedSkeletonCodec.cpp" />
-    <ClCompile Include="src\AnimationCodec\AnimationCodec.cpp" />
-    <ClCompile Include="src\PlaygroundCodec\PlaygroundCodecGLTF.cpp" />
-    <ClCompile Include="src\MaterialCodec\MaterialCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\SkeletonCodec\NodeBasedSkeletonCodec.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\AnimationCodec\AnimationCodec.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\PlaygroundCodec\PlaygroundCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\MaterialCodec\MaterialCodecGLTF.cpp" />
     <ClCompile Include="src\Formats\CodecGLTF\CodecGLTF.cpp" />
     <ClCompile Include="src\FileInputOutput.cpp" />
     <ClCompile Include="src\FileLoaderAsync.cpp" />
     <ClCompile Include="src\Formats\FileFormatBase.cpp" />
-    <ClCompile Include="src\BufferLayoutCodec\BufferViewAccessorCodecGLTF.cpp" />
-    <ClCompile Include="src\BufferLayoutCodec\BufferViewCodecGLTF.cpp" />
-    <ClCompile Include="src\MaterialCodec\ImageSamplerCodecGLTF.cpp" />
-    <ClCompile Include="src\MeshCodec\MeshCodecGLTF.cpp" />
-    <ClCompile Include="src\PlaygroundCodec\NodeCodecGLTF.cpp" />
-    <ClCompile Include="src\PlaygroundCodec\SceneCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\BufferLayoutCodec\BufferViewAccessorCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\BufferLayoutCodec\BufferViewCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\MaterialCodec\ImageSamplerCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\MeshCodec\MeshCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\PlaygroundCodec\NodeCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\PlaygroundCodec\SceneCodecGLTF.cpp" />
     <ClCompile Include="src\Formats\JSON\JSON.cpp" />
     <ClCompile Include="src\Formats\WavefrontOBJ\WavefrontOBJ.cpp" />
     <ClCompile Include="src\Formats\WavefrontOBJ\WavefrontOBJRegexPack.cpp" />
-    <ClCompile Include="src\MaterialCodec\ImageCodecGLTF.cpp" />
+    <ClCompile Include="src\Formats\CodecGLTF\MaterialCodec\ImageCodecGLTF.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

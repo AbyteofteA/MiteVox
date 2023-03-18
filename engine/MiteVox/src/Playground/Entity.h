@@ -12,9 +12,10 @@ namespace mitevox
     public:
 
         uint32_t ID = 0;
+        mathem::GeometryTransform transform;
 		mathem::ComplexGeometry collider;
 		physcs::MovementProperties movementProperties;
-		Node renderableNode;
+		Node* renderableNode;
 
         mathem::GeometryTransform* getTransform();
         mathem::GeometryTransform* getTransformForMove();

@@ -36,6 +36,8 @@ uniform samplerCube reflectionMap;
 uniform vec3 viewPos;
 uniform Material material;
 
+uniform vec3 ambientLight;
+
 struct PointLight
 {
 	vec3 pos;
@@ -123,18 +125,17 @@ void main()
 		//reflectionMapFragment = texture(reflectionMap, reflectionDir);
 	}*/
 
-	vec3 result = vec3(1.0, 0.0, 1.0);
+	vec3 light = ambientLight;
 	switch (material.illuminationModel)
 	{
 	case ILLUMINATION_MODEL_SPECULAR:
-		result = albedoFragment * calculate_PointLight(norm, viewDir, roughness, metallicity);
+		light += calculate_PointLight(norm, viewDir, roughness, metallicity);
 		break;
 
 	case ILLUMINATION_MODEL_CONSTANT_COLOR:
 	default:
-		result = albedoFragment;
 		break;
 	}
-	outColor = vec4(result, 1.0);
+	outColor = vec4(albedoFragment * light, 1.0);
 }
 

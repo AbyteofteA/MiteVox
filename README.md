@@ -71,7 +71,7 @@ Has a basic user I/O setup. It definitely needs redesign...
 - [GLEW (The OpenGL Extension Wrangler Library)](https://github.com/nigels-com/glew)
 - [GLFW (A multiplatform library for OpenGL)](https://github.com/glfw/glfw)
 - [GLM (A header only C++ mathematics library)](https://github.com/g-truc/glm)
-- SOIL (Simple OpenGL Image Library)
+- [stb (stb_image.h, stb_image_write.h)](https://github.com/nothings/stb)
 
 ## References
 1. [Learn OpenGL](https://learnopengl.com)

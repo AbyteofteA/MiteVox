@@ -25,7 +25,7 @@ namespace mitevox
 	{
 		prevCycleTime = std::chrono::steady_clock::now();
 
-		std::string executionDir = fs::path(argv[0]).parent_path().string();
+		std::string executionDir = fs::absolute(fs::path(argv[0])).parent_path().string();
 		settings = new EngineSettings(executionDir);
 
 		entitiesToSimulate.reserve(64); // TODO: add to EngineSettings
@@ -37,16 +37,16 @@ namespace mitevox
 
 		// TODO: add to EngineSettings
 
+		playground = new Playground();
 		if (argc > 1)
 		{
-			fileio::CodecGLTF* playgroundGLTF = new fileio::CodecGLTF();
+			fileio::CodecGLTF* playgroundGLTF = new fileio::CodecGLTF(playground);
 			playgroundGLTF->readFromFile(std::string(argv[1]));
 			// TODO: add checks
-			playground = playgroundGLTF->result;
 		}
 		else
 		{
-			playground = new Playground();
+			
 		}
 
 		preparePlayground();
@@ -169,7 +169,7 @@ namespace mitevox
 						render::renderSkybox(renderer, skybox->shaderID, skybox, camera, cameraTransform);
 					}
 
-					renderEntities(deltaTime, renderer, camera, cameraTransform);
+					renderEntities(deltaTime, renderer, scene, camera, cameraTransform);
 
 					if (settings->debug)
 					{
@@ -218,12 +218,14 @@ namespace mitevox
 		}
 
 		// TODO: create load/unload system
-		Scene* activeScene = playground->getActiveScene();
-		size_t activeEntitiesCount = activeScene->entities.getElementsCount();
-		for (size_t i = 0; i < activeEntitiesCount; ++i)
+		if (Scene* activeScene = playground->getActiveScene())
 		{
-			Entity* entity = activeScene->entities.getElement(i);
-			entity->tryGenerateHitbox();
+			size_t activeEntitiesCount = activeScene->entities.getElementsCount();
+			for (size_t i = 0; i < activeEntitiesCount; ++i)
+			{
+				Entity* entity = activeScene->entities.getElement(i);
+				entity->tryGenerateHitbox();
+			}
 		}
 
 		size_t scenesCount = playground->scenes.getElementsCount();
@@ -285,7 +287,7 @@ namespace mitevox
 		size_t entitiesCount = entities->getElementsCount();
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
-			animateNodeRecursively(&entities->getElement(i)->renderableNode, deltaTime);
+			animateNodeRecursively(entities->getElement(i)->renderableNode, deltaTime);
 		}
 	}
 
@@ -305,19 +307,26 @@ namespace mitevox
 
 	void Engine::uploadScene(Scene* scene, int shaderID)
 	{
+		if (scene == nullptr)
+		{
+			return;
+		}
+
 		size_t entitiesCount = scene->entities.getElementsCount();
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
-			uploadNodeRecursively(&scene->entities.getElement(i)->renderableNode, shaderID);
+			uploadNodeRecursively(scene->entities.getElement(i)->renderableNode, shaderID);
 		}
 	}
 
 	void Engine::renderEntities(
 		float deltaTime,
 		render::RendererSettings* renderer,
+		Scene* scene,
 		render::Camera* camera,
 		mathem::GeometryTransform* cameraTransform)
 	{
+		render::setAmbientLight(scene->ambientLight, basicShader);
 		collectPointLights(&entitiesToSimulate, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
 		render::uploadPointLights(&pointLightsArray, basicShader);
 		// TODO: render::uploadLights(&LightsArray, basicShader);
@@ -336,12 +345,12 @@ namespace mitevox
 		size_t entitiesCount = entitiesToSimulate.getElementsCount();
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
-			mathem::GeometryTransform transform;
+			Entity* entity = entitiesToSimulate.getElement(i);
 			render::renderNodeRecursively(
 				settings->renderer, 
 				basicShader,
-				&entitiesToSimulate.getElement(i)->renderableNode,
-				&transform, 
+				entity->renderableNode,
+				&entity->transform,
 				camera, 
 				cameraTransform);
 		}

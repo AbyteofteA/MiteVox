@@ -39,8 +39,9 @@ void mitevox::Engine::onCreate()
 	//node->movementProperties->angularVelocity = { 0.1f, 0.0f, 0.0f };
 	
 	Entity* whiteLightEntity = new Entity();
-	whiteLightEntity->renderableNode.lightType = render::LightType::POINT;
-	whiteLightEntity->renderableNode.light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 40.0 };
+	whiteLightEntity->renderableNode = new Node();
+	whiteLightEntity->renderableNode->lightType = render::LightType::POINT;
+	whiteLightEntity->renderableNode->light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 40.0 };
 	whiteLightEntity->setTranslation({ 11.0, 11.0, 11.0 });
 	whiteLightEntity->collider = entity->collider;
 
