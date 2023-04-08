@@ -4,6 +4,8 @@
 
 #include "engine/AIModels/src/Structure/FormalNeuron.h"
 
+#include <cstdio>
+
 namespace aimods
 {
 	class HopfieldNetwork
@@ -12,7 +14,7 @@ namespace aimods
 
 		float* output = nullptr;
 
-		inline HopfieldNetwork(size_t _size);
+		inline HopfieldNetwork(size_t size);
 		inline ~HopfieldNetwork();
 
 		inline void inputData(float* data);
@@ -53,9 +55,9 @@ namespace aimods
 	// IMPLEMENTATION BELOW //
 
 
-	inline HopfieldNetwork::HopfieldNetwork(size_t _size)
+	inline HopfieldNetwork::HopfieldNetwork(size_t size)
 	{
-		this->size = _size;
+		this->size = size;
 		this->neuronArray = new FormalNeuron*[this->size];
 		this->previousOutput = new float[this->size];
 		this->output = new float[this->size];

@@ -19,6 +19,9 @@ namespace aimods
         UPSAMPLING_2D,                          // TODO: Implement
         HOPFIELD,                               // TODO: Implement
     };
+
+    const char* neuralLayerTypeToString(NeuralLayerType neuralLayerType);
+    NeuralLayerType stringToNeuralLayerType(const char* string);
 }
 
 #endif

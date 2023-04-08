@@ -1,8 +1,7 @@
 #include "GeometryPrimitiveBase.h"
 
-#include  "engine/Math/src/almostEqual.h"
-
-#include <limits>
+#include "engine/Math/src/almostEqual.h"
+#include "engine/Math/src/MinAndMax.h"
 
 namespace mathem
 {
@@ -46,7 +45,7 @@ namespace mathem
 	{
 		Vector3D targetNormal;
 		Vector3D targetVertex = getVertexPosition(vertexIndex);
-		float normalAngle = -std::numeric_limits<float>::max();
+		float normalAngle = -mathem::max<float>();
 		size_t trianglesCount = getTrianglesCount();
 		for (size_t i = 0; i < trianglesCount; ++i)
 		{

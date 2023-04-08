@@ -29,10 +29,12 @@ The core of the engine. It defines the **entry point**.
 - engine_config.json
 
 ### engine / Renderer
+- API file: RendererAPI.h
 - Rendering APIs: OpenGL
 - Multiple lights
 
 ### engine / FileIO
+- API file: FileInputOutput.h
 Contains implementation of asynchronous file loader & parser.
 
 ### engine / Math

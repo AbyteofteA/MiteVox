@@ -56,6 +56,7 @@
     <ClInclude Include="src\Geometry\CollisionDetection\contains.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.h" />
     <ClInclude Include="src\MathConstants.h" />
+    <ClInclude Include="src\MinAndMax.h" />
     <ClInclude Include="src\Quaternion.h" />
     <ClInclude Include="src\Calculus\Sequences.h" />
     <ClInclude Include="src\Convertations.h" />

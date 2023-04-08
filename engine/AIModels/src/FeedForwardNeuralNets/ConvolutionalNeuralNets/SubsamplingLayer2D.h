@@ -7,6 +7,8 @@
 #include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/FilterLayer2DBase.h"
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"
 
+#include <cstdlib>
+
 namespace aimods
 {
 	template <typename T>
@@ -14,8 +16,8 @@ namespace aimods
 	{
 	public:
 
-		T _weight;
-		T _threshold;
+		T weight;
+		T threshold;
 
 		SubsamplingLayer2D(
 			size_t amountOfInputMaps,
@@ -24,22 +26,25 @@ namespace aimods
 			ActivationFunction function,
 			Filter2D<T>* filter);
 
+		inline void setWeightsRandom();
+		inline void setWeights(T value);
+
 		inline T getWeight();
 		inline T getThreshold();
 
 		/// <summary>
 		/// Propagates signals through the layer, then stores the results in outputs.
 		/// </summary>
-		/// <param name="inputs"> - array, must be of size FilterLayer2DBase::_inputsDataSize</param>
-		inline void propagate(T* inputs);
-		inline void propagateSavingWeightedSums(T* inputs);
-		inline void adjustWeights(T* inputs, float learningRate) {}
+		/// <param name="inputs"> - array, must be of size FilterLayer2DBase::inputsDataSize</param>
+		inline void propagate(safety::SafeArray<T>* inputs);
+		inline void propagateSavingWeightedSums(safety::SafeArray<T>* inputs);
+		inline void adjustWeights(safety::SafeArray<T>* inputs, float learningRate);
 
 	private:
 
 		void tuneOutputs();
-		inline void computeWeightedSums(T* inputs, T* resultsArray);
-		inline void computeOutputs(T* weightedSumsArray);
+		inline void computeWeightedSums(safety::SafeArray<T>* inputs, safety::SafeArray<T>* resultsArray);
+		inline void computeOutputs(safety::SafeArray<T>* weightedSumsArray);
 	};
 
 
@@ -60,55 +65,71 @@ namespace aimods
 			amountOfInputMaps,
 			filter)
 	{
-		_weight = 1;
-		_threshold = 0;
-		this->_function = function;
+		weight = 1.0;
+		threshold = 0.0;
+		this->function = function;
 		this->tuneOutputs();
+	}
+
+	template <typename T>
+	inline void SubsamplingLayer2D<T>::setWeightsRandom()
+	{
+		weight = (T)rand() / ((T)RAND_MAX * 10.0f);
+		threshold = (T)rand() / ((T)RAND_MAX * 10.0f);
+	}
+
+	template <typename T>
+	inline void SubsamplingLayer2D<T>::setWeights(T value)
+	{
+		weight = value;
+		threshold = value;
 	}
 
 	template <typename T>
 	inline T SubsamplingLayer2D<T>::getWeight()
 	{
-		return _weight;
+		return weight;
 	}
 
 	template <typename T>
 	inline T SubsamplingLayer2D<T>::getThreshold()
 	{
-		return _threshold;
+		return threshold;
 	}
 
 	template <typename T>
-	inline void SubsamplingLayer2D<T>::propagate(T* inputs)
+	inline void SubsamplingLayer2D<T>::propagate(safety::SafeArray<T>* inputs)
 	{
-		computeWeightedSums(inputs, this->_outputs);
-		computeWeightedSums(this->_temporaryCalculations, this->_outputs);
+		computeWeightedSums(inputs, &this->outputs);
+		computeOutputs(&this->outputs);
 	}
 
 	template <typename T>
-	inline void SubsamplingLayer2D<T>::propagateSavingWeightedSums(T* inputs)
+	inline void SubsamplingLayer2D<T>::propagateSavingWeightedSums(safety::SafeArray<T>* inputs)
 	{
-		computeWeightedSums(inputs, this->_temporaryCalculations);
-		computeWeightedSums(this->_temporaryCalculations, this->_outputs);
+		computeWeightedSums(inputs, &this->temporaryCalculations);
+		computeOutputs(&this->temporaryCalculations);
 	}
 
-	//template <typename T>
-	//inline void SubsamplingLayer2D<T>::adjustWeights(T* inputs, float learningRate);
+	template <typename T>
+	inline void SubsamplingLayer2D<T>::adjustWeights(safety::SafeArray<T>* inputs, float learningRate)
+	{
+		// TODO: 
+	}
 
 	template <typename T>
 	void SubsamplingLayer2D<T>::tuneOutputs()
 	{
-		this->_outputMapElementCount = this->_outputWidth * this->_outputHeight;
-		this->_outputsCount = this->_outputMapElementCount * this->_amountOfOutputMaps;
-		this->_outputs = new T[this->_outputsCount];
-		this->_outputsDataSize = this->_outputsCount * sizeof(T);
+		size_t outputMapElementCount = this->outputWidth * this->outputHeight;
+		size_t outputsCount = outputMapElementCount * this->amountOfOutputMaps;
+		this->outputs.resize(outputsCount);
+		this->outputsDataSize = outputsCount * sizeof(T);
 	}
 
 	template <typename T>
-	inline void SubsamplingLayer2D<T>::computeWeightedSums(T* inputs, T* resultsArray)
+	inline void SubsamplingLayer2D<T>::computeWeightedSums(safety::SafeArray<T>* inputs, safety::SafeArray<T>* resultsArray)
 	{
-		// Check if the inputs are passed.
-		if (inputs == nullptr)
+		if (inputs->getElementsCount() == 0)
 		{
 			return;
 		}
@@ -120,8 +141,8 @@ namespace aimods
 		size_t outputHeight = this->getOutputHeight();
 		size_t outputWidth = this->getOutputWidth();
 
-		long filterHalfDimension = this->_filter->computeHalfDimension();
-		long filterStride = this->_filter->getStride();
+		long filterHalfDimension = this->filter->computeHalfDimension();
+		long filterStride = this->filter->getStride();
 
 		for (size_t mapIndex = 0; mapIndex < amountOfMaps; mapIndex++)
 		{
@@ -132,17 +153,17 @@ namespace aimods
 					// This block of code executes for every element of output map.
 
 					T subsampledValue = 0;
-					if (this->_filter->getActivationFunction() == ActivationFunction::MIN ||
-						this->_filter->getActivationFunction() == ActivationFunction::MAX)
+					if (this->function == ActivationFunction::MIN ||
+						this->function == ActivationFunction::MAX)
 					{
-						subsampledValue = inputs[0];
+						subsampledValue = inputs->getElement(0);
 					}
 
-					long filterStartOffsetFromMapsOrigin = this->_filter->getPadding() - filterHalfDimension;
+					long filterStartOffsetFromMapsOrigin = this->filter->getPadding() - filterHalfDimension;
 					long inputCoordY = outputCoordY * filterStride - filterStartOffsetFromMapsOrigin;
 					long inputCoordX = outputCoordX * filterStride - filterStartOffsetFromMapsOrigin;
 
-					long filterRightConstraint = this->_filter->getDimension() - filterHalfDimension;
+					long filterRightConstraint = this->filter->getDimension() - filterHalfDimension;
 					for (long i = -filterHalfDimension; i < filterRightConstraint; i++)
 					{
 						for (long j = -filterHalfDimension; j < filterRightConstraint; j++)
@@ -152,7 +173,7 @@ namespace aimods
 
 							T inputElement = this->sampleElement(samplingCoordX, samplingCoordY, mapIndex, inputs);
 
-							switch (this->_filter->getActivationFunction())
+							switch (this->function)
 							{
 							case ActivationFunction::AVERAGE:
 								subsampledValue += inputElement;
@@ -175,9 +196,9 @@ namespace aimods
 						}
 					}
 
-					if (this->_filter->getActivationFunction() == ActivationFunction::AVERAGE)
+					if (this->function == ActivationFunction::AVERAGE)
 					{
-						size_t kernelElementCount = this->_filter->getKernelElementCount();
+						size_t kernelElementCount = this->filter->getKernelElementCount();
 						subsampledValue /= kernelElementCount;
 					}
 					/// AVERAGE, d = 3, SAME
@@ -187,7 +208,7 @@ namespace aimods
 					/// 0.22 0.33 0.22 0.11
 					/// 
 					// Apply subsampling trainable parameters.
-					subsampledValue = subsampledValue * _weight - _threshold;
+					subsampledValue = subsampledValue * weight - threshold;
 
 					size_t outputElementIndex =
 						this->computeOutputsDataIndex(outputCoordX, outputCoordY, mapIndex);
@@ -198,11 +219,13 @@ namespace aimods
 	}
 
 	template <typename T>
-	inline void SubsamplingLayer2D<T>::computeOutputs(T* weightedSumsArray)
+	inline void SubsamplingLayer2D<T>::computeOutputs(safety::SafeArray<T>* weightedSumsArray)
 	{
-		for (size_t outputIndex = 0; outputIndex < this->_outputsCount; outputIndex++)
+		size_t outputsCount = this->outputs.getElementsCount();
+		for (size_t outputIndex = 0; outputIndex < outputsCount; outputIndex++)
 		{
-			weightedSumsArray[outputIndex] = activationFunction(weightedSumsArray[outputIndex], this->_function);
+			T weightedSum = weightedSumsArray->getElement(outputIndex);
+			weightedSumsArray->setElement(outputIndex, activationFunction(weightedSum, this->function));
 		}
 	}
 }

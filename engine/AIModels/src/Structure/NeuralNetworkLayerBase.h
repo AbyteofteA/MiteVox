@@ -1,9 +1,9 @@
-
 #ifndef NEURALNETWORKLAYERBASE_H
 #define NEURALNETWORKLAYERBASE_H
 
 #include "Functions.h"
 #include "NeuralLayerType.h"
+#include "engine/CodeSafety/src/SafeArray.h"
 
 namespace aimods
 {
@@ -12,7 +12,12 @@ namespace aimods
     {
     public:
 
-        ActivationFunction _function;
+        ActivationFunction function;
+        size_t inputsCount;
+        safety::SafeArray<T> outputs;
+
+        safety::SafeArray<T> temporaryCalculations; // Data necessary for training, is allocated when calling NeuralNetworkLayerBase::prepareForTraining().
+        safety::SafeArray<T> errors;                // Data necessary for training, is allocated when calling NeuralNetworkLayerBase::prepareForTraining().
 
         inline NeuralNetworkLayerBase(NeuralLayerType type);
 
@@ -21,27 +26,18 @@ namespace aimods
         inline ActivationFunction getFunction();
         inline size_t getInputsCount();
         inline size_t getOutputsCount();
-        inline T* getOutputs();
-        inline size_t getMaxOutputIndex();
-        inline T* getTemporaryCalculations();
+        inline size_t getIndexOfMaxOutput();
 
-        inline T* getErrors();
-        
-        /// <summary>
-        /// Computes errors for the last layer.
-        /// </summary>
-        /// <param name="targets">- target values for the outputs;</param>
-        inline void computeLastLayerErrors(T* targets);
-
+        inline void computeLastLayerErrors(safety::SafeArray<T>* targets);
         inline float computeMeanSquaredError();
 
         inline void setOutputs(T value);
-        inline void allocateErrorsArray();
+        inline void allocateErrorsArray(); 
         inline void freeErrorsArray();
         inline void allocateTemporaryCalculations();
         inline void freeTemporaryCalculations();
-
-        void printInputs(T* inputs);
+        
+        void printInputs(safety::SafeArray<T>* inputs);
         void printOutputs();
 
         virtual inline ~NeuralNetworkLayerBase();
@@ -51,33 +47,19 @@ namespace aimods
         virtual inline T* getWeights() = 0;
         virtual inline size_t getWeightsCount() = 0;
         virtual inline T* getThresholds() = 0;
-
-        /// <summary>
-        /// Computes errors for the hidden layers.
-        /// </summary>
-        /// <param name="nextLayer">- target values for the outputs;</param>
         virtual inline void computeHiddenLayerErrors(NeuralNetworkLayerBase<T>* nextLayer) = 0;
-
-        virtual inline void propagate(T* inputs) = 0;
-        virtual inline void propagateSavingWeightedSums(T* inputs) = 0;
-
-        virtual inline void adjustWeights(T* inputs, float learningRate) = 0;
+        
+        virtual inline void propagate(safety::SafeArray<T>* inputs) = 0;
+        virtual inline void propagateSavingWeightedSums(safety::SafeArray<T>* inputs) = 0;
+        
+        virtual inline void adjustWeights(safety::SafeArray<T>* inputs, float learningRate) = 0;
 
     protected:
 
-        NeuralLayerType _type;
+        NeuralLayerType type;
 
-        size_t _inputsCount;
-        size_t _outputsCount;
-        T* _outputs;
-
-        // Data necessary for training, is allocated when calling NeuralNetworkLayerBase::prepareForTraining().
-
-        T* _temporaryCalculations;
-        T* _errors;
-
-        virtual inline void computeWeightedSums(T* inputs, T* resultsArray) = 0;
-        virtual inline void computeOutputs(T* weightedSumsArray) = 0;
+        virtual inline void computeWeightedSums(safety::SafeArray<T>* inputs, safety::SafeArray<T>* resultsArray) = 0;
+        virtual inline void computeOutputs(safety::SafeArray<T>* weightedSumsArray) = 0;
     };
 
 
@@ -87,65 +69,54 @@ namespace aimods
     template <typename T>
     inline NeuralNetworkLayerBase<T>::NeuralNetworkLayerBase(NeuralLayerType type)
     {
-        _function = ActivationFunction::RELU;
-        _type = type;
-        _inputsCount = 0;
-        _outputsCount = 0;
-        _outputs = nullptr;
-        _temporaryCalculations = nullptr;
-        _errors = nullptr;
+        this->function = ActivationFunction::RELU;
+        this->type = type;
+        this->inputsCount = 0;
     }
 
     template <typename T>
     inline bool NeuralNetworkLayerBase<T>::isReadyToBeTrained()
     {
-        if (_temporaryCalculations == nullptr || _errors == nullptr)
+        if (temporaryCalculations.getElementsCount() == 0 ||
+            errors.getElementsCount() == 0)
         {
             return false;
         }
-        else
-        {
-            return true;
-        }
+        return true;
     }
 
     template <typename T>
     inline NeuralLayerType NeuralNetworkLayerBase<T>::getType()
     {
-        return _type;
+        return type;
     }
 
     template <typename T>
     inline ActivationFunction NeuralNetworkLayerBase<T>::getFunction()
     {
-        return _function;
+        return function;
     }
 
     template <typename T>
     inline size_t NeuralNetworkLayerBase<T>::getInputsCount()
     {
-        return _inputsCount;
+        return inputsCount;
     }
 
     template <typename T>
     inline size_t NeuralNetworkLayerBase<T>::getOutputsCount()
     {
-        return _outputsCount;
+        return outputs.getElementsCount();
     }
 
     template <typename T>
-    inline T* NeuralNetworkLayerBase<T>::getOutputs()
-    {
-        return _outputs;
-    }
-
-    template <typename T>
-    inline size_t NeuralNetworkLayerBase<T>::getMaxOutputIndex()
+    inline size_t NeuralNetworkLayerBase<T>::getIndexOfMaxOutput()
     {
         T maxOutputIndex = 0;
-        for (size_t neuronIndex = 1; neuronIndex < this->_outputsCount; neuronIndex++)
+        size_t outputsCount = outputs.getElementsCount();
+        for (size_t neuronIndex = 1; neuronIndex < outputsCount; neuronIndex++)
         {
-            if (_outputs[maxOutputIndex] < _outputs[neuronIndex])
+            if (outputs[maxOutputIndex] < outputs[neuronIndex])
             {
                 maxOutputIndex = neuronIndex;
             }
@@ -154,90 +125,68 @@ namespace aimods
     }
 
     template <typename T>
-    inline T* NeuralNetworkLayerBase<T>::getTemporaryCalculations()
+    inline void NeuralNetworkLayerBase<T>::computeLastLayerErrors(safety::SafeArray<T>* targets)
     {
-        return _temporaryCalculations;
-    }
-
-    template <typename T>
-    inline T* NeuralNetworkLayerBase<T>::getErrors()
-    {
-        return _errors;
-    }
-
-    template <typename T>
-    inline void NeuralNetworkLayerBase<T>::computeLastLayerErrors(T* targets)
-    {
-        // Exit if targets are not passed.
-        if (targets == nullptr)
+        if (targets->getElementsCount() == 0 || 
+            errors.getElementsCount() == 0)
         {
             return;
         }
 
-        // Exit if errors array is not allocated.
-        if (this->_errors == nullptr)
-        {
-            return;
-        }
-
-        for (size_t neuronIndex = 0; neuronIndex < this->_outputsCount; neuronIndex++)
-        {
-            this->_errors[neuronIndex] = this->_outputs[neuronIndex] - targets[neuronIndex];
-        }
+        errors = outputs;
+        errors -= *targets;
     }
 
     template <typename T>
     inline float NeuralNetworkLayerBase<T>::computeMeanSquaredError()
     {
-        T meanSquaredError = 0;
-        for (size_t neuronIndex = 0; neuronIndex < this->_outputsCount; neuronIndex++)
+        T meanSquaredError = 0.0;
+        size_t outputsCount = outputs.getElementsCount();
+        for (size_t neuronIndex = 0; neuronIndex < outputsCount; neuronIndex++)
         {
-            meanSquaredError += pow(this->_errors[neuronIndex], 2);
+            meanSquaredError += std::pow(errors[neuronIndex], 2.0);
         }
-        return (float)meanSquaredError / this->_outputsCount;
+        return (float)meanSquaredError / outputsCount;
     }
 
     template <typename T>
     inline void NeuralNetworkLayerBase<T>::setOutputs(T value)
     {
-        for (size_t neuronIndex = 0; neuronIndex < this->_outputsCount; neuronIndex++)
-        {
-            this->_outputs[neuronIndex] = value;
-        }
+        outputs.setAllElements(value);
     }
 
     template <typename T>
     inline void NeuralNetworkLayerBase<T>::allocateErrorsArray()
     {
-        this->_errors = new T[this->_outputsCount];
+        size_t outputsCount = outputs.getElementsCount();
+        errors.resize(outputsCount);
     }
 
     template <typename T>
     inline void NeuralNetworkLayerBase<T>::freeErrorsArray()
     {
-        delete[] this->_errors;
-        this->_errors = nullptr;
+        errors.deallocate();
     }
 
     template <typename T>
     inline void NeuralNetworkLayerBase<T>::allocateTemporaryCalculations()
     {
-        this->_temporaryCalculations = new T[this->_outputsCount];
+        size_t outputsCount = outputs.getElementsCount();
+        temporaryCalculations.resize(outputsCount);
     }
 
     template <typename T>
     inline void NeuralNetworkLayerBase<T>::freeTemporaryCalculations()
     {
-        delete[] this->_temporaryCalculations;
-        this->_temporaryCalculations = nullptr;
+        temporaryCalculations.deallocate();
     }
 
     template <typename T>
-    void NeuralNetworkLayerBase<T>::printInputs(T* inputs)
+    void NeuralNetworkLayerBase<T>::printInputs(safety::SafeArray<T>* inputs)
     {
-        for (size_t inputIndex = 0; inputIndex < _inputsCount; inputIndex++)
+        for (size_t inputIndex = 0; inputIndex < inputsCount; inputIndex++)
         {
-            printf(" %3.3f", inputs[inputIndex]);
+            printf(" %3.3f", inputs->getElement(inputIndex));
         }
         printf("\n");
     }
@@ -245,11 +194,10 @@ namespace aimods
     template <typename T>
     void NeuralNetworkLayerBase<T>::printOutputs()
     {
-        for (size_t neuronIndex = 0;
-            neuronIndex < _outputsCount;
-            neuronIndex++)
+        size_t outputsCount = outputs.getElementsCount();
+        for (size_t neuronIndex = 0; neuronIndex < outputsCount; neuronIndex++)
         {
-            printf(" %3.3f", this->_outputs[neuronIndex]);
+            printf(" %3.3f", outputs[neuronIndex]);
         }
         printf("\n");
     }
@@ -257,7 +205,9 @@ namespace aimods
     template <typename T>
     inline NeuralNetworkLayerBase<T>::~NeuralNetworkLayerBase()
     {
-
+        outputs.deallocate();
+        temporaryCalculations.deallocate();
+        errors.deallocate();
     }
 }
 

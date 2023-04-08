@@ -1,13 +1,11 @@
-
 #ifndef FILTERLAYER2DBASE_H
 #define FILTERLAYER2DBASE_H
 
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"
 #include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/Filter2D.h"
 
-#include <cstdlib>
-#include <cstring>
-#include <limits>
+#include "engine/Math/src/MinAndMax.h"
+#include <algorithm>
 
 namespace aimods
 {
@@ -16,7 +14,7 @@ namespace aimods
 	{
 	public:
 
-		Filter2D<T>* _filter;
+		Filter2D<T>* filter;
 
 		inline FilterLayer2DBase(
 			NeuralLayerType layerType,
@@ -27,16 +25,10 @@ namespace aimods
 			Filter2D<T>* filter);
 
 		inline ~FilterLayer2DBase();
-		inline void setWeightsRandom();
-		inline void setWeights(T value);
 		inline T* getWeights();
 		inline size_t getWeightsCount();
 		inline T* getThresholds();
 		inline void computeHiddenLayerErrors(NeuralNetworkLayerBase<T>* nextLayer);
-
-		virtual inline void propagate(T* inputs) = 0;
-		virtual inline void propagateSavingWeightedSums(T* inputs) = 0;
-		virtual inline void adjustWeights(T* inputs, float learningRate) = 0;
 
 		/// <summary>
 		/// Samples an element from the map pointed by inputs.
@@ -44,8 +36,8 @@ namespace aimods
 		/// <param name="column"> - horizontal index</param>
 		/// <param name="row"> - vertical index</param>
 		/// <param name="mapIndex"> - map index</param>
-		/// <param name="inputsData"> - array, must be of size FilterLayer2DBase::_inputsDataSize</param>
-		inline T sampleElement(long column, long row, size_t mapIndex, T* inputsData);
+		/// <param name="inputsData"> - array, must be of size FilterLayer2DBase::inputsDataSize</param>
+		inline T sampleElement(long column, long row, size_t mapIndex, safety::SafeArray<T>* inputsData);
 
 		size_t computeInputsDataIndex(long column, long row, size_t mapIndex);
 		size_t computeOutputsDataIndex(long column, long row, size_t mapIndex);
@@ -64,27 +56,27 @@ namespace aimods
 		inline size_t getOutputHeight();
 		inline size_t getOutputMapElementCount();
 
+		virtual inline void setWeightsRandom() = 0;
+		virtual inline void setWeights(T value) = 0;
+
 	protected:
 
-		size_t _inputsDataSize;
-		size_t _amountOfInputMaps;
-		size_t _inputWidth;
-		size_t _inputHeight;
-		size_t _inputMapElementCount;
+		size_t inputsDataSize;
+		size_t amountOfInputMaps;
+		size_t inputWidth;
+		size_t inputHeight;
+		size_t inputMapElementCount;
 
-		size_t _outputsDataSize;
-		size_t _amountOfOutputMaps;
-		size_t _outputWidth;
-		size_t _outputHeight;
-		size_t _outputMapElementCount;
+		size_t outputsDataSize;
+		size_t amountOfOutputMaps;
+		size_t outputWidth;
+		size_t outputHeight;
+		size_t outputMapElementCount;
 
 	private:
 
 		void tuneParameters();
 		virtual void tuneOutputs() = 0;
-
-		virtual inline void computeWeightedSums(T* inputs, T* resultsArray) = 0;
-		virtual inline void computeOutputs(T* weightedSumsArray) = 0;
 	};
 
 
@@ -100,20 +92,19 @@ namespace aimods
 		size_t amountOfOutputMaps,
 		Filter2D<T>* filter) : NeuralNetworkLayerBase<T>(layerType)
 	{
-		// Check if the filter is passed.
 		if (filter == nullptr)
 		{
 			return;
 		}
 
-		_amountOfInputMaps = safety::ensureMinimum<size_t>(amountOfInputMaps, 1);
-		_inputWidth = safety::ensureMinimum<size_t>(inputWidth, 1);
-		_inputHeight = safety::ensureMinimum<size_t>(inputHeight, 1);
-		_amountOfOutputMaps = safety::ensureMinimum<size_t>(amountOfOutputMaps, 1);
-		_inputMapElementCount = _inputWidth * _inputHeight;
-		this->_inputsCount = _inputMapElementCount * _amountOfInputMaps;
-		_inputsDataSize = this->_inputsCount * sizeof(T);
-		_filter = filter;
+		this->amountOfInputMaps = std::max<size_t>(amountOfInputMaps, 1);
+		this->inputWidth = std::max<size_t>(inputWidth, 1);
+		this->inputHeight = std::max<size_t>(inputHeight, 1);
+		this->amountOfOutputMaps = std::max<size_t>(amountOfOutputMaps, 1);
+		this->inputMapElementCount = this->inputWidth * this->inputHeight;
+		this->inputsCount = this->inputMapElementCount * this->amountOfInputMaps;
+		this->inputsDataSize = this->inputsCount * sizeof(T);
+		this->filter = filter;
 
 		tuneParameters();
 	}
@@ -121,31 +112,19 @@ namespace aimods
 	template <typename T>
 	inline FilterLayer2DBase<T>::~FilterLayer2DBase()
 	{
-		delete[] this->_outputs;
-	}
-
-	template <typename T>
-	inline void FilterLayer2DBase<T>::setWeightsRandom()
-	{
-		this->_filter->setFilterRandom();
-	}
-
-	template <typename T>
-	inline void FilterLayer2DBase<T>::setWeights(T value)
-	{
-		this->_filter->setFilter(value);
+		this->outputs.deallocate();
 	}
 
 	template <typename T>
 	inline T* FilterLayer2DBase<T>::getWeights()
 	{
-		return _filter->getFilterData();
+		return filter->getFilterData();
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getWeightsCount()
 	{
-		return _filter->computeFilterDataElementCount();
+		return filter->computeFilterDataElementCount();
 	}
 
 	template <typename T>
@@ -157,209 +136,185 @@ namespace aimods
 	template <typename T>
 	inline void FilterLayer2DBase<T>::computeHiddenLayerErrors(NeuralNetworkLayerBase<T>* nextLayer)
 	{
-
+		// TODO:
 	}
 
 	template <typename T>
-	inline T FilterLayer2DBase<T>::sampleElement(long column, long row, size_t mapIndex, T* inputsData)
+	inline T FilterLayer2DBase<T>::sampleElement(long column, long row, size_t mapIndex, safety::SafeArray<T>* inputsData)
 	{
-		// Check if the filter exists.
-		if (_filter == nullptr)
+		if (filter == nullptr ||
+			mapIndex >= amountOfInputMaps ||
+			inputsData->getElementsCount() == 0)
 		{
 			return 0;
 		}
 
-		// mapIndex must be valid (less than _amountOfInputMaps).
-		if (mapIndex >= _amountOfInputMaps)
-		{
-			return 0;
-		}
+		size_t inputMapsOffset = inputMapElementCount * mapIndex;
 
-		// Check if the inputs are passed.
-		if (inputsData == nullptr)
-		{
-			return 0;
-		}
-
-		size_t inputMapsOffset = _inputMapElementCount * mapIndex;
-
-		switch (_filter->_fillType)
+		switch (filter->fillType)
 		{
 		case FillType::ZERO:
-			if (column < 0 || column >= _inputWidth || row < 0 || row >= _inputHeight)
+			if (column < 0 || column >= inputWidth || row < 0 || row >= inputHeight)
 			{
 				return 0;
 			}
-			else
-			{
-				return inputsData[inputMapsOffset + row * _inputWidth + column];
-			}
+			break;
 
 		case FillType::MAX:
-			if (column < 0 || column >= _inputWidth || row < 0 || row >= _inputHeight)
+			if (column < 0 || column >= inputWidth || row < 0 || row >= inputHeight)
 			{
-				return std::numeric_limits<T>().max();
+				return mathem::max<T>();
 			}
-			else
-			{
-				return inputsData[inputMapsOffset + row * _inputWidth + column];
-			}
+			break;
 
 		case FillType::BORDER:
 			if (column < 0)
 			{
 				column = 0;
 			}
-			else if (column >= _inputWidth)
+			else if (column >= inputWidth)
 			{
-				column = _inputWidth - 1;
+				column = inputWidth - 1;
 			}
 			if (row < 0)
 			{
 				row = 0;
 			}
-			else if (row >= _inputHeight)
+			else if (row >= inputHeight)
 			{
-				row = _inputHeight - 1;
+				row = inputHeight - 1;
 			}
-			return inputsData[inputMapsOffset + row * _inputWidth + column];
+			break;
 
 		case FillType::REPEAT:
-			row = row % _inputHeight;
-			column = column % _inputWidth;
-			return inputsData[inputMapsOffset + row * _inputWidth + column];
+			row = row % inputHeight;
+			column = column % inputWidth;
+			break;
 
 		case FillType::REPEAT_HORIZONTALLY_ZERO:
-			if (row < 0 || row >= _inputHeight)
+			if (row < 0 || row >= inputHeight)
 			{
 				return 0;
 			}
 			else
 			{
-				column = column % _inputWidth;
-				return inputsData[inputMapsOffset + row * _inputWidth + column];
+				column = column % inputWidth;
 			}
+			break;
 
 		case FillType::REPEAT_HORIZONTALLY_MAX:
-			if (row < 0 || row >= _inputHeight)
+			if (row < 0 || row >= inputHeight)
 			{
-				return std::numeric_limits<T>().max();
+				return mathem::max<T>();
 			}
 			else
 			{
-				column = column % _inputWidth;
-				return inputsData[inputMapsOffset + row * _inputWidth + column];
+				column = column % inputWidth;
 			}
+			break;
 
 		case FillType::REPEAT_VERTICALLY_ZERO:
-			if (column < 0 || column >= _inputWidth)
+			if (column < 0 || column >= inputWidth)
 			{
 				return 0;
 			}
 			else
 			{
-				row = row % _inputHeight;
-				return inputsData[inputMapsOffset + row * _inputWidth + column];
+				row = row % inputHeight;
 			}
+			break;
 
 		case FillType::REPEAT_VERTICALLY_MAX:
-			if (column < 0 || column >= _inputWidth)
+			if (column < 0 || column >= inputWidth)
 			{
-				return std::numeric_limits<T>().max();
+				return mathem::max<T>();
 			}
 			else
 			{
-				row = row % _inputHeight;
-				return inputsData[inputMapsOffset + row * _inputWidth + column];
+				row = row % inputHeight;
 			}
+			break;
 		}
 
-		return 0;
+		return inputsData->getElement(inputMapsOffset + row * inputWidth + column);
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getInputsDataSize()
 	{
-		return _inputsDataSize;
+		return inputsDataSize;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getAmountOfInputMaps()
 	{
-		return _amountOfInputMaps;
+		return amountOfInputMaps;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getInputWidth()
 	{
-		return _inputWidth;
+		return inputWidth;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getInputHeight()
 	{
-		return _inputHeight;
+		return inputHeight;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getInputMapElementCount()
 	{
-		return _inputMapElementCount;
+		return inputMapElementCount;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getOutputsDataSize()
 	{
-		return _outputsDataSize;
+		return outputsDataSize;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getAmountOfOutputMaps()
 	{
-		return _amountOfOutputMaps;
+		return amountOfOutputMaps;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getOutputWidth()
 	{
-		return _outputWidth;
+		return outputWidth;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getOutputHeight()
 	{
-		return _outputHeight;
+		return outputHeight;
 	}
 
 	template <typename T>
 	inline size_t FilterLayer2DBase<T>::getOutputMapElementCount()
 	{
-		return _outputMapElementCount;
+		return outputMapElementCount;
 	}
 
 	template <typename T>
 	size_t FilterLayer2DBase<T>::computeInputsDataIndex(long column, long row, size_t mapIndex)
 	{
-		return 
-			_inputMapElementCount * mapIndex +
-			row * _inputWidth + 
-			column;
+		return inputMapElementCount * mapIndex + row * inputWidth + column;
 	}
 
 	template <typename T>
 	size_t FilterLayer2DBase<T>::computeOutputsDataIndex(long column, long row, size_t mapIndex)
 	{
-		return
-			_outputMapElementCount * mapIndex +
-			row * _outputWidth +
-			column;
+		return outputMapElementCount * mapIndex + row * outputWidth + column;
 	}
 
 	template <typename T>
 	void FilterLayer2DBase<T>::tuneParameters()
 	{
-		// Check if the filter exists.
-		if (_filter == nullptr)
+		if (filter == nullptr)
 		{
 			return;
 		}
@@ -367,27 +322,27 @@ namespace aimods
 		long deltaSize = 0;
 		float outputWidthFloat = 0;
 		float outputHeightFloat = 0;
-		size_t filterHalfDimension = _filter->computeHalfDimension();
+		size_t filterHalfDimension = filter->computeHalfDimension();
 
-		switch (_filter->_paddingType)
+		switch (filter->paddingType)
 		{
 		case PaddingType::NO_PADDING:
-			_outputWidth = (_inputWidth - _filter->_dimension) / _filter->_stride + 1;
-			_outputHeight = (_inputHeight - _filter->_dimension) / _filter->_stride + 1;
+			outputWidth = (inputWidth - filter->dimension) / filter->stride + 1;
+			outputHeight = (inputHeight - filter->dimension) / filter->stride + 1;
 			break;
 
 		case PaddingType::ARBITRARY:
-			_outputWidth =
-				(_inputWidth + _filter->_padding * 2 - _filter->_dimension) / _filter->_stride + 1;
-			_outputHeight =
-				(_inputHeight + _filter->_padding * 2 - _filter->_dimension) / _filter->_stride + 1;
+			outputWidth =
+				(inputWidth + filter->padding * 2 - filter->dimension) / filter->stride + 1;
+			outputHeight =
+				(inputHeight + filter->padding * 2 - filter->dimension) / filter->stride + 1;
 			break;
 
 		case PaddingType::SAME:
-			_filter->_stride = 1;
-			_outputWidth = _inputWidth;
-			_outputHeight = _inputHeight;
-			_filter->_padding = (long)filterHalfDimension;
+			filter->stride = 1;
+			outputWidth = inputWidth;
+			outputHeight = inputHeight;
+			filter->padding = (long)filterHalfDimension;
 			break;
 
 		case PaddingType::DILATED:

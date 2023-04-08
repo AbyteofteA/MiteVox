@@ -1,6 +1,7 @@
 #include "CollisionInfo.h"
 
 #include "engine/Math/src/almostEqual.h"
+#include "engine/Math/src/MinAndMax.h"
 #include <algorithm>
 
 namespace mathem
@@ -25,14 +26,14 @@ namespace mathem
 		contactPointsCount = 0;
 		for (size_t i = 0; i < MAX_CONTACT_POINTS_COUNT; ++i)
 		{
-			contactPointsDistancesSquared[i] = std::numeric_limits<float>::max();
+			contactPointsDistancesSquared[i] = mathem::max<float>();
 		}
 	}
 
 	void CollisionProperties::tryAddNewContactPoint(Vector3D contactPoint, float distanceSquared, float equalityTolerance)
 	{
 		int32_t contactToChangeIndex = -1;
-		float contactToChangeDistance = std::numeric_limits<float>::max();
+		float contactToChangeDistance = mathem::max<float>();
 		for (size_t i = 0; i < contactPointsCount; ++i)
 		{
 			if (almostEqual(contactPoints[i], contactPoint, equalityTolerance))

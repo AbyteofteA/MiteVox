@@ -3,6 +3,7 @@
 #include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 #include "engine/Math/src/almostEqual.h"
+#include "engine/Math/src/MinAndMax.h"
 
 namespace mathem
 {
@@ -168,7 +169,7 @@ namespace mathem
 	size_t getFurthestVertexInTheDirection(GeometryPrimitiveBase* meshGeometry, GeometryTransform* meshGeometryTransform, Vector3D direction)
 	{
 		size_t furthestVertexIndex = 0;
-		float maxDistance = -std::numeric_limits<float>::max();
+		float maxDistance = -mathem::max<float>();
 		size_t meshGeometryVertecesCount = meshGeometry->getVertecesCount();
 		for (size_t i = 0; i < meshGeometryVertecesCount; i++)
 		{

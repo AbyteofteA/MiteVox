@@ -90,38 +90,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\ConvolutionalLayer2D.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\ConvolutionalLayer2DDeserializer.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\ConvolutionalLayer2DSerializer.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\Filter2DDeserializer.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\Filter2DSerializer.h" />
+    <ClInclude Include="src\NeuralNetworkCodec\ConvolutionalLayer2DCodec.h" />
+    <ClInclude Include="src\NeuralNetworkCodec\Filter2DCodec.h" />
     <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\FilterLayer2DBase.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\FilterLayer2DBaseSerializer.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\SubsamplingLayer2DDeserializer.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\SubsamplingLayer2DSerializer.h" />
+    <ClInclude Include="src\NeuralNetworkCodec\SubsamplingLayer2DCodec.h" />
     <ClInclude Include="src\FeedForwardNeuralNets\FullyConnectedLayer.h" />
     <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\Filter2D.h" />
     <ClInclude Include="src\FeedForwardNeuralNets\ConvolutionalNeuralNets\SubsamplingLayer2D.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\FullyConnectedLayerDeserializer.h" />
-    <ClInclude Include="src\FeedForwardNeuralNets\FullyConnectedLayerSerializer.h" />
+    <ClInclude Include="src\NeuralNetworkCodec\FullyConnectedLayerCodec.h" />
     <ClInclude Include="src\FeedForwardNeuralNets\SoftmaxLayer.h" />
     <ClInclude Include="src\Structure\NeuralLayerCompatibility.h" />
     <ClInclude Include="src\Structure\NeuralLayerType.h" />
-    <ClInclude Include="src\Structure\NeuralLayerGeneration.h" />
     <ClInclude Include="src\RecurrentNeuralNets\HopfieldNetwork.h" />
     <ClInclude Include="src\Structure\Functions.h" />
-    <ClInclude Include="src\GZ_File_IO.h" />
     <ClInclude Include="src\Structure\LearningBatch.h" />
-    <ClInclude Include="src\AIModels.h" />
     <ClInclude Include="src\Service.h" />
     <ClInclude Include="src\Structure\FormalNeuron.h" />
     <ClInclude Include="src\Structure\NeuralNetwork.h" />
-    <ClInclude Include="src\Structure\NeuralNetworkDeserializer.h" />
     <ClInclude Include="src\Structure\NeuralNetworkLayerBase.h" />
-    <ClInclude Include="src\Structure\NeuralNetworkLayerBaseSerializer.h" />
-    <ClInclude Include="src\Structure\NeuralNetworkSerializer.h" />
+    <ClInclude Include="src\NeuralNetworkCodec\NeuralNetworkCodec.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Structure\FormalNeuron.cpp" />
+    <ClCompile Include="src\Structure\Functions.cpp" />
+    <ClCompile Include="src\Structure\NeuralLayerType.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

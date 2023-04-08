@@ -3,7 +3,6 @@
 #define FUNCTIONS_H
 
 #include <cmath>
-#include <conio.h>
 
 #include "engine/Math/src/MathConstants.h"
 
@@ -22,6 +21,9 @@ namespace aimods
 		MIN, 
 		MAX 
 	};
+
+	const char* activationFunctionToString(ActivationFunction activationFunction);
+	ActivationFunction stringToActivationFunction(const char* string);
 
 	template <typename T>
 	inline T activationFunction(T weightedSum, ActivationFunction function)
@@ -116,8 +118,8 @@ namespace aimods
 			break;
 
 		case ActivationFunction::SIGMOID:
-			der = (1.0f - 1.0f / (1.0f + (T)pow((T)M_E, -weightedSum))) / 
-				(1.0f + (T)pow((T)M_E, -weightedSum));
+			der = (1.0f - 1.0f / (1.0f + (T)pow((T)mathem::E, -weightedSum))) / 
+				(1.0f + (T)pow((T)mathem::E, -weightedSum));
 			break;
 
 		case ActivationFunction::TANH:

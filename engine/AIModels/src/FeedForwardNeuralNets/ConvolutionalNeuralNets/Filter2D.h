@@ -1,10 +1,11 @@
-
 #ifndef FILTER_2D_H
 #define FILTER_2D_H
 
-#include <string>
-#include "engine/CodeSafety/src/CodeSafety.h"
 #include "engine/AIModels/src/Structure/Functions.h"
+#include "engine/CodeSafety/src/SafeArray.h"
+
+#include <string>
+#include <algorithm>
 
 namespace aimods
 {
@@ -15,7 +16,7 @@ namespace aimods
 	{ 
 		NO_PADDING = 0,	/// The filter can sample from the map, but not from outside;
 		SAME,			/// The padding is calculated so that input map is of the same size as output map;
-		ARBITRARY,		/// The padding is set by user (via Filter2D::_padding);
+		ARBITRARY,		/// The padding is set by user (via Filter2D::padding);
 		DILATED			/// TODO: add description for PaddingType::DILATED.
 	};
 
@@ -45,6 +46,8 @@ namespace aimods
 	template <typename T>
 	class Filter2D
 	{
+		friend class Filter2DCodec;
+
 		template <typename T>
 		friend class FilterLayer2DBase;
 
@@ -57,7 +60,6 @@ namespace aimods
 			size_t amountOfKernels,
 			size_t dimension,
 			size_t stride,
-			ActivationFunction activationFunction,
 			FillType fillType = FillType::ZERO,
 			PaddingType paddingType = PaddingType::SAME,
 			size_t padding = 0);
@@ -68,7 +70,6 @@ namespace aimods
 		inline Filter2D(
 			size_t dimension,
 			size_t stride,
-			ActivationFunction activationFunction,
 			FillType fillType = FillType::ZERO,
 			PaddingType paddingType = PaddingType::SAME,
 			size_t padding = 0);
@@ -84,8 +85,6 @@ namespace aimods
 		inline size_t computeKernelSize();
 		inline size_t computeHalfDimension();
 
-		// Getters //
-
 		inline size_t getDimension();
 		inline size_t getStride();
 		inline PaddingType getPaddingType();
@@ -93,21 +92,19 @@ namespace aimods
 		inline FillType getFillType();
 		inline size_t getAmountOfKernels();
 		inline size_t getKernelElementCount();
-		inline ActivationFunction getActivationFunction();
 		inline T* getFilterData();
 
 	private:
 
-		size_t _dimension;
-		size_t _stride;
-		PaddingType _paddingType;
-		size_t _padding;
-		FillType _fillType;
-		size_t _amountOfKernels;
-		size_t _kernelElementCount;
-		ActivationFunction _activationFunction;
+		size_t dimension;
+		size_t stride;
+		PaddingType paddingType;
+		size_t padding;
+		FillType fillType;
+		size_t amountOfKernels;
+		size_t kernelElementCount;
 
-		T* _filterData;
+		safety::SafeArray<T> filterData;
 	};
 
 
@@ -119,79 +116,72 @@ namespace aimods
 		size_t amountOfKernels,
 		size_t dimension,
 		size_t stride,
-		ActivationFunction activationFunction,
 		FillType fillType,
 		PaddingType paddingType,
 		size_t padding)
 	{
-		_amountOfKernels = safety::ensureMinimum<size_t>(amountOfKernels, 1);
+		this->amountOfKernels = std::max<size_t>(amountOfKernels, 1);
 
-		// Kernel's _dimension must be at least 2.
-		_dimension = safety::ensureMinimum<size_t>(dimension, 2);
+		// Kernel's dimension must be at least 2.
+		this->dimension = std::max<size_t>(dimension, 2);
 
-		_fillType = fillType;
-		_paddingType = paddingType;
-		_padding = padding;
-		_activationFunction = activationFunction;
-		_kernelElementCount = _dimension * _dimension;
+		this->fillType = fillType;
+		this->paddingType = paddingType;
+		this->padding = padding;
+		this->kernelElementCount = this->dimension * this->dimension;
 
-		// _stride must be at least 1 to prevent the filter from getting stuck in place.
-		_stride = safety::ensureMinimum<size_t>(stride, 1);
+		// stride must be at least 1 to prevent the filter from getting stuck in place.
+		this->stride = std::max<size_t>(stride, 1);
 
 		size_t kernelsElementCount = computeFilterDataElementCount();
-		_filterData = new T[kernelsElementCount];
-		memset(_filterData, 0, kernelsElementCount * sizeof(T));
+		this->filterData.resize(kernelsElementCount);
+		this->filterData.setAllElements(0.0);
 	}
 
 	template <typename T>
 	inline Filter2D<T>::Filter2D(
 		size_t dimension,
 		size_t stride,
-		ActivationFunction activationFunction,
 		FillType fillType,
 		PaddingType paddingType,
 		size_t padding)
 	{
-		_amountOfKernels = 1;
+		this->amountOfKernels = 1;
 
-		// Kernel's _dimension must be odd and at least 3.
-		_dimension = safety::ensureMinimum<size_t>(dimension, 2);
+		// Kernel's dimension must be odd and at least 3.
+		this->dimension = std::max<size_t>(dimension, 2);
 
-		_fillType = fillType;
-		_paddingType = paddingType;
-		_padding = padding;
-		_activationFunction = activationFunction;
-		_kernelElementCount = _dimension * _dimension;
+		this->fillType = fillType;
+		this->paddingType = paddingType;
+		this->padding = padding;
+		this->kernelElementCount = this->dimension * this->dimension;
 
-		// _stride must be at least 1 to prevent the filter from getting stuck in place.
-		_stride = safety::ensureMinimum<size_t>(stride, 1);
-
-		_filterData = nullptr;
+		// stride must be at least 1 to prevent the filter from getting stuck in place.
+		this->stride = std::max<size_t>(stride, 1);
 	}
 
 	template <typename T>
 	inline Filter2D<T>::~Filter2D()
 	{
-		delete[] _filterData;
+		filterData.deallocate();
 	}
 
 	template <typename T>
 	inline void Filter2D<T>::setFilter(T value)
 	{
-		// Exit if it is a subsampling filter.
-		if (_filterData == nullptr)
+		if (filterData.getElementsCount() == 0)
 		{
 			return;
 		}
 
-		size_t kernelOffset = _dimension * _dimension;
-		for (size_t kernelIndex = 0; kernelIndex < _amountOfKernels; kernelIndex++)
+		size_t kernelOffset = dimension * dimension;
+		for (size_t kernelIndex = 0; kernelIndex < amountOfKernels; kernelIndex++)
 		{
-			for (size_t j = 0; j < _dimension; j++)
+			for (size_t j = 0; j < dimension; j++)
 			{
-				for (size_t i = 0; i < _dimension; i++)
+				for (size_t i = 0; i < dimension; i++)
 				{
-					_filterData[kernelIndex * kernelOffset + i + j * _dimension] = value;
+					filterData[kernelIndex * kernelOffset + i + j * dimension] = value;
 				}
 			}
 		}
@@ -200,15 +190,15 @@ namespace aimods
 	template <typename T>
 	inline void Filter2D<T>::setFilterRandom()
 	{
-		size_t kernelOffset = _dimension * _dimension;
-		for (size_t kernelIndex = 0; kernelIndex < _amountOfKernels; kernelIndex++)
+		size_t kernelOffset = dimension * dimension;
+		for (size_t kernelIndex = 0; kernelIndex < amountOfKernels; kernelIndex++)
 		{
-			for (size_t j = 0; j < _dimension; j++)
+			for (size_t j = 0; j < dimension; j++)
 			{
-				for (size_t i = 0; i < _dimension; i++)
+				for (size_t i = 0; i < dimension; i++)
 				{
-					_filterData[kernelIndex * kernelOffset + i + j * _dimension] =
-						(T)(rand() % 200 - 100) / 50;
+					filterData[kernelIndex * kernelOffset + i + j * dimension] =
+						(T)rand() / ((T)RAND_MAX * 10.0f);
 				}
 			}
 		}
@@ -217,80 +207,73 @@ namespace aimods
 	template <typename T>
 	inline size_t Filter2D<T>::computeFilterDataElementCount()
 	{
-		return _amountOfKernels * _dimension * _dimension;
+		return amountOfKernels * dimension * dimension;
 	}
 
 	template <typename T>
 	inline size_t Filter2D<T>::computeFilterDataSize()
 	{
-		return _amountOfKernels * _dimension * _dimension * sizeof(T);
+		return amountOfKernels * dimension * dimension * sizeof(T);
 	}
 	
 	template <typename T>
 	inline size_t Filter2D<T>::computeKernelSize()
 	{
-		return _kernelElementCount * sizeof(T);
+		return kernelElementCount * sizeof(T);
 	}
 
 	template <typename T>
 	inline size_t Filter2D<T>::computeHalfDimension()
 	{
-		// Left shift is equivalent to integer devision by 2.
-		return _dimension >> 1;
+		return dimension / 2;
 	}
 
 	template <typename T>
 	inline size_t Filter2D<T>::getDimension()
 	{
-		return _dimension;
+		return dimension;
 	}
 
 	template <typename T>
 	inline size_t Filter2D<T>::getStride()
 	{
-		return _stride;
+		return stride;
 	}
 
 	template <typename T>
 	inline PaddingType Filter2D<T>::getPaddingType()
 	{
-		return _paddingType;
+		return paddingType;
 	}
 
 	template <typename T>
 	inline size_t Filter2D<T>::getPadding()
 	{
-		return _padding;
+		return padding;
 	}
 
 	template <typename T>
 	inline FillType Filter2D<T>::getFillType()
 	{
-		return _fillType;
+		return fillType;
 	}
 
 	template <typename T>
 	inline size_t Filter2D<T>::getAmountOfKernels()
 	{
-		return _amountOfKernels;
+		return amountOfKernels;
 	}
 
 	template <typename T>
 	inline size_t Filter2D<T>::getKernelElementCount()
 	{
-		return _kernelElementCount;
-	}
-
-	template <typename T>
-	inline ActivationFunction Filter2D<T>::getActivationFunction()
-	{
-		return _activationFunction;
+		return kernelElementCount;
 	}
 
 	template <typename T>
 	inline T* Filter2D<T>::getFilterData()
 	{
-		return _filterData;
+		return filterData.getElementsArray();
 	}
 }
 

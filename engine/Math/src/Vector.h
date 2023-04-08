@@ -2,10 +2,10 @@
 #define MATH_VECTOR_H
 
 #include "engine/CodeSafety/src/SafeArray.h"
+#include "engine/Math/src/MinAndMax.h"
 
 #include <cmath>
 #include <algorithm>
-#include <limits>
 #include <cassert>
 #include <initializer_list>
 
@@ -96,6 +96,7 @@ namespace mathem
 
 	// IMPLEMENTATION BELOW //
 
+
 	VECTOR_TEMPLATE
 	inline VECTOR VECTOR::min(VECTOR* vector1, VECTOR* vector2)
 	{
@@ -127,7 +128,7 @@ namespace mathem
 	{
 		for (size_t index = 0; index < Dimension; ++index)
 		{
-			data[index] = std::numeric_limits<T>::min();
+			data[index] = mathem::min<T>();
 		}
 	}
 
@@ -136,7 +137,7 @@ namespace mathem
 	{
 		for (size_t index = 0; index < Dimension; ++index)
 		{
-			data[index] = std::numeric_limits<T>::max();
+			data[index] = mathem::max<T>();
 		}
 	}
 

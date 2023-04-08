@@ -17,7 +17,7 @@ namespace aimods
 		float* weightArray = nullptr;
 		FormalNeuron** axonArray = nullptr;
 		
-		inline FormalNeuron(ActivationFunction _function, unsigned int _amountOfAxons);
+		inline FormalNeuron(ActivationFunction function, unsigned int amountOfAxons);
 		inline ~FormalNeuron();
 
 		inline void setWeights(float value);

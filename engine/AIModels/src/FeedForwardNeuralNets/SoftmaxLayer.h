@@ -1,13 +1,14 @@
-
 #ifndef SOFTMAXLAYER_H
 #define SOFTMAXLAYER_H
 
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"
 
+#include <cmath>
+
 namespace aimods
 {
 	template <typename T>
-	class SoftmaxLayer : public NeuralNetworkLayerBase<T>
+	class SoftmaxLayer : public NeuralNetworkLayerBase<T> // TODO: : public FullyConnectedLayer<T>
 	{
 	public:
 
@@ -16,33 +17,26 @@ namespace aimods
 
 		inline void setWeightsRandom() {};
 		inline void setWeights(T value) {};
+		inline T* getWeights() { return nullptr; };
+		inline size_t getWeightsCount() { return 0; };
+		inline T* getThresholds() { return nullptr; };
 
 		/// <summary>
 		/// Calculates Softmax of inputs, then stores the results in outputs.
 		/// </summary>
 		/// <param name="inputs"> - array, must be of size "size"</param>
-		inline void propagate(T* inputs);
-		inline void propagateSavingWeightedSums(T* inputs);
+		inline void propagate(safety::SafeArray<T>* inputs);
+		inline void propagateSavingWeightedSums(safety::SafeArray<T>* inputs);
 
-		/// <summary>
-		/// Computes errors for the last layer.
-		/// </summary>
-		/// <param name="targets">- target values for the outputs;</param>
-		inline void computeLastLayerErrors(T* targets);
-
-		/// <summary>
-		/// Computes errors for the hidden layers.
-		/// </summary>
-		/// <param name="nextLayer">- target values for the outputs;</param>
 		inline void computeHiddenLayerErrors(NeuralNetworkLayerBase<T>* nextLayer);
 		inline float computeMeanSquaredError();
 
-		inline void adjustWeights(T* inputs, float learningRate) {};
+		inline void adjustWeights(safety::SafeArray<T>* inputs, float learningRate) {};
 
 	private:
 
-		inline void computeWeightedSums(T* inputs, T* resultsArray) {};
-		inline void computeOutputs(T* weightedSumsArray) {};
+		inline void computeWeightedSums(safety::SafeArray<T>* inputs, safety::SafeArray<T>* resultsArray) {};
+		inline void computeOutputs(safety::SafeArray<T>* weightedSumsArray) {};
 	};
 
 
@@ -53,94 +47,67 @@ namespace aimods
 	SoftmaxLayer<T>::SoftmaxLayer(size_t outputsCount) :
 		NeuralNetworkLayerBase<T>::NeuralNetworkLayerBase(NeuralLayerType::SOFTMAX)
 	{
-		this->_outputsCount = outputsCount;
-
-		if (this->_outputsCount != 0)
+		if (outputsCount != 0)
 		{
-			this->_outputs = new T[this->_outputsCount];
-			this->setOutputs(0);
+			this->outputs.resize(outputsCount);
+			this->outputs.setAllElements(0);
 		}
 	}
 
 	template <typename T>
 	SoftmaxLayer<T>::~SoftmaxLayer()
 	{
-		delete[] this->_outputs;
+		this->outputs.deallocate();
 	}
 
 	template <typename T>
-	inline void SoftmaxLayer<T>::propagate(T* inputs)
+	inline void SoftmaxLayer<T>::propagate(safety::SafeArray<T>* inputs)
 	{
-		T sum = 0;
-		for (size_t i = 0; i < this->_outputsCount; i++)
+		T sum = 0.0;
+		size_t outputsCount = this->outputs.getElementsCount();
+		for (size_t i = 0; i < outputsCount; i++)
 		{
-			this->_outputs[i] = (T)exp(inputs[i]);
-			sum += this->_outputs[i];
+			this->outputs[i] = (T)std::exp(inputs->getElement(i));
+			sum += this->outputs[i];
 		}
-		for (size_t i = 0; i < this->_outputsCount; i++)
+		for (size_t i = 0; i < outputsCount; i++)
 		{
-			this->_outputs[i] /= sum;
+			this->outputs[i] /= sum;
 		}
 	}
 
 	template <typename T>
-	inline void SoftmaxLayer<T>::propagateSavingWeightedSums(T* inputs)
+	inline void SoftmaxLayer<T>::propagateSavingWeightedSums(safety::SafeArray<T>* inputs)
 	{
 		propagate(inputs);
 	}
 
 	template <typename T>
-	inline void SoftmaxLayer<T>::computeLastLayerErrors(T* targets)
-	{
-		// Exit if targets are not passed.
-		if (targets == nullptr)
-		{
-			return;
-		}
-
-		// Exit if errors array is not allocated.
-		if (this->_errors == nullptr)
-		{
-			return;
-		}
-
-		for (size_t neuronIndex = 0; neuronIndex < this->_outputsCount; neuronIndex++)
-		{
-			this->_errors[neuronIndex] = this->_outputs[neuronIndex] - targets[neuronIndex];
-		}
-	}
-
-	template <typename T>
 	inline void SoftmaxLayer<T>::computeHiddenLayerErrors(aimods::NeuralNetworkLayerBase<T>* nextLayer)
 	{
-		// Exit if nextLayer is not passed.
-		if (nextLayer == nullptr)
-		{
-			return;
-		}
-
-		// Exit if errors array is not allocated.
-		if (this->_errors == nullptr)
+		if (nextLayer == nullptr ||
+			this->errors.getElementsCount() == 0)
 		{
 			return;
 		}
 
 		FullyConnectedLayer<T>* nextLayerFullyConnected = (FullyConnectedLayer<T>*)nextLayer;
 		T* nextLayerWeights = nextLayerFullyConnected->getWeights();
-		T* nextLayerErrors = nextLayerFullyConnected->getErrors();
+		T* nextLayerErrors = nextLayerFullyConnected->errors.getElementsArray();
 
+		size_t outputsCount = this->outputs.getElementsCount();
 		for (size_t currentLayerNeuronIndex = 0;
-			currentLayerNeuronIndex < this->_outputsCount;
+			currentLayerNeuronIndex < outputsCount;
 			currentLayerNeuronIndex++)
 		{
-			this->_errors[currentLayerNeuronIndex] = 0;
+			this->errors[currentLayerNeuronIndex] = 0;
 
 			for (size_t nextLayerNeuronIndex = 0;
 				nextLayerNeuronIndex < nextLayer->getOutputsCount();
 				nextLayerNeuronIndex++)
 			{
-				size_t nextLayerWeightIndex = this->_outputsCount * currentLayerNeuronIndex + nextLayerNeuronIndex;
-				this->_errors[currentLayerNeuronIndex] +=
+				size_t nextLayerWeightIndex = outputsCount * currentLayerNeuronIndex + nextLayerNeuronIndex;
+				this->errors[currentLayerNeuronIndex] +=
 					nextLayerErrors[nextLayerNeuronIndex] * nextLayerWeights[nextLayerWeightIndex];
 			}
 		}
@@ -150,11 +117,12 @@ namespace aimods
 	inline float SoftmaxLayer<T>::computeMeanSquaredError()
 	{
 		T meanSquaredError = 0;
-		for (size_t neuronIndex = 0; neuronIndex < this->_outputsCount; neuronIndex++)
+		size_t outputsCount = this->outputs.getElementsCount();
+		for (size_t neuronIndex = 0; neuronIndex < outputsCount; neuronIndex++)
 		{
-			meanSquaredError += pow(this->_errors[neuronIndex], 2);
+			meanSquaredError += pow(this->errors[neuronIndex], 2);
 		}
-		return (float)meanSquaredError / this->_outputsCount;
+		return (float)meanSquaredError / outputsCount;
 	}
 }
 

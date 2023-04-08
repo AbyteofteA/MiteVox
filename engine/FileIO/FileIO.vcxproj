@@ -167,6 +167,7 @@
     <ClInclude Include="src\Formats\CodecGLTF\MaterialCodec\ImageSamplerCodec.h" />
     <ClInclude Include="src\Formats\CodecGLTF\MeshCodec\MeshCodec.h" />
     <ClInclude Include="src\Formats\CodecGLTF\PlaygroundCodec\SceneCodec.h" />
+    <ClInclude Include="src\Formats\GZ_File_IO.h" />
     <ClInclude Include="src\Formats\JSON\JSONRegex.h" />
     <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJ.h" />
     <ClInclude Include="src\Formats\WavefrontOBJ\WavefrontOBJRegexPack.h" />

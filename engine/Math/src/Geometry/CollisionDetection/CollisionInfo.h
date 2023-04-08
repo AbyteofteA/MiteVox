@@ -2,10 +2,10 @@
 #define COLLISIONINFO_H
 
 #include "engine/Math/src/Vector.h"
+#include "engine/Math/src/MinAndMax.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionType.h"
 
 #include <cstdint>
-#include <limits>
 
 #define MAX_CONTACT_POINTS_COUNT 4
 
@@ -14,17 +14,17 @@ namespace mathem
 	struct CollisionProperties
 	{
 		CollisionType type = CollisionType::NONE;
-		float penetrationDepth = std::numeric_limits<float>::max();
+		float penetrationDepth = mathem::max<float>();
 		bool normalBelongsToTheFirst = true;
 		Vector3D normal;
 		uint16_t contactPointsCount = 0;
 		Vector3D contactPoints[MAX_CONTACT_POINTS_COUNT];
 		Vector3D forces[MAX_CONTACT_POINTS_COUNT];
 		float contactPointsDistancesSquared[MAX_CONTACT_POINTS_COUNT] = { 
-			std::numeric_limits<float>::max(),
-			std::numeric_limits<float>::max(),
-			std::numeric_limits<float>::max(),
-			std::numeric_limits<float>::max() };
+			mathem::max<float>(),
+			mathem::max<float>(),
+			mathem::max<float>(),
+			mathem::max<float>() };
 
 		void invert();
 		void recomputePenetrationAndNormal(float penetrationDepth, Vector3D normal, bool normalBelongsToTheFirst);

@@ -7,10 +7,10 @@
 namespace aimods
 {
 
-	inline FormalNeuron::FormalNeuron(ActivationFunction _function, unsigned int _amountOfAxons)
+	inline FormalNeuron::FormalNeuron(ActivationFunction function, unsigned int amountOfAxons)
 	{
-		this->function = _function;
-		this->amountOfAxons = _amountOfAxons;
+		this->function = function;
+		this->amountOfAxons = amountOfAxons;
 
 		this->axonArray = new FormalNeuron * [this->amountOfAxons];
 		this->weightArray = new float[this->amountOfAxons];
