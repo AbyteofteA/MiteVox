@@ -22,14 +22,14 @@ namespace mitevox
 		render::ColorRGBAf baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		float roughness = 1.0f;
 		float metallicity = 1.0f;
-		render::ColorRGBf emission = { 0.0f, 0.0f, 0.0f };	// (0.0 - 1.0)
-		float specularExponent = 8;					// (0.0 - 1000.0)
+		render::ColorRGBf emission = { 0.0f, 0.0f, 0.0f };	// (0.0f - 1.0f)
+		float specularExponent = 8;					// (0.0f - 1000.0f)
 
 		// Transparancy
 		render::ColorRGBAf filter = { 1.0f, 1.0f, 1.0f };
-		float transparency = 0;						// (0.0 - 1.0)
-		float opticalDensity;						// (0.001 - 10.0)
-		float reflectionSharpness;					// (0.0 - 1000.0)
+		float transparency = 0;						// (0.0f - 1.0f)
+		float opticalDensity;						// (0.001f - 10.0f)
+		float reflectionSharpness;					// (0.0f - 1000.0f)
 													
 		int illuminationModel = 2;						// (0 - 10)
 

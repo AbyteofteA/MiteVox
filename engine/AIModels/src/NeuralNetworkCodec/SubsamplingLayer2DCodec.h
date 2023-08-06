@@ -24,14 +24,14 @@ namespace aimods
     {
         ActivationFunction function =
             stringToActivationFunction(layerJSON->getFieldStringOrDefault("function", "IDENTITY").c_str());
-        size_t amountOfInputMaps = (size_t)layerJSON->getFieldNumberOrDefault("amountOfInputMaps", 0.0);
-        size_t inputWidth = (size_t)layerJSON->getFieldNumberOrDefault("inputWidth", 0.0);
-        size_t inputHeight = (size_t)layerJSON->getFieldNumberOrDefault("inputHeight", 0.0);
+        size_t amountOfInputMaps = (size_t)layerJSON->getFieldNumberOrDefault("amountOfInputMaps", 0.0f);
+        size_t inputWidth = (size_t)layerJSON->getFieldNumberOrDefault("inputWidth", 0.0f);
+        size_t inputHeight = (size_t)layerJSON->getFieldNumberOrDefault("inputHeight", 0.0f);
 
         Filter2D<T>* filter = Filter2DCodec::fromJSON<T>(layerJSON->getFieldObject("filter"));
 
-        T weight = (T)layerJSON->getFieldNumberOrDefault("weight", 0.0);
-        T threshold = (T)layerJSON->getFieldNumberOrDefault("threshold", 0.0);
+        T weight = (T)layerJSON->getFieldNumberOrDefault("weight", 0.0f);
+        T threshold = (T)layerJSON->getFieldNumberOrDefault("threshold", 0.0f);
 
         SubsamplingLayer2D<T>* subsamplingLayer2D =
             new SubsamplingLayer2D<T>(amountOfInputMaps, inputWidth, inputHeight, filter);

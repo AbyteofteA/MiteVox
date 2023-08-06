@@ -15,17 +15,17 @@ namespace fileio
 
 		if (JSON* numberJSON = nodeJSON->getField("camera"))
 		{
-			int32_t cameraIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t cameraIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			nodeResult->camera = cameras->getElement(cameraIndex);
 		}
 		if (JSON* numberJSON = nodeJSON->getField("skin"))
 		{
-			int32_t skeletonIndex = (int32_t)numberJSON->getNumberOrDefault(-2.0) + 1;
+			int32_t skeletonIndex = (int32_t)numberJSON->getNumberOrDefault(-2.0f) + 1;
 			nodeResult->skeleton = (mitevox::SkeletonBase*)skeletonIndex;
 		}
 		if (JSON* numberJSON = nodeJSON->getField("mesh"))
 		{
-			int32_t meshIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t meshIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			nodeResult->mesh = meshes->getElement(meshIndex);
 		}
 		if (JSON* weightsArrayJSON = nodeJSON->getFieldArray("weights"))
@@ -69,7 +69,7 @@ namespace fileio
 
 			for (size_t i = 0; i < childrenCount; ++i)
 			{
-				int32_t childIndex = (int32_t)childrenArrayJSON->getArrayItemNumberOrDefault(i, -1.0);
+				int32_t childIndex = (int32_t)childrenArrayJSON->getArrayItemNumberOrDefault(i, -1.0f);
 				nodeResult->children.setElement(i, nodes->getElement(childIndex));
 			}
 		}

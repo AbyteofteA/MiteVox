@@ -7,7 +7,7 @@
 
 namespace render
 {
-    enum class LightType
+    enum struct LightType
     {
         NONE,
         POINT,

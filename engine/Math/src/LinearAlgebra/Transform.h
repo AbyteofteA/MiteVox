@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include "engine/Math/src/MathConstants.h"
+#include "engine/Math/src/Vector.h"
 
 namespace mathem
 {
@@ -36,9 +37,9 @@ namespace mathem
 			resultVector.z() = 1.0f;
 			/*glm::vec3 vector = { 0, 0, 1 };
 			glm::mat4 global = glm::mat4(1.0f);
-			global = glm::rotate(global, glm::radians(angleX), glm::vec3(1.0, 0.0, 0.0));
-			global = glm::rotate(global, glm::radians(angleY), glm::vec3(0.0, 1.0, 0.0));
-			global = glm::rotate(global, glm::radians(angleZ), glm::vec3(0.0, 0.0, 1.0));
+			global = glm::rotate(global, glm::radians(angleX), glm::vec3(1.0f, 0.0f, 0.0f));
+			global = glm::rotate(global, glm::radians(angleY), glm::vec3(0.0f, 1.0f, 0.0f));
+			global = glm::rotate(global, glm::radians(angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
 			vector = vector * glm::mat3(global);
 			resultVector.i = vector.x;
 			resultVector.j = vector.y;
@@ -55,19 +56,19 @@ namespace mathem
 			Vector3D vNew = { v.x(), v.y(), v.z() };
 			Vector3D vTmp = { v.x(), v.y(), v.z() };
 
-			float angle = angleY * (float)mathem::PI / 180;
+			float angle = angleY * (float)mathem::PI / 180.0f;
 			vTmp.x() = (float)cos(angle) * vNew.x() + (float)sin(angle) * vNew.z();
 			vTmp.z() = (float)-sin(angle) * vNew.x() + (float)cos(angle) * vNew.z();
 			vNew.x() = vTmp.x();
 			vNew.z() = vTmp.z();
 
-			angle = angleX * (float)mathem::PI / 180;
+			angle = angleX * (float)mathem::PI / 180.0f;
 			vTmp.y() = (float)cos(angle) * vNew.y() + (float)sin(angle) * vNew.z();
 			vTmp.z() = (float)-sin(angle) * vNew.y() + (float)cos(angle) * vNew.z();
 			vNew.y() = vTmp.y();
 			vNew.z() = vTmp.z();
 
-			angle = angleZ * (float)mathem::PI / 180;
+			angle = angleZ * (float)mathem::PI / 180.0f;
 			vTmp.x() = (float)cos(angle) * vNew.x() - (float)sin(angle) * vNew.y();
 			vTmp.y() = (float)sin(angle) * vNew.x() + (float)cos(angle) * vNew.y();
 			vNew.x() = vTmp.x();
@@ -91,19 +92,19 @@ namespace mathem
 			Vector3D vNew = v;
 			Vector3D vTmp = v;
 
-			float angle = angleY * (float)mathem::PI / 180;
+			float angle = angleY * (float)mathem::PI / 180.0f;
 			vTmp.i() = (float)cos(angle) * vNew.i() + (float)sin(angle) * vNew.k();
 			vTmp.k() = (float)-sin(angle) * vNew.i() + (float)cos(angle) * vNew.k();
 			vNew.i() = vTmp.i();
 			vNew.k() = vTmp.k();
 
-			angle = angleX * (float)mathem::PI / 180;
+			angle = angleX * (float)mathem::PI / 180.0f;
 			vTmp.j() = (float)cos(angle) * vNew.j() - (float)sin(angle) * vNew.k();
 			vTmp.k() = (float)sin(angle) * vNew.j() + (float)cos(angle) * vNew.k();
 			vNew.j() = vTmp.j();
 			vNew.k() = vTmp.k();
 
-			angle = angleZ * (float)mathem::PI / 180;
+			angle = angleZ * (float)mathem::PI / 180.0f;
 			vTmp.i() = (float)cos(angle) * vNew.i() - (float)sin(angle) * vNew.j();
 			vTmp.j() = (float)sin(angle) * vNew.i() + (float)cos(angle) * vNew.j();
 			vNew.i() = vTmp.i();

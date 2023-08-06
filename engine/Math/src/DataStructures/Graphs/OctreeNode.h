@@ -177,7 +177,7 @@ namespace mathem
 
 		if (subNodes[subNodeIndex] == nullptr)
 		{
-			Vector3D newHalfSize = boundingBox.halfSize * 0.5;
+			Vector3D newHalfSize = boundingBox.halfSize * 0.5f;
 			Vector3D newOrigin;
 			newOrigin.x() = boundingBox.position.x() + newHalfSize.x() * signesX[subNodeIndex];
 			newOrigin.y() = boundingBox.position.y() + newHalfSize.y() * signesY[subNodeIndex];

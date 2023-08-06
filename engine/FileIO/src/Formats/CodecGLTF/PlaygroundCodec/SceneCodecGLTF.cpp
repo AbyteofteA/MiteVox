@@ -21,7 +21,7 @@ namespace fileio
 
 			for (size_t entityIndex = 0; entityIndex < entitiesCount; ++entityIndex)
 			{
-				int32_t nodeIndex = (int32_t)nodesArrayJSON->getArrayItemNumberOrDefault(entityIndex, -1.0);
+				int32_t nodeIndex = (int32_t)nodesArrayJSON->getArrayItemNumberOrDefault(entityIndex, -1.0f);
 				mitevox::Node* renderableNode = nodes->getElement(nodeIndex);
 				prepareNodeRecursively(renderableNode);
 

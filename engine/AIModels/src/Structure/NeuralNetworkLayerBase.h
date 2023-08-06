@@ -140,11 +140,11 @@ namespace aimods
     template <typename T>
     inline float NeuralNetworkLayerBase<T>::computeMeanSquaredError()
     {
-        T meanSquaredError = 0.0;
+        T meanSquaredError = 0.0f;
         size_t outputsCount = outputs.getElementsCount();
         for (size_t neuronIndex = 0; neuronIndex < outputsCount; neuronIndex++)
         {
-            meanSquaredError += std::pow(errors[neuronIndex], 2.0);
+            meanSquaredError += std::pow(errors[neuronIndex], 2.0f);
         }
         return (float)meanSquaredError / outputsCount;
     }

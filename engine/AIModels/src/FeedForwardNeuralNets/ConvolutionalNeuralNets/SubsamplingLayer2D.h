@@ -65,8 +65,8 @@ namespace aimods
 			amountOfInputMaps,
 			filter)
 	{
-		weight = 1.0;
-		threshold = 0.0;
+		weight = 1.0f;
+		threshold = 0.0f;
 		this->function = function;
 		this->tuneOutputs();
 	}

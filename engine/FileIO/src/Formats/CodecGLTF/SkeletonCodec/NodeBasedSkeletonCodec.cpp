@@ -14,7 +14,7 @@ namespace fileio
     {
 		skeletonResult->name = skeletonJSON->getFieldStringOrDefault("name", "Untitled");
 
-		int32_t skeletonRootNodeIndex = (int32_t)skeletonJSON->getFieldNumberOrDefault("skeleton", -1.0);
+		int32_t skeletonRootNodeIndex = (int32_t)skeletonJSON->getFieldNumberOrDefault("skeleton", -1.0f);
 		if (skeletonRootNodeIndex >= 0)
 		{
 			skeletonResult->root = nodes->getElement(skeletonRootNodeIndex);
@@ -31,14 +31,14 @@ namespace fileio
 
 			for (size_t i = 0; i < jointsCount; ++i)
 			{
-				int32_t jointNodeIndex = (int32_t)jointsArrayJSON->getArrayItemNumberOrDefault(i, -1.0);
+				int32_t jointNodeIndex = (int32_t)jointsArrayJSON->getArrayItemNumberOrDefault(i, -1.0f);
 				skeletonResult->joints.setElement(i, nodes->getElement(jointNodeIndex));
 			}
 		}
 
 		if (JSON* numberJSON = skeletonJSON->getField("inverseBindMatrices"))
 		{
-			int32_t inverseBindMatricesAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t inverseBindMatricesAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			mitevox::BufferViewAccessor* inverseBindMatricesAccessor = accessors->getElement(inverseBindMatricesAccessorIndex);
 
 			for (size_t i = 0; i < jointsCount; ++i)

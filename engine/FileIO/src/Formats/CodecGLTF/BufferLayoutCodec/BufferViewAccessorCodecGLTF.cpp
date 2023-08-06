@@ -11,15 +11,15 @@ namespace fileio
         safety::SafeArray<mitevox::BufferView*>* bufferViews)
     {
         bufferViewAccessorResult->name = accessorJSON->getFieldStringOrDefault("name", "Untitled");
-        bufferViewAccessorResult->byteOffset = (uint64_t)accessorJSON->getFieldNumberOrDefault("byteOffset", 0.0);
+        bufferViewAccessorResult->byteOffset = (uint64_t)accessorJSON->getFieldNumberOrDefault("byteOffset", 0.0f);
         bufferViewAccessorResult->componentType = 
             (mitevox::ComponentDataType)accessorJSON->getFieldNumberOrDefault("componentType", (double)mitevox::ComponentDataType::FLOAT);
-        bufferViewAccessorResult->count = (uint64_t)accessorJSON->getFieldNumberOrDefault("count", 0.0);
+        bufferViewAccessorResult->count = (uint64_t)accessorJSON->getFieldNumberOrDefault("count", 0.0f);
         bufferViewAccessorResult->normalized = accessorJSON->getFieldBooleanOrDefault("normalized", false);
         
         if (JSON* numberJSON = accessorJSON->getField("bufferView"))
         {
-            int32_t bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+            int32_t bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
             bufferViewAccessorResult->bufferView = bufferViews->getElement(bufferViewIndex);
         }
 
@@ -87,18 +87,18 @@ namespace fileio
         mitevox::BufferViewAccessorSparse* bufferViewAccessorSparse = new mitevox::BufferViewAccessorSparse();
         if (JSON* numberJSON = accessorSparseJSON->getField("count"))
         {
-            bufferViewAccessorSparse->count = (uint64_t)numberJSON->getNumberOrDefault(0.0);
+            bufferViewAccessorSparse->count = (uint64_t)numberJSON->getNumberOrDefault(0.0f);
         }
 
         if (JSON* indicesJSON = accessorSparseJSON->getField("indices"))
         {
             if (JSON* numberJSON = indicesJSON->getField("bufferView"))
             {
-                bufferViewAccessorSparse->indices.bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+                bufferViewAccessorSparse->indices.bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
             }
             if (JSON* numberJSON = indicesJSON->getField("byteOffset"))
             {
-                bufferViewAccessorSparse->indices.byteOffset = (uint64_t)numberJSON->getNumberOrDefault(0.0);
+                bufferViewAccessorSparse->indices.byteOffset = (uint64_t)numberJSON->getNumberOrDefault(0.0f);
             }
             if (JSON* numberJSON = indicesJSON->getField("componentType"))
             {
@@ -111,11 +111,11 @@ namespace fileio
         {
             if (JSON* numberJSON = valuesJSON->getField("bufferView"))
             {
-                bufferViewAccessorSparse->values.bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+                bufferViewAccessorSparse->values.bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
             }
             if (JSON* numberJSON = valuesJSON->getField("byteOffset"))
             {
-                bufferViewAccessorSparse->values.byteOffset = (uint64_t)numberJSON->getNumberOrDefault(0.0);
+                bufferViewAccessorSparse->values.byteOffset = (uint64_t)numberJSON->getNumberOrDefault(0.0f);
             }
         }
 

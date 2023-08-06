@@ -25,9 +25,9 @@ namespace aimods
     {
         ActivationFunction function =
             stringToActivationFunction(layerJSON->getFieldStringOrDefault("function", "IDENTITY").c_str());
-        size_t inputsCount = (size_t)layerJSON->getFieldNumberOrDefault("inputsCount", 0.0);
-        size_t outputsCount = (size_t)layerJSON->getFieldNumberOrDefault("outputsCount", 0.0);
-        float dropout = (float)layerJSON->getFieldNumberOrDefault("dropout", 0.0);
+        size_t inputsCount = (size_t)layerJSON->getFieldNumberOrDefault("inputsCount", 0.0f);
+        size_t outputsCount = (size_t)layerJSON->getFieldNumberOrDefault("outputsCount", 0.0f);
+        float dropout = (float)layerJSON->getFieldNumberOrDefault("dropout", 0.0f);
 
         FullyConnectedLayer<T>* fullyConnectedLayer =
             new FullyConnectedLayer<T>(function, inputsCount, outputsCount, dropout);

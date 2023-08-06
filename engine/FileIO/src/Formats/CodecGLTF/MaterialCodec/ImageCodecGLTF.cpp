@@ -29,7 +29,7 @@ namespace fileio
 			std::string mimeType = imageJSON->getFieldStringOrDefault("mimeType", "ERROR");
 			if (JSON* numberJSON = imageJSON->getField("bufferView"))
 			{
-				imageResult->bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				imageResult->bufferViewIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			}
 		}
 	}

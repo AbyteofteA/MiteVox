@@ -23,9 +23,9 @@ namespace aimods
     {
         ActivationFunction function =
             stringToActivationFunction(layerJSON->getFieldStringOrDefault("function", "IDENTITY").c_str());
-        size_t amountOfInputMaps = (size_t)layerJSON->getFieldNumberOrDefault("amountOfInputMaps", 0.0);
-        size_t inputWidth = (size_t)layerJSON->getFieldNumberOrDefault("inputWidth", 0.0);
-        size_t inputHeight = (size_t)layerJSON->getFieldNumberOrDefault("inputHeight", 0.0);
+        size_t amountOfInputMaps = (size_t)layerJSON->getFieldNumberOrDefault("amountOfInputMaps", 0.0f);
+        size_t inputWidth = (size_t)layerJSON->getFieldNumberOrDefault("inputWidth", 0.0f);
+        size_t inputHeight = (size_t)layerJSON->getFieldNumberOrDefault("inputHeight", 0.0f);
 
         Filter2D<T>* filter = Filter2DCodec::fromJSON<T>(layerJSON->getFieldObject("filter"));
 

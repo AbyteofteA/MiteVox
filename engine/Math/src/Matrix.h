@@ -263,7 +263,7 @@ namespace mathem
 
 	inline Matrix3x3 getInverse(Matrix3x3 matrix)
 	{
-		float inverseDeterminant = 1.0 / computeDeterminant(matrix);
+		float inverseDeterminant = 1.0f / computeDeterminant(matrix);
 		
 		float subDeterminant00 = matrix.m11() * matrix.m22() - matrix.m21() * matrix.m12();
 		float subDeterminant01 = matrix.m02() * matrix.m21() - matrix.m01() * matrix.m22();

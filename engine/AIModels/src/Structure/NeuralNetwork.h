@@ -231,7 +231,7 @@ namespace aimods
 			size_t neuronCount = lastLayer->getOutputsCount();
 			newFullyConnectedLayer = new FullyConnectedLayer<T>(function, neuronCount, outputsCount, dropout);
 		}
-		newFullyConnectedLayer->setOutputs(0.0);
+		newFullyConnectedLayer->setOutputs(0.0f);
 		newFullyConnectedLayer->setWeightsRandom();
 		layers.push_back((NeuralNetworkLayerBase<T>*)newFullyConnectedLayer);
 		this->outputsCount = newFullyConnectedLayer->getOutputsCount();

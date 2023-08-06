@@ -13,7 +13,7 @@ namespace fileio
 
 namespace mitevox
 {
-	enum class AnimationType
+	enum struct AnimationType
 	{
 		SINGLE_SHOT,
 		REPEATED

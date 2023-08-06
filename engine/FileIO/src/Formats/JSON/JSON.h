@@ -124,7 +124,7 @@ namespace fileio
 			JSON* numberField = _fields[index];
 			if (numberField->isNumber())
 			{
-				resultArray->setElement(numberIndex, (T)numberField->getNumberOrDefault(0.0));
+				resultArray->setElement(numberIndex, (T)numberField->getNumberOrDefault(0.0f));
 				++numberIndex;
 			}
 		}

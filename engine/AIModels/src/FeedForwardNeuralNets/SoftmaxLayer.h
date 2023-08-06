@@ -63,7 +63,7 @@ namespace aimods
 	template <typename T>
 	inline void SoftmaxLayer<T>::propagate(safety::SafeArray<T>* inputs)
 	{
-		T sum = 0.0;
+		T sum = 0.0f;
 		size_t outputsCount = this->outputs.getElementsCount();
 		for (size_t i = 0; i < outputsCount; i++)
 		{

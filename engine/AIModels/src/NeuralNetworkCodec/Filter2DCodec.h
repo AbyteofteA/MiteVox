@@ -20,12 +20,12 @@ namespace aimods
     template <typename T>
     Filter2D<T>* Filter2DCodec::fromJSON(fileio::JSON* filter2DJSON)
     {
-        size_t dimension = (size_t)filter2DJSON->getFieldNumberOrDefault("dimension", 0.0);
-        size_t stride = (size_t)filter2DJSON->getFieldNumberOrDefault("stride", 0.0);
-        PaddingType paddingType = (PaddingType)filter2DJSON->getFieldNumberOrDefault("paddingType", 0.0);
-        size_t padding = (size_t)filter2DJSON->getFieldNumberOrDefault("padding", 0.0);
-        FillType fillType = (FillType)filter2DJSON->getFieldNumberOrDefault("fillType", 0.0);
-        size_t amountOfKernels = (size_t)filter2DJSON->getFieldNumberOrDefault("amountOfKernels", 0.0);
+        size_t dimension = (size_t)filter2DJSON->getFieldNumberOrDefault("dimension", 0.0f);
+        size_t stride = (size_t)filter2DJSON->getFieldNumberOrDefault("stride", 0.0f);
+        PaddingType paddingType = (PaddingType)filter2DJSON->getFieldNumberOrDefault("paddingType", 0.0f);
+        size_t padding = (size_t)filter2DJSON->getFieldNumberOrDefault("padding", 0.0f);
+        FillType fillType = (FillType)filter2DJSON->getFieldNumberOrDefault("fillType", 0.0f);
+        size_t amountOfKernels = (size_t)filter2DJSON->getFieldNumberOrDefault("amountOfKernels", 0.0f);
 
         Filter2D<T>* filter2D = nullptr;
 

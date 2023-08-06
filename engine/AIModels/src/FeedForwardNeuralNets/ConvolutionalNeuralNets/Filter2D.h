@@ -135,7 +135,7 @@ namespace aimods
 
 		size_t kernelsElementCount = computeFilterDataElementCount();
 		this->filterData.resize(kernelsElementCount);
-		this->filterData.setAllElements(0.0);
+		this->filterData.setAllElements(0.0f);
 	}
 
 	template <typename T>

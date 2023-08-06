@@ -33,7 +33,7 @@ namespace fileio
 				int32_t samplerIndex = -1;
 				if (JSON* numberJSON = animationChannelJSON->getField("sampler"))
 				{
-					samplerIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+					samplerIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 				}
 				mitevox::BufferViewAccessor* timeAccessor = nullptr;
 				mitevox::BufferViewAccessor* dataAccessor = nullptr;
@@ -43,13 +43,13 @@ namespace fileio
 				{
 					if (JSON* numberJSON = animationSamplerJSON->getField("input"))
 					{
-						timeAccessor = accessors->getElement((size_t)numberJSON->getNumberOrDefault(-1.0));
+						timeAccessor = accessors->getElement((size_t)numberJSON->getNumberOrDefault(-1.0f));
 						animationFramesCount = timeAccessor->count;
 					}
 
 					if (JSON* numberJSON = animationSamplerJSON->getField("output"))
 					{
-						dataAccessor = accessors->getElement((size_t)numberJSON->getNumberOrDefault(-1.0));
+						dataAccessor = accessors->getElement((size_t)numberJSON->getNumberOrDefault(-1.0f));
 					}
 
 					std::string interpolationTypeString = "LINEAR";
@@ -82,7 +82,7 @@ namespace fileio
 
 				if (JSON* animationTargetNodeJSON = animationTargetJSON->getField("node"))
 				{
-					int32_t animationTargetNodeIndex = (int32_t)animationTargetNodeJSON->getNumberOrDefault(-1.0);
+					int32_t animationTargetNodeIndex = (int32_t)animationTargetNodeJSON->getNumberOrDefault(-1.0f);
 					mitevox::Node* node = nodes->getElement(animationTargetNodeIndex);
 
 					if (animationTargetPath == "translation")

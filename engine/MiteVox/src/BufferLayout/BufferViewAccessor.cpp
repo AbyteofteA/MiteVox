@@ -187,25 +187,25 @@ namespace mitevox
             {
             case mitevox::BYTE:
             {
-                int8_t normalizedValue = std::round(value * 127.0);
+                int8_t normalizedValue = std::round(value * 127.0f);
                 setElementsComponent<int8_t>(elementIndex, componentIndex, normalizedValue);
                 break;
             }
             case mitevox::UNSIGNED_BYTE:
             {
-                uint8_t normalizedValue = std::round(value * 255.0);
+                uint8_t normalizedValue = std::round(value * 255.0f);
                 setElementsComponent<uint8_t>(elementIndex, componentIndex, normalizedValue);
                 break;
             }
             case mitevox::SHORT:
             {
-                int16_t normalizedValue = std::round(value * 32767.0);
+                int16_t normalizedValue = std::round(value * 32767.0f);
                 setElementsComponent<int16_t>(elementIndex, componentIndex, normalizedValue);
                 break;
             }
             case mitevox::UNSIGNED_SHORT:
             {
-                uint16_t normalizedValue = std::round(value * 65535.0);
+                uint16_t normalizedValue = std::round(value * 65535.0f);
                 setElementsComponent<uint16_t>(elementIndex, componentIndex, normalizedValue);
                 break;
             }

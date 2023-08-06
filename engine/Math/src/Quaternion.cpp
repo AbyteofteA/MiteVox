@@ -145,7 +145,7 @@ namespace mathem
 		
 		*y = 2.0f * std::atan2(
 			std::sqrt(1.0f + 2.0f * (components.s() * components.y() - components.x() * components.z())),
-			std::sqrt(1.0f - 2.0f * (components.s() * components.y() - components.x() * components.z()))) - PI / 2.0f;
+			std::sqrt(1.0f - 2.0f * (components.s() * components.y() - components.x() * components.z()))) - (float)PI / 2.0f;
 
 		*z = atan2(
 			2.0f * (components.s() * components.z() + components.x() * components.y()),

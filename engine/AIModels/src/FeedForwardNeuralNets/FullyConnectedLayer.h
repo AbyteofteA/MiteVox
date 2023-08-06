@@ -77,7 +77,7 @@ namespace aimods
 	FullyConnectedLayer<T>::FullyConnectedLayer(ActivationFunction function, size_t inputsCount, size_t outputsCount, float dropout) :
 		NeuralNetworkLayerBase<T>::NeuralNetworkLayerBase(NeuralLayerType::FULLYCONNECTED)
 	{
-		this->dropout = safety::ensureRange<float>(dropout, 0.0, 100.0);
+		this->dropout = safety::ensureRange<float>(dropout, 0.0f, 100.0f);
 		this->inputsCount = inputsCount;
 		this->function = function;
 
@@ -86,9 +86,9 @@ namespace aimods
 			return;
 		}
 		this->outputs.resize(outputsCount);
-		this->outputs.setAllElements(0.0);
+		this->outputs.setAllElements(0.0f);
 		thresholds.resize(outputsCount);
-		thresholds.setAllElements(0.0);
+		thresholds.setAllElements(0.0f);
 
 		if (this->inputsCount == 0)
 		{
@@ -96,7 +96,7 @@ namespace aimods
 		}
 		size_t weightsCount = inputsCount * outputsCount;
 		weights.resize(weightsCount);
-		weights.setAllElements(0.0);
+		weights.setAllElements(0.0f);
 	}
 
 	template <typename T>

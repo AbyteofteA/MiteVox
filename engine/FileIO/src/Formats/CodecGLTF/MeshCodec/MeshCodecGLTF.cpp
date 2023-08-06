@@ -68,13 +68,13 @@ namespace fileio
 
 		if (JSON* numberJSON = meshPrimitiveJSON->getField("indices"))
 		{
-			int32_t indecesAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t indecesAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshPrimitiveResult->indecesAccessor = accessors->getElement(indecesAccessorIndex);
 		}
 
 		if (JSON* numberJSON = meshPrimitiveJSON->getField("material"))
 		{
-			int32_t materialIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t materialIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshPrimitiveResult->material = materials->getElementPointer(materialIndex);
 		}
 		else
@@ -109,42 +109,42 @@ namespace fileio
 	{
 		if (JSON* numberJSON = meshAttributesJSON->getField("POSITION"))
 		{
-			int32_t positionAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t positionAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.positionAccessor = accessors->getElement(positionAccessorIndex);
 		}
 		if (JSON* numberJSON = meshAttributesJSON->getField("NORMAL"))
 		{
-			int32_t normalAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t normalAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.normalAccessor = accessors->getElement(normalAccessorIndex);
 		}
 		if (JSON* numberJSON = meshAttributesJSON->getField("TANGENT"))
 		{
-			int32_t tangentAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t tangentAccessorIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.tangentAccessor = accessors->getElement(tangentAccessorIndex);
 		}
 		if (JSON* numberJSON = meshAttributesJSON->getField("TEXCOORD_0"))
 		{
-			int32_t textureCoordAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t textureCoordAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.textureCoordAccessor_0 = accessors->getElement(textureCoordAccessorIndex_0);
 		}
 		if (JSON* numberJSON = meshAttributesJSON->getField("TEXCOORD_1"))
 		{
-			int32_t textureCoordAccessorIndex_1 = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t textureCoordAccessorIndex_1 = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.textureCoordAccessor_1 = accessors->getElement(textureCoordAccessorIndex_1);
 		}
 		if (JSON* numberJSON = meshAttributesJSON->getField("COLOR_0"))
 		{
-			int32_t colorAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t colorAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.colorAccessor_0 = accessors->getElement(colorAccessorIndex_0);
 		}
 		if (JSON* numberJSON = meshAttributesJSON->getField("JOINTS_0"))
 		{
-			int32_t jointsAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t jointsAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.jointsAccessor_0 = accessors->getElement(jointsAccessorIndex_0);
 		}
 		if (JSON* numberJSON = meshAttributesJSON->getField("WEIGHTS_0"))
 		{
-			int32_t weightsAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			int32_t weightsAccessorIndex_0 = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 			meshAttributeSet->byName.weightsAccessor_0 = accessors->getElement(weightsAccessorIndex_0);
 		}
 	}

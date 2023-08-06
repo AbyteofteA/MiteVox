@@ -35,7 +35,7 @@ namespace fileio
 
 		if (JSON* numberJSON = playgroundJSON->getField("scene"))
 		{
-			playgroundResult->activeScene = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+			playgroundResult->activeScene = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 		}
 
 		JSON* camerasArrayJSON = playgroundJSON->getFieldArray("cameras");
@@ -222,21 +222,21 @@ namespace fileio
 				camera->_type = render::CameraType::PERPECTIVE;
 				JSON* perspectiveCameraJSON = cameraJSON->getFieldObject("perspective");
 
-				double aspectRatio = perspectiveCameraJSON->getFieldNumberOrDefault("aspectRatio", 1.0);
-				camera->FOV = (float)perspectiveCameraJSON->getFieldNumberOrDefault("yfov", 1.0);
+				double aspectRatio = perspectiveCameraJSON->getFieldNumberOrDefault("aspectRatio", 1.0f);
+				camera->FOV = (float)perspectiveCameraJSON->getFieldNumberOrDefault("yfov", 1.0f);
 				camera->FOV = mathem::toDegrees(camera->FOV);
-				camera->farCullPlane = (float)perspectiveCameraJSON->getFieldNumberOrDefault("zfar", 100.0);
-				camera->nearCullPlane = (float)perspectiveCameraJSON->getFieldNumberOrDefault("znear", 0.001);
+				camera->farCullPlane = (float)perspectiveCameraJSON->getFieldNumberOrDefault("zfar", 100.0f);
+				camera->nearCullPlane = (float)perspectiveCameraJSON->getFieldNumberOrDefault("znear", 0.001f);
 			}
 			else if (cameraType == "orthographic")
 			{
 				camera->_type = render::CameraType::ORTHOGRAPHIC;
 				JSON* orthographicCameraJSON = cameraJSON->getFieldObject("orthographic");
 
-				double xMagnification = orthographicCameraJSON->getFieldNumberOrDefault("xmag", 1.0);
-				double yMagnification = orthographicCameraJSON->getFieldNumberOrDefault("ymag", 1.0);
-				camera->farCullPlane = (float)orthographicCameraJSON->getFieldNumberOrDefault("zfar", 100.0);
-				camera->nearCullPlane = (float)orthographicCameraJSON->getFieldNumberOrDefault("znear", 0.001);
+				double xMagnification = orthographicCameraJSON->getFieldNumberOrDefault("xmag", 1.0f);
+				double yMagnification = orthographicCameraJSON->getFieldNumberOrDefault("ymag", 1.0f);
+				camera->farCullPlane = (float)orthographicCameraJSON->getFieldNumberOrDefault("zfar", 100.0f);
+				camera->nearCullPlane = (float)orthographicCameraJSON->getFieldNumberOrDefault("znear", 0.001f);
 			}
 
 			playgroundResult->cameras.setElement(i, camera);
@@ -258,7 +258,7 @@ namespace fileio
 		{
 			JSON* bufferJSON = buffersArrayJSON->getArrayItem(i);
 
-			size_t byteLength = (size_t)bufferJSON->getFieldNumberOrDefault("byteLength", 0.0);
+			size_t byteLength = (size_t)bufferJSON->getFieldNumberOrDefault("byteLength", 0.0f);
 			safety::SafeByteArray* buffer = new safety::SafeByteArray();
 
 			std::string uri = bufferJSON->getFieldStringOrDefault("uri", "ERROR");
@@ -374,13 +374,13 @@ namespace fileio
 			texture->name = textureJSON->getFieldStringOrDefault("name", "Untitled");
 			if (JSON* numberJSON = textureJSON->getField("sampler"))
 			{
-				int32_t samplerIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				int32_t samplerIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 				texture->sampler = playgroundResult->imageSamplers.getElementPointer(samplerIndex);
 			}
 
 			if (JSON* numberJSON = textureJSON->getField("source"))
 			{
-				int32_t imageIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0);
+				int32_t imageIndex = (int32_t)numberJSON->getNumberOrDefault(-1.0f);
 				texture->image = playgroundResult->images.getElementPointer(imageIndex);
 			}
 		}
@@ -582,8 +582,8 @@ namespace fileio
 			{
 				cameraJSON->setField("type", std::string("orthographic"));
 				JSON* orthographicCameraJSON = cameraJSON->setFieldType("orthographic", JSONtype::OBJECT);
-				// TODO: orthographicCameraJSON->setField("xmag", 1.0);
-				// TODO: orthographicCameraJSON->setField("ymag", 1.0);
+				// TODO: orthographicCameraJSON->setField("xmag", 1.0f);
+				// TODO: orthographicCameraJSON->setField("ymag", 1.0f);
 				orthographicCameraJSON->setField("zfar", camera->farCullPlane);
 				orthographicCameraJSON->setField("znear", camera->nearCullPlane);
 			}

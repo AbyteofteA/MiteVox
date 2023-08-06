@@ -18,7 +18,7 @@ namespace fileio
 		_isNameless = true;
 		_name = "";
 
-		_booleanOrNumber.number = 0.0;
+		_booleanOrNumber.number = 0.0f;
 		_string = "";
 	}
 
