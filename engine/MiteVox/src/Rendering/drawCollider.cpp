@@ -16,10 +16,10 @@ namespace mitevox
 		mathem::GeometryTransform* transform,
 		render::ColorRGBAf color)
 	{
-		size_t colliderPrimitivesCount = collider->primitives.getElementsCount();
+		size_t colliderPrimitivesCount = collider->getPrimitivesCount();
 		for (size_t i = 0; i < colliderPrimitivesCount; ++i)
 		{
-			mathem::GeometryPrimitiveBase* colliderPrimitive = collider->primitives.getElement(i);
+			mathem::GeometryPrimitiveBase* colliderPrimitive = collider->getPrimitive(i);
 			drawGeometryPrimitive(renderer, colliderPrimitive, transform, color);
 		}
 	}

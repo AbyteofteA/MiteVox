@@ -7,6 +7,13 @@ namespace mitevox
 		type = mathem::GeometryPrimitiveType::MESH;
 	}
 
+	MeshPrimitive* Mesh::addMeshPrimitive()
+	{
+		MeshPrimitive* meshPrimitive = new MeshPrimitive();
+		primitives.appendElement(meshPrimitive);
+		return meshPrimitive;
+	}
+
 	void Mesh::makeCopyForAnimationTo(Mesh* resultMesh)
 	{
 		size_t primitivesCount = primitives.getElementsCount();

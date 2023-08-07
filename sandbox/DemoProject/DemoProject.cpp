@@ -32,26 +32,16 @@ void mitevox::Engine::onCreate()
 	
 	activeScene->scripts.appendElement(processInput_Script);
 
-	Entity* entity = activeScene->entities.getElement(0);
-	entity->movementProperties.inverseMass = 1.0f;
-	entity->movementProperties.inverseMomentOfInertia = 0.5f;
-	entity->movementProperties.restitution = 1.0f;
-	//node->movementProperties->angularVelocity = { 0.1f, 0.0f, 0.0f };
-	
-	Entity* whiteLightEntity = new Entity();
-	whiteLightEntity->renderableNode = new Node();
-	whiteLightEntity->renderableNode->lightType = render::LightType::POINT;
-	whiteLightEntity->renderableNode->light.pointLight.lightBase = { { 1.0, 1.0, 1.0 }, 1.0, 40.0 };
-	whiteLightEntity->setTranslation({ 11.0, 11.0, 11.0 });
-	whiteLightEntity->collider = entity->collider;
-
-	activeScene->entities.appendElement(whiteLightEntity);
-
-	size_t activeEntitiesCount = activeScene->entities.getElementsCount();
-	for (size_t i = 0; i < activeEntitiesCount; ++i)
-	{
-		activeScene->foundation->emplace(activeScene->entities.getElement(i));
-	}
+	MiteVoxAPI::createPointLightEntity({ 11.0f, 11.0f, 11.0f }, { 1.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 3.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { -7.0f, 6.0f, 4.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 6.0f, 3.0f, 3.0f }, { 1.0f, 1.0f, 0.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { -3.0f, 2.0f, 5.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 0.0f, 7.0f }, { 1.0f, 0.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 2.0f, 7.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 4.0f, 7.0f }, { 0.0f, 1.0f, 0.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 6.0f, 7.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createPlane("Plane", { 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void mitevox::Engine::onUpdate() {}

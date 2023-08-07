@@ -12,10 +12,10 @@ namespace mathem
 			return 0.0f;
 		}
 
-		float penetration = -1.0f;
+		float penetration = 1.0f;
 		if (object1ProjectionMin > object2ProjectionMin)
 		{
-			penetration = 1.0f;
+			penetration = -1.0f;
 		}
 
 		float delta1 = std::abs(object1ProjectionMax - object2ProjectionMin);

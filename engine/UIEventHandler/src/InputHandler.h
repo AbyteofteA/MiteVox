@@ -1,10 +1,26 @@
-
 #ifndef INPUTHANDLER_H
 #define INPUTHANDLER_H
+
+#include "engine/CodeSafety/src/SafeArray.h"
 
 #include "dependencies/glfw-3.3.2.bin.WIN32/include/GLFW/glfw3.h"
 #include <chrono>
 #include <mutex>
+
+enum struct KeyAction
+{
+	RELEASE = GLFW_RELEASE,
+	PRESS = GLFW_PRESS,
+	REPEAT = GLFW_REPEAT
+};
+
+struct KeyEvent
+{
+	int key;
+	int scancode;
+	KeyAction action;
+	int mods;
+};
 
 class InputHandler
 {
@@ -16,11 +32,11 @@ public:
 	double mouseDeltaY;
 	float mouseDeltaScroll;
 
-	bool keyW = false, keyS = false;
-	bool keyD = false, keyA = false;
-	bool keySpace = false, keyLShift = false;
+	safety::SafeArray<KeyEvent> pressedKeys;
+	safety::SafeArray<KeyEvent> keySequence;
+	safety::SafeArray<KeyEvent> keyEventQueue;
 
-	bool isAttached = false;
+	bool isMouseLocked = false;
 
 	std::chrono::high_resolution_clock::time_point lastUpdate = std::chrono::high_resolution_clock::now();
 	double dt = 0;
@@ -28,7 +44,9 @@ public:
 
 	InputHandler(InputHandler& other) = delete;
 	void operator=(const InputHandler&) = delete;
-	static InputHandler* getInstance(GLFWwindow* _window);
+
+	static void init(GLFWwindow* _window);
+	static InputHandler* getInstance();
 
 	void getWindowSize(int* x, int* y);
 	void setWindowSize(int x, int y);
@@ -36,12 +54,14 @@ public:
 	void setMousePosition(double x, double y);
 	void setMousePositionCenter();
 
-	void attach();
-	void detach();
+	void lockMouse();
+	void unlockMouse();
 
 	void processMouse();
-	void processKeys();
 	void update();
+
+	bool isKeyPressed(int key);
+	void appendKeyEvent(KeyEvent keyEvent);
 
 private:
 

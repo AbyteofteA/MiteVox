@@ -6,9 +6,18 @@
 
 namespace mathem
 {
+	void CollisionProperties::reset()
+	{
+		type = CollisionType::NONE;
+		penetrationDepth = mathem::max<float>();
+
+		resetContactPoints();
+	}
+
 	void CollisionProperties::invert()
 	{
 		penetrationDepth = -penetrationDepth;
+		normal = -normal;
 	}
 
 	void CollisionProperties::recomputePenetrationAndNormal(float penetrationDepth, Vector3D normal, bool normalBelongsToTheFirst)
@@ -18,6 +27,12 @@ namespace mathem
 			this->normalBelongsToTheFirst = normalBelongsToTheFirst;
 			this->penetrationDepth = penetrationDepth;
 			this->normal = normal;
+
+			// Make sure that the normal looks towards the second geometry
+			if (penetrationDepth < 0.0f)
+			{
+				invert();
+			}
 		}
 	}
 

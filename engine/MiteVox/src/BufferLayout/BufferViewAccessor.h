@@ -39,7 +39,19 @@ namespace mitevox
         safety::SafeFloatArray max;
         BufferViewAccessorSparse* sparse = nullptr;
 
-        uint32_t getComponentsCount();
+        void init(safety::SafeByteArray* buffer, uint16_t byteStride, uint64_t byteOffset, ComponentDataType componentType, Type type);
+
+        uint32_t getComponentsPerElement();
+
+        /// <summary>
+        /// The method can be used only if ...
+        /// </summary>
+        /// <param name="count"></param>
+        void reserveElements(size_t count);
+
+        void resizeElements(size_t count);
+
+        void clear();
 
         template<typename T>
         T getElementsComponent(int64_t elementIndex, int64_t componentIndex);
@@ -75,6 +87,7 @@ namespace mitevox
         bool isSparse();
         void makeSparse(BufferViewAccessorSparse* sparseAccessor);
         void makeNotSparse();
+
         static Type mapTypeNameToType(std::string typeName);
         static std::string mapTypeToTypeName(Type type);
 

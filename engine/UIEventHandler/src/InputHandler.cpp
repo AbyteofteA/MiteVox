@@ -3,17 +3,42 @@
 #include "dependencies/glfw-3.3.2.bin.WIN32/include/GLFW/glfw3.h"
 #include <chrono>
 #include <thread>
+#include <string>
 
 InputHandler* InputHandler::instance{ nullptr };
 std::mutex InputHandler::mutex;
 
-InputHandler* InputHandler::getInstance(GLFWwindow* _window)
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	InputHandler* inputHandler = InputHandler::getInstance();
+	KeyEvent newKeyEvent = { key, scancode, (KeyAction)action, mods };
+	inputHandler->appendKeyEvent(newKeyEvent);
+}
+
+void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	InputHandler* inputHandler = InputHandler::getInstance();
+	inputHandler->mouseDeltaScroll = yoffset;
+}
+
+void InputHandler::init(GLFWwindow* _window)
 {
 	std::lock_guard<std::mutex> lock(mutex);
+
 	if (instance == nullptr)
 	{
 		instance = new InputHandler(_window);
+		instance->pressedKeys.reserve(16);
+		instance->keyEventQueue.reserve(1024);
+
+		//glfwSetCursorPosCallback(instance->window, cursor_position_callback);
+		glfwSetScrollCallback(instance->window, mouseScrollCallback);
+		glfwSetKeyCallback(instance->window, keyCallback);
 	}
+}
+
+InputHandler* InputHandler::getInstance()
+{
 	return instance;
 }
 
@@ -44,24 +69,25 @@ void InputHandler::setMousePositionCenter()
 	setMousePosition(windowWidth / 2, windowHeight / 2);
 }
 
-void InputHandler::attach()
+void InputHandler::lockMouse()
 {
-	isAttached = true;
+	isMouseLocked = true;
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	setMousePositionCenter();
 }
-void InputHandler::detach()
+
+void InputHandler::unlockMouse()
 {
-	isAttached = false;
-	//mouseDeltaX = 0.0;
-	//mouseDeltaY = 0.0;
+	isMouseLocked = false;
+	//mouseDeltaX = 0.0f;
+	//mouseDeltaY = 0.0f;
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	setMousePositionCenter();
 }
 
 void InputHandler::processMouse()
 {
-	if (isAttached == false)
+	if (isMouseLocked == false)
 	{
 		return;
 	}
@@ -69,7 +95,7 @@ void InputHandler::processMouse()
 	int windowWidth, windowHeight;
 	getWindowSize(&windowWidth, &windowHeight); // TODO: store windowWidth, windowHeight
 
-	double currentMousePositionX = 0.0, currentMousePositionY = 0.0;
+	double currentMousePositionX = 0.0, currentMousePositionY = 0.0f;
 	getMousePosition(&currentMousePositionX, &currentMousePositionY);
 	mouseDeltaX = windowWidth / 2 - currentMousePositionX;
 	mouseDeltaY = windowHeight / 2 - currentMousePositionY;
@@ -79,30 +105,6 @@ void InputHandler::processMouse()
 	glfwPollEvents();
 }
 
-void InputHandler::processKeys()
-{
-	if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) && (keyS == false))
-		keyW = true;
-	else keyW = false;
-	if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) && (keyW == false))
-		keyS = true;
-	else keyS = false;
-
-	if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) && (keyA == false))
-		keyD = true;
-	else keyD = false;
-	if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) && (keyD == false))
-		keyA = true;
-	else keyA = false;
-
-	if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) && (keyLShift == false))
-		keySpace = true;
-	else keySpace = false;
-	if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) && (keySpace == false))
-		keyLShift = true;
-	else keyLShift = false;
-}
-
 void InputHandler::update()
 {
 	// Update timers.
@@ -110,26 +112,58 @@ void InputHandler::update()
 	dt = std::chrono::duration_cast<std::chrono::duration<double>>(now - lastUpdate).count();
 	lastUpdate = std::chrono::high_resolution_clock::now();
 
-	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+	if (isKeyPressed(GLFW_KEY_TAB))
 	{
-		if (isAttached)
-			detach();
+		if (isMouseLocked)
+			unlockMouse();
 		else
-			attach();
+			lockMouse();
 		afterPushDelay();
 	}
-	if (isAttached == false)
+	if (isMouseLocked == false)
 	{
 		return;
 	}
 	processMouse();
-	processKeys();
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+bool InputHandler::isKeyPressed(int key)
 {
-	InputHandler* inputHandler = InputHandler::getInstance(window);
-	inputHandler->mouseDeltaScroll = yoffset;
+	size_t pressedKeysCount = pressedKeys.getElementsCount();
+	for (size_t i = 0; i < pressedKeysCount; ++i)
+	{
+		KeyEvent pressedKey = pressedKeys.getElement(i);
+		if (pressedKey.key == key)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void InputHandler::appendKeyEvent(KeyEvent keyEvent)
+{
+	instance->keyEventQueue.appendElement(keyEvent);
+
+	size_t pressedKeysCount = pressedKeys.getElementsCount();
+	for (size_t i = 0; i < pressedKeysCount; ++i)
+	{
+		KeyEvent pressedKey = pressedKeys.getElement(i);
+		if (keyEvent.key == pressedKey.key)
+		{
+			if (keyEvent.action == KeyAction::PRESS ||
+				keyEvent.action == KeyAction::REPEAT)
+			{
+				pressedKeys.setElement(i, keyEvent);
+			}
+			else
+			{
+				pressedKeys.removeElementAndSwapWithLast(i);
+			}
+			return;
+		}
+	}
+	pressedKeys.appendElement(keyEvent);
 }
 
 InputHandler::InputHandler(GLFWwindow* _window)
@@ -140,20 +174,17 @@ InputHandler::InputHandler(GLFWwindow* _window)
 
 	resetMouseInfo();
 
-	attach();
+	lockMouse();
 	update();
-	detach();
+	unlockMouse();
 
 	setMousePositionCenter();
-
-	//glfwSetCursorPosCallback(window, cursor_position_callback);
-	glfwSetScrollCallback(window, scroll_callback);
 }
 
 void InputHandler::resetMouseInfo()
 {
-	mouseDeltaX = 0.0;
-	mouseDeltaY = 0.0;
+	mouseDeltaX = 0.0f;
+	mouseDeltaY = 0.0f;
 	mouseDeltaScroll = 0.0f;
 }
 

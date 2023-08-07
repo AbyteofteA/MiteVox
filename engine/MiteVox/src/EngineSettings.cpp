@@ -1,6 +1,6 @@
-
 #include "EngineSettings.h"
 
+#include "engine/CodeSafety/src/ensureValue.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Profiler/src/Logger.h"
@@ -20,7 +20,7 @@ namespace mitevox
 
 		fromJSON(engineConfig);
 
-		inputHandler = InputHandler::getInstance(renderer->getWindow());
+		InputHandler::init(renderer->getWindow());
 
 		delete engineConfig;
 	}
@@ -42,9 +42,9 @@ namespace mitevox
 		fileio::JSON* rendererConfig = json->getFieldObject("renderer");
 
 		debug = generalConfig->getFieldBooleanOrDefault("debug", true);
-		setCleanupPeriod(generalConfig->getFieldNumberOrDefault("cleanup_period", 0.5));
-		setPhysicsPeriod(generalConfig->getFieldNumberOrDefault("physics_period", 0.06));
-		setRendererPeriod(generalConfig->getFieldNumberOrDefault("renderer_period", 0.017));
+		setCleanupPeriod(generalConfig->getFieldNumberOrDefault("cleanup_period", 0.5f));
+		setPhysicsPeriod(generalConfig->getFieldNumberOrDefault("physics_period", 0.06f));
+		setRendererPeriod(generalConfig->getFieldNumberOrDefault("renderer_period", 0.017f));
 
 		fs::path _executionPath = fs::path(executionDir);
 		fs::current_path(_executionPath);
@@ -63,8 +63,8 @@ namespace mitevox
 
 		logger = profile::Logger(profile::LoggerMode::LOG_IN_CONSOLE, logDir);
 
-		int screenWidth = (int)rendererConfig->getFieldNumberOrDefault("screen_width", 720.0);
-		int screenHeight = (int)rendererConfig->getFieldNumberOrDefault("screen_height", 480.0);
+		int screenWidth = (int)rendererConfig->getFieldNumberOrDefault("screen_width", 720.0f);
+		int screenHeight = (int)rendererConfig->getFieldNumberOrDefault("screen_height", 480.0f);
 		bool backfaceCulling = rendererConfig->getFieldBooleanOrDefault("back_culling", true);
 
 		// TODO: move clearColor to engine_config.json .
@@ -172,7 +172,7 @@ namespace mitevox
 
 	void EngineSettings::setAnimationsPeriod(float value)
 	{
-		if (value > 0.5 || value < 0.0f)
+		if (value > 0.5f || value < 0.0f)
 		{
 			animationPeriod = 0.06f;
 		}
@@ -199,13 +199,18 @@ namespace mitevox
 		}
 	}
 
+	float EngineSettings::getEqualityTolerance()
+	{
+		return equalityTolerance;
+	}
+
+	void EngineSettings::setEqualityTolerance(float value)
+	{
+		equalityTolerance = safety::ensureRange(value, 0.0000001f, 0.01f);
+	}
+
 	render::RendererSettings* EngineSettings::getRendererSettings()
 	{
 		return renderer;
-	}
-
-	InputHandler* EngineSettings::getInputHandler()
-	{
-		return inputHandler;
 	}
 }

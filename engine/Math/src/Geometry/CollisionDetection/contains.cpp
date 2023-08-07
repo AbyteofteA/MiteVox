@@ -103,7 +103,18 @@ namespace mathem
 		GeometryPrimitiveBase* geometryPrimitiveContainer,
 		GeometryTransform* geometryPrimitiveContainerTransform)
 	{
-		size_t geometryPrimitivesCount = complexGeometry->primitives.getElementsCount();
+		if (complexGeometry->getType() == GeometryType::POINT)
+		{
+			Vector3D point = complexGeometryTransform->translation; // TODO: is scale needed?
+			// point.x() *= complexGeometryTransform->scale.x();
+			// point.y() *= complexGeometryTransform->scale.y();
+			// point.z() *= complexGeometryTransform->scale.z();
+			CollisionProperties collisionProperties;
+			CollisionType collisionType = checkCollision(&point, geometryPrimitiveContainer, geometryPrimitiveContainerTransform, &collisionProperties);
+			return collisionType == CollisionType::INSCRIBTION_2_1;
+		}
+
+		size_t geometryPrimitivesCount = complexGeometry->getPrimitivesCount();
 		if (geometryPrimitivesCount == 0)
 		{
 			return false;
@@ -111,7 +122,7 @@ namespace mathem
 
 		for (size_t i = 0; i < geometryPrimitivesCount; ++i)
 		{
-			GeometryPrimitiveBase* geometryPrimitive = complexGeometry->primitives.getElement(i);
+			GeometryPrimitiveBase* geometryPrimitive = complexGeometry->getPrimitive(i);
 
 			bool containsPrimitive = contains(
 				geometryPrimitive,

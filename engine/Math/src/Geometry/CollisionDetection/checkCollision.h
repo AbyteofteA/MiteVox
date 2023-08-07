@@ -19,6 +19,9 @@
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Vector.h"
 
+#include <cassert>
+#undef NDEBUG
+
 namespace mathem
 {
 	CollisionType checkCollision(
@@ -102,24 +105,47 @@ namespace mathem
 		collisionInfo->properties.type = CollisionType::NONE;
 
 		ComplexGeometry* complexGeometry1 = object1->getCollider();
-		GeometryTransform* complexGeometryTransform1 = object1->getTransform();
 		ComplexGeometry* complexGeometry2 = object2->getCollider();
+		if (complexGeometry1->getType() == mathem::GeometryType::NONE ||
+			complexGeometry2->getType() == mathem::GeometryType::NONE)
+		{
+			collisionInfo->reset();
+			return CollisionType::NONE;
+		}
+
+		GeometryTransform* complexGeometryTransform1 = object1->getTransform();
 		GeometryTransform* complexGeometryTransform2 = object2->getTransform();
 
-		size_t objectPrimitivesCount1 = complexGeometry1->primitives.getElementsCount();
+		size_t objectPrimitivesCount1 = complexGeometry1->getPrimitivesCount();
 		for (size_t primitiveIndex1 = 0; primitiveIndex1 < objectPrimitivesCount1; primitiveIndex1++)
 		{
-			GeometryPrimitiveBase* geometryPrimitive1 = complexGeometry1->primitives.getElement(primitiveIndex1);
-			size_t objectPrimitivesCount2 = complexGeometry2->primitives.getElementsCount();
+			GeometryPrimitiveBase* geometryPrimitive1 = complexGeometry1->getPrimitive(primitiveIndex1);
+			size_t objectPrimitivesCount2 = complexGeometry2->getPrimitivesCount();
 			for (size_t primitiveIndex2 = 0; primitiveIndex2 < objectPrimitivesCount2; primitiveIndex2++)
 			{
-				GeometryPrimitiveBase* geometryPrimitive2 = complexGeometry2->primitives.getElement(primitiveIndex2);
+				GeometryPrimitiveBase* geometryPrimitive2 = complexGeometry2->getPrimitive(primitiveIndex2);
 				CollisionProperties collisionProperties;
 				checkCollision(
 					geometryPrimitive1, complexGeometryTransform1, geometryPrimitive2, complexGeometryTransform2, &collisionProperties, equalityTolerance);
 				collisionInfo->properties.concatenate(collisionProperties, equalityTolerance);
 			}
 		}
+
+		if (collisionInfo->properties.normalBelongsToTheFirst == false)
+		{
+			collisionInfo->object1 = object2;
+			collisionInfo->object2 = object1;
+			collisionInfo->properties.normalBelongsToTheFirst = true;
+		}
+
+		// TODO: delete
+		if (collisionInfo->properties.type == CollisionType::INTERSECTION)
+		{
+			Vector3D distance = collisionInfo->object2->transform.translation - collisionInfo->object1->transform.translation;
+			float angle = distance * collisionInfo->properties.normal;
+			assert(("ERROR: Normal is not alligned", angle > 0.0f));
+		}
+
 		return collisionInfo->properties.type;
 	}
 

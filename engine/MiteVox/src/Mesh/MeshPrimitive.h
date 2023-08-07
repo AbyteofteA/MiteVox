@@ -35,6 +35,16 @@ namespace mitevox
         safety::SafeArray<MeshAttributeSet*> morphTargets;
         uint32_t ID = 0;
 
+        void initTriangles(
+            size_t count,
+            bool normals = false,
+            bool textureCoords_0 = false,
+            bool textureCoords_1 = false,
+            bool colors_0 = false,
+            bool joints_0 = false,
+            bool weights_0 = false,
+            bool tangents = false);
+
         void makeCopyForAnimationTo(MeshPrimitive* resultMeshPrimitive);
         void tryGenerateTangents();
 
@@ -50,6 +60,23 @@ namespace mitevox
 
         mathem::Vector3D getMinPosition();
         mathem::Vector3D getMaxPosition();
+
+        /// <summary>
+        /// Reserves memory for the mesh depending on the topology type (UNINDEXED!)
+        /// </summary>
+        /// <param name="topologyElementsCount"></param>
+        void reserve(size_t topologyElementsCount);
+
+        void resize(size_t topologyElementsCount);
+
+        /// <summary>
+        /// Appends topology elements (point, line, triangle, etc.) (UNINDEXED!)
+        /// </summary>
+        /// <param name="topologyElementsCount"></param>
+        /// <returns>Index of the last appended vertex</returns>
+        size_t appendTopologyElements(size_t topologyElementsCount);
+
+        void clear();
 
         bool isTriangularMesh();
         uint32_t getVertecesCount();
@@ -84,11 +111,27 @@ namespace mitevox
         /// TODO: void setVertexJoints_0(uint32_t index);
         /// TODO: void setVertexWeights_0(uint32_t index);
         /// TODO: void setVertexIndeces(uint32_t index);
-        
+
+        void setTrianglePositions(uint32_t index, mathem::Vector3D position1, mathem::Vector3D position2, mathem::Vector3D position3);
+        void setTriangleNormals(uint32_t index, mathem::Vector3D normal1, mathem::Vector3D normal2, mathem::Vector3D normal3);
+        /// TODO: void setTriangleTangents(uint32_t index);
+        /// TODO: void setTriangleTextureCoords_0(uint32_t index, mathem::TriangleGeometry2D);
+        /// TODO: void setTriangleTextureCoords_1(uint32_t index, mathem::TriangleGeometry2D);
+        /// TODO: void setTriangleColors_0(uint32_t index);
+        /// TODO: void setTriangleJoints_0(uint32_t index);
+        /// TODO: void setTriangleWeights_0(uint32_t index);
+        /// TODO: void setTriangleIndeces(uint32_t index);
+
         mathem::Vector3D getMorphVertexPosition(uint32_t morphIndex, uint32_t index);
         mathem::Vector3D getMorphVertexNormal(uint32_t morphIndex, uint32_t index);
         void setMorphVertexPosition(uint32_t morphIndex, uint32_t index, mathem::Vector3D position);
         void setMorphVertexNormal(uint32_t morphIndex, uint32_t index, mathem::Vector3D normal);
+
+    private:
+
+        size_t toVertecesCount(size_t topologyElementsCount);
+        void reserveVerteces(size_t count);
+        void resizeVerteces(size_t count);
     };
 }
 

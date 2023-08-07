@@ -65,8 +65,8 @@
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)engine\FileIO\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Math\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Physics\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Renderer\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\UIEventHandler\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\AIModels\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Math.lib;Physics.lib;Renderer.lib;FileIO.lib;AIModels.lib;UIEventHandler.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)engine\FileIO\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Math\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Renderer\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\UIEventHandler\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\AIModels\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Math.lib;Renderer.lib;FileIO.lib;AIModels.lib;UIEventHandler.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,6 +89,13 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Physics\PhysicsSolvers\computeIntegration.cpp" />
+    <ClCompile Include="src\Physics\computePhysics.cpp" />
+    <ClCompile Include="src\MiteVoxAPI.cpp" />
+    <ClCompile Include="src\Physics\PhysicsSolvers\computePhysicsNewtonian.cpp" />
+    <ClCompile Include="src\Physics\PhysicalMaterial.cpp" />
+    <ClCompile Include="src\Physics\PhysicsSolvers\resolveCollisionNoPhysics.cpp" />
+    <ClCompile Include="src\Physics\PhysicsSolvers\separateObjects.cpp" />
     <ClCompile Include="src\Playground\Entity.cpp" />
     <ClCompile Include="src\Rendering\drawCollisions.cpp" />
     <ClCompile Include="src\Rendering\drawAxes.cpp" />
@@ -116,6 +123,11 @@
     <ClCompile Include="src\Playground\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Physics\computePhysics.h" />
+    <ClInclude Include="src\MiteVoxAPI.h" />
+    <ClInclude Include="src\Physics\MovementProperties.h" />
+    <ClInclude Include="src\Physics\PhysicalMaterial.h" />
+    <ClInclude Include="src\Physics\PhysicsSolvers\separateObjects.h" />
     <ClInclude Include="src\Playground\Entity.h" />
     <ClInclude Include="src\Rendering\drawCollisions.h" />
     <ClInclude Include="src\Rendering\drawAxes.h" />
@@ -156,9 +168,6 @@
     </ProjectReference>
     <ProjectReference Include="..\Math\Math.vcxproj">
       <Project>{c5ceff57-33a2-424b-bbce-600ae5a992e4}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Physics\Physics.vcxproj">
-      <Project>{f27c43b0-a260-453d-93c9-e9d0f5df8a1c}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Renderer\Renderer.vcxproj">
       <Project>{499c1c31-bd61-455f-b75c-23b6c245c5f4}</Project>

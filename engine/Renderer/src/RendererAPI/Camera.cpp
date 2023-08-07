@@ -12,8 +12,7 @@ namespace render
 	Camera::Camera(float _FOV, int _width, int _height, float _nearCullPlane, float _farCullPlane)
 	{
 		FOV = _FOV;
-		width = _width;
-		height = _height;
+		aspectRatio = (float)_width / (float)_height;
 		nearCullPlane = _nearCullPlane;
 		farCullPlane = _farCullPlane;
 	}
@@ -32,7 +31,7 @@ namespace render
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(-cameraTransform->translation.x(), -cameraTransform->translation.y(), -cameraTransform->translation.z()));
 
 		glm::mat4 projectionMatrix = glm::mat4(1.0f);
-		projectionMatrix = glm::perspective(glm::radians(FOV), (float)width / height, nearCullPlane, farCullPlane);
+		projectionMatrix = glm::perspective(glm::radians(FOV), aspectRatio, nearCullPlane, farCullPlane);
 		glm::mat4 viewProjectionMatrix = projectionMatrix * viewMatrix;
 
 		return viewProjectionMatrix;

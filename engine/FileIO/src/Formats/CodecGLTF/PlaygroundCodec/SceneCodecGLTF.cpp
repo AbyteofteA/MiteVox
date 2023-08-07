@@ -17,7 +17,7 @@ namespace fileio
 		{
 			size_t entitiesCount = nodesArrayJSON->getArraySize();
 			sceneResult->entities.resize(entitiesCount);
-			sceneResult->entities.fillWithZeros();
+			sceneResult->entities.setAllElementsZeros();
 
 			for (size_t entityIndex = 0; entityIndex < entitiesCount; ++entityIndex)
 			{

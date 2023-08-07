@@ -1,4 +1,3 @@
-
 #include "Engine.h"
 
 #include "engine/MiteVox/src/EngineSettings.h"
@@ -10,6 +9,8 @@
 #include "engine/MiteVox/src/Rendering/drawAxes.h"
 #include "engine/MiteVox/src/Rendering/drawLightSource.h"
 #include "engine/MiteVox/src/Rendering/Lighting/collectLights.h"
+#include "engine/MiteVox/src/Physics/computePhysics.h"
+#include "engine/MiteVox/src/MiteVoxAPI.h"
 
 #include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
 #include "engine/MiteVox/src/Animation/MorphTargetAnimation/applyMorphTargetAnimation.h"
@@ -21,19 +22,23 @@ namespace fs = std::filesystem;
 
 namespace mitevox
 {
-	Engine::Engine(int argc, char* argv[])
+	Engine::Engine(int argc, char* argv[]) : 
+		dataPointsContainers(32, 8) // TODO: add to EngineSettings
 	{
+		MiteVoxAPI::init(this);
+
 		prevCycleTime = std::chrono::steady_clock::now();
 
 		std::string executionDir = fs::absolute(fs::path(argv[0])).parent_path().string();
 		settings = new EngineSettings(executionDir);
 
-		entitiesToSimulate.reserve(64); // TODO: add to EngineSettings
+		entitiesAllocator.allocate(256); // TODO: add to EngineSettings
+
 		pointLightsArray.reserve(64); // TODO: add to EngineSettings
 		directionalLightsArray.reserve(64); // TODO: add to EngineSettings
 		spotLightsArray.reserve(64); // TODO: add to EngineSettings
+		entitiesToSimulate.reserve(64); // TODO: add to EngineSettings
 		collisions.reserve(64); // TODO: add to EngineSettings
-		dataPointsContainers = new mathem::PileOfSafeArrays<Entity*>(32, 8); // TODO: add to EngineSettings
 
 		// TODO: add to EngineSettings
 
@@ -46,7 +51,7 @@ namespace mitevox
 		}
 		else
 		{
-			
+			playground->createDefaultScene(settings);
 		}
 
 		preparePlayground();
@@ -109,7 +114,8 @@ namespace mitevox
 
 			onUpdate();
 
-			settings->getInputHandler()->update();
+			InputHandler* inputHandler = InputHandler::getInstance();
+			inputHandler->update();
 			
 			size_t activeScene = playground->activeScene;
 			if (activeScene < playground->scenes.getElementsCount())
@@ -118,16 +124,7 @@ namespace mitevox
 				scene->update(deltaTime); // Scripts are executed here
 
 				// Space culling
-				entitiesToSimulate.clear();
-				if (settings->spaceCulling)
-				{
-					// TODO: 
-					scene->foundation->getAll(&entitiesToSimulate);
-				}
-				else
-				{
-					scene->foundation->getAll(&entitiesToSimulate);
-				}
+				MiteVoxAPI::collectEntitiesToSimulate();
 
 				// Cleanup
 				scene->timeSinceCleanup += deltaTime;
@@ -140,11 +137,11 @@ namespace mitevox
 
 				// Physics and Transform
 				collisions.clear();
-				dataPointsContainers->returnAllContainers();
-				computePhysics(deltaTime);
-				
+				dataPointsContainers.returnAllContainers();
+				computePhysics(PhysicsSolverType::NEWTONIAN, deltaTime, settings->equalityTolerance);
+
 				animateNodes(&entitiesToSimulate, deltaTime);
-				
+
 				// Renderer
 				scene->timeSinceRendererUpdate += deltaTime;
 				if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
@@ -157,8 +154,9 @@ namespace mitevox
 					directionalLightsArray.clear();
 					spotLightsArray.clear();
 
-					render::Camera* camera = scene->activeCameraNode->camera;
-					mathem::GeometryTransform* cameraTransform = &scene->activeCameraNode->transform;
+					Entity* activeCameraEntity = MiteVoxAPI::getActiveCameraEntity();
+					render::Camera* camera = nullptr;
+					mathem::GeometryTransform cameraTransform = activeCameraEntity->getCamera(&camera);
 
 					render::clearBufferXY(renderer->clearColor);
 					render::clearBufferZ();
@@ -166,10 +164,10 @@ namespace mitevox
 					if (scene->activeSkybox >= 0)
 					{
 						render::Cubemap* skybox = &scene->skyboxes.at(scene->activeSkybox);
-						render::renderSkybox(renderer, skybox->shaderID, skybox, camera, cameraTransform);
+						render::renderSkybox(renderer, skybox->shaderID, skybox, camera, &cameraTransform);
 					}
 
-					renderEntities(deltaTime, renderer, scene, camera, cameraTransform);
+					renderEntities(deltaTime, renderer, scene, camera, &cameraTransform);
 
 					if (settings->debug)
 					{
@@ -177,16 +175,16 @@ namespace mitevox
 
 						if (scene->foundation != nullptr)
 						{
-							drawSceneOctree(renderer, scene->foundation->octree);
+							//drawSceneOctree(renderer, scene->foundation->octree);
 						}
 
 						drawCollisions(renderer, &collisions);
 					}
 
 					// Render primitives.
-					render::renderPoints(renderer, camera, cameraTransform);
-					render::renderLines(renderer, camera, cameraTransform);
-					render::renderTriangles(renderer, camera, cameraTransform);
+					render::renderPoints(renderer, camera, &cameraTransform);
+					render::renderLines(renderer, camera, &cameraTransform);
+					render::renderTriangles(renderer, camera, &cameraTransform);
 
 					render::display(renderer);
 				}
@@ -194,29 +192,26 @@ namespace mitevox
 				//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
 			}
 		}
+
+		if (playground)
+		{
+			fileio::CodecGLTF* playgroundGLTF = new fileio::CodecGLTF(playground);
+			playgroundGLTF->saveToFile(settings->executionDir + "\\playground.gltf");
+		}
+	}
+
+	Entity* Engine::useEntity()
+	{
+		return entitiesAllocator.useElement();
+	}
+
+	void Engine::returnEntity(Entity* usedEntity)
+	{
+		entitiesAllocator.returnUsedElement(usedEntity);
 	}
 
 	void Engine::preparePlayground()
 	{
-		// Add a default camera to every scene that doesn't have one
-		if (1/*playground->cameras.getElementsCount() == 0*/)
-		{
-			render::Camera* camera = new render::Camera(50, SCREEN_WIDTH, SCREEN_HEIGHT, 0.001f, 100000);
-			Node* cameraNode = new Node();
-			cameraNode->camera = camera;
-			cameraNode->transform.translation = {0.0f, 0.0f, 20.0f};
-			size_t nodesCount = playground->nodes.getElementsCount();
-			playground->cameras.appendElement(camera);
-			playground->nodes.appendElement(cameraNode);
-
-			size_t scenesCount = playground->scenes.getElementsCount();
-			for (size_t i = 0; i < scenesCount; ++i)
-			{
-				Scene* scene = playground->scenes.getElement(i);
-				scene->activeCameraNode = cameraNode;
-			}
-		}
-
 		// TODO: create load/unload system
 		if (Scene* activeScene = playground->getActiveScene())
 		{
@@ -226,6 +221,12 @@ namespace mitevox
 				Entity* entity = activeScene->entities.getElement(i);
 				entity->tryGenerateHitbox();
 			}
+		}
+
+		// Add a default camera to every scene that doesn't have one
+		if (1/*playground->cameras.getElementsCount() == 0*/)
+		{
+			MiteVoxAPI::createFPSCharacter("FPS Character");
 		}
 
 		size_t scenesCount = playground->scenes.getElementsCount();
@@ -239,16 +240,6 @@ namespace mitevox
 		{
 			playground->animations.getElement(i)->start();
 		}
-	}
-
-	void Engine::computePhysics(float deltaTime)
-	{
-
-	}
-
-	void Engine::computeKinematics(float deltaTime)
-	{
-
 	}
 
 	void Engine::animateNodeRecursively(Node* node, float deltaTime)
@@ -326,8 +317,9 @@ namespace mitevox
 		render::Camera* camera,
 		mathem::GeometryTransform* cameraTransform)
 	{
-		render::setAmbientLight(scene->ambientLight, basicShader);
 		collectPointLights(&entitiesToSimulate, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
+
+		render::setAmbientLight(scene->ambientLight, basicShader);
 		render::uploadPointLights(&pointLightsArray, basicShader);
 		// TODO: render::uploadLights(&LightsArray, basicShader);
 		// TODO: render::uploadLights(&LightsArray, basicShader);
@@ -346,13 +338,28 @@ namespace mitevox
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
 			Entity* entity = entitiesToSimulate.getElement(i);
-			render::renderNodeRecursively(
-				settings->renderer, 
-				basicShader,
-				entity->renderableNode,
-				&entity->transform,
-				camera, 
-				cameraTransform);
+			
+			if (settings->debug)
+			{
+				/*render::renderNodeRecursively(
+					settings->renderer,
+					basicShader,
+					entity->renderableNode,
+					&entity->transform,
+					camera,
+					cameraTransform);*/
+				drawCollider(settings->renderer, entity->getCollider(), &entity->transform);
+			}
+			else
+			{
+				render::renderNodeRecursively(
+					settings->renderer,
+					basicShader,
+					entity->renderableNode,
+					&entity->transform,
+					camera,
+					cameraTransform);
+			}
 		}
 	}
 }

@@ -1,4 +1,3 @@
-
 #ifndef MITEVOX_SETTINGS_H
 #define MITEVOX_SETTINGS_H
 
@@ -19,6 +18,8 @@ namespace mitevox
 	public:
 
 		profile::Logger logger;
+		bool debug = true;
+		bool spaceCulling = true; // TODO: add to EngineSettings
 
 		EngineSettings(std::string _executionPath);
 		~EngineSettings();
@@ -45,17 +46,17 @@ namespace mitevox
 		float getRendererPeriod();
 		void setRendererPeriod(float value);
 
+		float getEqualityTolerance();
+		void setEqualityTolerance(float value);
+
 		render::RendererSettings* getRendererSettings();
-		InputHandler* getInputHandler();
 
 	private:
 
-		bool debug = true;
-		bool spaceCulling = true; // TODO: add to EngineSettings
-		float cleanupPeriod = 0.5;
-		float physicsPeriod = 0.06;
-		float animationPeriod = 0.06;
-		float rendererPeriod = 0.017;
+		float cleanupPeriod = 0.5f;
+		float physicsPeriod = 0.06f;
+		float animationPeriod = 0.06f;
+		float rendererPeriod = 0.017f;
 
 		bool logConsole = true;
 		bool logFile = true;
@@ -69,7 +70,6 @@ namespace mitevox
 		float equalityTolerance = 0.001f; // TODO: add to EngineSettings
 
 		render::RendererSettings* renderer = nullptr;
-		InputHandler* inputHandler = nullptr;
 	};
 
 

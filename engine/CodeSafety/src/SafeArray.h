@@ -36,12 +36,12 @@ namespace safety
         inline T* getLastElementPointer() const;
         inline void setElement(size_t index, T value);
         inline void setAllElements(T value);
+        inline void setAllElementsZeros();
         inline void insertElement(size_t index, T value); // TODO: 
         inline void appendElement(T value);
         inline void removeElement(size_t index); // TODO: 
         inline void removeElementAndSwapWithLast(size_t index);
         inline void removeLastElement();
-        inline void fillWithZeros();
 
         inline void swap(size_t index1, size_t index2);
 
@@ -250,6 +250,18 @@ namespace safety
     }
 
     template <typename T>
+    inline void SafeArray<T>::setAllElementsZeros()
+    {
+        if ((_elements == nullptr) || (_elementsCount == 0))
+        {
+            // TODO: log WARNING message.
+
+            return;
+        }
+        memset(_elements, 0, _elementsCount * sizeof(T));
+    }
+
+    template <typename T>
     inline void SafeArray<T>::insertElement(size_t index, T value)
     {
         if (index > _elementsCount)
@@ -298,18 +310,6 @@ namespace safety
     inline void SafeArray<T>::removeLastElement()
     {
         _elementsCount -= 1;
-    }
-
-    template <typename T>
-    inline void SafeArray<T>::fillWithZeros()
-    {
-        if ((_elements == nullptr) || (_elementsCount == 0))
-        {
-            // TODO: log WARNING message.
-
-            return;
-        }
-        memset(_elements, 0, _elementsCount * sizeof(T));
     }
 
     template <typename T>

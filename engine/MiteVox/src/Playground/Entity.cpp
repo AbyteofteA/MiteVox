@@ -5,89 +5,145 @@
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
 #include "engine/Math/src/Convertations.h"
-#include "engine/Physics/src/MovementProperties.h"
+#include "engine/MiteVox/src/Physics/MovementProperties.h"
 
 namespace mitevox
 {
+	Entity::Entity() : collider(mathem::GeometryType::NONE)
+	{
+
+	}
+
 	mathem::GeometryTransform* Entity::getTransform()
 	{
 		return &transform;
 	}
 
-	mathem::GeometryTransform* Entity::getTransformForMove()
+	bool Entity::hasCamera()
 	{
-		isMoved = false;
-		return &transform;
+		return renderableNode->hasCameraRecursively();
 	}
 
-	bool Entity::getIsMoved()
+	mathem::GeometryTransform Entity::getCamera(render::Camera** cameraResult)
 	{
-		return isMoved;
+		return renderableNode->getCameraRecursively(cameraResult, &transform);
+	}
+
+	mathem::Vector3D Entity::getViewRay()
+	{
+		mathem::Vector3D viewRay = { 0.0f, 0.0f, -1.0f };
+		render::Camera* c = nullptr;
+		mathem::GeometryTransform cameraTransform = getCamera(&c);
+		viewRay = cameraTransform.rotation.rotate(viewRay);
+		return viewRay;
 	}
 
 	void Entity::resetTransform()
 	{
-		isMoved = true;
 		transform.reset();
 	}
 
 	void Entity::setTransform(mathem::GeometryTransform transform)
 	{
-		isMoved = true;
 		transform = transform;
 	}
 
 	void Entity::setTranslation(mathem::Vector3D translation)
 	{
-		isMoved = true;
 		transform.translation = translation;
 	}
 
 	void Entity::setRotation(mathem::Quaternion quaternion)
 	{
-		isMoved = true;
 		transform.rotation = quaternion;
 	}
 
 	void Entity::setRotation(mathem::Vector3D eulersRadians)
 	{
-		isMoved = true;
 		transform.rotation.fromEulersRadians(eulersRadians.x(), eulersRadians.y(), eulersRadians.z());
 	}
 
 	void Entity::setScale(mathem::Vector3D scale)
 	{
-		isMoved = true;
 		transform.scale = scale;
+	}
+
+	void Entity::setMass(float mass)
+	{
+		if (mass == 0.0f)
+		{
+			movementProperties.inverseMass = 0.0f;
+			return;
+		}
+		movementProperties.inverseMass = 1.0f / mass;
+		computeMomentOfInertia();
+	}
+
+	float Entity::getMass()
+	{
+		if (movementProperties.inverseMass == 0.0f)
+		{
+			return 0.0f;
+		}
+		return 1.0f / movementProperties.inverseMass;
+	}
+
+	void Entity::computeMomentOfInertia()
+	{
+		movementProperties.momentOfInertia.makeZero();
+		movementProperties.inverseMomentOfInertia.makeZero();
+		float mass = getMass();
+
+		if (mass == 0.0f)
+		{
+			return;
+		}
+
+		switch (collider.getType())
+		{
+		case mathem::GeometryType::PRIMITIVES:
+			computeMomentOfInertiaForPrimitives();
+			break;
+
+		case mathem::GeometryType::MESH:
+			computeMomentOfInertiaForMesh();
+			break;
+
+		case mathem::GeometryType::SKELETON:
+			computeMomentOfInertiaForSkeleton();
+			break;
+
+		case mathem::GeometryType::NONE:
+		case mathem::GeometryType::POINT:
+		default:
+			break;
+		}
+	}
+
+	mathem::Matrix3x3 Entity::getMomentOfInertia()
+	{
+		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(renderableNode->transform.rotation));
+		mathem::Matrix3x3 objectOrientationTransposed = objectOrientation;
+		objectOrientationTransposed.transpose();
+
+		mathem::Matrix3x3 momentOfInertia;
+		momentOfInertia = mathem::multiply(objectOrientation, movementProperties.momentOfInertia);
+		momentOfInertia = mathem::multiply(movementProperties.momentOfInertia, objectOrientationTransposed);
+
+		return momentOfInertia;
 	}
 
 	mathem::Matrix3x3 Entity::getInverseMomentOfInertia()
 	{
-		// TODO:
-		mathem::Matrix3x3 momentOfInertia;
+		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(renderableNode->transform.rotation));
+		mathem::Matrix3x3 objectOrientationTransposed = objectOrientation;
+		objectOrientationTransposed.transpose();
 
-		if (movementProperties.inverseMomentOfInertia == 0.0f)
-		{
-			momentOfInertia.makeZero();
-			return momentOfInertia;
-		}
+		mathem::Matrix3x3 inverseMomentOfInertia;
+		inverseMomentOfInertia = mathem::multiply(objectOrientation, movementProperties.inverseMomentOfInertia);
+		inverseMomentOfInertia = mathem::multiply(movementProperties.inverseMomentOfInertia, objectOrientationTransposed);
 
-		momentOfInertia.m00() = (20.0f / 12.0f) * movementProperties.getMass();
-		momentOfInertia.m01() = 0.0f;
-		momentOfInertia.m02() = 0.0f;
-		momentOfInertia.m10() = 0.0f;
-		momentOfInertia.m11() = (20.0f / 12.0f) * movementProperties.getMass();
-		momentOfInertia.m12() = 0.0f;
-		momentOfInertia.m20() = 0.0f;
-		momentOfInertia.m21() = 0.0f;
-		momentOfInertia.m22() = (20.0f / 12.0f) * movementProperties.getMass();
-
-		//mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(renderableNode.transform.rotation));
-		//mathem::Matrix3x3 objectOrientationInverse = mathem::getInverse(objectOrientation);
-		//momentOfInertia = mathem::multiply(momentOfInertia, objectOrientationInverse);
-		//momentOfInertia = mathem::multiply(objectOrientation, momentOfInertia);
-
-		return getInverse(momentOfInertia);
+		return inverseMomentOfInertia;
 	}
 
 	mathem::ComplexGeometry* Entity::getCollider()
@@ -97,7 +153,7 @@ namespace mitevox
 
 	void Entity::tryGenerateHitbox()
 	{
-		if (collider.primitives.getElementsCount() != 0)
+		if (collider.getPrimitivesCount() != 0)
 		{
 			return;
 		}
@@ -112,6 +168,105 @@ namespace mitevox
 		boundingBox->halfSize = (max - min) * 0.5f;
 		boundingBox->transform.translation = (max + min) * 0.5f;
 
-		collider.primitives.appendElement(boundingBox);
+		collider.setType(mathem::GeometryType::PRIMITIVES);
+		collider.appendPrimitive(boundingBox);
+
+		computeMomentOfInertia();
+	}
+
+	void Entity::applyForce(mathem::Vector3D force)
+	{
+		movementProperties.externalForces += force;
+	}
+
+	void Entity::applyForceAtPoint(mathem::Vector3D force, mathem::Vector3D point)
+	{
+		movementProperties.externalForces += force;
+		movementProperties.externalTorque += mathem::crossProduct(point - transform.translation, force);
+	}
+
+	void Entity::integrateForces(float deltaTime)
+	{
+		movementProperties.velocity += movementProperties.externalForces / getMass() * deltaTime;
+
+		mathem::Matrix3x3 I = getMomentOfInertia();
+		mathem::Matrix3x3 inverseI = getInverseMomentOfInertia();
+		mathem::Vector3D& w = movementProperties.angularVelocity;
+		mathem::Vector3D T = movementProperties.externalTorque;
+
+		w += mathem::multiply(inverseI, (T - mathem::crossProduct(w, mathem::multiply(I, w)))) * deltaTime;
+	}
+
+	void Entity::integrateGravity(mathem::Vector3D gravity, float deltaTime)
+	{
+		movementProperties.velocity += gravity * deltaTime;
+	}
+
+	void Entity::integrateVelocities(float deltaTime)
+	{
+		transform.translation += movementProperties.velocity * deltaTime;
+		
+		mathem::Quaternion deltaOrientation(
+			movementProperties.angularVelocity.x(),
+			movementProperties.angularVelocity.y(),
+			movementProperties.angularVelocity.z(),
+			0.0f);
+		mathem::Quaternion worldDeltaOrientation = deltaOrientation.multiplyCopy(transform.rotation);
+		transform.rotation.components += worldDeltaOrientation.components * 0.5f * deltaTime;
+		transform.rotation.normalize();
+	}
+
+	void Entity::resetForces()
+	{
+		movementProperties.externalForces = { 0.0f, 0.0f, 0.0f };
+		movementProperties.externalTorque = { 0.0f, 0.0f, 0.0f };
+	}
+
+	Node* Entity::tryAttachNewRenderableNode()
+	{
+		if (renderableNode == nullptr)
+		{
+			renderableNode = new Node();
+		}
+		return renderableNode;
+	}
+
+	/// <summary>
+	/// TODO: implement other primitives
+	/// TODO: add support of off-center primitives
+	/// </summary>
+	void Entity::computeMomentOfInertiaForPrimitives()
+	{
+		size_t colliderPrimitivesCount = collider.getPrimitivesCount();
+		for (size_t i = 0; i < colliderPrimitivesCount; ++i)
+		{
+			mathem::GeometryPrimitiveBase* primitive = collider.getPrimitive(i);
+
+			switch (primitive->getType())
+			{
+			case mathem::GeometryPrimitiveType::BOX:
+			{
+				mathem::BoxGeometry* box = (mathem::BoxGeometry*)primitive;
+				movementProperties.momentOfInertia.m00() = (box->halfSize.y() * box->halfSize.y() + box->halfSize.z() * box->halfSize.z()) * getMass() / 12.0f;
+				movementProperties.momentOfInertia.m11() = (box->halfSize.x() * box->halfSize.x() + box->halfSize.z() * box->halfSize.z()) * getMass() / 12.0f;
+				movementProperties.momentOfInertia.m22() = (box->halfSize.x() * box->halfSize.x() + box->halfSize.y() * box->halfSize.y()) * getMass() / 12.0f;
+				movementProperties.inverseMomentOfInertia = mathem::getInverse(movementProperties.momentOfInertia);
+				break;
+			}
+
+			default:
+				break;
+			}
+		}
+	}
+
+	void Entity::computeMomentOfInertiaForMesh()
+	{
+		// TODO:
+	}
+
+	void Entity::computeMomentOfInertiaForSkeleton()
+	{
+		// TODO:
 	}
 }

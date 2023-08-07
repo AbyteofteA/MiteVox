@@ -65,7 +65,7 @@ namespace fileio
 		{
 			size_t childrenCount = childrenArrayJSON->getArraySize();
 			nodeResult->children.resize(childrenCount);
-			nodeResult->children.fillWithZeros();
+			nodeResult->children.setAllElementsZeros();
 
 			for (size_t i = 0; i < childrenCount; ++i)
 			{

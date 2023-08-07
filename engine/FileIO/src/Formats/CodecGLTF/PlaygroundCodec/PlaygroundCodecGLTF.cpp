@@ -252,7 +252,7 @@ namespace fileio
 
 		int64_t buffersCount = buffersArrayJSON->getArraySize();
 		playgroundResult->buffers.resize(buffersCount);
-		playgroundResult->buffers.fillWithZeros();
+		playgroundResult->buffers.setAllElementsZeros();
 
 		for (int64_t i = 0; i < buffersCount; ++i)
 		{
@@ -285,7 +285,7 @@ namespace fileio
 
 		int64_t bufferViewsCount = bufferViewsArrayJSON->getArraySize();
 		playgroundResult->bufferViews.resize(bufferViewsCount);
-		playgroundResult->bufferViews.fillWithZeros();
+		playgroundResult->bufferViews.setAllElementsZeros();
 
 		for (int64_t i = 0; i < bufferViewsCount; ++i)
 		{
@@ -305,7 +305,7 @@ namespace fileio
 
 		int64_t accessorsCount = accessorsArrayJSON->getArraySize();
 		playgroundResult->accessors.resize(accessorsCount);
-		playgroundResult->accessors.fillWithZeros();
+		playgroundResult->accessors.setAllElementsZeros();
 
 		for (int64_t i = 0; i < accessorsCount; ++i)
 		{
@@ -469,15 +469,15 @@ namespace fileio
 			SceneCodec::fromGLTF(scene, sceneJSON, &playgroundResult->nodes);
 			playgroundResult->scenes.setElement((int64_t)i, scene);
 
-			if (scene->activeCameraNode == nullptr)
+			if (scene->activeCameraEntity == nullptr)
 			{
 				size_t entitiesCount = scene->entities.getElementsCount();
 				for (size_t i = 0; i < entitiesCount; ++i)
 				{
-					mitevox::Node* node = scene->entities.getElement(i)->renderableNode;
-					if (node->camera)
+					mitevox::Entity* entity = scene->entities.getElement(i);
+					if (entity->hasCamera())
 					{
-						scene->activeCameraNode = node;
+						scene->activeCameraEntity = entity;
 						break;
 					}
 				}
@@ -573,7 +573,7 @@ namespace fileio
 			{
 				cameraJSON->setField("type", std::string("perspective"));
 				JSON* perspectiveCameraJSON = cameraJSON->setFieldType("perspective", JSONtype::OBJECT);
-				perspectiveCameraJSON->setField("aspectRatio", (double)camera->width / camera->height); // TODO:
+				perspectiveCameraJSON->setField("aspectRatio", camera->aspectRatio);
 				perspectiveCameraJSON->setField("yfov", mathem::toRadians(camera->FOV));
 				perspectiveCameraJSON->setField("zfar", camera->farCullPlane);
 				perspectiveCameraJSON->setField("znear", camera->nearCullPlane);

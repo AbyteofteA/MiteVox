@@ -14,6 +14,24 @@ namespace mitevox
 	Playground::Playground(std::string _name)
 	{
 		name = _name;
+
+		// Create default assets
+		//safety::SafeArray<safety::SafeByteArray*> buffers;
+		//safety::SafeArray<BufferView*> bufferViews;
+		//safety::SafeArray<BufferViewAccessor*> accessors;
+		render::Camera* camera = new render::Camera();
+		// TODO: 
+		cameras.appendElement(camera);
+		imageSamplers.appendElement(ImageSampler()); // TODO: 
+		images.appendElement(Image()); // TODO: 
+		textures.appendElement(Texture()); // TODO: 
+		materials.appendElement(Material()); // TODO: 
+		physicalMaterial.appendElement(PhysicalMaterial("Default PhysicalMaterial", 1.0f, 0.0f, 1.0f, 1.0f)); // TODO: 
+		//safety::SafeArray<Mesh*> meshes;
+		//safety::SafeArray<Node*> nodes;
+		scenes.appendElement(new Scene()); // TODO: 
+		//safety::SafeArray<Animation*> animations;
+		//safety::SafeArray<SkeletonBase*> skeletons;
 	}
 
 	Playground::~Playground()
@@ -25,9 +43,30 @@ namespace mitevox
 		}
 	}
 
+	void Playground::updateAssets()
+	{
+		size_t scenesCount = scenes.getElementsCount();
+		for (size_t i = 0; i < scenesCount; ++i)
+		{
+			Scene* scene = scenes.getElement(i);
+			// TODO: 
+		}
+	}
+
+	// TODO: How to add assets?
+
+	size_t Playground::createDefaultScene(EngineSettings* settings)
+	{
+		size_t index = createActiveScene("Default Scene", settings);
+		Scene* defaultScene = scenes.getElement(index);
+
+
+		return index;
+	}
+
 	size_t Playground::createScene(std::string name, EngineSettings* settings)
 	{
-		auto newScene = new Scene(settings);
+		Scene* newScene = new Scene(settings);
 		newScene->name = name;
 		scenes.appendElement(newScene);
 		return scenes.getElementsCount() - 1;
@@ -48,5 +87,28 @@ namespace mitevox
 	Scene* Playground::getActiveScene()
 	{
 		return scenes.getElement(activeScene);
+	}
+
+	size_t Playground::addEntity(Entity* entity)
+	{
+		Scene* activeScene = getActiveScene();
+		size_t entitiesCount = activeScene->entities.getElementsCount();
+		activeScene->entities.appendElement(entity);
+		activeScene->foundation->emplace(entity); // TODO: delete
+		return entitiesCount;
+	}
+
+	void Playground::removeEntity(Entity* entity)
+	{
+		Scene* activeScene = getActiveScene();
+		size_t entitiesCount = activeScene->entities.getElementsCount();
+		for (size_t i = 0; i < entitiesCount; ++i)
+		{
+			if (entity == activeScene->entities.getElement(i))
+			{
+				activeScene->entities.removeElement(i);
+				return;
+			}
+		}
 	}
 }

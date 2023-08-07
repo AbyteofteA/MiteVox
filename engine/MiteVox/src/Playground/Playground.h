@@ -10,6 +10,7 @@
 #include "engine/MiteVox/src/Material/Image.h"
 #include "engine/MiteVox/src/Material/Texture.h"
 #include "engine/MiteVox/src/Material/Material.h"
+#include "engine/MiteVox/src/Physics/PhysicalMaterial.h"
 #include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/MiteVox/src/Playground/Node.h"
@@ -32,6 +33,7 @@ namespace fileio
 namespace mitevox
 {
 	/// <summary>
+	/// 
 	/// TODO: implement serialization to glTF, CBOR
 	/// TODO: implement deserialization from CBOR
 	/// </summary>
@@ -41,16 +43,23 @@ namespace mitevox
 
 	public:
 
-		std::string name;
+		std::string name = "Untitled";
 		std::string file;
 		size_t activeScene = 0;
 
 		Playground(std::string _name = "Untitled");
 		~Playground();
+
+		void updateAssets();
+
+		size_t createDefaultScene(EngineSettings* settings);
 		size_t createScene(std::string name, EngineSettings* settings);
 		size_t createActiveScene(std::string name, EngineSettings* settings);
 		void deleteScene(size_t index);
 		Scene* getActiveScene();
+
+		size_t addEntity(Entity* entity);
+		void removeEntity(Entity* entity);
 
 	// TODO: make private:
 
@@ -73,6 +82,7 @@ namespace mitevox
 		safety::SafeArray<Image> images;
 		safety::SafeArray<Texture> textures;
 		safety::SafeArray<Material> materials;
+		safety::SafeArray<PhysicalMaterial> physicalMaterial;
 		safety::SafeArray<Mesh*> meshes;
 		safety::SafeArray<Node*> nodes;
 		safety::SafeArray<Scene*> scenes;

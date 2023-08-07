@@ -97,62 +97,21 @@ namespace mathem
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry3D tmpTriangle = box1->getTrianglePositions(0);
-		box1Transform->applyTo(tmpTriangle);
-		Vector3D tmpPositionMax;
-		Vector3D tmpPositionMin;
-		Vector3D tmpNormal = tmpTriangle.computeNormal();
 		float tmpBox1ProjectionMin = 0.0f, tmpBox1ProjectionMax = 0.0f;
 		float tmpBox2ProjectionMin = 0.0f, tmpBox2ProjectionMax = 0.0f;
 
-		float penetrationSign = 1.0f;
-		if (isFirstPass == false)
+		size_t box1TrianglesCount = box1->getTrianglesCount();
+		for (size_t i = 0; i < box1TrianglesCount; ++i)
 		{
-			penetrationSign = -1.0f;
-		}
-
-		// Check box1's local Z-axis
-		{
-			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box1->getVertexPosition(7);
-			box1Transform->applyTo(tmpPositionMin);
-			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
-			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
-
-			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
+			if (thereMayBeACollision == false)
 			{
-				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
+				break;
 			}
-			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
-			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
-			if (penetration == 0.0f)
-			{
-				thereMayBeACollision = false;
-				collisionProperties->penetrationDepth = 0.0f;
-			}
-			else
-			{
-				collisionProperties->recomputePenetrationAndNormal(penetrationSign * penetration, tmpNormal, isFirstPass);
-			}
-		}
-
-		// Check box1's local X-axis
-		if (thereMayBeACollision)
-		{
-			tmpTriangle = box1->getTrianglePositions(8);
+			TriangleGeometry3D tmpTriangle = box1->getTrianglePositions(i);
 			box1Transform->applyTo(tmpTriangle);
-			tmpNormal = tmpTriangle.computeNormal();
+			Vector3D tmpNormal = tmpTriangle.computeNormal();
 
-			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box1->getVertexPosition(3);
-			box1Transform->applyTo(tmpPositionMin);
-			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
-			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
-
-			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
-			{
-				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
-			}
+			computeProjection(box1, box1Transform, &tmpNormal, &tmpBox1ProjectionMin, &tmpBox1ProjectionMax);
 			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
 			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
 			if (penetration == 0.0f)
@@ -162,37 +121,7 @@ namespace mathem
 			}
 			else
 			{
-				collisionProperties->recomputePenetrationAndNormal(penetrationSign * penetration, tmpNormal, isFirstPass);
-			}
-		}
-
-		// Check box1's local Y-axis
-		if (thereMayBeACollision)
-		{
-			tmpTriangle = box1->getTrianglePositions(4);
-			box1Transform->applyTo(tmpTriangle);
-			tmpNormal = tmpTriangle.computeNormal();
-
-			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box1->getVertexPosition(0);
-			box1Transform->applyTo(tmpPositionMin);
-			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
-			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
-
-			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
-			{
-				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
-			}
-			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
-			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
-			if (penetration == 0.0f)
-			{
-				thereMayBeACollision = false;
-				collisionProperties->penetrationDepth = 0.0f;
-			}
-			else
-			{
-				collisionProperties->recomputePenetrationAndNormal(penetrationSign * penetration, tmpNormal, isFirstPass);
+				collisionProperties->recomputePenetrationAndNormal(penetration, tmpNormal, isFirstPass);
 			}
 		}
 
@@ -208,15 +137,6 @@ namespace mathem
 		else
 		{
 			collisionProperties->type = CollisionType::INTERSECTION;
-
-			Vector3D firstPosition = box1Transform->applyToCopy(box1->transform.translation);
-			Vector3D secondPosition = box2Transform->applyToCopy(box2->transform.translation);
-			Vector3D fromSecondToFirstDirection = secondPosition - firstPosition;
-			if (fromSecondToFirstDirection * collisionProperties->normal < 0.0f)
-			{
-				collisionProperties->normal = -collisionProperties->normal;
-				collisionProperties->penetrationDepth = -collisionProperties->penetrationDepth;
-			}
 		}
 	}
 

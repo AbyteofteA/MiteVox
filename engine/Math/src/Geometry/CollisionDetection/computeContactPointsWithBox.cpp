@@ -24,47 +24,33 @@ namespace mathem
 		Vector3D faceVerteces[4];
 		size_t faceVertecesCount = 0;
 
-		GeometryPrimitiveBase* referenceMeshGeometry;
-		GeometryTransform* referenceMeshGeometryTransform;
-		GeometryPrimitiveBase* incidentMeshGeometry;
-		GeometryTransform* incidentMeshGeometryTransform;
-
-		if (collisionProperties->normalBelongsToTheFirst)
-		{
-			if (collisionProperties->penetrationDepth > 0.0f)
-			{
-				normal = -normal;
-			}
-
-			referenceMeshGeometry = meshGeometry1;
-			referenceMeshGeometryTransform = meshGeometryTransform1;
-			incidentMeshGeometry = meshGeometry2;
-			incidentMeshGeometryTransform = meshGeometryTransform2;
-		}
-		else
-		{
-			referenceMeshGeometry = meshGeometry2;
-			referenceMeshGeometryTransform = meshGeometryTransform2;
-			incidentMeshGeometry = meshGeometry1;
-			incidentMeshGeometryTransform = meshGeometryTransform1;
-		}
+		GeometryPrimitiveBase* referenceMeshGeometry = meshGeometry1;
+		GeometryTransform* referenceMeshGeometryTransform = meshGeometryTransform1;
+		GeometryPrimitiveBase* incidentMeshGeometry = meshGeometry2;
+		GeometryTransform* incidentMeshGeometryTransform = meshGeometryTransform2;
 
 		// Plane calculation
-		size_t furthestVertexIndex = getFurthestVertexInTheDirection(referenceMeshGeometry, referenceMeshGeometryTransform, normal);
+		size_t furthestVertexIndex = getFurthestVertexInTheDirection(referenceMeshGeometry, referenceMeshGeometryTransform, -normal);
 		Vector3D planeVertex = referenceMeshGeometry->getVertexPosition(furthestVertexIndex);
 		referenceMeshGeometryTransform->applyTo(planeVertex);
-		float planeDistance = planeVertex * normal;
+		float planeDistance = -planeVertex * normal;
 
 		// Find contact face
-		size_t closestVertexIndex = getFurthestVertexInTheDirection(incidentMeshGeometry, incidentMeshGeometryTransform, -normal);
+		size_t closestVertexIndex = getFurthestVertexInTheDirection(incidentMeshGeometry, incidentMeshGeometryTransform, normal);
 		faceVertecesCount = incidentMeshGeometry->getFaceVerteces(
-			closestVertexIndex, -normal, faceVerteces, incidentMeshGeometryTransform, equalityTolerance);
+			closestVertexIndex, normal, faceVerteces, incidentMeshGeometryTransform, equalityTolerance);
 
-		float distance = 0.01;
+		float distance = 0.01f;
 		for (size_t i = 0; i < faceVertecesCount; i++)
 		{
 			Vector3D faceVertex = faceVerteces[i];
 			
+			// Discard points above reference surfase
+			if (isBeforePlane(faceVertex, -normal, planeDistance))
+			{
+				continue;
+			}
+
 			// Project onto reference geometry
 			size_t referenceTrianglesCount = referenceMeshGeometry->getTrianglesCount();
 			for (size_t i = 0; i < referenceTrianglesCount; ++i)
@@ -72,7 +58,7 @@ namespace mathem
 				TriangleGeometry3D resultTriangle = referenceMeshGeometry->getTrianglePositions(i);
 				referenceMeshGeometryTransform->applyTo(resultTriangle);
 				Vector3D triangleNormal = resultTriangle.computeNormal();
-				if (almostEqual(triangleNormal, normal, equalityTolerance))
+				if (almostEqual(triangleNormal, -normal, equalityTolerance))
 				{
 					continue;
 				}
@@ -93,14 +79,8 @@ namespace mathem
 				faceVertex = projectOntoPlaneIfBehind(faceVertex, triangleNormal, tmpPlaneDistance);
 			}
 
-			// Discard points above reference surfase
-			if (isBeforePlane(faceVertex, normal, planeDistance))
-			{
-				continue;
-			}
-
 			collisionProperties->tryAddNewContactPoint(faceVertex, distance, equalityTolerance);
-			distance *= 0.01;
+			distance *= 0.01f;
 		}
 	}
 

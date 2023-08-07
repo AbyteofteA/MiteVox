@@ -21,7 +21,6 @@ namespace mathem
 	/// Datapoint type must define the following methods:
 	/// - GeometryTransform* getTransform();
 	/// - ComplexGeometry* getCollider();
-	/// - bool getIsMoved();
 	/// </summary>
 	/// <typeparam name="T">Datapoint type</typeparam>
 	template <class T>

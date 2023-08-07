@@ -2,7 +2,17 @@
 
 namespace mitevox
 {
-    uint32_t BufferViewAccessor::getComponentsCount()
+    void BufferViewAccessor::init(safety::SafeByteArray* buffer, uint16_t byteStride, uint64_t byteOffset, ComponentDataType componentType, Type type)
+    {
+        this->bufferView = new BufferView();
+        this->bufferView->buffer = buffer;
+        this->bufferView->byteStride = byteStride;
+        this->byteOffset = byteOffset;
+        this->componentType = componentType;
+        this->type = type;
+    }
+
+    uint32_t BufferViewAccessor::getComponentsPerElement()
     {
         switch (type)
         {
@@ -13,7 +23,6 @@ namespace mitevox
         case mitevox::BufferViewAccessor::Type::VEC3:
             return 3;
         case mitevox::BufferViewAccessor::Type::VEC4:
-            return 4;
         case mitevox::BufferViewAccessor::Type::MAT2:
             return 4;
         case mitevox::BufferViewAccessor::Type::MAT3:
@@ -25,18 +34,38 @@ namespace mitevox
         }
     }
 
+    void BufferViewAccessor::reserveElements(size_t count)
+    {
+        size_t byteStride = bufferView->byteStride;
+        bufferView->buffer->reserve(byteStride * count);
+    }
+
+    void BufferViewAccessor::resizeElements(size_t count)
+    {
+        size_t byteStride = bufferView->byteStride;
+        this->bufferView->buffer->resize(byteStride * count);
+        this->bufferView->byteLength = byteStride * count;
+        this->count = count;
+    }
+
+    void BufferViewAccessor::clear()
+    {
+        bufferView->buffer->clear();
+        this->count = 0;
+    }
+
     template <typename T>
     T BufferViewAccessor::getElementsComponent(int64_t elementIndex, int64_t componentIndex)
     {
         if (elementIndex >= count ||
-            componentIndex >= getComponentsCount())
+            componentIndex >= getComponentsPerElement())
         {
             return (T)0;
         }
         int64_t actualIndex = 0;
         if (bufferView->byteStride == 0)
         {
-            actualIndex = elementIndex * getComponentsCount() + componentIndex;
+            actualIndex = elementIndex * getComponentsPerElement() + componentIndex;
             actualIndex *= sizeof(T);
         }
         else
@@ -161,14 +190,14 @@ namespace mitevox
     void BufferViewAccessor::setElementsComponent(int64_t elementIndex, int64_t componentIndex, T value)
     {
         if (elementIndex >= count ||
-            componentIndex >= getComponentsCount())
+            componentIndex >= getComponentsPerElement())
         {
             return;
         }
         int64_t actualIndex = 0;
         if (bufferView->byteStride == 0)
         {
-            actualIndex = elementIndex * getComponentsCount() + componentIndex;
+            actualIndex = elementIndex * getComponentsPerElement() + componentIndex;
             actualIndex *= sizeof(T);
         }
         else

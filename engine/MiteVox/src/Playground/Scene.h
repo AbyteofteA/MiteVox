@@ -24,9 +24,10 @@ namespace mitevox
 
 		mathem::Vector3D ambientLight = { 0.1f, 0.1f, 0.1f };
 		std::vector<render::Cubemap> skyboxes;
-		mathem::Vector3D globalGravity = { 0.0f, 0.0f, 0.0f };
+		bool isGravityGlobal = true;
+		mathem::Vector3D globalGravity = { 0.0f, -9.8f, 0.0f };
 		long activeSkybox = -1;
-		Node* activeCameraNode = nullptr;
+		Entity* activeCameraEntity = nullptr;
 
 		safety::SafeArray<NativeScript> scripts;
 

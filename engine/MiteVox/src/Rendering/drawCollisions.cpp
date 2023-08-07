@@ -6,6 +6,9 @@
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "drawCollider.h"
 
+#include <cassert>
+#undef NDEBUG
+
 namespace mitevox
 {
 	void drawCollisions(render::RendererSettings* renderer, safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions)
@@ -13,6 +16,7 @@ namespace mitevox
 		render::ColorRGBAf redColor = { 1.0f, 0.0f, 0.0f, 1.0f };
 		render::ColorRGBAf greenColor = { 0.0f, 1.0f, 0.0f, 1.0f };
 		render::ColorRGBAf blueColor = { 0.0f, 0.0f, 1.0f, 1.0f };
+		render::ColorRGBAf magentaColor = { 1.0f, 0.0f, 1.0f, 1.0f };
 		mathem::GeometryTransform zeroTransform;
 
 		size_t collisionsCount = collisions->getElementsCount();
@@ -33,20 +37,17 @@ namespace mitevox
 			}
 			else
 			{
+				assert(collision.properties.normalBelongsToTheFirst == true);
 				normalOrigin = complexGeometryTransform2->translation;
 			}
-			render::Point normalPoint1, normalPoint2;
-			normalPoint1.position = normalOrigin;
-			normalPoint1.color = greenColor;
-			normalPoint2.position = normalOrigin + collision.properties.normal;
-			normalPoint2.color = greenColor;
-			render::drawLine(renderer, normalPoint1, normalPoint2);
+			
+			render::drawArrow(renderer, normalOrigin, collision.properties.normal, greenColor);
 
 			for (size_t i = 0; i < collision.properties.contactPointsCount; ++i)
 			{
 				render::Point lightPoint;
 				lightPoint.position = collision.properties.contactPoints[i];
-				lightPoint.color = greenColor;
+				lightPoint.color = magentaColor;
 				render::drawCross(renderer, lightPoint, 0.125f);
 			}
 		}

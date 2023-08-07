@@ -20,7 +20,11 @@ namespace mitevox
         safety::SafeFloatArray weights;
         std::string name;
 
+        bool isUploaded = false;
+
         explicit Mesh();
+
+        MeshPrimitive* addMeshPrimitive();
 
         void makeCopyForAnimationTo(Mesh* resultMesh);
         void tryGenerateTangents();

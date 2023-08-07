@@ -310,22 +310,18 @@ namespace mathem
 		for (int32_t i = 0; i < dataPointsCount; i++)
 		{
 			T dataPoint = dataPoints.getElement(i);
-			if (dataPoint->getIsMoved())
+			GeometryTransform zeroTransform;
+			bool datapointFits = contains(
+				dataPoint->getCollider(),
+				dataPoint->getTransform(),
+				(GeometryPrimitiveBase*)&boundingBox,
+				&zeroTransform);
+			if (datapointFits == false)
 			{
-				GeometryTransform zeroTransform;
-				bool datapointFits = contains(
-					dataPoint->getCollider(),
-					dataPoint->getTransform(),
-					(GeometryPrimitiveBase*)&boundingBox,
-					&zeroTransform);
-				if (datapointFits == false)
-				{
-					dataPoints.removeElementAndSwapWithLast(i);
-					i -= 1;
-					dataPointsCount -= 1;
-					datapointsToMove->appendElement(dataPoint);
-					dataPoint->getTransformForMove();
-				}
+				dataPoints.removeElementAndSwapWithLast(i);
+				i -= 1;
+				dataPointsCount -= 1;
+				datapointsToMove->appendElement(dataPoint);
 			}
 		}
 

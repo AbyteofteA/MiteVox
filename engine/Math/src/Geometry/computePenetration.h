@@ -4,7 +4,7 @@
 namespace mathem
 {
 	/// <summary>
-	/// Tells how much the object1 must be moved to eliminate the intersection, if any.
+	/// Tells how much the object1 is moved into the object2 along the positive direction, if any.
 	/// </summary>
 	/// <param name="object1ProjectionMin"></param>
 	/// <param name="object1ProjectionMax"></param>

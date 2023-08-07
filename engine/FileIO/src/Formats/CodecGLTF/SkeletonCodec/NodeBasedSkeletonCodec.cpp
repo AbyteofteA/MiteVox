@@ -27,7 +27,7 @@ namespace fileio
 			skeletonResult->init(jointsCount);
 
 			skeletonResult->joints.resize(jointsCount);
-			skeletonResult->joints.fillWithZeros();
+			skeletonResult->joints.setAllElementsZeros();
 
 			for (size_t i = 0; i < jointsCount; ++i)
 			{

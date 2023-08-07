@@ -26,6 +26,7 @@
     <ClCompile Include="src\Geometry\CollisionDetection\CollisionInfo.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPoints.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPointsWithBox.cpp" />
+    <ClCompile Include="src\Geometry\ComplexGeometry.cpp" />
     <ClCompile Include="src\Geometry\computePenetration.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\contains.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.cpp" />

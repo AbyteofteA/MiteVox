@@ -375,7 +375,7 @@ namespace render
 						glBindBuffer(GL_ARRAY_BUFFER, attributeAccessor->bufferView->ID);
 						glVertexAttribPointer(
 							attributeLocation,
-							attributeAccessor->getComponentsCount(),
+							attributeAccessor->getComponentsPerElement(),
 							attributeAccessor->componentType,
 							attributeAccessor->normalized,
 							attributeAccessor->bufferView->byteStride,
@@ -388,7 +388,7 @@ namespace render
 						glBindBuffer(GL_ARRAY_BUFFER, attributeAccessor->bufferView->ID);
 						glVertexAttribIPointer(
 							attributeLocation,
-							attributeAccessor->getComponentsCount(),
+							attributeAccessor->getComponentsPerElement(),
 							attributeAccessor->componentType,
 							attributeAccessor->bufferView->byteStride,
 							(void*)attributeAccessor->byteOffset);
@@ -409,6 +409,8 @@ namespace render
 
 			PRINT_RENDERER_ERRORS;
 		}
+
+		mesh->isUploaded = true;
 
 		checkMeshBuffers(mesh);
 	}
@@ -442,6 +444,8 @@ namespace render
 
 			PRINT_RENDERER_ERRORS;
 		}
+
+		mesh->isUploaded = true;
 	}
 
 	void removeMesh(mitevox::Mesh* mesh, int shaderID)
@@ -468,6 +472,7 @@ namespace render
 				removeBufferView(indexAccessor->bufferView);
 			}
 		}
+		mesh->isUploaded = false;
 	}
 
 	void renderMesh(
@@ -533,9 +538,13 @@ namespace render
 	{
 		mathem::GeometryTransform nodeGlobalTransform = *transform * node->transform;
 
-		if (auto meshToRender = node->getMeshToRender())
+		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
 		{
 			tryUploadSkeleton(node, shaderID);
+			if (meshToRender->isUploaded == false)
+			{
+				uploadMesh(meshToRender, shaderID);
+			}
 			renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
 		}
 

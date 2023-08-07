@@ -35,6 +35,11 @@ namespace mitevox
         bool isMorphableMesh();
         Mesh* getMeshToRender();
 
+        Mesh* tryAttachNewMesh();
+
+        bool hasCameraRecursively();
+        mathem::GeometryTransform getCameraRecursively(render::Camera** cameraResult, mathem::GeometryTransform* parentTransform);
+
         void getMinMaxRecursively(mathem::GeometryTransform* parentTransform, mathem::Vector3D* min, mathem::Vector3D* max);
     };
 }

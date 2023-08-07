@@ -20,6 +20,8 @@ namespace mitevox
 	/// </summary>
 	class Engine
 	{
+		friend class MiteVoxAPI;
+
 	public:
 
 		EngineSettings* settings;
@@ -44,17 +46,20 @@ namespace mitevox
 		int primitiveShader = -1;
 		int skyboxShader = -1;
 
+		mathem::PileAllocator<Entity> entitiesAllocator;
+
+		// Temporary containers
 		safety::SafeArray<render::PointLight> pointLightsArray;
 		safety::SafeArray<render::DirectionalLight> directionalLightsArray;
 		safety::SafeArray<render::SpotLight> spotLightsArray;
 		safety::SafeArray<Entity*> entitiesToSimulate;
 		safety::SafeArray<mathem::CollisionInfo<Entity*>> collisions;
-		mathem::PileOfSafeArrays<Entity*>* dataPointsContainers;
+		mathem::PileOfSafeArrays<Entity*> dataPointsContainers;
+
+		Entity* useEntity();
+		void returnEntity(Entity* usedEntity);
 
 		void preparePlayground();
-
-		void computePhysics(float deltaTime);
-		void computeKinematics(float deltaTime);
 
 		void animateNodeRecursively(Node* node, float deltaTime);
 		void animateNodes(safety::SafeArray<Entity*>* entities, float deltaTime);

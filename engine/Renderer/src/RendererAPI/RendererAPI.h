@@ -1,4 +1,3 @@
-
 #ifndef RENDERER_API_H
 #define RENDERER_API_H
 
@@ -8,6 +7,7 @@
 #include "Color.h"
 #include "Primitives.h"
 #include "Cubemap.h"
+#include "engine/Math/src/Vector.h"
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
@@ -66,6 +66,7 @@ printErrors(__FILE__, __LINE__);
 	void drawTriangle(RendererSettings* renderer, Point point1, Point point2, Point point3);
 
 	void drawCross(RendererSettings* renderer, Point point, float size);
+	void drawArrow(RendererSettings* renderer, mathem::Vector3D origin, mathem::Vector3D direction, ColorRGBAf color);
 	void drawSnowflake(RendererSettings* renderer, Point point, float size);
 
 	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform);

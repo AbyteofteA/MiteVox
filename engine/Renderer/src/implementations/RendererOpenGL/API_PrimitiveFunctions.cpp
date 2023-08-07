@@ -44,6 +44,28 @@ namespace render
 		render::drawLine(renderer, point2, point5);
 		render::drawLine(renderer, point3, point6);
 	}
+
+	void drawArrow(RendererSettings* renderer, mathem::Vector3D origin, mathem::Vector3D direction, ColorRGBAf color)
+	{
+		render::Point pointOrigin;
+		pointOrigin.position = origin;
+		pointOrigin.color = color;
+		drawSnowflake(renderer, pointOrigin, 0.05f);
+
+		render::Point normalPoint1, normalPoint2;
+		normalPoint1.position = origin;
+		normalPoint1.color = color;
+		normalPoint2.position = origin + direction;
+		normalPoint2.color = color;
+		drawLine(renderer, normalPoint1, normalPoint2);
+
+		mathem::Vector3D pointArrowDelta = direction * 0.2f;
+		render::Point pointArrow = normalPoint2;
+		pointArrow.position -= pointArrowDelta;
+
+		drawSnowflake(renderer, pointArrow, 0.1f);
+	}
+
 	void drawSnowflake(RendererSettings* renderer, Point point, float size)
 	{
 		drawCross(renderer, point, size);
