@@ -1,7 +1,10 @@
 #include "computeContactPoints.h"
 
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
+#include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
 #include "engine/Math/src/almostEqual.h"
 #include "engine/Math/src/MinAndMax.h"
 
@@ -20,25 +23,24 @@ namespace mathem
 		float equalityTolerance,
 		bool isFirstPass = true)
 	{
-		Vector3D normal = collisionProperties->normal;
-		Vector3D faceVerteces[4];
-		size_t faceVertecesCount = 0;
-
 		GeometryPrimitiveBase* referenceMeshGeometry = meshGeometry1;
 		GeometryTransform* referenceMeshGeometryTransform = meshGeometryTransform1;
 		GeometryPrimitiveBase* incidentMeshGeometry = meshGeometry2;
 		GeometryTransform* incidentMeshGeometryTransform = meshGeometryTransform2;
 
 		// Plane calculation
-		size_t furthestVertexIndex = getFurthestVertexInTheDirection(referenceMeshGeometry, referenceMeshGeometryTransform, -normal);
+		Vector3D referencePlaneNormal = collisionProperties->normal;
+		size_t furthestVertexIndex = getFurthestVertexInTheDirection(referenceMeshGeometry, referenceMeshGeometryTransform, referencePlaneNormal);
 		Vector3D planeVertex = referenceMeshGeometry->getVertexPosition(furthestVertexIndex);
 		referenceMeshGeometryTransform->applyTo(planeVertex);
-		float planeDistance = -planeVertex * normal;
+		float referencePlaneDistance = planeVertex * referencePlaneNormal;
 
 		// Find contact face
-		size_t closestVertexIndex = getFurthestVertexInTheDirection(incidentMeshGeometry, incidentMeshGeometryTransform, normal);
+		size_t closestVertexIndex = getFurthestVertexInTheDirection(incidentMeshGeometry, incidentMeshGeometryTransform, -referencePlaneNormal);
+		Vector3D faceVerteces[4];
+		size_t faceVertecesCount = 0;
 		faceVertecesCount = incidentMeshGeometry->getFaceVerteces(
-			closestVertexIndex, normal, faceVerteces, incidentMeshGeometryTransform, equalityTolerance);
+			closestVertexIndex, -referencePlaneNormal, faceVerteces, incidentMeshGeometryTransform, equalityTolerance);
 
 		float distance = 0.01f;
 		for (size_t i = 0; i < faceVertecesCount; i++)
@@ -46,7 +48,7 @@ namespace mathem
 			Vector3D faceVertex = faceVerteces[i];
 			
 			// Discard points above reference surfase
-			if (isBeforePlane(faceVertex, -normal, planeDistance))
+			if (isBeforePlane(faceVertex, referencePlaneNormal, referencePlaneDistance))
 			{
 				continue;
 			}
@@ -58,7 +60,9 @@ namespace mathem
 				TriangleGeometry3D resultTriangle = referenceMeshGeometry->getTrianglePositions(i);
 				referenceMeshGeometryTransform->applyTo(resultTriangle);
 				Vector3D triangleNormal = resultTriangle.computeNormal();
-				if (almostEqual(triangleNormal, -normal, equalityTolerance))
+
+				// Don't project onto reference plane
+				if (almostEqual(triangleNormal, referencePlaneNormal, equalityTolerance))
 				{
 					continue;
 				}
@@ -69,7 +73,7 @@ namespace mathem
 			}
 
 			// Project onto incident geometry
-			size_t incidentTrianglesCount = incidentMeshGeometry->getTrianglesCount();
+			/*size_t incidentTrianglesCount = incidentMeshGeometry->getTrianglesCount();
 			for (size_t i = 0; i < incidentTrianglesCount; ++i)
 			{
 				TriangleGeometry3D resultTriangle = incidentMeshGeometry->getTrianglePositions(i);
@@ -77,9 +81,14 @@ namespace mathem
 				Vector3D triangleNormal = -resultTriangle.computeNormal();
 				float tmpPlaneDistance = resultTriangle.point1 * triangleNormal;
 				faceVertex = projectOntoPlaneIfBehind(faceVertex, triangleNormal, tmpPlaneDistance);
-			}
+			}*/
 
-			collisionProperties->tryAddNewContactPoint(faceVertex, distance, equalityTolerance);
+			Vector3D referenceContactPoint = projectOntoPlaneIfBehind(faceVertex, referencePlaneNormal, referencePlaneDistance);
+			collisionProperties->tryAddNewContactPoint(
+				referenceContactPoint, 
+				faceVertex,
+				distance, 
+				equalityTolerance);
 			distance *= 0.01f;
 		}
 	}

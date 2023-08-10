@@ -59,7 +59,7 @@ namespace mathem
 
 	inline float computeDeterminant(Matrix3x3 matrix);
 	inline Matrix3x3 getInverse(Matrix3x3 matrix);
-
+	inline Matrix3x3 getTransposed(Matrix3x3& matrix);
 	inline Vector3D multiply(Matrix3x3 matrix, Vector3D vector);
 
 #define SQUARE_MATRIX Matrix<float, Dimension, Dimension>
@@ -237,6 +237,9 @@ namespace mathem
 		memset(data, 0, DimensionX * DimensionY * sizeof(T));
 	}
 
+	/// <summary>
+	/// BUG!!!
+	/// </summary>
 	MATRIX_TEMPLATE
 	inline void MATRIX::transpose()
 	{
@@ -286,6 +289,21 @@ namespace mathem
 		matrix.m22() = inverseDeterminant * subDeterminant22;
 
 		return matrix;
+	}
+
+	inline Matrix3x3 getTransposed(Matrix3x3& matrix)
+	{
+		Matrix3x3 resultMatrix;
+		resultMatrix.m00() = matrix.m00();
+		resultMatrix.m01() = matrix.m10();
+		resultMatrix.m02() = matrix.m20();
+		resultMatrix.m10() = matrix.m01();
+		resultMatrix.m11() = matrix.m11();
+		resultMatrix.m12() = matrix.m21();
+		resultMatrix.m20() = matrix.m02();
+		resultMatrix.m21() = matrix.m12();
+		resultMatrix.m22() = matrix.m22();
+		return resultMatrix;
 	}
 
 	inline Vector3D multiply(Matrix3x3 matrix, Vector3D vector)

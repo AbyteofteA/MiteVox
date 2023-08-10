@@ -29,7 +29,6 @@ namespace mathem
 		bool normalBelongsToTheFirst = true;
 		Vector3D normal;
 		uint16_t contactPointsCount = 0;
-		Vector3D contactPoints[MAX_CONTACT_POINTS_COUNT];
 		CollisionContact contacts[MAX_CONTACT_POINTS_COUNT];
 		float contactPointsDistancesSquared[MAX_CONTACT_POINTS_COUNT] = { 
 			mathem::max<float>(),
@@ -38,10 +37,13 @@ namespace mathem
 			mathem::max<float>() };
 
 		void reset();
-		void invert();
 		void recomputePenetrationAndNormal(float penetrationDepth, Vector3D normal, bool normalBelongsToTheFirst);
 		void resetContactPoints();
-		void tryAddNewContactPoint(Vector3D contactPoint, float distancesSquared, float equalityTolerance);
+		void tryAddNewContactPoint(
+			Vector3D contactPoint1, 
+			Vector3D contactPoint2, 
+			float distanceSquared, 
+			float equalityTolerance);
 		void concatenate(CollisionProperties& other, float equalityTolerance);
 	};
 
@@ -54,6 +56,7 @@ namespace mathem
 		T object2 = nullptr;
 
 		inline void reset();
+		inline void swapObjects();
 	};
 
 	template <class T>
@@ -62,6 +65,14 @@ namespace mathem
 		properties.reset();
 		object1 = nullptr;
 		object2 = nullptr;
+	}
+
+	template <class T>
+	void CollisionInfo<T>::swapObjects()
+	{
+		std::swap(object1, object2);
+		properties.normal = -properties.normal;
+		properties.normalBelongsToTheFirst = !properties.normalBelongsToTheFirst;
 	}
 }
 

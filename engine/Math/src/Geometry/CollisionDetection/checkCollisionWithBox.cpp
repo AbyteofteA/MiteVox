@@ -1,5 +1,6 @@
 #include "checkCollision.h"
 
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Geometry/computeProjection.h"
 #include "engine/Math/src/Geometry/computePenetration.h"
 #include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"

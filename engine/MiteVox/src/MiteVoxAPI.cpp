@@ -162,6 +162,9 @@ namespace mitevox
 		meshPrimitive->setTriangleNormals(11, normal, normal, normal);
 
 		entity->tryGenerateHitbox();
+		entity->physicalMaterial.setRestitution(0.5f);
+		entity->physicalMaterial.setDynamicFriction(1.0f);
+		entity->physicalMaterial.setStaticFriction(1.0f);
 		entity->setMass(1.0f);
 
 		engine->playground->addEntity(entity);
@@ -185,7 +188,7 @@ namespace mitevox
 
 	Entity* MiteVoxAPI::createPlane(std::string name, render::ColorRGBAf color)
 	{
-		Entity* entity = MiteVoxAPI::createBox(name, 10.0f, 0.5f, 10.0f, { 0.0f, -7.0f, 0.0f }, color);
+		Entity* entity = MiteVoxAPI::createBox(name, 10.0f, 0.5f, 10.0f, { 0.0f, -3.0f, 0.0f }, color);
 		entity->setMass(0.0f);
 		return entity;
 	}
@@ -201,7 +204,7 @@ namespace mitevox
 		}
 		else
 		{
-			activeScene->foundation->getAll(&engine->entitiesToSimulate);
+			engine->entitiesToSimulate.concatenate(&activeScene->entities);
 		}
 		return &engine->entitiesToSimulate;
 	}

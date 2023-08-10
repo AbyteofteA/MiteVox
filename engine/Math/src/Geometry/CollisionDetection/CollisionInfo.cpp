@@ -2,6 +2,7 @@
 
 #include "engine/Math/src/almostEqual.h"
 #include "engine/Math/src/MinAndMax.h"
+
 #include <algorithm>
 
 namespace mathem
@@ -14,12 +15,6 @@ namespace mathem
 		resetContactPoints();
 	}
 
-	void CollisionProperties::invert()
-	{
-		penetrationDepth = -penetrationDepth;
-		normal = -normal;
-	}
-
 	void CollisionProperties::recomputePenetrationAndNormal(float penetrationDepth, Vector3D normal, bool normalBelongsToTheFirst)
 	{
 		if (std::abs(penetrationDepth) < std::abs(this->penetrationDepth))
@@ -27,12 +22,6 @@ namespace mathem
 			this->normalBelongsToTheFirst = normalBelongsToTheFirst;
 			this->penetrationDepth = penetrationDepth;
 			this->normal = normal;
-
-			// Make sure that the normal looks towards the second geometry
-			if (penetrationDepth < 0.0f)
-			{
-				invert();
-			}
 		}
 	}
 
@@ -45,13 +34,18 @@ namespace mathem
 		}
 	}
 
-	void CollisionProperties::tryAddNewContactPoint(Vector3D contactPoint, float distanceSquared, float equalityTolerance)
+	void CollisionProperties::tryAddNewContactPoint(
+		Vector3D contactPoint1, 
+		Vector3D contactPoint2,
+		float distanceSquared, 
+		float equalityTolerance)
 	{
 		int32_t contactToChangeIndex = -1;
 		float contactToChangeDistance = mathem::max<float>();
 		for (size_t i = 0; i < contactPointsCount; ++i)
 		{
-			if (almostEqual(contactPoints[i], contactPoint, equalityTolerance))
+			// TODO: 
+			if (almostEqual(contacts[i].contactPoints2, contactPoint2, equalityTolerance))
 			{
 				return;
 			}
@@ -75,7 +69,8 @@ namespace mathem
 		{
 			return;
 		}
-		contactPoints[contactToChangeIndex] = contactPoint;
+		contacts[contactToChangeIndex].contactPoints1 = contactPoint1;
+		contacts[contactToChangeIndex].contactPoints2 = contactPoint2;
 		contactPointsDistancesSquared[contactToChangeIndex] = distanceSquared;
 	}
 
@@ -104,7 +99,11 @@ namespace mathem
 
 		for (size_t i = 0; i < other.contactPointsCount; ++i)
 		{
-			tryAddNewContactPoint(other.contactPoints[i], other.contactPointsDistancesSquared[i], equalityTolerance);
+			tryAddNewContactPoint(
+				other.contacts[i].contactPoints1, 
+				other.contacts[i].contactPoints2, 
+				other.contactPointsDistancesSquared[i], 
+				equalityTolerance);
 		}
 	}
 }

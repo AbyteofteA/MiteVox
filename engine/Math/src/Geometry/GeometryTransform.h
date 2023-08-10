@@ -24,6 +24,8 @@ namespace mathem
 
 		void applyTo(Vector3D& vector);
 		Vector3D applyToCopy(Vector3D vector);
+		void applyInverseTo(Vector3D& vector);
+		Vector3D applyInverseToCopy(Vector3D vector);
 		void applyTo(TriangleGeometry3D& triangle);
 		TriangleGeometry3D applyToCopy(TriangleGeometry3D triangle);
 

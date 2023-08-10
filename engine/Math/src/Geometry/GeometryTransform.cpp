@@ -11,6 +11,10 @@ namespace mathem
 		scale.setAll(1.0f);
 	}
 
+	/// <summary>
+	/// May cause BUGS!!!
+	/// </summary>
+	/// <returns></returns>
 	GeometryTransform GeometryTransform::getInverse()
 	{
 		GeometryTransform inverseTransform;
@@ -40,6 +44,27 @@ namespace mathem
 	{
 		Vector3D resultVector = vector;
 		this->applyTo(resultVector);
+		return resultVector;
+	}
+
+	void GeometryTransform::applyInverseTo(Vector3D& vector)
+	{
+		vector.x() -= translation.x();
+		vector.y() -= translation.y();
+		vector.z() -= translation.z();
+
+		// TODO: check rotation
+		vector = rotation.getConjugate().rotate(vector);
+
+		vector.x() /= scale.x();
+		vector.y() /= scale.y();
+		vector.z() /= scale.z();
+	}
+
+	Vector3D GeometryTransform::applyInverseToCopy(Vector3D vector)
+	{
+		Vector3D resultVector = vector;
+		this->applyInverseTo(resultVector);
 		return resultVector;
 	}
 

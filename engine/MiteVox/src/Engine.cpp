@@ -117,10 +117,12 @@ namespace mitevox
 			InputHandler* inputHandler = InputHandler::getInstance();
 			inputHandler->update();
 			
-			size_t activeScene = playground->activeScene;
-			if (activeScene < playground->scenes.getElementsCount())
-			{
 				Scene* scene = playground->getActiveScene();
+			if (scene == nullptr)
+			{
+				continue;
+			}
+
 				scene->update(deltaTime); // Scripts are executed here
 
 				// Space culling
@@ -138,7 +140,7 @@ namespace mitevox
 				// Physics and Transform
 				collisions.clear();
 				dataPointsContainers.returnAllContainers();
-				computePhysics(PhysicsSolverType::NEWTONIAN, deltaTime, settings->equalityTolerance);
+			computePhysics(PhysicsSolverType::POSITION_BASED, deltaTime, settings->equalityTolerance);
 
 				animateNodes(&entitiesToSimulate, deltaTime);
 
@@ -191,7 +193,6 @@ namespace mitevox
 
 				//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
 			}
-		}
 
 		if (playground)
 		{

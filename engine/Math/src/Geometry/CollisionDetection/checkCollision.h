@@ -131,19 +131,26 @@ namespace mathem
 			}
 		}
 
-		if (collisionInfo->properties.normalBelongsToTheFirst == false)
+		if (collisionInfo->properties.type != CollisionType::NONE)
 		{
-			collisionInfo->object1 = object2;
-			collisionInfo->object2 = object1;
-			collisionInfo->properties.normalBelongsToTheFirst = true;
-		}
+			// Check the order of objects
+			if (collisionInfo->properties.normalBelongsToTheFirst == false)
+			{
+				collisionInfo->object1 = object2;
+				collisionInfo->object2 = object1;
+				collisionInfo->properties.normalBelongsToTheFirst = true;
+			}
 
-		// TODO: delete
-		if (collisionInfo->properties.type == CollisionType::INTERSECTION)
-		{
+			// Make sure that the normal looks towards the second geometry
+			if (collisionInfo->properties.penetrationDepth < 0.0f)
+			{
+				collisionInfo->properties.penetrationDepth = -collisionInfo->properties.penetrationDepth;
+				collisionInfo->properties.normal = -collisionInfo->properties.normal;
+			}
+
 			Vector3D distance = collisionInfo->object2->transform.translation - collisionInfo->object1->transform.translation;
-			float angle = distance * collisionInfo->properties.normal;
-			assert(("ERROR: Normal is not alligned", angle > 0.0f));
+			assert(("ERROR: Normal is not alligned", distance * collisionInfo->properties.normal >= 0.0f));
+			assert(("ERROR: penetrationDepth is negative", collisionInfo->properties.penetrationDepth >= 0.0f));
 		}
 
 		return collisionInfo->properties.type;

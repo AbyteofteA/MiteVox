@@ -1,6 +1,8 @@
 #ifndef GENERALFUNCTIONS_H
 #define GENERALFUNCTIONS_H
 
+#include "engine/Renderer/src/RendererAPI/RendererAPI.h"
+
 #define PRIMITIVE_BUFFER_SIZE 1024
 
 namespace render
@@ -50,6 +52,7 @@ namespace render
 		}
 		
 		glfwMakeContextCurrent(renderer->getWindow());
+		glfwSwapInterval(0);
 
 		glewExperimental = GL_TRUE;
 		GLenum err = glewInit();
@@ -147,7 +150,6 @@ namespace render
 
 	void display(RendererSettings* renderer)
 	{
-		glfwSwapInterval(1);
 		glfwSwapBuffers(renderer->getWindow());
 	}
 }

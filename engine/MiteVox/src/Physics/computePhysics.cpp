@@ -1,7 +1,6 @@
 #include "computePhysics.h"
 
 #include "engine/MiteVox/src/Physics/MovementProperties.h"
-#include "engine/MiteVox/src/Physics/PhysicsSolvers/separateObjects.h"
 #include "engine/MiteVox/src/MiteVoxAPI.h"
 
 #include "engine/Math/src/Vector.h"
@@ -15,6 +14,7 @@ namespace mitevox
 {
 	void resolveCollisionNoPhysics(float equalityTolerance);
 	void computePhysicsNewtonian(safety::SafeArray<Entity*>* entitiesToSimulate, float deltaTime, float equalityTolerance);
+	void computePositionBasedDynamics(safety::SafeArray<Entity*>* entitiesToSimulate, float deltaTime, float equalityTolerance);
 
 	void computePhysics(PhysicsSolverType physicsSolverType, float deltaTime, float equalityTolerance)
 	{
@@ -32,7 +32,7 @@ namespace mitevox
 			// TODO:
 			break;
 		case mitevox::PhysicsSolverType::POSITION_BASED:
-			// TODO:
+			computePositionBasedDynamics(entitiesToSimulate, deltaTime, equalityTolerance);
 			break;
 		case PhysicsSolverType::IMPULSE_BASED_LINEAR:
 			// TODO:

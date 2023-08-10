@@ -2,6 +2,7 @@
 
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Renderer/src/RendererAPI/RendererSettings.h"
+#include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "drawCollider.h"
@@ -17,6 +18,7 @@ namespace mitevox
 		render::ColorRGBAf greenColor = { 0.0f, 1.0f, 0.0f, 1.0f };
 		render::ColorRGBAf blueColor = { 0.0f, 0.0f, 1.0f, 1.0f };
 		render::ColorRGBAf magentaColor = { 1.0f, 0.0f, 1.0f, 1.0f };
+		render::ColorRGBAf cyanColor = { 0.0f, 1.0f, 1.0f, 1.0f };
 		mathem::GeometryTransform zeroTransform;
 
 		size_t collisionsCount = collisions->getElementsCount();
@@ -45,9 +47,18 @@ namespace mitevox
 
 			for (size_t i = 0; i < collision.properties.contactPointsCount; ++i)
 			{
+				mathem::Vector3D contactPoints1GlobalCoords = 
+					complexGeometryTransform1->applyToCopy(collision.properties.contacts[i].contactPoints1);
+				mathem::Vector3D contactPoints2GlobalCoords = 
+					complexGeometryTransform2->applyToCopy(collision.properties.contacts[i].contactPoints2);
+
 				render::Point lightPoint;
-				lightPoint.position = collision.properties.contactPoints[i];
+				lightPoint.position = contactPoints1GlobalCoords;
 				lightPoint.color = magentaColor;
+				render::drawCross(renderer, lightPoint, 0.125f);
+
+				lightPoint.position = contactPoints2GlobalCoords;
+				lightPoint.color = cyanColor;
 				render::drawCross(renderer, lightPoint, 0.125f);
 			}
 		}

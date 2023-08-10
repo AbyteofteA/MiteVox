@@ -67,6 +67,17 @@ namespace mathem
 					equalityTolerance);
 			}
 		}
+
+		// Transform contact points to local space
+		for (size_t i = 0; i < collisionInfo->properties.contactPointsCount; i++)
+		{
+			Vector3D object1Contact = collisionInfo->properties.contacts[i].contactPoints1;
+			Vector3D object2Contact = collisionInfo->properties.contacts[i].contactPoints2;
+			complexGeometryTransform1->applyInverseTo(object1Contact);
+			complexGeometryTransform2->applyInverseTo(object2Contact);
+			collisionInfo->properties.contacts[i].contactPoints1 = object1Contact;
+			collisionInfo->properties.contacts[i].contactPoints2 = object2Contact;
+		}
 	}
 }
 

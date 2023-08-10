@@ -70,12 +70,11 @@ namespace mitevox
 
 	void Entity::setMass(float mass)
 	{
-		if (mass == 0.0f)
+		movementProperties.inverseMass = 0.0f;
+		if (mass != 0.0f)
 		{
-			movementProperties.inverseMass = 0.0f;
-			return;
+			movementProperties.inverseMass = 1.0f / mass;
 		}
-		movementProperties.inverseMass = 1.0f / mass;
 		computeMomentOfInertia();
 	}
 
@@ -122,26 +121,24 @@ namespace mitevox
 
 	mathem::Matrix3x3 Entity::getMomentOfInertia()
 	{
-		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(renderableNode->transform.rotation));
-		mathem::Matrix3x3 objectOrientationTransposed = objectOrientation;
-		objectOrientationTransposed.transpose();
+		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(transform.rotation));
+		mathem::Matrix3x3 objectOrientationTransposed = getTransposed(objectOrientation);
 
 		mathem::Matrix3x3 momentOfInertia;
 		momentOfInertia = mathem::multiply(objectOrientation, movementProperties.momentOfInertia);
-		momentOfInertia = mathem::multiply(movementProperties.momentOfInertia, objectOrientationTransposed);
+		momentOfInertia = mathem::multiply(momentOfInertia, objectOrientationTransposed);
 
 		return momentOfInertia;
 	}
 
 	mathem::Matrix3x3 Entity::getInverseMomentOfInertia()
 	{
-		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(renderableNode->transform.rotation));
-		mathem::Matrix3x3 objectOrientationTransposed = objectOrientation;
-		objectOrientationTransposed.transpose();
+		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(transform.rotation));
+		mathem::Matrix3x3 objectOrientationTransposed = getTransposed(objectOrientation);
 
 		mathem::Matrix3x3 inverseMomentOfInertia;
 		inverseMomentOfInertia = mathem::multiply(objectOrientation, movementProperties.inverseMomentOfInertia);
-		inverseMomentOfInertia = mathem::multiply(movementProperties.inverseMomentOfInertia, objectOrientationTransposed);
+		inverseMomentOfInertia = mathem::multiply(inverseMomentOfInertia, objectOrientationTransposed);
 
 		return inverseMomentOfInertia;
 	}
@@ -187,7 +184,7 @@ namespace mitevox
 
 	void Entity::integrateForces(float deltaTime)
 	{
-		movementProperties.velocity += movementProperties.externalForces / getMass() * deltaTime;
+		movementProperties.velocity += movementProperties.externalForces * (movementProperties.inverseMass * deltaTime);
 
 		mathem::Matrix3x3 I = getMomentOfInertia();
 		mathem::Matrix3x3 inverseI = getInverseMomentOfInertia();
@@ -247,9 +244,12 @@ namespace mitevox
 			case mathem::GeometryPrimitiveType::BOX:
 			{
 				mathem::BoxGeometry* box = (mathem::BoxGeometry*)primitive;
-				movementProperties.momentOfInertia.m00() = (box->halfSize.y() * box->halfSize.y() + box->halfSize.z() * box->halfSize.z()) * getMass() / 12.0f;
-				movementProperties.momentOfInertia.m11() = (box->halfSize.x() * box->halfSize.x() + box->halfSize.z() * box->halfSize.z()) * getMass() / 12.0f;
-				movementProperties.momentOfInertia.m22() = (box->halfSize.x() * box->halfSize.x() + box->halfSize.y() * box->halfSize.y()) * getMass() / 12.0f;
+				float x = box->halfSize.x() * 2.0f;
+				float y = box->halfSize.y() * 2.0f;
+				float z = box->halfSize.z() * 2.0f;
+				movementProperties.momentOfInertia.m00() = (y * y + z * z) * getMass() / 12.0f;
+				movementProperties.momentOfInertia.m11() = (x * x + z * z) * getMass() / 12.0f;
+				movementProperties.momentOfInertia.m22() = (x * x + y * y) * getMass() / 12.0f;
 				movementProperties.inverseMomentOfInertia = mathem::getInverse(movementProperties.momentOfInertia);
 				break;
 			}

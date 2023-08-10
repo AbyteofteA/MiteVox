@@ -1,5 +1,6 @@
 #include "checkCollision.h"
 
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Geometry/computeProjection.h"
 #include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Vector.h"
@@ -49,7 +50,7 @@ namespace mathem
 		case GeometryPrimitiveType::BOX:
 		{
 			CollisionType collisionType = checkCollision((BoxGeometry*)otherGeometry, otherGeometryTransform, axisAlignedBox, axisAlignedBoxTransform, collisionProperties);
-			collisionProperties->invert();
+			collisionProperties->normalBelongsToTheFirst = !collisionProperties->normalBelongsToTheFirst;
 			return collisionType;
 		}
 		case GeometryPrimitiveType::AXIS_ALIGNED_BOX:

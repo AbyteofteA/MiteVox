@@ -43,7 +43,7 @@ namespace mathem
 
 	size_t GeometryPrimitiveBase::getFaceVerteces(size_t vertexIndex, Vector3D normal, Vector3D* faceVerteces, GeometryTransform* geometryPrimitiveTransform, float equalityTolerance)
 	{
-		Vector3D targetNormal;
+		Vector3D closestNormal;
 		Vector3D targetVertex = getVertexPosition(vertexIndex);
 		float normalAngle = -mathem::max<float>();
 		size_t trianglesCount = getTrianglesCount();
@@ -62,7 +62,7 @@ namespace mathem
 			if (newNormalAngle > normalAngle)
 			{
 				normalAngle = newNormalAngle;
-				targetNormal = triangleNormal;
+				closestNormal = triangleNormal;
 				continue;
 			}
 		}
@@ -74,7 +74,7 @@ namespace mathem
 			TriangleGeometry3D resultTriangle = getTrianglePositions(i);
 			geometryPrimitiveTransform->applyTo(resultTriangle);
 			Vector3D triangleNormal = resultTriangle.computeNormal();
-			if (almostEqual(targetNormal, triangleNormal, equalityTolerance) == false)
+			if (almostEqual(closestNormal, triangleNormal, equalityTolerance) == false)
 			{
 				continue;
 			}
@@ -82,6 +82,11 @@ namespace mathem
 			tryAppendVertex(resultTriangle.point1, faceVerteces, &faceVertecesCount, equalityTolerance);
 			tryAppendVertex(resultTriangle.point2, faceVerteces, &faceVertecesCount, equalityTolerance);
 			tryAppendVertex(resultTriangle.point3, faceVerteces, &faceVertecesCount, equalityTolerance);
+
+			if (faceVertecesCount >= 4)
+			{
+				break;
+			}
 		}
 		return faceVertecesCount;
 	}
