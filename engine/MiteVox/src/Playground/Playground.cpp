@@ -15,21 +15,36 @@ namespace mitevox
 	{
 		name = _name;
 
+		buffers.reserve(128);
+		bufferViews.reserve(128);
+		accessors.reserve(128);
+		cameras.reserve(8);
+		imageSamplers.reserve(128);
+		images.reserve(128);
+		textures.reserve(128);
+		materials.reserve(128);
+		physicalMaterials.reserve(128);
+		meshes.reserve(128);
+		nodes.reserve(128);
+		scenes.reserve(128);
+
 		// Create default assets
 		//safety::SafeArray<safety::SafeByteArray*> buffers;
 		//safety::SafeArray<BufferView*> bufferViews;
 		//safety::SafeArray<BufferViewAccessor*> accessors;
-		render::Camera* camera = new render::Camera();
-		// TODO: 
-		cameras.appendElement(camera);
-		imageSamplers.appendElement(ImageSampler()); // TODO: 
-		images.appendElement(Image()); // TODO: 
-		textures.appendElement(Texture()); // TODO: 
-		materials.appendElement(Material()); // TODO: 
-		physicalMaterial.appendElement(PhysicalMaterial("Default PhysicalMaterial", 1.0f, 0.0f, 1.0f, 1.0f)); // TODO: 
-		//safety::SafeArray<Mesh*> meshes;
-		//safety::SafeArray<Node*> nodes;
-		scenes.appendElement(new Scene()); // TODO: 
+
+		//render::Camera* camera = new render::Camera();
+		//// TODO: 
+		//cameras.appendElement(camera);
+		//imageSamplers.appendElement(ImageSampler()); // TODO: 
+		//images.appendElement(Image()); // TODO: 
+		//textures.appendElement(Texture()); // TODO: 
+		//materials.appendElement(Material()); // TODO: 
+		//physicalMaterial.appendElement(PhysicalMaterial("Default PhysicalMaterial", 1.0f, 0.0f, 1.0f, 1.0f)); // TODO: 
+		////safety::SafeArray<Mesh*> meshes;
+		////safety::SafeArray<Node*> nodes;
+		//scenes.appendElement(new Scene()); // TODO: 
+
 		//safety::SafeArray<Animation*> animations;
 		//safety::SafeArray<SkeletonBase*> skeletons;
 	}

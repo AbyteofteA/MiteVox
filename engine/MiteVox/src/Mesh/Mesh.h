@@ -24,6 +24,9 @@ namespace mitevox
 
         explicit Mesh();
 
+        IlluminationModel getIlluminationModel();
+        void setIlluminationModel(IlluminationModel illuminationModel);
+
         MeshPrimitive* addMeshPrimitive();
 
         void makeCopyForAnimationTo(Mesh* resultMesh);

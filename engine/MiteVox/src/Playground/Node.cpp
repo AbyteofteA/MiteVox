@@ -4,6 +4,65 @@
 
 namespace mitevox
 {
+	void Node::setLight(render::LightType lightType)
+	{
+		this->lightType = lightType;
+
+		switch (lightType)
+		{
+		case render::LightType::POINT:
+			this->light.pointLight = render::PointLight();
+			break;
+		case render::LightType::DIRECTIONAL:
+			this->light.directionalLight = render::DirectionalLight();
+			break;
+		case render::LightType::SPOT:
+			this->light.spotLight = render::SpotLight();
+			break;
+
+		case render::LightType::NONE:
+		default:
+			break;
+		}
+	}
+
+	IlluminationModel Node::getIlluminationModelRecursively()
+	{
+		if (mesh)
+		{
+			return mesh->getIlluminationModel();
+		}
+		else
+		{
+			size_t childrenNodesCount = children.getElementsCount();
+			for (size_t i = 0; i < childrenNodesCount; ++i)
+			{
+				Node* node = children.getElement(i);
+				IlluminationModel result = node->getIlluminationModelRecursively();
+				if (result != IlluminationModel::NONE)
+				{
+					return result;
+				}
+			}
+		}
+		return IlluminationModel::NONE;
+	}
+
+	void Node::setIlluminationModelRecursively(IlluminationModel illuminationModel)
+	{
+		if (mesh)
+		{
+			mesh->setIlluminationModel(illuminationModel);
+		}
+		
+		size_t childrenNodesCount = children.getElementsCount();
+		for (size_t i = 0; i < childrenNodesCount; ++i)
+		{
+			Node* node = children.getElement(i);
+			node->setIlluminationModelRecursively(illuminationModel);
+		}
+	}
+
 	bool Node::isMorphableMesh()
 	{
 		if (mesh != nullptr)

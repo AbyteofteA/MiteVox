@@ -32,6 +32,11 @@ namespace mitevox
         render::AnyLight light;
         safety::SafeArray<Node*> children;
 
+        void setLight(render::LightType lightType = render::LightType::NONE);
+
+        IlluminationModel getIlluminationModelRecursively();
+        void setIlluminationModelRecursively(IlluminationModel illuminationModel);
+
         bool isMorphableMesh();
         Mesh* getMeshToRender();
 

@@ -17,33 +17,33 @@ namespace render
 
     struct LightBase
     {
-        ColorRGBf color;
-        float intensity;
-        float range;
+        ColorRGBf color = { 1.0f, 1.0f, 1.0f };
+        float intensity = 1.0f;
+        float range = 10.0f;
     };
 
     struct PointLight
     {
         LightBase lightBase;
 
-        mathem::Vector3D position;
+        mathem::Vector3D position = { 0.0f, 0.0f, 0.0f };
     };
 
     struct DirectionalLight
     {
         LightBase lightBase;
 
-        mathem::Quaternion direction;
+        mathem::Vector3D direction = { 0.0f, 0.0f, -1.0f };
     };
 
     struct SpotLight
     {
         LightBase lightBase;
 
-        mathem::Vector3D position;
-        mathem::Quaternion direction;
-        float innerConeAngle = 0.0f;
-        float outerConeAngle = 45.0f;
+        mathem::Vector3D position = { 0.0f, 0.0f, 0.0f };
+        mathem::Vector3D direction = { 0.0f, 0.0f, -1.0f };
+        float innerConeAngle = 0.15f;
+        float outerConeAngle = 0.25f;
     };
 
     union AnyLight

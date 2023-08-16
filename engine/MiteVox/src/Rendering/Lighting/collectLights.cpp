@@ -4,7 +4,7 @@
 
 namespace mitevox
 {
-	void collectPointLightsRecursively(
+	void collectLightsRecursively(
 		Node* node, 
 		safety::SafeArray<render::PointLight>* resultPointLightsArray,
 		safety::SafeArray<render::DirectionalLight>* resultDirectionalLightsArray,
@@ -21,15 +21,21 @@ namespace mitevox
 			break;
 
 		case render::LightType::DIRECTIONAL:
-			node->light.directionalLight.direction = transform.rotation;
+		{
+			mathem::Vector3D lightDirection = { 0.0f, 0.0f, -1.0f };
+			node->light.directionalLight.direction = transform.rotation.rotate(lightDirection);
 			resultDirectionalLightsArray->appendElement(node->light.directionalLight);
 			break;
+		}
 
 		case render::LightType::SPOT:
+		{
 			node->light.spotLight.position = transform.translation;
-			node->light.spotLight.direction = transform.rotation;
+			mathem::Vector3D lightDirection = { 0.0f, 0.0f, -1.0f };
+			node->light.spotLight.direction = transform.rotation.rotate(lightDirection);
 			resultSpotLightsArray->appendElement(node->light.spotLight);
 			break;
+		}
 
 		default:
 			break;
@@ -38,7 +44,7 @@ namespace mitevox
 		size_t subnodesCount = node->children.getElementsCount();
 		for (size_t i = 0; i < subnodesCount; ++i)
 		{
-			collectPointLightsRecursively(
+			collectLightsRecursively(
 				node->children.getElement(i), 
 				resultPointLightsArray, 
 				resultDirectionalLightsArray, 
@@ -47,7 +53,7 @@ namespace mitevox
 		}
 	}
 
-	void collectPointLights(
+	void collectLights(
 		safety::SafeArray<Entity*>* entities,
 		safety::SafeArray<render::PointLight>* resultPointLightsArray,
 		safety::SafeArray<render::DirectionalLight>* resultDirectionalLightsArray,
@@ -57,7 +63,7 @@ namespace mitevox
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
 			Entity* entity = entities->getElement(i);
-			collectPointLightsRecursively(
+			collectLightsRecursively(
 				entity->renderableNode,
 				resultPointLightsArray,
 				resultDirectionalLightsArray,

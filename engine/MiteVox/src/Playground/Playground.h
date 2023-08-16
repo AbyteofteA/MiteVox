@@ -82,7 +82,7 @@ namespace mitevox
 		safety::SafeArray<Image> images;
 		safety::SafeArray<Texture> textures;
 		safety::SafeArray<Material> materials;
-		safety::SafeArray<PhysicalMaterial> physicalMaterial;
+		safety::SafeArray<PhysicalMaterial> physicalMaterials;
 		safety::SafeArray<Mesh*> meshes;
 		safety::SafeArray<Node*> nodes;
 		safety::SafeArray<Scene*> scenes;

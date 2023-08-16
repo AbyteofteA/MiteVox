@@ -117,82 +117,82 @@ namespace mitevox
 			InputHandler* inputHandler = InputHandler::getInstance();
 			inputHandler->update();
 			
-				Scene* scene = playground->getActiveScene();
+			Scene* scene = playground->getActiveScene();
 			if (scene == nullptr)
 			{
 				continue;
 			}
 
-				scene->update(deltaTime); // Scripts are executed here
+			scene->update(deltaTime); // Scripts are executed here
 
-				// Space culling
-				MiteVoxAPI::collectEntitiesToSimulate();
+			// Space culling
+			MiteVoxAPI::collectEntitiesToSimulate();
 
-				// Cleanup
-				scene->timeSinceCleanup += deltaTime;
-				if (scene->timeSinceCleanup > settings->getCleanupPeriod())
-				{
-					scene->timeSinceCleanup = 0.0f;
-					std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
-					// TODO: Implement cleanup.
-				}
-
-				// Physics and Transform
-				collisions.clear();
-				dataPointsContainers.returnAllContainers();
-			computePhysics(PhysicsSolverType::POSITION_BASED, deltaTime, settings->equalityTolerance);
-
-				animateNodes(&entitiesToSimulate, deltaTime);
-
-				// Renderer
-				scene->timeSinceRendererUpdate += deltaTime;
-				if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
-				{
-					render::RendererSettings* renderer = settings->getRendererSettings();
-					scene->timeSinceRendererUpdate = 0.0f;
-					renderer->amountOfDrawCalls = 0;
-
-					pointLightsArray.clear();
-					directionalLightsArray.clear();
-					spotLightsArray.clear();
-
-					Entity* activeCameraEntity = MiteVoxAPI::getActiveCameraEntity();
-					render::Camera* camera = nullptr;
-					mathem::GeometryTransform cameraTransform = activeCameraEntity->getCamera(&camera);
-
-					render::clearBufferXY(renderer->clearColor);
-					render::clearBufferZ();
-
-					if (scene->activeSkybox >= 0)
-					{
-						render::Cubemap* skybox = &scene->skyboxes.at(scene->activeSkybox);
-						render::renderSkybox(renderer, skybox->shaderID, skybox, camera, &cameraTransform);
-					}
-
-					renderEntities(deltaTime, renderer, scene, camera, &cameraTransform);
-
-					if (settings->debug)
-					{
-						drawAxes(renderer);
-
-						if (scene->foundation != nullptr)
-						{
-							//drawSceneOctree(renderer, scene->foundation->octree);
-						}
-
-						drawCollisions(renderer, &collisions);
-					}
-
-					// Render primitives.
-					render::renderPoints(renderer, camera, &cameraTransform);
-					render::renderLines(renderer, camera, &cameraTransform);
-					render::renderTriangles(renderer, camera, &cameraTransform);
-
-					render::display(renderer);
-				}
-
-				//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
+			// Cleanup
+			scene->timeSinceCleanup += deltaTime;
+			if (scene->timeSinceCleanup > settings->getCleanupPeriod())
+			{
+				scene->timeSinceCleanup = 0.0f;
+				std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
+				// TODO: Implement cleanup.
 			}
+
+			// Physics and Transform
+			collisions.clear();
+			dataPointsContainers.returnAllContainers();
+			//computePhysics(PhysicsSolverType::POSITION_BASED, deltaTime, settings->equalityTolerance);
+
+			animateNodes(&entitiesToSimulate, deltaTime);
+
+			// Renderer
+			scene->timeSinceRendererUpdate += deltaTime;
+			if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
+			{
+				render::RendererSettings* renderer = settings->getRendererSettings();
+				scene->timeSinceRendererUpdate = 0.0f;
+				renderer->amountOfDrawCalls = 0;
+
+				pointLightsArray.clear();
+				directionalLightsArray.clear();
+				spotLightsArray.clear();
+
+				Entity* activeCameraEntity = MiteVoxAPI::getActiveCameraEntity();
+				render::Camera* camera = nullptr;
+				mathem::GeometryTransform cameraTransform = activeCameraEntity->getCamera(&camera);
+
+				render::clearBufferXY(renderer->clearColor);
+				render::clearBufferZ();
+
+				if (scene->activeSkybox >= 0)
+				{
+					render::Cubemap* skybox = &scene->skyboxes.at(scene->activeSkybox);
+					render::renderSkybox(renderer, skyboxShader, skybox, camera, &cameraTransform);
+				}
+
+				renderEntities(deltaTime, renderer, scene, camera, &cameraTransform);
+
+				if (settings->debug)
+				{
+					drawAxes(renderer);
+
+					if (scene->foundation != nullptr)
+					{
+						drawSceneOctree(renderer, scene->foundation->octree);
+					}
+
+					drawCollisions(renderer, &collisions);
+				}
+
+				// Render primitives.
+				render::renderPoints(renderer, camera, &cameraTransform);
+				render::renderLines(renderer, camera, &cameraTransform);
+				render::renderTriangles(renderer, camera, &cameraTransform);
+
+				render::display(renderer);
+			}
+
+			//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
+		}
 
 		if (playground)
 		{
@@ -221,6 +221,7 @@ namespace mitevox
 			{
 				Entity* entity = activeScene->entities.getElement(i);
 				entity->tryGenerateHitbox();
+				activeScene->foundation->emplace(entity); // TODO: delete
 			}
 		}
 
@@ -318,12 +319,12 @@ namespace mitevox
 		render::Camera* camera,
 		mathem::GeometryTransform* cameraTransform)
 	{
-		collectPointLights(&entitiesToSimulate, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
+		collectLights(&entitiesToSimulate, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
 
 		render::setAmbientLight(scene->ambientLight, basicShader);
+		render::uploadDirectionalLights(&directionalLightsArray, basicShader);
 		render::uploadPointLights(&pointLightsArray, basicShader);
-		// TODO: render::uploadLights(&LightsArray, basicShader);
-		// TODO: render::uploadLights(&LightsArray, basicShader);
+		render::uploadSpotLights(&spotLightsArray, basicShader);
 
 		if (renderer->backfaceCulling)
 		{
@@ -342,19 +343,17 @@ namespace mitevox
 			
 			if (settings->debug)
 			{
-				/*render::renderNodeRecursively(
-					settings->renderer,
+				MiteVoxAPI::renderNodeRecursively(
 					basicShader,
 					entity->renderableNode,
 					&entity->transform,
 					camera,
-					cameraTransform);*/
+					cameraTransform);
 				drawCollider(settings->renderer, entity->getCollider(), &entity->transform);
 			}
 			else
 			{
-				render::renderNodeRecursively(
-					settings->renderer,
+				MiteVoxAPI::renderNodeRecursively(
 					basicShader,
 					entity->renderableNode,
 					&entity->transform,

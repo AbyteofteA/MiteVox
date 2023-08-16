@@ -57,6 +57,21 @@ namespace mitevox
 		return entity;
 	}
 
+	Entity* MiteVoxAPI::getEntity(std::string name)
+	{
+		Scene* activeScene = MiteVoxAPI::getActiveScene();
+		size_t entitiesCount = activeScene->entities.getElementsCount();
+		for (size_t i = 0; i < entitiesCount; ++i)
+		{
+			Entity* entity = activeScene->entities.getElement(i);
+			if (entity->name == name)
+			{
+				return entity;
+			}
+		}
+		return nullptr;
+	}
+
 	Entity* MiteVoxAPI::getActiveCameraEntity()
 	{
 		return MiteVoxAPI::getActiveScene()->activeCameraEntity;
@@ -236,5 +251,51 @@ namespace mitevox
 			// TODO: return scene->computeLocalGravity();
 		}
 		return activeScene->globalGravity;
+	}
+
+	void MiteVoxAPI::renderNodeRecursively(
+		int shaderID,
+		Node* node,
+		mathem::GeometryTransform* nodeTransform,
+		render::Camera* camera,
+		mathem::GeometryTransform* cameraTransform)
+	{
+		mathem::GeometryTransform nodeGlobalTransform = *nodeTransform * node->transform;
+
+		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::tryUploadSkeleton(node, shaderID);
+			if (meshToRender->isUploaded == false)
+			{
+				render::uploadMesh(meshToRender, shaderID);
+			}
+			render::RendererSettings* rendererSettings = MiteVoxAPI::getSettings()->getRendererSettings();
+			render::renderMesh(rendererSettings, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
+		}
+		
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			MiteVoxAPI::renderNodeRecursively(
+				shaderID,
+				node->children.getElement(i),
+				&nodeGlobalTransform,
+				camera,
+				cameraTransform);
+		}
+	}
+
+	void MiteVoxAPI::removeNodeRecursively(int shaderID, Node* node)
+	{
+		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
+		{
+			render::removeMesh(meshToRender, shaderID);
+		}
+
+		size_t childrenCount = node->children.getElementsCount();
+		for (size_t i = 0; i < childrenCount; ++i)
+		{
+			MiteVoxAPI::removeNodeRecursively(shaderID, node->children.getElement(i));
+		}
 	}
 }

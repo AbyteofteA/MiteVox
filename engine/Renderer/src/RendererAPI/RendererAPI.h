@@ -76,8 +76,9 @@ printErrors(__FILE__, __LINE__);
 	// Models
 
 	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID);
+	void uploadDirectionalLights(safety::SafeArray<render::DirectionalLight>* lightsArray, int shaderID);
 	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID);
-	void clearPointLights();
+	void uploadSpotLights(safety::SafeArray<render::SpotLight>* lightsArray, int shaderID);
 
 	void uploadMaterial(mitevox::Material* material, int shaderID);
 	void selectMaterial(mitevox::Material* material, int shaderID);
@@ -95,24 +96,10 @@ printErrors(__FILE__, __LINE__);
 	void renderMesh(
 		RendererSettings* renderer, 
 		int shaderID, 
-		mitevox::Mesh* mesh, 
-		mathem::GeometryTransform* transform, 
+		mitevox::Mesh* mesh,
+		mathem::GeometryTransform* transform,
 		Camera* camera, 
 		mathem::GeometryTransform* cameraTransform);
-
-	// Nodes
-
-	void renderNodeRecursively(
-		RendererSettings* renderer,
-		int shaderID,
-		mitevox::Node* node,
-		mathem::GeometryTransform* transform,
-		Camera* camera,
-		mathem::GeometryTransform* cameraTransform);
-
-	void removeNodeRecursively(mitevox::Node* node, int shaderID);
-
-	void renderWireframe(RendererSettings* renderer, Model3D* model3D, mathem::Transform* transform, ColorRGBAf color, Camera* camera, mathem::Transform* cameraTransform);
 
 	void uploadSkybox(Cubemap* skybox, int shaderID);
 	void selectSkybox(Cubemap* skybox, int shaderID);

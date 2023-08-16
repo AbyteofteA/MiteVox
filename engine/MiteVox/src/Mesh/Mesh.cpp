@@ -7,6 +7,27 @@ namespace mitevox
 		type = mathem::GeometryPrimitiveType::MESH;
 	}
 
+	IlluminationModel Mesh::getIlluminationModel()
+	{
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			return primitive->material->illuminationModel;
+		}
+		return IlluminationModel::NONE;
+	}
+
+	void Mesh::setIlluminationModel(IlluminationModel illuminationModel)
+	{
+		size_t primitivesCount = primitives.getElementsCount();
+		for (size_t primitiveIndex = 0; primitiveIndex < primitivesCount; ++primitiveIndex)
+		{
+			MeshPrimitive* primitive = primitives.getElement(primitiveIndex);
+			primitive->material->illuminationModel = illuminationModel;
+		}
+	}
+
 	MeshPrimitive* Mesh::addMeshPrimitive()
 	{
 		MeshPrimitive* meshPrimitive = new MeshPrimitive();

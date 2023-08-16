@@ -7,7 +7,7 @@
 
 namespace mitevox
 {
-	void collectPointLights(
+	void collectLights(
 		safety::SafeArray<Entity*>* entities,
 		safety::SafeArray<render::PointLight>* resultPointLightsArray,
 		safety::SafeArray<render::DirectionalLight>* resultDirectionalLightsArray,

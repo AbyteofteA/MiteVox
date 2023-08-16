@@ -11,6 +11,14 @@
 
 namespace mitevox
 {
+	enum struct IlluminationModel
+	{
+		NONE = 0,
+		UNLIT = 1,
+		PHONG = 2,
+		PBR = 32
+	};
+
 	class Material
 	{
 	public:
@@ -31,7 +39,7 @@ namespace mitevox
 		float opticalDensity;						// (0.001f - 10.0f)
 		float reflectionSharpness;					// (0.0f - 1000.0f)
 													
-		int illuminationModel = 2;						// (0 - 10)
+		IlluminationModel illuminationModel = IlluminationModel::PHONG;	// (0 - 10)
 
 		std::string alphaMode = "OPAQUE";
 		float alphaCutoff = 0.5f;

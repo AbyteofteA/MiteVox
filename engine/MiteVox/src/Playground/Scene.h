@@ -22,7 +22,7 @@ namespace mitevox
 		SceneFoundation* foundation = nullptr;
 		safety::SafeArray<Entity*> entities;
 
-		mathem::Vector3D ambientLight = { 0.1f, 0.1f, 0.1f };
+		mathem::Vector3D ambientLight = { 0.05f, 0.05f, 0.05f };
 		std::vector<render::Cubemap> skyboxes;
 		bool isGravityGlobal = true;
 		mathem::Vector3D globalGravity = { 0.0f, -9.8f, 0.0f };
