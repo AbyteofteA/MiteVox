@@ -7,11 +7,6 @@ namespace mathem
 		type = GeometryPrimitiveType::TRUNCATED_PYRAMID;
 	}
 
-	bool TruncatedPyramidGeometry::isTriangularMesh()
-	{
-		return true;
-	}
-
 	uint32_t TruncatedPyramidGeometry::getVertecesCount()
 	{
 		return 8;
@@ -160,10 +155,5 @@ namespace mathem
 		}
 
 		return resultTriangle;
-	}
-
-	bool TruncatedPyramidGeometry::isIdealGeometry()
-	{
-		return false;
 	}
 }

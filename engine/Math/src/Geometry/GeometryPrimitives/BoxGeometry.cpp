@@ -7,11 +7,6 @@ namespace mathem
 		type = GeometryPrimitiveType::BOX;
 	}
 
-	bool BoxGeometry::isTriangularMesh()
-	{
-		return true;
-	}
-
 	uint32_t BoxGeometry::getVertecesCount()
 	{
 		return 8;
@@ -157,10 +152,5 @@ namespace mathem
 		}
 		
 		return resultTriangle;
-	}
-
-	bool BoxGeometry::isIdealGeometry()
-	{
-		return false;
 	}
 }

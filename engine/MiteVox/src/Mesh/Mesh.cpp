@@ -150,11 +150,6 @@ namespace mitevox
 		return mathem::TriangleGeometry3D();
 	}
 
-	bool Mesh::isIdealGeometry()
-	{
-		return false;
-	}
-
 	void setVertexPosition(uint32_t index, mathem::Vector3D value)
 	{
 		// TODO:

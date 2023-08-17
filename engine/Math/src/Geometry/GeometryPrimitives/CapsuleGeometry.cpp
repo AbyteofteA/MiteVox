@@ -7,11 +7,6 @@ namespace mathem
 		type = GeometryPrimitiveType::CAPSULE;
 	}
 
-	bool CapsuleGeometry::isTriangularMesh()
-	{
-		return false;
-	}
-
 	uint32_t CapsuleGeometry::getVertecesCount()
 	{
 		return 0;
@@ -30,10 +25,5 @@ namespace mathem
 	TriangleGeometry3D CapsuleGeometry::getTrianglePositions(uint32_t index)
 	{
 		return TriangleGeometry3D();
-	}
-
-	bool CapsuleGeometry::isIdealGeometry()
-	{
-		return true;
 	}
 }

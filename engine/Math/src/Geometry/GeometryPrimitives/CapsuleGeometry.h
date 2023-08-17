@@ -16,12 +16,10 @@ namespace mathem
 		float radius = 0.5f;
 
 		explicit CapsuleGeometry();
-		bool isTriangularMesh();
 		uint32_t getVertecesCount();
 		Vector3D getVertexPosition(uint32_t index);
 		uint32_t getTrianglesCount();
 		TriangleGeometry3D getTrianglePositions(uint32_t index);
-		bool isIdealGeometry();
 	};
 }
 

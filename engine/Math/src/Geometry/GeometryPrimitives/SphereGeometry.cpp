@@ -7,11 +7,6 @@ namespace mathem
 		type = GeometryPrimitiveType::SPHERE;
 	}
 
-	bool SphereGeometry::isTriangularMesh()
-	{
-		return false;
-	}
-
 	uint32_t SphereGeometry::getVertecesCount()
 	{
 		return 0;
@@ -30,10 +25,5 @@ namespace mathem
 	TriangleGeometry3D SphereGeometry::getTrianglePositions(uint32_t index)
 	{
 		return TriangleGeometry3D();
-	}
-
-	bool SphereGeometry::isIdealGeometry()
-	{
-		return true;
 	}
 }

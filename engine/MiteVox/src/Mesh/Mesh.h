@@ -40,7 +40,6 @@ namespace mitevox
         mathem::Vector3D getVertexPosition(uint32_t index);
         size_t getTrianglesCount();
         mathem::TriangleGeometry3D getTrianglePositions(uint32_t index);
-        bool isIdealGeometry();
 
         void setVertexPosition(uint32_t index, mathem::Vector3D value);
 

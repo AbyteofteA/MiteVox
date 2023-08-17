@@ -18,12 +18,10 @@ namespace mathem
 		float farPlane = 100000.f;
 
 		explicit TruncatedPyramidGeometry();
-		bool isTriangularMesh();
 		uint32_t getVertecesCount();
 		Vector3D getVertexPosition(uint32_t index);
 		uint32_t getTrianglesCount();
 		TriangleGeometry3D getTrianglePositions(uint32_t index);
-		bool isIdealGeometry();
 	};
 }
 

@@ -5,9 +5,36 @@
 
 namespace mathem
 {
+	AnyGeometryPrimitive::AnyGeometryPrimitive()
+	{
+		AABB = AxisAlignedBox();
+	}
+
 	GeometryPrimitiveType GeometryPrimitiveBase::getType()
 	{
 		return type;
+	}
+
+	bool GeometryPrimitiveBase::isTriangularMesh()
+	{
+		switch (type)
+		{
+		case mathem::GeometryPrimitiveType::AXIS_ALIGNED_BOX:
+		case mathem::GeometryPrimitiveType::BOX:
+		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
+		case mathem::GeometryPrimitiveType::MESH:
+			return true;
+
+		case mathem::GeometryPrimitiveType::NONE:
+		case mathem::GeometryPrimitiveType::POINT:
+		case mathem::GeometryPrimitiveType::LINE:
+		case mathem::GeometryPrimitiveType::RAY:
+		case mathem::GeometryPrimitiveType::PLANE:
+		case mathem::GeometryPrimitiveType::SPHERE:
+		case mathem::GeometryPrimitiveType::CAPSULE:
+		default:
+			return false;
+		}
 	}
 
 	bool containsVertex(Vector3D vertex, Vector3D* faceVerteces, size_t faceVertecesCount)

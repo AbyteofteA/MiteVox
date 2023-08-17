@@ -16,12 +16,10 @@ namespace mathem
 		Vector3D halfSize = { 0.5f, 0.5f, 0.5f };
 
 		explicit BoxGeometry();
-		bool isTriangularMesh();
 		uint32_t getVertecesCount();
 		Vector3D getVertexPosition(uint32_t index);
 		uint32_t getTrianglesCount();
 		TriangleGeometry3D getTrianglePositions(uint32_t index);
-		bool isIdealGeometry();
 	};
 }
 

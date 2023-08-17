@@ -7,11 +7,6 @@ namespace mathem
 		type = GeometryPrimitiveType::AXIS_ALIGNED_BOX;
 	}
 
-	bool AxisAlignedBoxGeometry::isTriangularMesh()
-	{
-		return true;
-	}
-
 	uint32_t AxisAlignedBoxGeometry::getVertecesCount()
 	{
 		return 8;
@@ -157,10 +152,5 @@ namespace mathem
 		}
 
 		return resultTriangle;
-	}
-
-	bool AxisAlignedBoxGeometry::isIdealGeometry()
-	{
-		return false;
 	}
 }
