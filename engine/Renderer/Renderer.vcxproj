@@ -19,21 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\implementations\RendererOpenGL\API_GeneralFunctions.h" />
-    <ClInclude Include="src\implementations\RendererOpenGL\API_ModelFunctions.h" />
-    <ClInclude Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.h" />
-    <ClInclude Include="src\implementations\RendererOpenGL\API_ShaderFunctions.h" />
-    <ClInclude Include="src\implementations\RendererOpenGL\GlobalData.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\RendererOpenGL.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\ShaderOpenGL.h" />
-    <ClInclude Include="src\RendererAPI\parseModel_OBJ.h" />
     <ClInclude Include="src\RendererAPI\RendererAPI.h" />
     <ClInclude Include="src\RendererAPI\Camera.h" />
     <ClInclude Include="src\RendererAPI\Color.h" />
     <ClInclude Include="src\RendererAPI\Cubemap.h" />
     <ClInclude Include="src\RendererAPI\Light.h" />
-    <ClInclude Include="src\RendererAPI\Mesh3D.h" />
-    <ClInclude Include="src\RendererAPI\Model3D.h" />
     <ClInclude Include="src\RendererAPI\Primitives.h" />
     <ClInclude Include="src\RendererAPI\RendererSettings.h" />
     <ClInclude Include="src\RendererImplementations\RendererCPU\PrimitivesCPU.h" />
@@ -47,17 +39,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\basic\basic.frag.shader" />
-    <None Include="shaders\basic\basic.vert.shader" />
-    <None Include="shaders\primitive\primitive.frag.shader" />
-    <None Include="shaders\primitive\primitive.vert.shader" />
-    <None Include="shaders\skybox\skybox.frag.shader" />
-    <None Include="shaders\skybox\skybox.vert.shader" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\implementations\RendererOpenGL\GlobalData.cpp" />
+    <ClCompile Include="src\implementations\RendererOpenGL\API_GeneralFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_ModelFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.cpp" />
+    <ClCompile Include="src\implementations\RendererOpenGL\API_ShaderFunctions.cpp" />
+    <ClCompile Include="src\implementations\RendererOpenGL\RendererOpenGL.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\ShaderOpenGL.cpp" />
     <ClCompile Include="src\RendererAPI\Camera.cpp" />
     <ClCompile Include="src\RendererAPI\Cubemap.cpp" />
@@ -78,7 +64,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -170,6 +156,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\SFML-2.5.1\include;$(SolutionDir)Math\src;$(SolutionDir)Renderer\src;$(SolutionDir)dependencies;$(SolutionDir)FileIO\src</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -15,6 +15,7 @@
 #include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
 #include "engine/MiteVox/src/Animation/MorphTargetAnimation/applyMorphTargetAnimation.h"
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <filesystem>

@@ -3,23 +3,18 @@
 
 #define HEXAGON_CONST 0.866025403
 
-#include "Cubemap.h"
-#include "Color.h"
-#include "Primitives.h"
-#include "Cubemap.h"
+#include "engine/Renderer/src/RendererAPI/Color.h"
+#include "engine/Renderer/src/RendererAPI/Primitives.h"
+#include "engine/Renderer/src/RendererAPI/Cubemap.h"
+#include "engine/Renderer/src/RendererAPI/Camera.h"
+#include "engine/Renderer/src/RendererAPI/Light.h"
+#include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 #include "engine/Math/src/Vector.h"
 #include "engine/MiteVox/src/Material/Material.h"
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/MiteVox/src/Skeleton/SkeletonBase.h"
 #include "engine/MiteVox/src/Playground/Node.h"
-#include "Camera.h"
-#include "Mesh3D.h"
-#include "Model3D.h"
-#include "parseModel_OBJ.h"
-#include "Light.h"
-#include "Effects.h"
-#include "RendererSettings.h"
 
 namespace render
 {
@@ -30,13 +25,13 @@ namespace render
 
 	// General
 
-	inline RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor);
-	inline void closeRenderer(RendererSettings* renderer);
-	inline std::string getVendorName();
-	inline std::string getRendererName();
-	inline std::string getVersion();
-	inline std::string getLanguageVersion();
-	inline void printErrors(const char* file, int line);
+	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor);
+	void closeRenderer(RendererSettings* renderer);
+	std::string getVendorName();
+	std::string getRendererName();
+	std::string getVersion();
+	std::string getLanguageVersion();
+	void printErrors(const char* file, int line);
 #define PRINT_RENDERER_ERRORS \
 printErrors(__FILE__, __LINE__);
 
@@ -49,15 +44,15 @@ printErrors(__FILE__, __LINE__);
 					  Filenames must be the same for all types of shaders.
 					  Expected extensions are: .vert.shader and .frag.shader
 	*****************************************************************************************/
-	inline int createShader(std::string name, std::string filename);
-	inline void useShader(int shaderID);
-	inline void deleteShader(int shaderID);
+	int createShader(std::string name, std::string filename);
+	void useShader(int shaderID);
+	void deleteShader(int shaderID);
 
 	// Buffers
 
-	inline void clearBufferXY(ColorRGBf color);
-	inline void clearBufferZ();
-	inline void display(RendererSettings* renderer);
+	void clearBufferXY(ColorRGBf color);
+	void clearBufferZ();
+	void display(RendererSettings* renderer);
 
 	// Primitives
 

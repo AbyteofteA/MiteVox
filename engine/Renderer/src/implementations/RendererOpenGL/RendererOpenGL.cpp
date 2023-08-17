@@ -1,5 +1,4 @@
-
-#include "GlobalData.h"
+#include "RendererOpenGL.h"
 
 namespace render
 {

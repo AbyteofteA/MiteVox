@@ -24,7 +24,7 @@
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -76,6 +76,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)dependencies;$(SolutionDir)dependencies\SFML-2.5.1\include;$(SolutionDir)dependencies\glfw-3.3.2.bin.WIN32\include;$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\Simple OpenGL Image Library\src;$(SolutionDir)FileIO\src;$(SolutionDir)Math\src;$(SolutionDir)Physics\src;$(SolutionDir)UIEventHandler\src;$(SolutionDir)Renderer\src</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -87,6 +88,10 @@
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>Math.lib;Renderer.lib;FileIO.lib;AIModels.lib;UIEventHandler.lib;User32.lib;Gdi32.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)engine\FileIO\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Math\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Renderer\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\UIEventHandler\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\AIModels\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Physics\PhysicsSolvers\computeIntegration.cpp" />
@@ -97,6 +102,7 @@
     <ClCompile Include="src\Physics\PhysicsSolvers\computePositionBasedDynamics.cpp" />
     <ClCompile Include="src\Physics\PhysicsSolvers\resolveCollisionNoPhysics.cpp" />
     <ClCompile Include="src\Playground\Entity.cpp" />
+    <ClCompile Include="src\Profiler\Logger.cpp" />
     <ClCompile Include="src\Rendering\drawCollisions.cpp" />
     <ClCompile Include="src\Rendering\drawAxes.cpp" />
     <ClCompile Include="src\Rendering\drawCollider.cpp" />
@@ -128,6 +134,7 @@
     <ClInclude Include="src\Physics\MovementProperties.h" />
     <ClInclude Include="src\Physics\PhysicalMaterial.h" />
     <ClInclude Include="src\Playground\Entity.h" />
+    <ClInclude Include="src\Profiler\Logger.h" />
     <ClInclude Include="src\Rendering\drawCollisions.h" />
     <ClInclude Include="src\Rendering\drawAxes.h" />
     <ClInclude Include="src\Rendering\drawCollider.h" />

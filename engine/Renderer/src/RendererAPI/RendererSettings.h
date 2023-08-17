@@ -1,4 +1,3 @@
-
 #ifndef RENDERER_SETTINGS_H
 #define RENDERER_SETTINGS_H
 

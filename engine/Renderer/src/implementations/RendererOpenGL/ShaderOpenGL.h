@@ -1,8 +1,6 @@
-
 #ifndef SHADEROPENGL_H
 #define SHADEROPENGL_H
 
-#include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Matrix.h"
 #include "engine/CodeSafety/src/SafeArray.h"

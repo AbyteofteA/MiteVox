@@ -1,4 +1,3 @@
-
 #ifndef RENDERER_CUBEMAP_H
 #define RENDERER_CUBEMAP_H
 

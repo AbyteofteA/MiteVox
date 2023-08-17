@@ -5,6 +5,8 @@
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/CollisionDetection/computeContactPoints.h"
 
+#include <algorithm>
+
 namespace mitevox
 {
 	void solveConstraints(safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions, float substepDeltaTime);
@@ -230,12 +232,12 @@ namespace mitevox
 				mathem::Vector3D relativeVelocityTangent = relativeVelocity - n * relativeVelocityNormal;
 				mathem::Vector3D tangent = relativeVelocityTangent;
 				tangent.normalize();
-				deltaVelocity -= tangent * min(
+				deltaVelocity -= tangent * std::min(
 					dynamicFriction * std::fabs(collisionInfo->properties.contacts[i].normalForce / substepDeltaTime),
 					relativeVelocityTangent.getLength());
 
 				// Restitution
-				deltaVelocity += n * (-relativeVelocityNormal + max(-restitution * previousRelativeVelocityNormal, 0.0f));
+				deltaVelocity += n * (-relativeVelocityNormal + std::max(-restitution * previousRelativeVelocityNormal, 0.0f));
 
 				mathem::Vector3D impulse = deltaVelocity * generalizedMass;
 

@@ -1,7 +1,7 @@
-#ifndef GENERALFUNCTIONS_H
-#define GENERALFUNCTIONS_H
-
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
+
+#include <iostream>
+#include <cassert>
 
 #define PRIMITIVE_BUFFER_SIZE 1024
 
@@ -94,22 +94,22 @@ namespace render
 		glfwTerminate();
 	}
 
-	inline std::string getVendorName()
+	std::string getVendorName()
 	{
 		return std::string((const char*)glGetString(GL_VENDOR));
 	}
 
-	inline std::string getRendererName()
+	std::string getRendererName()
 	{
 		return std::string((const char*)glGetString(GL_RENDERER));
 	}
 
-	inline std::string getVersion()
+	std::string getVersion()
 	{
 		return std::string((const char*)glGetString(GL_VERSION));
 	}
 
-	inline std::string getLanguageVersion()
+	std::string getLanguageVersion()
 	{
 		return std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 	}
@@ -117,7 +117,7 @@ namespace render
 	/// <summary>
 	/// Source: https://learnopengl.com/In-Practice/Debugging
 	/// </summary>
-	inline void printErrors(const char* file, int line)
+	void printErrors(const char* file, int line)
 	{
 		GLenum errorCode;
 		while ((errorCode = glGetError()) != GL_NO_ERROR)
@@ -153,5 +153,3 @@ namespace render
 		glfwSwapBuffers(renderer->getWindow());
 	}
 }
-
-#endif

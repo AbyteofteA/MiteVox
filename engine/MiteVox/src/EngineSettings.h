@@ -3,7 +3,7 @@
 
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
-#include "engine/Profiler/src/Logger.h"
+#include "engine/MiteVox/src/Profiler/Logger.h"
 #include "engine/UIEventHandler/src/InputHandler.h"
 #include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 

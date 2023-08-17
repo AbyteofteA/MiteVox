@@ -1,4 +1,3 @@
-
 #ifndef RENDERER_COLOR_H
 #define RENDERER_COLOR_H
 

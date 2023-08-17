@@ -4,7 +4,6 @@
 #include "engine/Math/src/Math.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/UIEventHandler/src/InputHandler.h"
-#include "engine/Profiler/src/Logger.h"
 
 #include "engine/MiteVox/src/MiteVoxAPI.h"
 #include "engine/MiteVox/src/NativeScript.h"

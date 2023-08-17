@@ -1,5 +1,6 @@
 #include "PlaygroundCodecGLTF.h"
 
+#include "engine/FileIO/src/FileInputOutput.h"
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/FileIO/src/Formats/CodecGLTF/BufferLayoutCodec/BufferViewCodec.h"
 #include "engine/FileIO/src/Formats/CodecGLTF/BufferLayoutCodec/BufferViewAccessorCodec.h"
