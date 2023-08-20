@@ -208,6 +208,56 @@ namespace mitevox
 		return entity;
 	}
 
+	float MiteVoxAPI::getCurrentDeltaTime()
+	{
+		return engine->deltaTime / (float)engine->settings->physics.substepsCount;
+	}
+
+	PhysicsSolverType MiteVoxAPI::getPhysicsSolverType()
+	{
+		return engine->settings->physics.physicsSolver;
+	}
+
+	size_t MiteVoxAPI::getSubstepsCount()
+	{
+		return engine->settings->physics.substepsCount;
+	}
+
+	float MiteVoxAPI::getSleepTime()
+	{
+		return engine->settings->physics.sleepTime;
+	}
+
+	float MiteVoxAPI::getMaxLinearSpeed()
+	{
+		return engine->settings->physics.maxLinearSpeed;
+	}
+
+	float MiteVoxAPI::getMaxAngularSpeed()
+	{
+		return engine->settings->physics.maxAngularSpeed;
+	}
+
+	float MiteVoxAPI::getLinearDamping()
+	{
+		return engine->settings->physics.linearDamping;
+	}
+
+	float MiteVoxAPI::getAngularDamping()
+	{
+		return engine->settings->physics.angularDamping;
+	}
+
+	float MiteVoxAPI::getLinearSleepThreshold()
+	{
+		return engine->settings->physics.linearSleepThreshold;
+	}
+
+	float MiteVoxAPI::getAngularSleepThreshold()
+	{
+		return engine->settings->physics.angularSleepThreshold;
+	}
+
 	safety::SafeArray<Entity*>* MiteVoxAPI::collectEntitiesToSimulate()
 	{
 		Scene* activeScene = MiteVoxAPI::getActiveScene();

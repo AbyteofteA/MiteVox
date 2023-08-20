@@ -39,6 +39,7 @@ namespace mitevox
 
 	private:
 
+		float deltaTime = 0.0f;
 		std::chrono::steady_clock::time_point prevCycleTime;
 
 		Playground* playground;

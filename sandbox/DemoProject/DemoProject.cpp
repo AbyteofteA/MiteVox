@@ -35,12 +35,12 @@ void mitevox::Engine::onCreate()
 
 	activeScene->scripts.appendElement(processInput_Script);
 
-	//MiteVoxAPI::createPointLightEntity({ 11.0f, 11.0f, 11.0f }, { 1.0f, 1.0f, 1.0f });
-	//MiteVoxAPI::createCube("Cube", { 2.0f, 0.0f, 7.0f }, { 1.0f, 0.0f, 1.0f, 1.0f });
-	//MiteVoxAPI::createCube("Cube", { 2.0f, 1.0f, 7.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
-	//MiteVoxAPI::createCube("Cube", { 2.0f, 2.0f, 7.0f }, { 0.0f, 1.0f, 0.0f, 1.0f });
-	//MiteVoxAPI::createCube("Cube", { 2.0f, 3.0f, 7.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
-	//MiteVoxAPI::createPlane("Plane", { 1.0f, 1.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createPointLightEntity({ 11.0f, 11.0f, 11.0f }, { 1.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 0.0f, 7.0f }, { 1.0f, 0.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 1.0f, 7.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 2.0f, 7.0f }, { 0.0f, 1.0f, 0.0f, 1.0f });
+	MiteVoxAPI::createCube("Cube", { 2.0f, 3.0f, 7.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+	MiteVoxAPI::createPlane("Plane", { 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void mitevox::Engine::onUpdate() {}

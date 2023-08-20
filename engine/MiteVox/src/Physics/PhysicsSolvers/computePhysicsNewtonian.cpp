@@ -12,8 +12,6 @@ namespace mitevox
 
 	void computePhysicsNewtonian(safety::SafeArray<Entity*>* entitiesToSimulate, float deltaTime, float equalityTolerance)
 	{
-		computeIntegration(entitiesToSimulate, deltaTime);
-
 		safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions = MiteVoxAPI::computeCollisions();
 
 		size_t collisionsCount = collisions->getElementsCount();

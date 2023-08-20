@@ -104,7 +104,7 @@ namespace mitevox
 
 			// Update timers
 			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-			float deltaTime = std::chrono::duration_cast<std::chrono::duration<float>>(now - prevCycleTime).count();
+			deltaTime = std::chrono::duration_cast<std::chrono::duration<float>>(now - prevCycleTime).count();
 			prevCycleTime = now;
 
 			// Skip large time steps (TODO: add to EngineSettings)
@@ -141,7 +141,22 @@ namespace mitevox
 			// Physics and Transform
 			collisions.clear();
 			dataPointsContainers.returnAllContainers();
-			//computePhysics(PhysicsSolverType::POSITION_BASED, deltaTime, settings->equalityTolerance);
+			size_t substepsCount = MiteVoxAPI::getSubstepsCount();
+			float substepDeltaTime = deltaTime / (float)substepsCount;
+			for (size_t i = 0; i < substepsCount; ++i)
+			{
+				applyDampingAndSleeping(&entitiesToSimulate, substepDeltaTime);
+				computeIntegration(&entitiesToSimulate, substepDeltaTime);
+				computePhysics(MiteVoxAPI::getPhysicsSolverType(), substepDeltaTime, settings->equalityTolerance);
+			}
+
+			// Reset forces and torques
+			size_t entitiesToSimulateCount = entitiesToSimulate.getElementsCount();
+			for (size_t i = 0; i < entitiesToSimulateCount; ++i)
+			{
+				Entity* entity = entitiesToSimulate.getElement(i);
+				entity->resetForces();
+			}
 
 			animateNodes(&entitiesToSimulate, deltaTime);
 
@@ -350,7 +365,11 @@ namespace mitevox
 					&entity->transform,
 					camera,
 					cameraTransform);
-				drawCollider(settings->renderer, entity->getCollider(), &entity->transform);
+
+				if (entity->isSleeping() == false)
+				{
+					drawCollider(settings->renderer, entity->getCollider(), &entity->transform);
+				}
 			}
 			else
 			{
@@ -360,6 +379,12 @@ namespace mitevox
 					&entity->transform,
 					camera,
 					cameraTransform);
+
+				// TODO: delete
+				if (entity->isSleeping() == false)
+				{
+					drawCollider(settings->renderer, entity->getCollider(), &entity->transform);
+				}
 			}
 		}
 	}

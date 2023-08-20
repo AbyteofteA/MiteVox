@@ -23,6 +23,7 @@ namespace mitevox
         MovementProperties movementProperties;
         PhysicalMaterial physicalMaterial; // TOOD: make a reference
 		mathem::ComplexGeometry collider;
+        float timeUntilSleep = 1.0f;
 
 		Node* renderableNode = nullptr;
         // TODO: instanceVariations;
@@ -66,6 +67,10 @@ namespace mitevox
         mathem::ComplexGeometry* getCollider();
         void tryGenerateHitbox();
 
+        void awake(float deltaTime);
+        bool isSleeping();
+        void updateSleeping(float deltaTime);
+        void applyDamping(float deltaTime);
         void applyForce(mathem::Vector3D force);
         void applyForceAtPoint(mathem::Vector3D force, mathem::Vector3D point);
         void integrateForces(float deltaTime);

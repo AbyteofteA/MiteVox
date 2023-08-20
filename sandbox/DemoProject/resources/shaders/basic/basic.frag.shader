@@ -164,7 +164,7 @@ vec3 calculateLightSourcePBR(
 	// Specular component
 	float microfacetsAlignment = normalDistributionFunction(norm, halfVector, roughness);
 	float microfacetShadowing = geometryFunction(dotNormLightDir, K) * geometryFunction(dotNormViewDir, K);
-	vec3 specularBRDF = (specularFraction * microfacetsAlignment) / (4.0f * dotNormLightDir * dotNormViewDir + ALMOST_ZERO);
+	vec3 specularBRDF = (specularFraction * microfacetsAlignment * microfacetShadowing) / (4.0f * dotNormLightDir * dotNormViewDir + ALMOST_ZERO);
 
 	return (diffuseBRDF + specularBRDF) * lightColor * dotNormLightDir;
 }
@@ -200,7 +200,8 @@ float calculateAttenuation(float currentDistance, float range)
 {
 	// TODO: Recommended formula doesn't work for some reason
 	//float attenuation = max(min(1.0f - pow(currentDistance / range, 4.0f), 1.0f), 0.0f) / pow(currentDistance, 2.0f);
-	float attenuation = max(1.0f - pow(currentDistance / range, 2.0f), 0.0f);
+	//float attenuation = max(1.0f - pow(currentDistance / range, 2.0f), 0.0f);
+	float attenuation = (range * range) / (currentDistance * currentDistance);
 	return attenuation;
 }
 
@@ -335,7 +336,7 @@ void main()
 		outColor = vec4(calculateLighting(albedoFragment, roughness, metallicity, norm, occlusion), 1.0f);
 		//outColor += vec4(emissiveFragment, 1.0f); // TODO: add light bloom
 		outColor.rgb = outColor.rgb / (outColor.rgb + vec3(1.0f));
-		outColor.rgb = pow(outColor.rgb, vec3(1.0f / gammaCorrection));
+		//outColor.rgb = pow(outColor.rgb, vec3(1.0f / gammaCorrection));
 	}
 
 	// Linear fog

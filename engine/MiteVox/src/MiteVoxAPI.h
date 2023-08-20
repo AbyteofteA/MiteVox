@@ -66,6 +66,16 @@ namespace mitevox
 
 		// Physics
 
+		static float getCurrentDeltaTime();
+		static PhysicsSolverType getPhysicsSolverType();
+		static size_t getSubstepsCount();
+		static float getSleepTime();
+		static float getMaxLinearSpeed();
+		static float getMaxAngularSpeed();
+		static float getLinearDamping();
+		static float getAngularDamping();
+		static float getLinearSleepThreshold();
+		static float getAngularSleepThreshold();
 		static safety::SafeArray<Entity*>* collectEntitiesToSimulate();
 		static safety::SafeArray<mathem::CollisionInfo<Entity*>>* computeCollisions();
 		static mathem::Vector3D getGravity(Entity* entity);

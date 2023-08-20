@@ -63,7 +63,7 @@ namespace render
 		}
 
 		glEnable(GL_MULTISAMPLE);
-		glClearColor((GLclampf)renderer->clearColor.r, (GLclampf)renderer->clearColor.g, (GLclampf)renderer->clearColor.b, (GLclampf)1);
+		glClearColor((GLclampf)renderer->clearColor.r, (GLclampf)renderer->clearColor.g, (GLclampf)renderer->clearColor.b, (GLclampf)1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glfwSwapBuffers(renderer->getWindow());
 

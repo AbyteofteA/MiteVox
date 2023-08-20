@@ -50,6 +50,7 @@ printErrors(__FILE__, __LINE__);
 
 	// Buffers
 
+	void createFramebuffer();
 	void clearBufferXY(ColorRGBf color);
 	void clearBufferZ();
 	void display(RendererSettings* renderer);

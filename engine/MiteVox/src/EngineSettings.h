@@ -4,6 +4,7 @@
 #include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/MiteVox/src/Profiler/Logger.h"
+#include "engine/MiteVox/src/Physics/PhysicsSolverType.h"
 #include "engine/UIEventHandler/src/InputHandler.h"
 #include "engine/Renderer/src/RendererAPI/RendererSettings.h"
 
@@ -14,6 +15,7 @@ namespace mitevox
 	class EngineSettings
 	{
 		friend class Engine;
+		friend class MiteVoxAPI;
 
 	public:
 
@@ -68,6 +70,19 @@ namespace mitevox
 		std::string savesDir = "";
 
 		float equalityTolerance = 0.001f; // TODO: add to EngineSettings
+
+		struct
+		{
+			PhysicsSolverType physicsSolver = PhysicsSolverType::POSITION_BASED;
+			size_t substepsCount = 1;
+			float sleepTime = 0.333f;
+			float maxLinearSpeed = -1.0f;
+			float maxAngularSpeed = 10.0f;
+			float linearDamping = 0.05f;	// %/sec
+			float angularDamping = 0.1f;	// %/sec
+			float linearSleepThreshold = 0.075f;
+			float angularSleepThreshold = 0.075f;
+		} physics;
 
 		render::RendererSettings* renderer = nullptr;
 	};

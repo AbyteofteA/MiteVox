@@ -7,6 +7,39 @@
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/Math/src/Math.h"
 
+mathem::Vector3D getMovementDirection(int forwardKey, int backwardKey, int rightKey, int leftKey, int upKey, int downKey)
+{
+	InputHandler* inputHandler = InputHandler::getInstance();
+
+	mathem::Vector3D movementVector = { 0.0f, 0.0f, 0.0f };
+	if (inputHandler->isKeyPressed(forwardKey))
+	{
+		movementVector.z() = -1.0f;
+	}
+	else if (inputHandler->isKeyPressed(backwardKey))
+	{
+		movementVector.z() = 1.0f;
+	}
+	if (inputHandler->isKeyPressed(rightKey))
+	{
+		movementVector.x() = 1.0f;
+	}
+	else if (inputHandler->isKeyPressed(leftKey))
+	{
+		movementVector.x() = -1.0f;
+	}
+	if (inputHandler->isKeyPressed(upKey))
+	{
+		movementVector.y() = 1.0f;
+	}
+	else if (inputHandler->isKeyPressed(downKey))
+	{
+		movementVector.y() -= 1.0f;
+	}
+	movementVector.normalize();
+	return movementVector;
+}
+
 void processInput_Script(mitevox::Scene* scene)
 {
 	float cameraSensitivity = 0.1f;
@@ -33,32 +66,7 @@ void processInput_Script(mitevox::Scene* scene)
 
 	float movementStep = speed * (float)inputHandler->dt;
 
-	mathem::Vector3D movementVector = { 0.0f, 0.0f, 0.0f };
-	if (inputHandler->isKeyPressed(GLFW_KEY_W))
-	{
-		movementVector.z() = -1.0f;
-	}
-	else if (inputHandler->isKeyPressed(GLFW_KEY_S))
-	{
-		movementVector.z() = 1.0f;
-	}
-	if (inputHandler->isKeyPressed(GLFW_KEY_D))
-	{
-		movementVector.x() = 1.0f;
-	}
-	else if (inputHandler->isKeyPressed(GLFW_KEY_A))
-	{
-		movementVector.x() = -1.0f;
-	}
-	if (inputHandler->isKeyPressed(GLFW_KEY_SPACE))
-	{
-		movementVector.y() = 1.0f;
-	}
-	else if (inputHandler->isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-	{
-		movementVector.y() -= 1.0f;
-	}
-	movementVector.normalize();
+	mathem::Vector3D movementVector = movementVector = getMovementDirection(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
 	movementVector *= movementStep;
 	movementVector = cameraEntityTransform->rotation.rotate(movementVector);
 	cameraEntityTransform->translation += movementVector;
@@ -77,8 +85,11 @@ void processInput_Script(mitevox::Scene* scene)
 		rotation.z() = 0.785f;
 	}
 	rotation *= (float)inputHandler->dt;
-	mitevox::Entity* entity = mitevox::MiteVoxAPI::getActiveScene()->entities.getElement(0);
+
+	mitevox::Entity* entity = mitevox::MiteVoxAPI::getActiveScene()->entities.getElement(3);
 	entity->transform.rotation.rotateByEulersRadians(rotation.x(), rotation.y(), rotation.z());
+	movementVector = getMovementDirection(GLFW_KEY_KP_8, GLFW_KEY_KP_2, GLFW_KEY_KP_6, GLFW_KEY_KP_4, GLFW_KEY_KP_9, GLFW_KEY_KP_3);
+	entity->applyForce(movementVector * 10.0f);
 
 	if (inputHandler->isKeyPressed(GLFW_KEY_1))
 	{
@@ -127,18 +138,24 @@ void processInput_Script(mitevox::Scene* scene)
 		mitevox::MiteVoxAPI::getSettings()->debug = !mitevox::MiteVoxAPI::getSettings()->debug;
 	}
 
-	//if (inputHandler->isKeyPressed(GLFW_KEY_Q))
-	//{
-	//	mitevox::Entity* e = mitevox::MiteVoxAPI::createCube(
-	//		"Dropped Cube",
-	//		cameraEntityTransform->translation,
-	//		{ 
-	//			1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 2),
-	//			1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 3),
-	//			1.0f - 1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 2), 1.0f});
-	//	e->movementProperties.velocity = activeCameraEntity->getViewRay() * 10.0f;
-	//}
-
+	static float timeSinceLastDrop = 0.0f;
+	timeSinceLastDrop += inputHandler->dt;
+	if (timeSinceLastDrop > 0.333f)
+	{
+		if (inputHandler->isKeyPressed(GLFW_KEY_Q))
+		{
+			timeSinceLastDrop = 0.0f;
+			mitevox::Entity* e = mitevox::MiteVoxAPI::createCube(
+				"Dropped Cube",
+				cameraEntityTransform->translation,
+				{
+					1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 2),
+					1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 3),
+					1.0f - 1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 2), 1.0f });
+			e->movementProperties.velocity = activeCameraEntity->getViewRay() * 10.0f;
+		}
+	}
+	
 	//if (inputHandler->isKeyPressed(GLFW_KEY_F))
 	//{
 	//	auto entity = mitevox::MiteVoxAPI::getActiveCameraEntity();

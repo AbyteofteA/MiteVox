@@ -1,9 +1,9 @@
 #include "Cubemap.h"
 
 #include "engine/FileIO/src/FileLoaderAsync.h"
+
 #include <filesystem>
 #include <string>
-#include <algorithm>
 #include <cctype>
 namespace fs = std::filesystem;
 

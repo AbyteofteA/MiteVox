@@ -98,21 +98,86 @@ namespace mathem
 	{
 		bool thereMayBeACollision = true;
 
+		TriangleGeometry3D tmpTriangle = box1->getTrianglePositions(0);
+		box1Transform->applyTo(tmpTriangle);
+		Vector3D tmpPositionMax;
+		Vector3D tmpPositionMin;
+		Vector3D tmpNormal = tmpTriangle.computeNormal();
 		float tmpBox1ProjectionMin = 0.0f, tmpBox1ProjectionMax = 0.0f;
 		float tmpBox2ProjectionMin = 0.0f, tmpBox2ProjectionMax = 0.0f;
 
-		size_t box1TrianglesCount = box1->getTrianglesCount();
-		for (size_t i = 0; i < box1TrianglesCount; ++i)
+		// Check box1's local Z-axis
 		{
-			if (thereMayBeACollision == false)
-			{
-				break;
-			}
-			TriangleGeometry3D tmpTriangle = box1->getTrianglePositions(i);
-			box1Transform->applyTo(tmpTriangle);
-			Vector3D tmpNormal = tmpTriangle.computeNormal();
+			tmpPositionMax = tmpTriangle.point1;
+			tmpPositionMin = box1->getVertexPosition(7);
+			box1Transform->applyTo(tmpPositionMin);
+			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
 
-			computeProjection(box1, box1Transform, &tmpNormal, &tmpBox1ProjectionMin, &tmpBox1ProjectionMax);
+			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
+			{
+				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
+			}
+			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
+			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
+			if (penetration == 0.0f)
+			{
+				thereMayBeACollision = false;
+				collisionProperties->penetrationDepth = 0.0f;
+			}
+			else
+			{
+				collisionProperties->recomputePenetrationAndNormal(penetration, tmpNormal, isFirstPass);
+			}
+		}
+
+		// Check box1's local X-axis
+		if (thereMayBeACollision)
+		{
+			tmpTriangle = box1->getTrianglePositions(8);
+			box1Transform->applyTo(tmpTriangle);
+			tmpNormal = tmpTriangle.computeNormal();
+
+			tmpPositionMax = tmpTriangle.point1;
+			tmpPositionMin = box1->getVertexPosition(3);
+			box1Transform->applyTo(tmpPositionMin);
+			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
+
+			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
+			{
+				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
+			}
+			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
+			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
+			if (penetration == 0.0f)
+			{
+				thereMayBeACollision = false;
+				collisionProperties->penetrationDepth = 0.0f;
+			}
+			else
+			{
+				collisionProperties->recomputePenetrationAndNormal(penetration, tmpNormal, isFirstPass);
+			}
+		}
+
+		// Check box1's local Y-axis
+		if (thereMayBeACollision)
+		{
+			tmpTriangle = box1->getTrianglePositions(4);
+			box1Transform->applyTo(tmpTriangle);
+			tmpNormal = tmpTriangle.computeNormal();
+
+			tmpPositionMax = tmpTriangle.point1;
+			tmpPositionMin = box1->getVertexPosition(0);
+			box1Transform->applyTo(tmpPositionMin);
+			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
+			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
+
+			if (tmpBox1ProjectionMax < tmpBox1ProjectionMin)
+			{
+				std::swap(tmpBox1ProjectionMin, tmpBox1ProjectionMax);
+			}
 			computeProjection(box2, box2Transform, &tmpNormal, &tmpBox2ProjectionMin, &tmpBox2ProjectionMax);
 			float penetration = computePenetration(tmpBox1ProjectionMin, tmpBox1ProjectionMax, tmpBox2ProjectionMin, tmpBox2ProjectionMax);
 			if (penetration == 0.0f)
@@ -139,6 +204,7 @@ namespace mathem
 		{
 			collisionProperties->type = CollisionType::INTERSECTION;
 		}
+		return collisionProperties->type;
 	}
 
 	CollisionType checkCollision(

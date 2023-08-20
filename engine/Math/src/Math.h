@@ -1,27 +1,22 @@
-
 #ifndef MATH_HEADERS_H
 #define MATH_HEADERS_H
 
-#include <cmath>
+#include "engine/Math/src/Calculus/Sequences.h"
 
-#include "Calculus/Sequences.h"
-
-#include "DataStructures/HalfTable.h"
-#include "DataStructures/HyperData.h"
-#include "DataStructures/Graphs/Octree.h"
+#include "engine/Math/src/DataStructures/HalfTable.h"
+#include "engine/Math/src/DataStructures/HyperData.h"
+#include "engine/Math/src/DataStructures/Graphs/Octree.h"
 //#include "DataStructures/Graphs/Math_BinarySearchTree.h"
 
-#include "Convertations.h"
+#include "engine/Math/src/Convertations.h"
 
-#include "Generators/RandomNumberGenerators/CongruentialGenerator.h"
-#include "Generators/UniqueIDGenerator.h"
-#include "Generators/NoiseGenerators/PerlinNoiseGenerator.h"
+#include "engine/Math/src/Generators/RandomNumberGenerators/CongruentialGenerator.h"
+#include "engine/Math/src/Generators/UniqueIDGenerator.h"
+#include "engine/Math/src/Generators/NoiseGenerators/PerlinNoiseGenerator.h"
 
-#include "Vector.h"
-#include "Matrix.h"
-#include "LinearAlgebra/Transform.h"
-#include "LinearAlgebra/SquareMatrix.h"
+#include "engine/Math/src/Vector.h"
+#include "engine/Math/src/Matrix.h"
 
-#include "NumericalAnalysis/Intertolation.h"
+#include "engine/Math/src/NumericalAnalysis/Intertolation.h"
 
 #endif

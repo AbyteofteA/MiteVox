@@ -53,6 +53,7 @@
     <ClInclude Include="src\almostEqual.h" />
     <ClInclude Include="src\DataStructures\PileAllocator.h" />
     <ClInclude Include="src\DataStructures\PileOfContainers.h" />
+    <ClInclude Include="src\Float.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\CollisionType.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\computeContactPoints.h" />
     <ClInclude Include="src\Geometry\computePenetration.h" />
@@ -83,9 +84,7 @@
     <ClInclude Include="src\Geometry\GeometryPrimitives\SphereGeometry.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\TriangleGeometry3D.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.h" />
-    <ClInclude Include="src\LinearAlgebra\SquareMatrix.h" />
     <ClInclude Include="src\Matrix.h" />
-    <ClInclude Include="src\LinearAlgebra\Transform.h" />
     <ClInclude Include="src\Vector.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\NumericalAnalysis\Intertolation.h" />
@@ -165,7 +164,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
-      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -192,7 +191,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

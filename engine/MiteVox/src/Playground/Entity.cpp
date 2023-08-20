@@ -6,12 +6,13 @@
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
 #include "engine/Math/src/Convertations.h"
 #include "engine/MiteVox/src/Physics/MovementProperties.h"
+#include "engine/MiteVox/src/MiteVoxAPI.h"
 
 namespace mitevox
 {
 	Entity::Entity() : collider(mathem::GeometryType::NONE)
 	{
-
+		awake(MiteVoxAPI::getSleepTime());
 	}
 
 	mathem::GeometryTransform* Entity::getTransform()
@@ -171,24 +172,96 @@ namespace mitevox
 		computeMomentOfInertia();
 	}
 
+	void Entity::awake(float deltaTime)
+	{
+		timeUntilSleep = std::max(timeUntilSleep, deltaTime);
+	}
+
+	bool Entity::isSleeping()
+	{
+		if (timeUntilSleep <= 0.0f ||
+			movementProperties.inverseMass == 0.0f)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	void Entity::updateSleeping(float deltaTime)
+	{
+		mathem::Vector3D& v = movementProperties.velocity;
+		mathem::Vector3D& w = movementProperties.angularVelocity;
+
+		if (v.getLength() < MiteVoxAPI::getLinearSleepThreshold() &&
+			w.getLength() < MiteVoxAPI::getAngularSleepThreshold())
+		{
+			timeUntilSleep -= deltaTime;
+			timeUntilSleep = std::max(timeUntilSleep, 0.0f);
+		}
+		else
+		{
+			timeUntilSleep += deltaTime;
+			timeUntilSleep = std::min(timeUntilSleep, MiteVoxAPI::getSleepTime());
+		}
+	}
+
+	void Entity::applyDamping(float deltaTime)
+	{
+		mathem::Vector3D& v = movementProperties.velocity;
+		mathem::Vector3D& w = movementProperties.angularVelocity;
+
+		// Clamp to max speed
+		float maxLinearSpeed = MiteVoxAPI::getMaxLinearSpeed();
+		if (maxLinearSpeed > 0.0f)
+		{
+			v.clampLength(0.0f, maxLinearSpeed);
+		}
+		float maxAngularSpeed = MiteVoxAPI::getMaxAngularSpeed();
+		if (maxAngularSpeed > 0.0f)
+		{
+			w.clampLength(0.0f, maxAngularSpeed);
+		}
+
+		// Damping
+		v -= v * MiteVoxAPI::getLinearDamping() * deltaTime;
+		w -= w * MiteVoxAPI::getAngularDamping() * deltaTime;
+	}
+
 	void Entity::applyForce(mathem::Vector3D force)
 	{
-		movementProperties.externalForces += force;
+		if (force != mathem::Vector3D::zero())
+		{
+			awake(MiteVoxAPI::getSleepTime());
+			movementProperties.externalForces += force;
+		}
 	}
 
 	void Entity::applyForceAtPoint(mathem::Vector3D force, mathem::Vector3D point)
 	{
-		movementProperties.externalForces += force;
-		movementProperties.externalTorque += mathem::crossProduct(point - transform.translation, force);
+		if (force != mathem::Vector3D::zero())
+		{
+			awake(MiteVoxAPI::getSleepTime());
+			movementProperties.externalForces += force;
+			movementProperties.externalTorque += mathem::crossProduct(point - transform.translation, force);
+		}
 	}
 
 	void Entity::integrateForces(float deltaTime)
 	{
-		movementProperties.velocity += movementProperties.externalForces * (movementProperties.inverseMass * deltaTime);
+		mathem::Vector3D& v = movementProperties.velocity;
+		mathem::Vector3D& w = movementProperties.angularVelocity;
+
+		if (timeUntilSleep <= 0.0f)
+		{
+			v = { 0.0f, 0.0f, 0.0f };
+			w = { 0.0f, 0.0f, 0.0f };
+			return;
+		}
+
+		v += movementProperties.externalForces * (movementProperties.inverseMass * deltaTime);
 
 		mathem::Matrix3x3 I = getMomentOfInertia();
 		mathem::Matrix3x3 inverseI = getInverseMomentOfInertia();
-		mathem::Vector3D& w = movementProperties.angularVelocity;
 		mathem::Vector3D T = movementProperties.externalTorque;
 
 		w += mathem::multiply(inverseI, (T - mathem::crossProduct(w, mathem::multiply(I, w)))) * deltaTime;

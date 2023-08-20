@@ -1,0 +1,17 @@
+#ifndef PHYSICSSOLVERTYPE_H
+#define PHYSICSSOLVERTYPE_H
+
+namespace mitevox
+{
+	enum struct PhysicsSolverType
+	{
+		NO_PHYSICS,
+		NEWTONIAN,
+		POSITION_BASED_LINEAR,
+		POSITION_BASED,
+		IMPULSE_BASED_LINEAR,
+		IMPULSE_BASED,
+	};
+}
+
+#endif

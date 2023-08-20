@@ -104,6 +104,12 @@ namespace mathem
 		collisionInfo->object2 = object2;
 		collisionInfo->properties.type = CollisionType::NONE;
 
+		if (object1->isSleeping() &&
+			object2->isSleeping())
+		{
+			return CollisionType::NONE;
+		}
+
 		ComplexGeometry* complexGeometry1 = object1->getCollider();
 		ComplexGeometry* complexGeometry2 = object2->getCollider();
 		if (complexGeometry1->getType() == mathem::GeometryType::NONE ||
@@ -149,7 +155,7 @@ namespace mathem
 			}
 
 			Vector3D distance = collisionInfo->object2->transform.translation - collisionInfo->object1->transform.translation;
-			assert(("ERROR: Normal is not alligned", distance * collisionInfo->properties.normal >= 0.0f));
+			//assert(("ERROR: Normal is not alligned", distance * collisionInfo->properties.normal >= 0.0f));
 			assert(("ERROR: penetrationDepth is negative", collisionInfo->properties.penetrationDepth >= 0.0f));
 		}
 

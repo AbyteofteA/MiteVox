@@ -9,6 +9,7 @@
 
 namespace mitevox
 {
+	void applyDampingAndSleeping(safety::SafeArray<Entity*>* entitiesToSimulate, float substepDeltaTime);
 	void solveConstraints(safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions, float substepDeltaTime);
 	void deriveVelocities(safety::SafeArray<Entity*>* entitiesToSimulate, float substepDeltaTime);
 	void solveVelocities(safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions, float substepDeltaTime);
@@ -18,28 +19,33 @@ namespace mitevox
 	/// Original paper: https://matthias-research.github.io/pages/publications/PBDBodies.pdf
 	/// </summary>
 	/// <param name="entitiesToSimulate"></param>
-	/// <param name="deltaTime"></param>
+	/// <param name="substepDeltaTime"></param>
 	/// <param name="equalityTolerance"></param>
-	void computePositionBasedDynamics(safety::SafeArray<Entity*>* entitiesToSimulate, float deltaTime, float equalityTolerance)
+	void computePositionBasedDynamics(safety::SafeArray<Entity*>* entitiesToSimulate, float substepDeltaTime, float equalityTolerance)
 	{
-		size_t substepsCount = 1;
-		float substepDeltaTime = deltaTime / substepsCount;
+		safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions = MiteVoxAPI::computeCollisions();
+		solveConstraints(collisions, substepDeltaTime);
+		deriveVelocities(entitiesToSimulate, substepDeltaTime);
+		solveVelocities(collisions, substepDeltaTime);
+	}
 
-		for (size_t i = 0; i < substepsCount; ++i)
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns>true if both objects are sleeping, otherwise false and awake both objects</returns>
+	bool tryToSkipBecauseOfSleeping(mathem::CollisionInfo<Entity*>* collisionInfo)
+	{
+		Entity* object1 = collisionInfo->object1;
+		Entity* object2 = collisionInfo->object2;
+		if (object1->isSleeping() &&
+			object2->isSleeping())
 		{
-			computeIntegration(entitiesToSimulate, substepDeltaTime);
-			safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions = MiteVoxAPI::computeCollisions();
-			solveConstraints(collisions, substepDeltaTime);
-			deriveVelocities(entitiesToSimulate, substepDeltaTime);
-			solveVelocities(collisions, substepDeltaTime);
+			return true;
 		}
-
-		size_t entitiesToSimulateCount = entitiesToSimulate->getElementsCount();
-		for (size_t i = 0; i < entitiesToSimulateCount; ++i)
-		{
-			Entity* entity = entitiesToSimulate->getElement(i);
-			entity->resetForces();
-		}
+		
+		object1->awake(MiteVoxAPI::getCurrentDeltaTime());
+		object2->awake(MiteVoxAPI::getCurrentDeltaTime());
+		return false;
 	}
 
 	void solveConstraints(safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions, float substepDeltaTime)
@@ -48,6 +54,12 @@ namespace mitevox
 		for (size_t i = 0; i < collisionsCount; ++i)
 		{
 			mathem::CollisionInfo<Entity*>* collisionInfo = collisions->getElementPointer(i);
+
+			if (tryToSkipBecauseOfSleeping(collisionInfo))
+			{
+				continue;
+			}
+
 			computeContactPoints(collisionInfo, MiteVoxAPI::getSettings()->getEqualityTolerance());
 			collisions->setElement(i, *collisionInfo);
 
@@ -78,6 +90,11 @@ namespace mitevox
 				mathem::Vector3D n = collisionInfo->properties.normal;
 				float penetrationDepth = deltaX * n;
 
+				if (penetrationDepth <= 0.0f)
+				{
+					continue;
+				}
+
 				mathem::Vector3D r1Prev = collisionInfo->properties.contacts[i].contactPoints1;
 				r1Prev = movementProperties1->previousOrientation.rotate(r1Prev);
 				mathem::Vector3D r2Prev = collisionInfo->properties.contacts[i].contactPoints2;
@@ -106,11 +123,12 @@ namespace mitevox
 				collisionInfo->properties.contacts[i].tangentForce = deltaLambdaT;
 
 				// Static friction
+				// TODO: seems like it's not correct, but looks decent
 				mathem::Vector3D staticFrictionPositionalImpulse = { 0.0f, 0.0f, 0.0f };
 				if (collisionInfo->properties.contacts[i].tangentForce <
 					collisionInfo->properties.contacts[i].normalForce * staticFriction)
 				{
-					staticFrictionPositionalImpulse = tangent * deltaLambdaT;
+					staticFrictionPositionalImpulse = -deltaPTangent * generalizedMass * 0.5f;
 				}
 
 				mathem::Vector3D positionalImpulse = n * deltaLambda + staticFrictionPositionalImpulse;
@@ -154,6 +172,12 @@ namespace mitevox
 		for (size_t i = 0; i < entitiesToSimulateCount; ++i)
 		{
 			Entity* entity = entitiesToSimulate->getElement(i);
+
+			if (entity->isSleeping())
+			{
+				continue;
+			}
+
 			if (entity->movementProperties.inverseMass != 0.0f)
 			{
 				entity->movementProperties.previousVelocity = entity->movementProperties.velocity;
@@ -178,6 +202,11 @@ namespace mitevox
 		for (size_t i = 0; i < collisionsCount; ++i)
 		{
 			mathem::CollisionInfo<Entity*>* collisionInfo = collisions->getElementPointer(i);
+
+			if (tryToSkipBecauseOfSleeping(collisionInfo))
+			{
+				continue;
+			}
 
 			mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getTransform();
 			mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getTransform();

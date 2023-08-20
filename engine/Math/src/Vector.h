@@ -3,6 +3,7 @@
 
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Math/src/MinAndMax.h"
+#include "engine/Math/src/Float.h"
 
 #include <cmath>
 #include <algorithm>
@@ -21,6 +22,9 @@ namespace mathem
 	typedef Vector<float, 3> Vector3D;
 	typedef Vector<float, 4> Vector4D;
 
+	typedef Vector<Float, 3> Float3D;
+	typedef Vector<Float, 4> Float4D;
+
 	VECTOR_TEMPLATE
 	class Vector
 	{
@@ -28,8 +32,9 @@ namespace mathem
 
 		T data[Dimension];
 
-		static VECTOR min(VECTOR* vector1, VECTOR* vector2);
-		static VECTOR max(VECTOR* vector1, VECTOR* vector2);
+		inline static VECTOR zero();
+		inline static VECTOR min(VECTOR* vector1, VECTOR* vector2);
+		inline static VECTOR max(VECTOR* vector1, VECTOR* vector2);
 
 		inline void setMin();
 		inline void setMax();
@@ -53,8 +58,10 @@ namespace mathem
 
 		inline T& s();
 
+		inline void setLength(T newLength);
 		inline T getLength();
 		inline T getLengthSquared();
+		inline void clampLength(T minLength, T maxLength);
 		inline void normalize();
 
 		inline void reflect(VECTOR normal);
@@ -96,6 +103,14 @@ namespace mathem
 
 	// IMPLEMENTATION BELOW //
 
+
+	VECTOR_TEMPLATE
+	inline VECTOR VECTOR::zero()
+	{
+		VECTOR vector;
+		vector.setAll((T)0.0);
+		return vector;
+	}
 
 	VECTOR_TEMPLATE
 	inline VECTOR VECTOR::min(VECTOR* vector1, VECTOR* vector2)
@@ -240,6 +255,22 @@ namespace mathem
 	}
 
 	VECTOR_TEMPLATE
+	inline void VECTOR::setLength(T newLength)
+	{
+		T length = getLength();
+		if (length == (T)0.0)
+		{
+			return;
+		}
+
+		T lengthScale = newLength / length;
+		for (size_t i = 0; i < Dimension; ++i)
+		{
+			this->data[i] *= lengthScale;
+		}
+	}
+
+	VECTOR_TEMPLATE
 	inline T VECTOR::getLength()
 	{
 		return (T)std::sqrt(getLengthSquared());
@@ -248,23 +279,44 @@ namespace mathem
 	VECTOR_TEMPLATE
 	inline T VECTOR::getLengthSquared()
 	{
-		T lengthSquared = (T)0;
+		T lengthSquared = (T)0.0;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
-			lengthSquared += (T)std::pow(this->data[i], 2);
+			lengthSquared += (T)std::pow(this->data[i], (T)2.0);
 		}
 		return lengthSquared;
+	}
+
+	VECTOR_TEMPLATE
+	inline void VECTOR::clampLength(T minLength, T maxLength)
+	{
+		T length = getLength();
+		if (length == (T)0.0)
+		{
+			return;
+		}
+		if (length >= minLength &&
+			length <= maxLength)
+		{
+			return;
+		}
+		T newLength = std::clamp(length, minLength, maxLength);
+		T lengthScale = newLength / length;
+		for (size_t i = 0; i < Dimension; ++i)
+		{
+			this->data[i] *= lengthScale;
+		}
 	}
 
 	VECTOR_TEMPLATE
 	inline void VECTOR::normalize()
 	{
 		T length = getLength();
-		if (length == (T)0)
+		if (length == (T)0.0)
 		{
 			return;
 		}
-		T reciprocalLength = (T)1 / length;
+		T reciprocalLength = (T)1.0 / length;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
 			this->data[i] *= reciprocalLength;
@@ -274,7 +326,7 @@ namespace mathem
 	VECTOR_TEMPLATE
 	inline void VECTOR::reflect(VECTOR normal)
 	{
-		VECTOR vectorDelta = (normal * (*this * normal)) * (T)2;
+		VECTOR vectorDelta = (normal * (*this * normal)) * (T)2.0;
 		*this -= vectorDelta;
 	}
 
@@ -328,7 +380,7 @@ namespace mathem
 	VECTOR_TEMPLATE
 	inline T VECTOR::operator*(VECTOR& otherVector)
 	{
-		T resultScalar = (T)0;
+		T resultScalar = (T)0.0;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
 			resultScalar += this->data[i] * otherVector[i];
@@ -340,11 +392,11 @@ namespace mathem
 	inline VECTOR VECTOR::operator/(T divider)
 	{
 		VECTOR resultVector;
-		if (divider == (T)0)
+		if (divider == (T)0.0)
 		{
 			return resultVector;
 		}
-		T multiplier = (T)1 / divider;
+		T multiplier = (T)1.0 / divider;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
 			resultVector[i] = this->data[i] * multiplier;
@@ -355,11 +407,11 @@ namespace mathem
 	VECTOR_TEMPLATE
 	inline void VECTOR::operator/=(T divider)
 	{
-		if (divider == (T)0)
+		if (divider == (T)0.0)
 		{
 			return;
 		}
-		T multiplier = (T)1 / divider;
+		T multiplier = (T)1.0 / divider;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
 			this->data[i] *= multiplier;
@@ -470,7 +522,7 @@ namespace mathem
 	T distanceSquared(VECTOR vectorA, VECTOR vectorB)
 	{
 		VECTOR distanceVector = vectorB - vectorA;
-		T distanceSquared = (T)0.0f;
+		T distanceSquared = (T)0.0;
 		for (size_t i = 0; i < Dimension; ++i)
 		{
 			distanceSquared += distanceVector[i] * distanceVector[i];
