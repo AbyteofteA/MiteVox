@@ -154,7 +154,8 @@ void processInput_Script(mitevox::Scene* scene)
 				{
 					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f),
 					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f),
-					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f) 
+					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f),
+					1.0f
 				});
 			e->movementProperties.velocity = activeCameraEntity->getViewRay() * 10.0f;
 		}

@@ -2,7 +2,7 @@
 
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
-#include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
+#include "engine/Math/src/Geometry/GeometryUtilities/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
 #include "engine/Math/src/Utilities/almostEqual.h"

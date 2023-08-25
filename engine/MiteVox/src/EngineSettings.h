@@ -78,8 +78,8 @@ namespace mitevox
 			float sleepTime = 0.333f;
 			float maxLinearSpeed = -1.0f;
 			float maxAngularSpeed = 10.0f;
-			float linearDamping = 0.05f;	// %/sec
-			float angularDamping = 0.1f;	// %/sec
+			float linearDamping = 0.01f;	// %/sec
+			float angularDamping = 0.01f;	// %/sec
 			float linearSleepThreshold = 0.075f;
 			float angularSleepThreshold = 0.075f;
 		} physics;

@@ -1,8 +1,8 @@
 #include "checkCollisionWithSphere.h"
 
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
-#include "engine/Math/src/Geometry/computeProjection.h"
-#include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
+#include "engine/Math/src/Geometry/GeometryUtilities/computeProjection.h"
+#include "engine/Math/src/Geometry/GeometryUtilities/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Geometry/CollisionDetection/checkCollisionWithBox.h"
 #include "engine/Math/src/Geometry/CollisionDetection/checkCollisionWithAxisAlignedBox.h"
 

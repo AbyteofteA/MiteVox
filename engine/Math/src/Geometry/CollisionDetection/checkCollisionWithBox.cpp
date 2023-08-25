@@ -1,9 +1,9 @@
 #include "checkCollisionWithBox.h"
 
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
-#include "engine/Math/src/Geometry/computeProjection.h"
-#include "engine/Math/src/Geometry/computePenetration.h"
-#include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
+#include "engine/Math/src/Geometry/GeometryUtilities/computeProjection.h"
+#include "engine/Math/src/Geometry/GeometryUtilities/computePenetration.h"
+#include "engine/Math/src/Geometry/GeometryUtilities/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Vector.h"
 
 namespace mathem

@@ -247,7 +247,8 @@ namespace mitevox
 		{
 			awake(MiteVoxAPI::getSleepTime());
 			movementProperties.externalForces += force;
-			movementProperties.externalTorque += mathem::crossProduct(point - transform.translation, force);
+			point = transform.rotation.rotate(point);
+			movementProperties.externalTorque += mathem::crossProduct(point, force);
 		}
 	}
 

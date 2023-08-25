@@ -29,7 +29,7 @@
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPoints.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPointsWithBox.cpp" />
     <ClCompile Include="src\Geometry\ComplexGeometry.cpp" />
-    <ClCompile Include="src\Geometry\computePenetration.cpp" />
+    <ClCompile Include="src\Geometry\GeometryUtilities\computePenetration.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\contains.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.cpp" />
     <ClCompile Include="src\Utilities\Convertations.cpp" />
@@ -39,8 +39,8 @@
     <ClCompile Include="src\Geometry\GeometryPrimitives\BoxGeometry.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\CapsuleGeometry.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithSphere.cpp" />
-    <ClCompile Include="src\Geometry\computeClosestPointOnTheLine.cpp" />
-    <ClCompile Include="src\Geometry\computeProjection.cpp" />
+    <ClCompile Include="src\Geometry\GeometryUtilities\computeClosestPointOnTheLine.cpp" />
+    <ClCompile Include="src\Geometry\GeometryUtilities\computeProjection.cpp" />
     <ClCompile Include="src\Geometry\GeometryTransform.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\SphereGeometry.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry3D.cpp" />
@@ -60,7 +60,7 @@
     <ClInclude Include="src\Geometry\CollisionDetection\CollisionTable.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\CollisionType.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\computeContactPoints.h" />
-    <ClInclude Include="src\Geometry\computePenetration.h" />
+    <ClInclude Include="src\Geometry\GeometryUtilities\computePenetration.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\contains.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.h" />
     <ClInclude Include="src\MathConstants.h" />
@@ -80,8 +80,8 @@
     <ClInclude Include="src\Geometry\CollisionDetection\checkCollision.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\CollisionInfo.h" />
     <ClInclude Include="src\Geometry\ComplexGeometry.h" />
-    <ClInclude Include="src\Geometry\computeClosestPointOnTheLine.h" />
-    <ClInclude Include="src\Geometry\computeProjection.h" />
+    <ClInclude Include="src\Geometry\GeometryUtilities\computeClosestPointOnTheLine.h" />
+    <ClInclude Include="src\Geometry\GeometryUtilities\computeProjection.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\GeometryPrimitiveBase.h" />
     <ClInclude Include="src\Geometry\GeometryTransform.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\SphereGeometry.h" />
