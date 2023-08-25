@@ -4,7 +4,7 @@
 #include "engine/AIModels/src/Structure/NeuralNetworkLayerBase.h"
 #include "engine/AIModels/src/FeedForwardNeuralNets/ConvolutionalNeuralNets/Filter2D.h"
 
-#include "engine/Math/src/MinAndMax.h"
+#include "engine/Math/src/Utilities/MinAndMax.h"
 #include <algorithm>
 
 namespace aimods

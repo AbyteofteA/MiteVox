@@ -1,7 +1,7 @@
 #include "CollisionInfo.h"
 
-#include "engine/Math/src/almostEqual.h"
-#include "engine/Math/src/MinAndMax.h"
+#include "engine/Math/src/Utilities/almostEqual.h"
+#include "engine/Math/src/Utilities/MinAndMax.h"
 
 #include <algorithm>
 

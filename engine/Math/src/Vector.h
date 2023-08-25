@@ -2,7 +2,7 @@
 #define MATH_VECTOR_H
 
 #include "engine/CodeSafety/src/SafeArray.h"
-#include "engine/Math/src/MinAndMax.h"
+#include "engine/Math/src/Utilities/MinAndMax.h"
 #include "engine/Math/src/Float.h"
 
 #include <cmath>

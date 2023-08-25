@@ -2,7 +2,7 @@
 #define COLLISIONINFO_H
 
 #include "engine/Math/src/Vector.h"
-#include "engine/Math/src/MinAndMax.h"
+#include "engine/Math/src/Utilities/MinAndMax.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionType.h"
 
 #include <cstdint>

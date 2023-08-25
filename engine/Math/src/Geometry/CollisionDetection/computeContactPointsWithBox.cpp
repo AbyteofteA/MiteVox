@@ -5,8 +5,8 @@
 #include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
-#include "engine/Math/src/almostEqual.h"
-#include "engine/Math/src/MinAndMax.h"
+#include "engine/Math/src/Utilities/almostEqual.h"
+#include "engine/Math/src/Utilities/MinAndMax.h"
 
 namespace mathem
 {

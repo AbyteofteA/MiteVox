@@ -32,7 +32,7 @@
     <ClCompile Include="src\Geometry\computePenetration.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\contains.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.cpp" />
-    <ClCompile Include="src\Convertations.cpp" />
+    <ClCompile Include="src\Utilities\Convertations.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\GeometryPrimitiveBase.cpp" />
     <ClCompile Include="src\Quaternion.cpp" />
     <ClCompile Include="src\DataStructures\Graphs\BinarySearchTree.cpp" />
@@ -49,7 +49,7 @@
     <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry2D.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\almostEqual.h" />
+    <ClInclude Include="src\Utilities\almostEqual.h" />
     <ClInclude Include="src\DataStructures\PileAllocator.h" />
     <ClInclude Include="src\DataStructures\PileOfContainers.h" />
     <ClInclude Include="src\Float.h" />
@@ -64,10 +64,10 @@
     <ClInclude Include="src\Geometry\CollisionDetection\contains.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\AxisAlignedBoxGeometry.h" />
     <ClInclude Include="src\MathConstants.h" />
-    <ClInclude Include="src\MinAndMax.h" />
+    <ClInclude Include="src\Utilities\MinAndMax.h" />
     <ClInclude Include="src\Quaternion.h" />
     <ClInclude Include="src\Calculus\Sequences.h" />
-    <ClInclude Include="src\Convertations.h" />
+    <ClInclude Include="src\Utilities\Convertations.h" />
     <ClInclude Include="src\DataStructures\HalfTable.h" />
     <ClInclude Include="src\DataStructures\HyperData.h" />
     <ClInclude Include="src\Generators\NoiseGenerators\PerlinNoiseGenerator.h" />
