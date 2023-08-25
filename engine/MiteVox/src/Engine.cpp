@@ -11,6 +11,7 @@
 #include "engine/MiteVox/src/Rendering/Lighting/collectLights.h"
 #include "engine/MiteVox/src/Physics/computePhysics.h"
 #include "engine/MiteVox/src/MiteVoxAPI.h"
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionTable.h"
 
 #include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
 #include "engine/MiteVox/src/Animation/MorphTargetAnimation/applyMorphTargetAnimation.h"
@@ -27,6 +28,7 @@ namespace mitevox
 		dataPointsContainers(32, 8) // TODO: add to EngineSettings
 	{
 		MiteVoxAPI::init(this);
+		mathem::CollisionTable::tryInit();
 
 		prevCycleTime = std::chrono::steady_clock::now();
 
@@ -143,11 +145,16 @@ namespace mitevox
 			dataPointsContainers.returnAllContainers();
 			size_t substepsCount = MiteVoxAPI::getSubstepsCount();
 			float substepDeltaTime = deltaTime / (float)substepsCount;
-			for (size_t i = 0; i < substepsCount; ++i)
+			scene->timeSincePhysicsUpdate += deltaTime;
+			if (scene->timeSincePhysicsUpdate > settings->getPhysicsPeriod())
 			{
-				applyDampingAndSleeping(&entitiesToSimulate, substepDeltaTime);
-				computeIntegration(&entitiesToSimulate, substepDeltaTime);
-				computePhysics(MiteVoxAPI::getPhysicsSolverType(), substepDeltaTime, settings->equalityTolerance);
+				for (size_t i = 0; i < substepsCount; ++i)
+				{
+					applyDampingAndSleeping(&entitiesToSimulate, substepDeltaTime);
+					computeIntegration(&entitiesToSimulate, substepDeltaTime);
+					computePhysics(MiteVoxAPI::getPhysicsSolverType(), substepDeltaTime, settings->equalityTolerance);
+				}
+				scene->timeSincePhysicsUpdate = 0.0f;
 			}
 
 			// Reset forces and torques

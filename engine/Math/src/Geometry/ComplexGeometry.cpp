@@ -31,7 +31,7 @@ namespace mathem
 
 	GeometryPrimitiveBase* ComplexGeometry::getPrimitive(size_t index)
 	{
-		return primitives.getElement(index);
+		return primitives.getElementPointer(index);
 	}
 
 	void ComplexGeometry::reservePrimitives(size_t count)
@@ -39,9 +39,10 @@ namespace mathem
 		primitives.reserve(count);
 	}
 
-	void ComplexGeometry::appendPrimitive(GeometryPrimitiveBase* geometryPrimitive)
+	void ComplexGeometry::appendPrimitive(GeometryPrimitiveBase geometryPrimitive)
 	{
 		// TODO: add volume
+		this->volume += geometryPrimitive.getVolume();
 		primitives.appendElement(geometryPrimitive);
 	}
 }

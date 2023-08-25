@@ -3,19 +3,17 @@
 
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 
 namespace mathem
 {
-	class BoxGeometry : public GeometryPrimitiveBase
+	class BoxGeometry
 	{
 	public:
 
-		GeometryTransform transform;
 		Vector3D halfSize = { 0.5f, 0.5f, 0.5f };
+		GeometryTransform transform;
 
-		explicit BoxGeometry();
 		uint32_t getVertecesCount();
 		Vector3D getVertexPosition(uint32_t index);
 		uint32_t getTrianglesCount();

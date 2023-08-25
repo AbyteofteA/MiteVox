@@ -54,6 +54,11 @@ namespace mitevox
         void setScale(mathem::Vector3D scale);
 
         /// <summary>
+        /// Computes mass based on density and volume. Setting the mass must the last thing in the setup of an Entity
+        /// </summary>
+        void computeMass();
+
+        /// <summary>
         /// Setting the mass must the last thing in the setup of an Entity
         /// </summary>
         void setMass(float mass);

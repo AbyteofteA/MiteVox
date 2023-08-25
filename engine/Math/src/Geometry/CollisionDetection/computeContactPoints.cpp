@@ -28,7 +28,7 @@ namespace mathem
 			break;
 
 		case mathem::GeometryPrimitiveType::BOX:
-			return computeContactPoints((BoxGeometry*)geometryPrimitive1, geometryPrimitive1Transform, geometryPrimitive2, geometryPrimitive2Transform, collisionProperties, equalityTolerance);
+			return computeContactPointsWithBox(geometryPrimitive1, geometryPrimitive1Transform, geometryPrimitive2, geometryPrimitive2Transform, collisionProperties, equalityTolerance);
 
 		case mathem::GeometryPrimitiveType::SPHERE:
 			// TODO: computeContactPoints((SphereGeometry*)geometryPrimitive1, geometryPrimitive1Transform, geometryPrimitive2, geometryPrimitive2Transform, collisionProperties);
@@ -42,10 +42,6 @@ namespace mathem
 			break;
 
 		case mathem::GeometryPrimitiveType::RAY:
-			// TODO:
-			break;
-
-		case mathem::GeometryPrimitiveType::MESH:
 			// TODO:
 			break;
 

@@ -2,11 +2,6 @@
 
 namespace mathem
 {
-	AxisAlignedBoxGeometry::AxisAlignedBoxGeometry()
-	{
-		type = GeometryPrimitiveType::AXIS_ALIGNED_BOX;
-	}
-
 	uint32_t AxisAlignedBoxGeometry::getVertecesCount()
 	{
 		return 8;

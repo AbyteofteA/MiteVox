@@ -69,7 +69,6 @@ private:
 	static std::mutex mutex;
 
 	InputHandler(GLFWwindow* _window);
-	~InputHandler();
 
 	void resetMouseInfo();
 	void afterPushDelay();

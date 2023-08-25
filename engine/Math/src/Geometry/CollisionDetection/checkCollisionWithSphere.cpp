@@ -1,78 +1,56 @@
-#include "checkCollision.h"
+#include "checkCollisionWithSphere.h"
 
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Geometry/computeProjection.h"
 #include "engine/Math/src/Geometry/computeClosestPointOnTheLine.h"
+#include "engine/Math/src/Geometry/CollisionDetection/checkCollisionWithBox.h"
+#include "engine/Math/src/Geometry/CollisionDetection/checkCollisionWithAxisAlignedBox.h"
 
 namespace mathem
 {
-	CollisionType checkCollision(
-		SphereGeometry* sphere1,
-		GeometryTransform* sphere1Transform,
-		SphereGeometry* sphere2,
-		GeometryTransform* sphere2Transform,
-		CollisionProperties* collisionProperties);
-
-	// TODO: checkCollision SPHERE vs CAPSULE
-	// TODO: checkCollision SPHERE vs TRUNCATED_PYRAMID
-	// TODO: checkCollision SPHERE vs MESH
-	// TODO: checkCollision SPHERE vs RAY
-
-	CollisionType checkCollision(
-		SphereGeometry* sphere,
+	CollisionType checkCollisionSphereVsBox(
+		GeometryPrimitiveBase* sphere,
 		GeometryTransform* sphereTransform,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
+		GeometryPrimitiveBase* box,
+		GeometryTransform* boxTransform,
 		CollisionProperties* collisionProperties)
 	{
-		switch (otherGeometry->getType())
-		{
-		case GeometryPrimitiveType::BOX:
-		{
-			CollisionType collisionType = checkCollision((BoxGeometry*)otherGeometry, otherGeometryTransform, sphere, sphereTransform, collisionProperties);
-			collisionProperties->normalBelongsToTheFirst = !collisionProperties->normalBelongsToTheFirst;
-			return collisionType;
-		}
-		case GeometryPrimitiveType::AXIS_ALIGNED_BOX:
-		{
-			CollisionType collisionType = checkCollision((AxisAlignedBoxGeometry*)otherGeometry, otherGeometryTransform, sphere, sphereTransform, collisionProperties);
-			collisionProperties->normalBelongsToTheFirst = !collisionProperties->normalBelongsToTheFirst;
-			return collisionType;
-		}
-		case GeometryPrimitiveType::SPHERE:
-			return checkCollision(sphere, sphereTransform, (SphereGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::CAPSULE:
-			// TODO: return checkCollision(sphere, sphereTransform, (CapsuleGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::TRUNCATED_PYRAMID:
-			// TODO: return checkCollision(sphere, sphereTransform, (TruncatedPyramidGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::MESH:
-			// TODO: return checkCollision(sphere, sphereTransform, (mitevox::Mesh*)otherGeometry, otherGeometryTransform, collisionInfo);
-
-		default:
-			break;
-		}
-		return CollisionType::NONE;
+		CollisionType result = checkCollisionBoxVsSphere(box, boxTransform, sphere, sphereTransform, collisionProperties);
+		collisionProperties->normalBelongsToTheFirst = !collisionProperties->normalBelongsToTheFirst;
+		return result;
 	}
 
-	CollisionType checkCollision(
-		SphereGeometry* sphere1, 
+	CollisionType checkCollisionSphereVsAABB(
+		GeometryPrimitiveBase* sphere,
+		GeometryTransform* sphereTransform,
+		GeometryPrimitiveBase* AABB,
+		GeometryTransform* AABBTransform,
+		CollisionProperties* collisionProperties)
+	{
+		CollisionType result = checkCollisionBoxVsAABB(AABB, AABBTransform, sphere, sphereTransform, collisionProperties);
+		collisionProperties->normalBelongsToTheFirst = !collisionProperties->normalBelongsToTheFirst;
+		return result;
+	}
+
+	CollisionType checkCollisionSphereVsSphere(
+		GeometryPrimitiveBase* sphere1,
 		GeometryTransform* sphere1Transform,
-		SphereGeometry* sphere2,
+		GeometryPrimitiveBase* sphere2,
 		GeometryTransform* sphere2Transform,
 		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
-		Vector3D sphere1Position = sphere1->transform.translation;
-		sphere1Transform->applyTo(sphere1Position);
-		float sphere1Radius = sphere1->radius * sphere1->transform.scale.x() * sphere1Transform->scale.x();
+		SphereGeometry* sphereGeometry1 = sphere1->getSphere();
+		SphereGeometry* sphereGeometry2 = sphere2->getSphere();
 
-		Vector3D sphere2Position = sphere2->transform.translation;
+		Vector3D sphere1Position = sphereGeometry1->transform.translation;
+		sphere1Transform->applyTo(sphere1Position);
+		float sphere1Radius = sphereGeometry1->radius * sphereGeometry1->transform.scale.x() * sphere1Transform->scale.x();
+
+		Vector3D sphere2Position = sphereGeometry2->transform.translation;
 		sphere2Transform->applyTo(sphere2Position);
-		float sphere2Radius = sphere2->radius * sphere2->transform.scale.x() * sphere2Transform->scale.x();
+		float sphere2Radius = sphereGeometry2->radius * sphereGeometry2->transform.scale.x() * sphere2Transform->scale.x();
 
 		float minimumDistance = sphere1Radius + sphere2Radius;
 		

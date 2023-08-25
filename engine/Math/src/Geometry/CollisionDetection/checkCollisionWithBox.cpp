@@ -1,4 +1,4 @@
-#include "checkCollision.h"
+#include "checkCollisionWithBox.h"
 
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Geometry/computeProjection.h"
@@ -8,97 +8,20 @@
 
 namespace mathem
 {
-	/// checkCollision - BOX vs BOX
-	/// 
-	/// Algorithm:
-	/// 1. Get (transformed) triangles 0, 2, 4 from box1
-	/// 2. Extract normals from the triangles
-	/// 3. Compute the box1's & box2's projections onto the normals (via dot product)
-	/// 4. Check if the projections overlap
-	CollisionType checkCollision(
-		BoxGeometry* box1,
+	CollisionType checkCollisionBoxVsBoxHelper(
+		GeometryPrimitiveBase* box1,
 		GeometryTransform* box1Transform,
-		BoxGeometry* box2,
+		GeometryPrimitiveBase* box2,
 		GeometryTransform* box2Transform,
 		CollisionProperties* collisionProperties,
-		bool isFirstPass = true);
-
-	CollisionType checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		AxisAlignedBoxGeometry* axisAlignedBox,
-		GeometryTransform* axisAlignedBoxTransform,
-		CollisionProperties* collisionProperties,
-		bool isFirstPass = true);
-
-	CollisionType checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		SphereGeometry* sphere,
-		GeometryTransform* sphereTransform,
-		CollisionProperties* collisionProperties);
-
-	CollisionType checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		CapsuleGeometry* capsule,
-		GeometryTransform* capsuleTransform,
-		CollisionProperties* collisionProperties);
-
-	CollisionType checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		TruncatedPyramidGeometry* truncatedPyramid,
-		GeometryTransform* truncatedPyramidTransform,
-		CollisionProperties* collisionProperties);
-
-	// TODO: checkCollision BOX vs MESH
-	// TODO: checkCollision BOX vs RAY
-
-	CollisionType checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
-		CollisionProperties* collisionProperties)
-	{
-		switch (otherGeometry->getType())
-		{
-		case GeometryPrimitiveType::BOX:
-			return checkCollision(box, boxTransform, (BoxGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::AXIS_ALIGNED_BOX:
-			return checkCollision(box, boxTransform, (AxisAlignedBoxGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::SPHERE:
-			return checkCollision(box, boxTransform, (SphereGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::CAPSULE:
-			return checkCollision(box, boxTransform, (CapsuleGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::TRUNCATED_PYRAMID:
-			return checkCollision(box, boxTransform, (TruncatedPyramidGeometry*)otherGeometry, otherGeometryTransform, collisionProperties);
-
-		case GeometryPrimitiveType::MESH:
-			// TODO: return checkCollision(box, boxTransform, (mitevox::Mesh*)otherGeometry, otherGeometryTransform, collisionInfo);
-
-		default:
-			break;
-		}
-		return CollisionType::NONE;
-	}
-
-	CollisionType checkCollision(
-		BoxGeometry* box1,
-		GeometryTransform* box1Transform,
-		BoxGeometry* box2,
-		GeometryTransform* box2Transform,
-		CollisionProperties* collisionProperties,
-		bool isFirstPass)
+		bool isFirstPass = true)
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry3D tmpTriangle = box1->getTrianglePositions(0);
+		BoxGeometry* boxGeometry1 = box1->getBox();
+		BoxGeometry* boxGeometry2 = box2->getBox();
+
+		TriangleGeometry3D tmpTriangle = boxGeometry1->getTrianglePositions(0);
 		box1Transform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
@@ -109,7 +32,7 @@ namespace mathem
 		// Check box1's local Z-axis
 		{
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box1->getVertexPosition(7);
+			tmpPositionMin = boxGeometry1->getVertexPosition(7);
 			box1Transform->applyTo(tmpPositionMin);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
@@ -134,12 +57,12 @@ namespace mathem
 		// Check box1's local X-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box1->getTrianglePositions(8);
+			tmpTriangle = boxGeometry1->getTrianglePositions(8);
 			box1Transform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box1->getVertexPosition(3);
+			tmpPositionMin = boxGeometry1->getVertexPosition(3);
 			box1Transform->applyTo(tmpPositionMin);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
@@ -164,12 +87,12 @@ namespace mathem
 		// Check box1's local Y-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box1->getTrianglePositions(4);
+			tmpTriangle = boxGeometry1->getTrianglePositions(4);
 			box1Transform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box1->getVertexPosition(0);
+			tmpPositionMin = boxGeometry1->getVertexPosition(0);
 			box1Transform->applyTo(tmpPositionMin);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBox1ProjectionMax = tmpPositionMax * tmpNormal;
@@ -198,7 +121,7 @@ namespace mathem
 
 		if (isFirstPass)
 		{
-			checkCollision(box2, box2Transform, box1, box1Transform, collisionProperties, false);
+			checkCollisionBoxVsBoxHelper(box2, box2Transform, box1, box1Transform, collisionProperties, false);
 		}
 		else
 		{
@@ -207,32 +130,53 @@ namespace mathem
 		return collisionProperties->type;
 	}
 
-	CollisionType checkCollision(
-		BoxGeometry* box,
+	CollisionType checkCollisionBoxVsBox(
+		GeometryPrimitiveBase* box1,
+		GeometryTransform* box1Transform,
+		GeometryPrimitiveBase* box2,
+		GeometryTransform* box2Transform,
+		CollisionProperties* collisionProperties)
+	{
+		return checkCollisionBoxVsBoxHelper(box1, box1Transform, box2, box2Transform, collisionProperties);
+	}
+
+	CollisionType checkCollisionBoxVsAABBHelper(
+		GeometryPrimitiveBase* box,
 		GeometryTransform* boxTransform,
-		AxisAlignedBoxGeometry* axisAlignedBox,
+		GeometryPrimitiveBase* axisAlignedBox,
 		GeometryTransform* axisAlignedBoxTransform,
 		CollisionProperties* collisionProperties,
-		bool isFirstPass)
+		bool isFirstPass = false)
 	{
 		// TODO: optimize (currently redirects to another function)
 
-		BoxGeometry box2;
-		box2.halfSize = axisAlignedBox->halfSize;
-		box2.transform.translation = axisAlignedBox->position;
-		return checkCollision(box, boxTransform, &box2, axisAlignedBoxTransform, collisionProperties);
+		GeometryPrimitiveBase box2 = axisAlignedBox->axisAlignedBoxToBox();
+		return checkCollisionBoxVsBox(box, boxTransform, &box2, axisAlignedBoxTransform, collisionProperties);
 	}
 
-	CollisionType checkCollision(
-		BoxGeometry* box,
+	CollisionType checkCollisionBoxVsAABB(
+		GeometryPrimitiveBase* box,
 		GeometryTransform* boxTransform,
-		SphereGeometry* sphere,
+		GeometryPrimitiveBase* axisAlignedBox,
+		GeometryTransform* axisAlignedBoxTransform,
+		CollisionProperties* collisionProperties)
+	{
+		return checkCollisionBoxVsAABBHelper(box, boxTransform, axisAlignedBox, axisAlignedBoxTransform, collisionProperties);
+	}
+
+	CollisionType checkCollisionBoxVsSphere(
+		GeometryPrimitiveBase* box,
+		GeometryTransform* boxTransform,
+		GeometryPrimitiveBase* sphere,
 		GeometryTransform* sphereTransform,
 		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry3D tmpTriangle = box->getTrianglePositions(0);
+		BoxGeometry* boxGeometry = box->getBox();
+		SphereGeometry* sphereGeometry = sphere->getSphere();
+
+		TriangleGeometry3D tmpTriangle = boxGeometry->getTrianglePositions(0);
 		boxTransform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
@@ -243,7 +187,7 @@ namespace mathem
 		// Check box's local Z-axis
 		{
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box->getVertexPosition(7);
+			tmpPositionMin = boxGeometry->getVertexPosition(7);
 			boxTransform->applyTo(tmpPositionMin);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
@@ -263,12 +207,12 @@ namespace mathem
 		// Check box's local X-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box->getTrianglePositions(2);
+			tmpTriangle = boxGeometry->getTrianglePositions(2);
 			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box->getVertexPosition(0);
+			tmpPositionMin = boxGeometry->getVertexPosition(0);
 			boxTransform->applyTo(tmpPositionMin);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
@@ -288,12 +232,12 @@ namespace mathem
 		// Check box's local Y-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box->getTrianglePositions(4);
+			tmpTriangle = boxGeometry->getTrianglePositions(4);
 			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box->getVertexPosition(0);
+			tmpPositionMin = boxGeometry->getVertexPosition(0);
 			boxTransform->applyTo(tmpPositionMin);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
@@ -313,7 +257,7 @@ namespace mathem
 		// Check sphere vs box
 		if (thereMayBeACollision)
 		{
-			tmpNormal = box->transform.translation - sphere->transform.translation;
+			tmpNormal = boxGeometry->transform.translation - sphereGeometry->transform.translation;
 			tmpNormal.normalize();
 			computeProjection(sphere, sphereTransform, &tmpNormal, &tmpSphereProjectionMin, &tmpSphereProjectionMax);
 			computeProjection(box, boxTransform, &tmpNormal, &tmpBoxProjectionMin, &tmpBoxProjectionMax);
@@ -334,16 +278,19 @@ namespace mathem
 		return CollisionType::INTERSECTION;
 	}
 
-	CollisionType checkCollision(
-		BoxGeometry* box,
+	CollisionType checkCollisionBoxVsCapsule(
+		GeometryPrimitiveBase* box,
 		GeometryTransform* boxTransform,
-		CapsuleGeometry* capsule,
+		GeometryPrimitiveBase* capsule,
 		GeometryTransform* capsuleTransform,
 		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry3D tmpTriangle = box->getTrianglePositions(0);
+		BoxGeometry* boxGeometry = box->getBox();
+		CapsuleGeometry* capsuleGeometry = capsule->getCapsule();
+
+		TriangleGeometry3D tmpTriangle = boxGeometry->getTrianglePositions(0);
 		boxTransform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
@@ -354,7 +301,7 @@ namespace mathem
 		// Check box's local Z-axis
 		{
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box->getVertexPosition(7);
+			tmpPositionMin = boxGeometry->getVertexPosition(7);
 			boxTransform->applyTo(tmpPositionMin);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
@@ -374,12 +321,12 @@ namespace mathem
 		// Check box's local X-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box->getTrianglePositions(2);
+			tmpTriangle = boxGeometry->getTrianglePositions(2);
 			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box->getVertexPosition(0);
+			tmpPositionMin = boxGeometry->getVertexPosition(0);
 			boxTransform->applyTo(tmpPositionMin);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
@@ -399,12 +346,12 @@ namespace mathem
 		// Check box's local Y-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box->getTrianglePositions(4);
+			tmpTriangle = boxGeometry->getTrianglePositions(4);
 			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
 			tmpPositionMax = tmpTriangle.point1;
-			tmpPositionMin = box->getVertexPosition(0);
+			tmpPositionMin = boxGeometry->getVertexPosition(0);
 			boxTransform->applyTo(tmpPositionMin);
 			tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
 			tmpBoxProjectionMax = tmpPositionMax * tmpNormal;
@@ -422,9 +369,9 @@ namespace mathem
 		}
 
 		// Check capsule vs box
-		float actualCapsuleHalfHeight = capsule->halfHeight * capsule->transform.scale.x();
-		Vector3D capsulePosition1 = capsule->transform.translation;
-		Vector3D capsulePosition2 = capsule->transform.translation;
+		float actualCapsuleHalfHeight = capsuleGeometry->halfHeight * capsuleGeometry->transform.scale.x();
+		Vector3D capsulePosition1 = capsuleGeometry->transform.translation;
+		Vector3D capsulePosition2 = capsuleGeometry->transform.translation;
 		capsulePosition1.y() += actualCapsuleHalfHeight;
 		capsulePosition2.y() -= actualCapsuleHalfHeight;
 		capsuleTransform->applyTo(capsulePosition1);
@@ -433,17 +380,17 @@ namespace mathem
 		mathem::GeometryTransform zeroTransform;
 		zeroTransform.reset();
 
-		uint32_t  boxPointsCount = box->getVertecesCount();
+		uint32_t  boxPointsCount = boxGeometry->getVertecesCount();
 		for (uint32_t i = 0; i < boxPointsCount; ++i)
 		{
-			Vector3D boxPoint = box->getVertexPosition(i);
+			Vector3D boxPoint = boxGeometry->getVertexPosition(i);
 			boxTransform->applyTo(boxPoint);
 
 			Vector3D closestCapsuleSpherePosition =
 				computeClosestPointOnTheLine(capsulePosition1, capsulePosition2, boxPoint);
 
 			SphereGeometry closestSphere;
-			float actualCapsuleRadius = capsule->radius * capsule->transform.scale.x() * capsuleTransform->scale.x();
+			float actualCapsuleRadius = capsuleGeometry->radius * capsuleGeometry->transform.scale.x() * capsuleTransform->scale.x();
 			closestSphere.radius = actualCapsuleRadius;
 			closestSphere.transform.reset();
 			closestSphere.transform.translation = closestCapsuleSpherePosition;
@@ -470,16 +417,19 @@ namespace mathem
 		return CollisionType::INTERSECTION;
 	}
 
-	CollisionType checkCollision(
-		BoxGeometry* box,
+	CollisionType checkCollisionBoxVsTruncatedPyramid(
+		GeometryPrimitiveBase* box,
 		GeometryTransform* boxTransform,
-		TruncatedPyramidGeometry* truncatedPyramid,
+		GeometryPrimitiveBase* truncatedPyramid,
 		GeometryTransform* truncatedPyramidTransform,
 		CollisionProperties* collisionProperties)
 	{
 		bool thereMayBeACollision = true;
 
-		TriangleGeometry3D tmpTriangle = box->getTrianglePositions(0);
+		BoxGeometry* boxGeometry = box->getBox();
+		TruncatedPyramidGeometry* truncatedPyramidGeometry = truncatedPyramid->getTruncatedPyramid();
+
+		TriangleGeometry3D tmpTriangle = boxGeometry->getTrianglePositions(0);
 		boxTransform->applyTo(tmpTriangle);
 		Vector3D tmpPositionMax;
 		Vector3D tmpPositionMin;
@@ -489,8 +439,8 @@ namespace mathem
 
 		// Check box's local Z-axis
 		{
-			tmpPositionMin = box->getVertexPosition(7);
-			tmpPositionMax = box->getVertexPosition(0);
+			tmpPositionMin = boxGeometry->getVertexPosition(7);
+			tmpPositionMax = boxGeometry->getVertexPosition(0);
 			boxTransform->applyTo(tmpPositionMin);
 			boxTransform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
@@ -511,12 +461,12 @@ namespace mathem
 		// Check box's local X-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box->getTrianglePositions(2);
+			tmpTriangle = boxGeometry->getTrianglePositions(2);
 			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
-			tmpPositionMin = box->getVertexPosition(0);
-			tmpPositionMax = box->getVertexPosition(3);
+			tmpPositionMin = boxGeometry->getVertexPosition(0);
+			tmpPositionMax = boxGeometry->getVertexPosition(3);
 			boxTransform->applyTo(tmpPositionMin);
 			boxTransform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
@@ -537,12 +487,12 @@ namespace mathem
 		// Check box's local Y-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = box->getTrianglePositions(4);
+			tmpTriangle = boxGeometry->getTrianglePositions(4);
 			boxTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
-			tmpPositionMin = box->getVertexPosition(0);
-			tmpPositionMax = box->getVertexPosition(1);
+			tmpPositionMin = boxGeometry->getVertexPosition(0);
+			tmpPositionMax = boxGeometry->getVertexPosition(1);
 			boxTransform->applyTo(tmpPositionMin);
 			boxTransform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
@@ -563,12 +513,12 @@ namespace mathem
 		// Check pyramid's local Z-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = truncatedPyramid->getTrianglePositions(0);
+			tmpTriangle = truncatedPyramidGeometry->getTrianglePositions(0);
 			truncatedPyramidTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
-			tmpPositionMin = truncatedPyramid->getVertexPosition(7);
-			tmpPositionMax = truncatedPyramid->getVertexPosition(0);
+			tmpPositionMin = truncatedPyramidGeometry->getVertexPosition(7);
+			tmpPositionMax = truncatedPyramidGeometry->getVertexPosition(0);
 			truncatedPyramidTransform->applyTo(tmpPositionMin);
 			truncatedPyramidTransform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
@@ -589,12 +539,12 @@ namespace mathem
 		// Check pyramid's local X-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = truncatedPyramid->getTrianglePositions(2);
+			tmpTriangle = truncatedPyramidGeometry->getTrianglePositions(2);
 			truncatedPyramidTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
-			tmpPositionMin = truncatedPyramid->getVertexPosition(0);
-			tmpPositionMax = truncatedPyramid->getVertexPosition(3);
+			tmpPositionMin = truncatedPyramidGeometry->getVertexPosition(0);
+			tmpPositionMax = truncatedPyramidGeometry->getVertexPosition(3);
 			truncatedPyramidTransform->applyTo(tmpPositionMin);
 			truncatedPyramidTransform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;
@@ -615,12 +565,12 @@ namespace mathem
 		// Check pyramid's local Y-axis
 		if (thereMayBeACollision)
 		{
-			tmpTriangle = truncatedPyramid->getTrianglePositions(4);
+			tmpTriangle = truncatedPyramidGeometry->getTrianglePositions(4);
 			truncatedPyramidTransform->applyTo(tmpTriangle);
 			tmpNormal = tmpTriangle.computeNormal();
 
-			tmpPositionMin = truncatedPyramid->getVertexPosition(0);
-			tmpPositionMax = truncatedPyramid->getVertexPosition(1);
+			tmpPositionMin = truncatedPyramidGeometry->getVertexPosition(0);
+			tmpPositionMax = truncatedPyramidGeometry->getVertexPosition(1);
 			truncatedPyramidTransform->applyTo(tmpPositionMin);
 			truncatedPyramidTransform->applyTo(tmpPositionMax);
 			tmpBox1ProjectionMin = tmpPositionMin * tmpNormal;

@@ -11,8 +11,7 @@
 
 namespace mitevox
 {
-    class Mesh :
-        public mathem::GeometryPrimitiveBase
+    class Mesh
     {
     public:
 

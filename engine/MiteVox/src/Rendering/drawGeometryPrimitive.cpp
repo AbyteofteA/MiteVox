@@ -51,11 +51,11 @@ namespace mitevox
 		switch (colliderPrimitiveType)
 		{
 		case mathem::GeometryPrimitiveType::AXIS_ALIGNED_BOX:
-			drawBoxPrimitive(renderer, (mathem::AxisAlignedBoxGeometry*)geometryPrimitive, transform, color);
+			drawBoxPrimitive(renderer, geometryPrimitive, transform, color);
 			break;
 
 		case mathem::GeometryPrimitiveType::BOX:
-			drawBoxPrimitive(renderer, (mathem::BoxGeometry*)geometryPrimitive, transform, color);
+			drawBoxPrimitive(renderer, geometryPrimitive, transform, color);
 			break;
 
 		case mathem::GeometryPrimitiveType::SPHERE:
@@ -71,10 +71,6 @@ namespace mitevox
 			break;
 
 		case mathem::GeometryPrimitiveType::RAY:
-			// TODO:
-			break;
-
-		case mathem::GeometryPrimitiveType::MESH:
 			// TODO:
 			break;
 

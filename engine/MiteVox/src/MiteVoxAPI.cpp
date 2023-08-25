@@ -4,9 +4,12 @@
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
 #include "engine/Math/src/Geometry/CollisionDetection/checkCollision.h"
+#include "engine/Math/src/NumericalAnalysis/Intertolation.h"
 #include "engine/MiteVox/src/Playground/Entity.h"
 #include "engine/MiteVox/src/Playground/Scene.h"
 #include "engine/MiteVox/src/Engine.h"
+
+#include <cstdlib>
 
 namespace mitevox
 {
@@ -15,6 +18,28 @@ namespace mitevox
 	void MiteVoxAPI::init(Engine* engine)
 	{
 		MiteVoxAPI::engine = engine;
+	}
+
+	void MiteVoxAPI::setRandomSeed(size_t seed)
+	{
+		std::srand(seed);
+	}
+
+	size_t MiteVoxAPI::getRandom()
+	{
+		return std::rand();
+	}
+
+	size_t MiteVoxAPI::getRandom(size_t min, size_t max)
+	{
+		size_t randomFactor = (size_t)std::rand() / (size_t)RAND_MAX;
+		return mathem::lerp<size_t>(min, max, randomFactor);
+	}
+
+	float MiteVoxAPI::getRandom(float min, float max)
+	{
+		float randomFactor = (float)std::rand() / (float)RAND_MAX;
+		return mathem::lerp<float>(min, max, randomFactor);
 	}
 
 	EngineSettings* MiteVoxAPI::getSettings()
@@ -105,7 +130,7 @@ namespace mitevox
 	{
 		Entity* entity = MiteVoxAPI::createEmptyEntity(name);
 		entity->transform.translation = position;
-		
+
 		//entity->movementProperties.restitution = 0.9f;
 
 		Node* renderableNode = entity->tryAttachNewRenderableNode();
@@ -177,10 +202,10 @@ namespace mitevox
 		meshPrimitive->setTriangleNormals(11, normal, normal, normal);
 
 		entity->tryGenerateHitbox();
-		entity->physicalMaterial.setRestitution(0.5f);
+		entity->physicalMaterial.setRestitution(0.0f);
 		entity->physicalMaterial.setDynamicFriction(1.0f);
 		entity->physicalMaterial.setStaticFriction(1.0f);
-		entity->setMass(1.0f);
+		entity->computeMass();
 
 		engine->playground->addEntity(entity);
 
@@ -190,7 +215,6 @@ namespace mitevox
 	Entity* MiteVoxAPI::createCube(std::string name, mathem::Vector3D position, render::ColorRGBAf color)
 	{
 		Entity* entity = createBox(name, 0.5f, 0.5f, 0.5f, position, color);
-		//entity->movementProperties.angularVelocity = { 0.0f, 3.14f, 0.0f };
 		return entity;
 	}
 

@@ -6,17 +6,9 @@
 #define CHECKCOLLISION_H
 
 #include "engine/Math/src/Geometry/GeometryTransform.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/RayGeometry.h"
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
-#include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
+#include "engine/Math/src/Geometry/CollisionDetection/CollisionTable.h"
 #include "engine/Math/src/Vector.h"
 
 #include <cassert>
@@ -24,79 +16,6 @@
 
 namespace mathem
 {
-	CollisionType checkCollision(
-		Vector3D* point,
-		BoxGeometry* box,
-		GeometryTransform* boxTransform);
-
-	CollisionType checkCollision(
-		Vector3D* point,
-		AxisAlignedBoxGeometry* axisAlignedBox,
-		GeometryTransform* axisAlignedBoxTransform);
-
-	CollisionType checkCollision(
-		Vector3D* point,
-		SphereGeometry* sphere,
-		GeometryTransform* sphereTransform);
-
-	CollisionType checkCollision(
-		Vector3D* point,
-		CapsuleGeometry* capsule,
-		GeometryTransform* capsuleTransform);
-
-	// TODO: checkCollision POINT vs TRUNCATED_PYRAMID
-	// TODO: checkCollision POINT vs MESH
-
-	CollisionType checkCollision(
-		Vector3D* point,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
-		CollisionProperties* collisionProperties);
-
-	CollisionType checkCollision(
-		BoxGeometry* box,
-		GeometryTransform* boxTransform,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
-		CollisionProperties* collisionProperties);
-
-	CollisionType checkCollision(
-		AxisAlignedBoxGeometry* axisAlignedBox,
-		GeometryTransform* axisAlignedBoxTransform,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
-		CollisionProperties* collisionProperties);
-
-	CollisionType checkCollision(
-		SphereGeometry* sphere,
-		GeometryTransform* sphereTransform,
-		GeometryPrimitiveBase* otherGeometry,
-		GeometryTransform* otherGeometryTransform,
-		CollisionProperties* collisionProperties);
-
-	// TODO: checkCollision CAPSULE vs CAPSULE
-	// TODO: checkCollision CAPSULE vs TRUNCATED_PYRAMID
-	// TODO: checkCollision CAPSULE vs MESH
-	// TODO: checkCollision CAPSULE vs RAY
-	// TODO: checkCollision CAPSULE vs GeometryPrimitiveBase
-
-	// TODO: checkCollision TRUNCATED_PYRAMID vs TRUNCATED_PYRAMID
-	// TODO: checkCollision TRUNCATED_PYRAMID vs MESH
-	// TODO: checkCollision TRUNCATED_PYRAMID vs RAY
-	// TODO: checkCollision TRUNCATED_PYRAMID vs GeometryPrimitiveBase
-
-	// TODO: checkCollision MESH vs MESH
-	// TODO: checkCollision MESH vs RAY
-	// TODO: checkCollision MESH vs GeometryPrimitiveBase
-
-	CollisionType checkCollision(
-		GeometryPrimitiveBase* geometryPrimitive1,
-		GeometryTransform* geometryPrimitive1Transform,
-		GeometryPrimitiveBase* geometryPrimitive2,
-		GeometryTransform* geometryPrimitive2Transform,
-		CollisionProperties* collisionProperties,
-		float equalityTolerance);
-
 	template <class T>
 	inline CollisionType checkCollision(T object1, T object2, CollisionInfo<T>* collisionInfo, float equalityTolerance)
 	{
@@ -131,8 +50,8 @@ namespace mathem
 			{
 				GeometryPrimitiveBase* geometryPrimitive2 = complexGeometry2->getPrimitive(primitiveIndex2);
 				CollisionProperties collisionProperties;
-				checkCollision(
-					geometryPrimitive1, complexGeometryTransform1, geometryPrimitive2, complexGeometryTransform2, &collisionProperties, equalityTolerance);
+				CollisionTable::checkCollision(
+					geometryPrimitive1, complexGeometryTransform1, geometryPrimitive2, complexGeometryTransform2, &collisionProperties);
 				collisionInfo->properties.concatenate(collisionProperties, equalityTolerance);
 			}
 		}

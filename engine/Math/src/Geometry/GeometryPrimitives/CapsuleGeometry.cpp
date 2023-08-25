@@ -2,11 +2,6 @@
 
 namespace mathem
 {
-	CapsuleGeometry::CapsuleGeometry()
-	{
-		type = GeometryPrimitiveType::CAPSULE;
-	}
-
 	uint32_t CapsuleGeometry::getVertecesCount()
 	{
 		return 0;

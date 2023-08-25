@@ -9,7 +9,6 @@
 #include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/RayGeometry.h"
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
@@ -17,8 +16,8 @@
 
 namespace mathem
 {
-	void computeContactPoints(
-		BoxGeometry* box,
+	void computeContactPointsWithBox(
+		GeometryPrimitiveBase* box,
 		GeometryTransform* boxTransform,
 		GeometryPrimitiveBase* otherGeometry,
 		GeometryTransform* otherGeometryTransform,

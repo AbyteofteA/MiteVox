@@ -2,11 +2,8 @@
 
 #include "checkCollision.h"
 #include "engine/Math/src/Vector.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
+#include "engine/Math/src/Geometry/CollisionDetection/checkCollisionWithPoint.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 
 namespace mathem
@@ -61,26 +58,22 @@ namespace mathem
 			switch (geometryPrimitiveContainerType)
 			{
 			case mathem::GeometryPrimitiveType::AXIS_ALIGNED_BOX:
-				collisionType = checkCollision(&vertexPosition, (AxisAlignedBoxGeometry*)geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
+				collisionType = checkCollisionPointVsAABB(vertexPosition, geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
 				break;
 
 			case mathem::GeometryPrimitiveType::BOX:
-				collisionType = checkCollision(&vertexPosition, (BoxGeometry*)geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
+				collisionType = checkCollisionPointVsBox(vertexPosition, geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
 				break;
 
 			case mathem::GeometryPrimitiveType::SPHERE:
-				collisionType = checkCollision(&vertexPosition, (SphereGeometry*)geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
+				collisionType = checkCollisionPointVsSphere(vertexPosition, geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
 				break;
 
 			case mathem::GeometryPrimitiveType::CAPSULE:
-				collisionType = checkCollision(&vertexPosition, (CapsuleGeometry*)geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
+				collisionType = checkCollisionPointVsCapsule(vertexPosition, geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
 				break;
 
 			case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
-				// TODO:
-				break;
-
-			case mathem::GeometryPrimitiveType::MESH:
 				// TODO:
 				break;
 
@@ -105,12 +98,9 @@ namespace mathem
 	{
 		if (complexGeometry->getType() == GeometryType::POINT)
 		{
-			Vector3D point = complexGeometryTransform->translation; // TODO: is scale needed?
-			// point.x() *= complexGeometryTransform->scale.x();
-			// point.y() *= complexGeometryTransform->scale.y();
-			// point.z() *= complexGeometryTransform->scale.z();
+			Vector3D point = complexGeometryTransform->translation;
 			CollisionProperties collisionProperties;
-			CollisionType collisionType = checkCollision(&point, geometryPrimitiveContainer, geometryPrimitiveContainerTransform, &collisionProperties);
+			CollisionType collisionType = checkCollisionWithPoint(point, geometryPrimitiveContainer, geometryPrimitiveContainerTransform);
 			return collisionType == CollisionType::INSCRIBTION_2_1;
 		}
 

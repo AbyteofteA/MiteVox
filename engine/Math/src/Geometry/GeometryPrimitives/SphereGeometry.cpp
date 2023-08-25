@@ -2,11 +2,6 @@
 
 namespace mathem
 {
-	SphereGeometry::SphereGeometry()
-	{
-		type = GeometryPrimitiveType::SPHERE;
-	}
-
 	uint32_t SphereGeometry::getVertecesCount()
 	{
 		return 0;

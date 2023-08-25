@@ -78,6 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -118,6 +120,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)engine\MiteVox\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\FileIO\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Math\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Physics\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\Renderer\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\UIEventHandler\bin\$(Platform)\$(Configuration)\;$(SolutionDir)engine\AIModels\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FileIO.lib;Renderer.lib;AIModels.lib;MiteVox.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

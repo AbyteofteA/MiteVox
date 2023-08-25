@@ -69,6 +69,12 @@ namespace mitevox
 		transform.scale = scale;
 	}
 
+	void Entity::computeMass()
+	{
+		float mass = physicalMaterial.getDensity() * collider.getVolume();
+		setMass(mass);
+	}
+
 	void Entity::setMass(float mass)
 	{
 		movementProperties.inverseMass = 0.0f;
@@ -156,17 +162,16 @@ namespace mitevox
 			return;
 		}
 
+		collider.setType(mathem::GeometryType::PRIMITIVES);
+
 		mathem::GeometryTransform zeroTransform; // 
 		mathem::Vector3D min, max;
 		min.setMax();
 		max.setMin();
 		renderableNode->getMinMaxRecursively(&zeroTransform, &min, &max);
 
-		mathem::BoxGeometry* boundingBox = new mathem::BoxGeometry();
-		boundingBox->halfSize = (max - min) * 0.5f;
-		boundingBox->transform.translation = (max + min) * 0.5f;
-
-		collider.setType(mathem::GeometryType::PRIMITIVES);
+		mathem::GeometryPrimitiveBase boundingBox;
+		boundingBox.setBox((max - min) * 0.5f, (max + min) * 0.5f);
 		collider.appendPrimitive(boundingBox);
 
 		computeMomentOfInertia();
@@ -316,7 +321,7 @@ namespace mitevox
 			{
 			case mathem::GeometryPrimitiveType::BOX:
 			{
-				mathem::BoxGeometry* box = (mathem::BoxGeometry*)primitive;
+				mathem::BoxGeometry* box = primitive->getBox();
 				float x = box->halfSize.x() * 2.0f;
 				float y = box->halfSize.y() * 2.0f;
 				float z = box->halfSize.z() * 2.0f;

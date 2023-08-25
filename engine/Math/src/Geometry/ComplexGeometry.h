@@ -32,13 +32,13 @@ namespace mathem
 		size_t getPrimitivesCount();
 		GeometryPrimitiveBase* getPrimitive(size_t index);
 		void reservePrimitives(size_t count);
-		void appendPrimitive(GeometryPrimitiveBase* geometryPrimitive);
+		void appendPrimitive(GeometryPrimitiveBase geometryPrimitive);
 		//void tryMake
 
 	private:
 
 		GeometryType type = GeometryType::NONE;
-		safety::SafeArray<GeometryPrimitiveBase*> primitives;
+		safety::SafeArray<GeometryPrimitiveBase> primitives;
 		float volume = 0.0f;
 	};
 }

@@ -14,7 +14,7 @@ namespace mathem
 	Vector3D projectOntoPlaneIfBehind(Vector3D vertex, Vector3D planeNormal, float planeDistance);
 	size_t getFurthestVertexInTheDirection(GeometryPrimitiveBase* meshGeometry, GeometryTransform* meshGeometryTransform, Vector3D direction);
 
-	void computeMeshContactPoints(
+	void computeContactPointsMeshVsMesh(
 		GeometryPrimitiveBase* meshGeometry1,
 		GeometryTransform* meshGeometryTransform1,
 		GeometryPrimitiveBase* meshGeometry2,
@@ -100,8 +100,8 @@ namespace mathem
 	// TODO: checkCollision BOX vs MESH
 	// TODO: checkCollision BOX vs RAY
 
-	void computeContactPoints(
-		BoxGeometry* box,
+	void computeContactPointsWithBox(
+		GeometryPrimitiveBase* box,
 		GeometryTransform* boxTransform,
 		GeometryPrimitiveBase* otherGeometry,
 		GeometryTransform* otherGeometryTransform,
@@ -113,11 +113,10 @@ namespace mathem
 		case GeometryPrimitiveType::BOX:
 		case GeometryPrimitiveType::AXIS_ALIGNED_BOX:
 		case GeometryPrimitiveType::TRUNCATED_PYRAMID:
-		case GeometryPrimitiveType::MESH:
-			computeMeshContactPoints(
-				(GeometryPrimitiveBase*)box, 
+			computeContactPointsMeshVsMesh(
+				box, 
 				boxTransform, 
-				(GeometryPrimitiveBase*)otherGeometry, 
+				otherGeometry, 
 				otherGeometryTransform, 
 				collisionProperties, 
 				equalityTolerance);

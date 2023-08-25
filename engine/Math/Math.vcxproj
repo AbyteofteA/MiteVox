@@ -21,11 +21,11 @@
   <ItemGroup>
     <ClCompile Include="src\Calculus\Sequences.cpp" />
     <ClCompile Include="src\Generators\NoiseGenerators\PerlinNoiseGenerator.cpp" />
-    <ClCompile Include="src\Geometry\CollisionDetection\checkCollision.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithAxisAlignedBox.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithBox.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithPoint.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\CollisionInfo.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\CollisionTable.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPoints.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPointsWithBox.cpp" />
     <ClCompile Include="src\Geometry\ComplexGeometry.cpp" />
@@ -42,7 +42,6 @@
     <ClCompile Include="src\Geometry\computeClosestPointOnTheLine.cpp" />
     <ClCompile Include="src\Geometry\computeProjection.cpp" />
     <ClCompile Include="src\Geometry\GeometryTransform.cpp" />
-    <ClCompile Include="src\Geometry\GeometryPrimitives\RayGeometry.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\SphereGeometry.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry3D.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.cpp" />
@@ -54,6 +53,11 @@
     <ClInclude Include="src\DataStructures\PileAllocator.h" />
     <ClInclude Include="src\DataStructures\PileOfContainers.h" />
     <ClInclude Include="src\Float.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithAxisAlignedBox.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithBox.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithPoint.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithSphere.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\CollisionTable.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\CollisionType.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\computeContactPoints.h" />
     <ClInclude Include="src\Geometry\computePenetration.h" />
@@ -80,7 +84,6 @@
     <ClInclude Include="src\Geometry\computeProjection.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\GeometryPrimitiveBase.h" />
     <ClInclude Include="src\Geometry\GeometryTransform.h" />
-    <ClInclude Include="src\Geometry\GeometryPrimitives\RayGeometry.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\SphereGeometry.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\TriangleGeometry3D.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\TruncatedPyramidGeometry.h" />
@@ -153,6 +156,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -192,6 +197,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

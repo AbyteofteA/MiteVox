@@ -3,6 +3,11 @@
 
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
 
 #include <cstdint>
 
@@ -20,64 +25,30 @@ namespace mathem
 		SPHERE, 			/// 
 		CAPSULE,  			/// 
 		TRUNCATED_PYRAMID,	/// 
-		MESH, 				/// 
+
+		count
 	};
 
 	struct Point
 	{
-
+		Vector3D position = { 0.0f, 0.0f, 0.0f };
 	};
 
 	struct Line
 	{
-		Vector3D point1 = { 0.0f, 0.0f, 0.0f };
-		Vector3D point2 = { 0.0f, 1.0f, 0.0f };
+		Vector3D points[2] = { {0.0f, 0.0f, 0.0f}, { 0.0f, 1.0f, 0.0f } };
 	};
 
-	class Ray
+	struct Ray
 	{
 		Vector3D position = { 0.0f, 0.0f, 0.0f };
 		Vector3D direction = { 0.0f, 0.0f, -1.0f };
 	};
 
-	class Plane
+	struct Plane
 	{
-		Vector3D normal = { 0.0f, 1.0f, 0.0f };
 		float position = 0.0f;
-	};
-
-	struct AxisAlignedBox
-	{
-		Vector3D position = { 0.0f, 0.0f, 0.0f };
-		Vector3D halfSize = { 0.5f, 0.5f, 0.5f };
-	};
-
-	struct Box
-	{
-		GeometryTransform transform;
-		Vector3D halfSize = { 0.5f, 0.5f, 0.5f };
-	};
-
-	struct Sphere
-	{
-		GeometryTransform transform;
-		float radius = 0.5f;
-	};
-
-	struct Capsule
-	{
-		GeometryTransform transform;
-		float halfHeight = 0.5f;
-		float radius = 0.5f;
-	};
-
-	struct TruncatedPyramid
-	{
-		GeometryTransform transform;
-		float FOV = 45.f;
-		float halfWidth, halfHeight;
-		float nearPlane = 0.1f;
-		float farPlane = 100000.f;
+		Vector3D normal = { 0.0f, 1.0f, 0.0f };
 	};
 
 	union AnyGeometryPrimitive
@@ -86,11 +57,11 @@ namespace mathem
 		Line line;
 		Ray ray;
 		Plane plane;
-		AxisAlignedBox AABB;
-		Box box;
-		Sphere sphere;
-		Capsule capsule;
-		TruncatedPyramid truncatedPyramid;
+		AxisAlignedBoxGeometry AABB;
+		BoxGeometry box;
+		SphereGeometry sphere;
+		CapsuleGeometry capsule;
+		TruncatedPyramidGeometry truncatedPyramid;
 
 		AnyGeometryPrimitive();
 	};
@@ -101,20 +72,50 @@ namespace mathem
 	{
 	public:
 
+		AnyGeometryPrimitive anyPrimitive;
+
+		GeometryPrimitiveBase axisAlignedBoxToBox();
+
+		Point* getPoint();
+		Line* getLine();
+		Ray* getRay();
+		Plane* getPlane();
+		AxisAlignedBoxGeometry* getAxisAlignedBox();
+		BoxGeometry* getBox();
+		SphereGeometry* getSphere();
+		CapsuleGeometry* getCapsule();
+		TruncatedPyramidGeometry* getTruncatedPyramid();
+
+		void setPoint(Vector3D position = { 0.0f, 0.0f, 0.0f });
+		void setLine(Vector3D point1 = { 0.0f, 0.0f, 0.0f }, Vector3D point2 = { 0.0f, 1.0f, 0.0f });
+		void setRay(Vector3D position = { 0.0f, 0.0f, 0.0f }, Vector3D direction = { 0.0f, 0.0f, -1.0f });
+		void setPlane(float position = 0.0f, Vector3D normal = { 0.0f, 1.0f, 0.0f });
+		void setAxisAlignedBox(Vector3D position = { 0.0f, 0.0f, 0.0f }, Vector3D halfSize = { 0.5f, 0.5f, 0.5f });
+		void setBox();
+		void setBox(Vector3D halfSize, Vector3D translation);
+		void setBox(Vector3D halfSize, GeometryTransform transform);
+		void setSphere();
+		void setSphere(float radius, GeometryTransform transform);
+		void setCapsule();
+		void setCapsule(float halfHeight, float radius, GeometryTransform transform);
+		void setTruncatedPyramid();
+		void setTruncatedPyramid(float FOV, float halfWidth, float halfHeight, float nearPlane, float farPlane, GeometryTransform transform);
+
+		float getVolume();
+
 		GeometryPrimitiveType getType();
 		bool isTriangularMesh();
 
 		size_t getFaceVerteces(size_t vertexIndex, Vector3D normal, Vector3D* faceVerteces, GeometryTransform* geometryPrimitiveTransform, float equalityTolerance);
 
-		virtual uint32_t getVertecesCount() = 0;
-		virtual Vector3D getVertexPosition(uint32_t index) = 0;
-		virtual uint32_t getTrianglesCount() = 0;
-		virtual TriangleGeometry3D getTrianglePositions(uint32_t index) = 0;
+		uint32_t getVertecesCount();
+		Vector3D getVertexPosition(uint32_t index);
+		uint32_t getTrianglesCount();
+		TriangleGeometry3D getTrianglePositions(uint32_t index);
 
 	protected:
 
 		GeometryPrimitiveType type = GeometryPrimitiveType::NONE;
-		AnyGeometryPrimitive anyPrimitive;
 	};
 }
 

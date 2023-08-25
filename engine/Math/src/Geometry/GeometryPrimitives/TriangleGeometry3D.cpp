@@ -4,7 +4,9 @@ namespace mathem
 {
 	TriangleGeometry3D::TriangleGeometry3D()
 	{
-		
+		this->point1 = Vector3D::zero();
+		this->point2 = Vector3D::zero();
+		this->point3 = Vector3D::zero();
 	}
 
 	TriangleGeometry3D::TriangleGeometry3D(Vector3D point1, Vector3D point2, Vector3D point3)

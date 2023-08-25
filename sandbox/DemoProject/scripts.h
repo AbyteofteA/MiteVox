@@ -89,7 +89,7 @@ void processInput_Script(mitevox::Scene* scene)
 	mitevox::Entity* entity = mitevox::MiteVoxAPI::getActiveScene()->entities.getElement(3);
 	entity->transform.rotation.rotateByEulersRadians(rotation.x(), rotation.y(), rotation.z());
 	movementVector = getMovementDirection(GLFW_KEY_KP_8, GLFW_KEY_KP_2, GLFW_KEY_KP_6, GLFW_KEY_KP_4, GLFW_KEY_KP_9, GLFW_KEY_KP_3);
-	entity->applyForce(movementVector * 10.0f);
+	entity->applyForce(movementVector * 15.0f);
 
 	if (inputHandler->isKeyPressed(GLFW_KEY_1))
 	{
@@ -145,13 +145,17 @@ void processInput_Script(mitevox::Scene* scene)
 		if (inputHandler->isKeyPressed(GLFW_KEY_Q))
 		{
 			timeSinceLastDrop = 0.0f;
-			mitevox::Entity* e = mitevox::MiteVoxAPI::createCube(
+			mitevox::Entity* e = mitevox::MiteVoxAPI::createBox(
 				"Dropped Cube",
+				mitevox::MiteVoxAPI::getRandom(0.15f, 1.0f),
+				mitevox::MiteVoxAPI::getRandom(0.15f, 1.0f),
+				mitevox::MiteVoxAPI::getRandom(0.15f, 1.0f),
 				cameraEntityTransform->translation,
 				{
-					1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 2),
-					1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 3),
-					1.0f - 1.0f * (float)((*(uint32_t*)&inputHandler->dt) % 2), 1.0f });
+					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f),
+					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f),
+					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f) 
+				});
 			e->movementProperties.velocity = activeCameraEntity->getViewRay() * 10.0f;
 		}
 	}

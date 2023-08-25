@@ -2,11 +2,6 @@
 
 namespace mathem
 {
-	TruncatedPyramidGeometry::TruncatedPyramidGeometry()
-	{
-		type = GeometryPrimitiveType::TRUNCATED_PYRAMID;
-	}
-
 	uint32_t TruncatedPyramidGeometry::getVertecesCount()
 	{
 		return 8;

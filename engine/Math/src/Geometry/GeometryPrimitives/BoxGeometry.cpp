@@ -2,11 +2,6 @@
 
 namespace mathem
 {
-	BoxGeometry::BoxGeometry()
-	{
-		type = GeometryPrimitiveType::BOX;
-	}
-
 	uint32_t BoxGeometry::getVertecesCount()
 	{
 		return 8;

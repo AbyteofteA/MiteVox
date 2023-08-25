@@ -4,7 +4,7 @@ namespace mitevox
 {
 	Mesh::Mesh()
 	{
-		type = mathem::GeometryPrimitiveType::MESH;
+
 	}
 
 	IlluminationModel Mesh::getIlluminationModel()

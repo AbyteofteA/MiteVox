@@ -2,7 +2,7 @@
 #define OCTREENODE_H
 
 #include "engine/Math/src/Vector.h"
-#include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
 #include "engine/Math/src/Geometry/CollisionDetection/contains.h"
@@ -26,7 +26,7 @@ namespace mathem
 
 		size_t lifeTime = 0;
 		OctreeNode<T>* subNodes[8] = { nullptr };
-		AxisAlignedBoxGeometry boundingBox;
+		GeometryPrimitiveBase boundingBox;
 
 		// There lay the dataPoints that fit in the node's bounds and don't fit in the subnodes.
 		safety::SafeArray<T> dataPoints;
@@ -106,8 +106,7 @@ namespace mathem
 	template <class T>
 	inline void OctreeNode<T>::setBoundingBox(Vector3D position, Vector3D halfSize)
 	{
-		boundingBox.position = position;
-		boundingBox.halfSize = halfSize;
+		boundingBox.setAxisAlignedBox(position, halfSize);
 	}
 
 	template <class T>
@@ -177,11 +176,12 @@ namespace mathem
 
 		if (subNodes[subNodeIndex] == nullptr)
 		{
-			Vector3D newHalfSize = boundingBox.halfSize * 0.5f;
+			AxisAlignedBoxGeometry* AABB = boundingBox.getAxisAlignedBox();
+			Vector3D newHalfSize = AABB->halfSize * 0.5f;
 			Vector3D newOrigin;
-			newOrigin.x() = boundingBox.position.x() + newHalfSize.x() * signesX[subNodeIndex];
-			newOrigin.y() = boundingBox.position.y() + newHalfSize.y() * signesY[subNodeIndex];
-			newOrigin.z() = boundingBox.position.z() + newHalfSize.z() * signesZ[subNodeIndex];
+			newOrigin.x() = AABB->position.x() + newHalfSize.x() * signesX[subNodeIndex];
+			newOrigin.y() = AABB->position.y() + newHalfSize.y() * signesY[subNodeIndex];
+			newOrigin.z() = AABB->position.z() + newHalfSize.z() * signesZ[subNodeIndex];
 			subNodes[subNodeIndex] = nodesAllocator->useElement();
 			subNodes[subNodeIndex]->setBoundingBox(newOrigin, newHalfSize);
 		}
@@ -209,7 +209,8 @@ namespace mathem
 	inline OctreeNode<T>* OctreeNode<T>::trySuggestSubnode(T datapoint, float nodeMinHalfSize)
 	{
 		// Stop subdivision on minimum node size
-		if (this->boundingBox.halfSize.x() <= nodeMinHalfSize)
+		AxisAlignedBoxGeometry* AABB = this->boundingBox.getAxisAlignedBox();
+		if (AABB->halfSize.x() <= nodeMinHalfSize)
 		{
 			return nullptr;
 		}
@@ -218,15 +219,15 @@ namespace mathem
 
 		// Choose the subnode (octant) to emplace datapoint based on position
 		int octant = 0;
-		if (datapointTransform->translation.x() > boundingBox.position.x())
+		if (datapointTransform->translation.x() > AABB->position.x())
 		{
 			octant += 1;
 		}
-		if (datapointTransform->translation.y() > boundingBox.position.y())
+		if (datapointTransform->translation.y() > AABB->position.y())
 		{
 			octant += 2;
 		}
-		if (datapointTransform->translation.z() > boundingBox.position.z())
+		if (datapointTransform->translation.z() > AABB->position.z())
 		{
 			octant += 4;
 		}
@@ -252,7 +253,7 @@ namespace mathem
 			bool datapointFits = contains(
 				datapoint->getCollider(),
 				datapoint->getTransform(),
-				(GeometryPrimitiveBase*)&octant->boundingBox,
+				&octant->boundingBox,
 				&zeroTransform);
 			if (datapointFits)
 			{
@@ -314,7 +315,7 @@ namespace mathem
 			bool datapointFits = contains(
 				dataPoint->getCollider(),
 				dataPoint->getTransform(),
-				(GeometryPrimitiveBase*)&boundingBox,
+				&boundingBox,
 				&zeroTransform);
 			if (datapointFits == false)
 			{
