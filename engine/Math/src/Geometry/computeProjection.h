@@ -6,6 +6,7 @@
 #include "engine/Math/src/Geometry/GeometryPrimitives/GeometryPrimitiveBase.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
 
 namespace mathem
 {
@@ -33,6 +34,13 @@ namespace mathem
 
 	void computeProjection(
 		CapsuleGeometry* capsule,
+		GeometryTransform* parentTransform,
+		Vector3D* vector,
+		float* min,
+		float* max);
+
+	void computeProjection(
+		TriangleGeometry3D* triangle,
 		GeometryTransform* parentTransform,
 		Vector3D* vector,
 		float* min,
