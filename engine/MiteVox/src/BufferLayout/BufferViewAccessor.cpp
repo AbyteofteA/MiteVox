@@ -76,6 +76,48 @@ namespace mitevox
         return *((T*)componentPointer);
     }
 
+    uint32_t BufferViewAccessor::getElementsComponentAsUint(int64_t elementIndex, int64_t componentIndex)
+    {
+        switch (componentType)
+        {
+        case mitevox::BYTE:
+            return (uint32_t)getElementsComponent<int8_t>(elementIndex, componentIndex);
+        case mitevox::UNSIGNED_BYTE:
+            return (uint32_t)getElementsComponent<uint8_t>(elementIndex, componentIndex);
+        case mitevox::SHORT:
+            return (uint32_t)getElementsComponent<int16_t>(elementIndex, componentIndex);
+        case mitevox::UNSIGNED_SHORT:
+            return (uint32_t)getElementsComponent<uint16_t>(elementIndex, componentIndex);
+        case mitevox::UNSIGNED_INT:
+            return (uint32_t)getElementsComponent<uint32_t>(elementIndex, componentIndex);
+        case mitevox::FLOAT:
+            return (uint32_t)getElementsComponent<float>(elementIndex, componentIndex);
+        default:
+            return 0;
+        }
+    }
+
+    int32_t BufferViewAccessor::getElementsComponentAsInt(int64_t elementIndex, int64_t componentIndex)
+    {
+        switch (componentType)
+        {
+        case mitevox::BYTE:
+            return (int32_t)getElementsComponent<int8_t>(elementIndex, componentIndex);
+        case mitevox::UNSIGNED_BYTE:
+            return (int32_t)getElementsComponent<uint8_t>(elementIndex, componentIndex);
+        case mitevox::SHORT:
+            return (int32_t)getElementsComponent<int16_t>(elementIndex, componentIndex);
+        case mitevox::UNSIGNED_SHORT:
+            return (int32_t)getElementsComponent<uint16_t>(elementIndex, componentIndex);
+        case mitevox::UNSIGNED_INT:
+            return (int32_t)getElementsComponent<uint32_t>(elementIndex, componentIndex);
+        case mitevox::FLOAT:
+            return (int32_t)getElementsComponent<float>(elementIndex, componentIndex);
+        default:
+            return 0;
+        }
+    }
+
     float BufferViewAccessor::getElementsComponentAsFloat(int64_t elementIndex, int64_t componentIndex)
     {
         if (normalized)
@@ -132,48 +174,6 @@ namespace mitevox
         }
     }
 
-    uint32_t BufferViewAccessor::getElementsComponentAsUint(int64_t elementIndex, int64_t componentIndex)
-    {
-        switch (componentType)
-        {
-        case mitevox::BYTE:
-            return (uint32_t)getElementsComponent<int8_t>(elementIndex, componentIndex);
-        case mitevox::UNSIGNED_BYTE:
-            return (uint32_t)getElementsComponent<uint8_t>(elementIndex, componentIndex);
-        case mitevox::SHORT:
-            return (uint32_t)getElementsComponent<int16_t>(elementIndex, componentIndex);
-        case mitevox::UNSIGNED_SHORT:
-            return (uint32_t)getElementsComponent<uint16_t>(elementIndex, componentIndex);
-        case mitevox::UNSIGNED_INT:
-            return (uint32_t)getElementsComponent<uint32_t>(elementIndex, componentIndex);
-        case mitevox::FLOAT:
-            return (uint32_t)getElementsComponent<float>(elementIndex, componentIndex);
-        default:
-            return 0;
-        }
-    }
-
-    int32_t BufferViewAccessor::getElementsComponentAsInt(int64_t elementIndex, int64_t componentIndex)
-    {
-        switch (componentType)
-        {
-        case mitevox::BYTE:
-            return (int32_t)getElementsComponent<int8_t>(elementIndex, componentIndex);
-        case mitevox::UNSIGNED_BYTE:
-            return (int32_t)getElementsComponent<uint8_t>(elementIndex, componentIndex);
-        case mitevox::SHORT:
-            return (int32_t)getElementsComponent<int16_t>(elementIndex, componentIndex);
-        case mitevox::UNSIGNED_SHORT:
-            return (int32_t)getElementsComponent<uint16_t>(elementIndex, componentIndex);
-        case mitevox::UNSIGNED_INT:
-            return (int32_t)getElementsComponent<uint32_t>(elementIndex, componentIndex);
-        case mitevox::FLOAT:
-            return (int32_t)getElementsComponent<float>(elementIndex, componentIndex);
-        default:
-            return 0;
-        }
-    }
-
     void BufferViewAccessor::getElementsComponentsAsFloatArray(
         safety::SafeFloatArray* resultArray, 
         int64_t elementIndex, 
@@ -206,6 +206,46 @@ namespace mitevox
         }
         uint8_t* componentPointer = (uint8_t*)getDataStart() + actualIndex;
         *((T*)componentPointer) = value;
+    }
+
+    void BufferViewAccessor::setElementsComponentAsUint(int64_t elementIndex, int64_t componentIndex, uint32_t value)
+    {
+        switch (componentType)
+        {
+        case mitevox::BYTE:
+            setElementsComponent<int8_t>(elementIndex, componentIndex, (int8_t)value); break;
+        case mitevox::UNSIGNED_BYTE:
+            setElementsComponent<uint8_t>(elementIndex, componentIndex, (uint8_t)value); break;
+        case mitevox::SHORT:
+            setElementsComponent<int16_t>(elementIndex, componentIndex, (int16_t)value); break;
+        case mitevox::UNSIGNED_SHORT:
+            setElementsComponent<uint16_t>(elementIndex, componentIndex, (uint16_t)value); break;
+        case mitevox::UNSIGNED_INT:
+            setElementsComponent<uint32_t>(elementIndex, componentIndex, (uint32_t)value); break;
+        case mitevox::FLOAT:
+            setElementsComponent<float>(elementIndex, componentIndex, (float)value); break;
+        default: break;
+        }
+    }
+
+    void BufferViewAccessor::setElementsComponentAsInt(int64_t elementIndex, int64_t componentIndex, int32_t value)
+    {
+        switch (componentType)
+        {
+        case mitevox::BYTE:
+            setElementsComponent<int8_t>(elementIndex, componentIndex, (int8_t)value); break;
+        case mitevox::UNSIGNED_BYTE:
+            setElementsComponent<uint8_t>(elementIndex, componentIndex, (uint8_t)value); break;
+        case mitevox::SHORT:
+            setElementsComponent<int16_t>(elementIndex, componentIndex, (int16_t)value); break;
+        case mitevox::UNSIGNED_SHORT:
+            setElementsComponent<uint16_t>(elementIndex, componentIndex, (uint16_t)value); break;
+        case mitevox::UNSIGNED_INT:
+            setElementsComponent<uint32_t>(elementIndex, componentIndex, (uint32_t)value); break;
+        case mitevox::FLOAT:
+            setElementsComponent<float>(elementIndex, componentIndex, (float)value); break;
+        default: break;
+        }
     }
 
     void BufferViewAccessor::setElementsComponentAsFloat(int64_t elementIndex, int64_t componentIndex, float value)
@@ -264,6 +304,16 @@ namespace mitevox
             default: break;
             }
         }
+    }
+
+    uint32_t BufferViewAccessor::getUint(int64_t index)
+    {
+        return getElementsComponentAsUint(index, 0);
+    }
+
+    int32_t BufferViewAccessor::getInt(int64_t index)
+    {
+        return getElementsComponentAsInt(index, 0);
     }
 
     mathem::Vector2D BufferViewAccessor::getVector2D(int64_t index)
@@ -330,6 +380,16 @@ namespace mitevox
             }
         }
         return resultMatrix4x4;
+    }
+
+    void BufferViewAccessor::setUint(int64_t index, uint32_t value)
+    {
+        setElementsComponentAsUint(index, 0, value);
+    }
+
+    void BufferViewAccessor::setInt(int64_t index, int32_t value)
+    {
+        setElementsComponentAsInt(index, 0, value);
     }
 
     void BufferViewAccessor::setVector2D(int64_t index, mathem::Vector2D value)

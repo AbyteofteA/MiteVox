@@ -28,7 +28,7 @@ namespace mitevox
 	void Scene::update(float deltaTime)
 	{
 		currentTime += deltaTime;
-		foundation->update();
+		//foundation->update();
 
 		size_t scriptsCount = scripts.getElementsCount();
 		for (size_t i = 0; i < scriptsCount; ++i)

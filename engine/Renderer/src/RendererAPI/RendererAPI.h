@@ -35,6 +35,8 @@ namespace render
 #define PRINT_RENDERER_ERRORS \
 printErrors(__FILE__, __LINE__);
 
+	void setWireframeRendering(bool isEnabled);
+
 	// Shaders
 
 	/*****************************************************************************************

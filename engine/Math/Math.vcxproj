@@ -19,6 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithConvexHull.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\checkDistanceAxis.cpp" />
+    <ClCompile Include="src\Geometry\CollisionDetection\computeContactPointsWithMesh.cpp" />
+    <ClCompile Include="src\Geometry\GeometryGenerators\makeConvexHullFromMesh.cpp" />
+    <ClCompile Include="src\Geometry\GeometryGenerators\makeTetrahedron.cpp" />
+    <ClCompile Include="src\Geometry\GeometryPrimitives\PlaneGeometry.cpp" />
     <ClCompile Include="src\Calculus\Sequences.cpp" />
     <ClCompile Include="src\Generators\NoiseGenerators\PerlinNoiseGenerator.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithAxisAlignedBox.cpp" />
@@ -27,7 +33,6 @@
     <ClCompile Include="src\Geometry\CollisionDetection\CollisionInfo.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\CollisionTable.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPoints.cpp" />
-    <ClCompile Include="src\Geometry\CollisionDetection\computeContactPointsWithBox.cpp" />
     <ClCompile Include="src\Geometry\ComplexGeometry.cpp" />
     <ClCompile Include="src\Geometry\GeometryUtilities\computePenetration.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\contains.cpp" />
@@ -49,6 +54,12 @@
     <ClCompile Include="src\Geometry\GeometryPrimitives\TriangleGeometry2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Algorithms\Sorting\bubbleSort.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithConvexHull.h" />
+    <ClInclude Include="src\Geometry\CollisionDetection\checkDistanceAxis.h" />
+    <ClInclude Include="src\Geometry\GeometryGenerators\makeConvexHullFromMesh.h" />
+    <ClInclude Include="src\Geometry\GeometryGenerators\makeTetrahedron.h" />
+    <ClInclude Include="src\Geometry\GeometryPrimitives\PlaneGeometry.h" />
     <ClInclude Include="src\Utilities\almostEqual.h" />
     <ClInclude Include="src\DataStructures\PileAllocator.h" />
     <ClInclude Include="src\DataStructures\PileOfContainers.h" />

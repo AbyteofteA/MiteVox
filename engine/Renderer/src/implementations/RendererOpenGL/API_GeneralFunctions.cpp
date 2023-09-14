@@ -137,6 +137,18 @@ namespace render
 		}
 	}
 
+	void setWireframeRendering(bool isEnabled)
+	{
+		if (isEnabled)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+	}
+
 	void clearBufferXY(ColorRGBf color = { 0 })
 	{
 		glClearColor(color.r, color.g, color.b, 1);

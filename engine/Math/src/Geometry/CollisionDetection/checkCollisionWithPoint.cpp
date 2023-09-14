@@ -70,7 +70,7 @@ namespace mathem
 		float tmpBoxProjectionMin = 0.0f, tmpBoxProjectionMax = 0.0f;
 
 		// Check box's local Z-axis
-		tmpPositionMax = tmpTriangle.point1;
+		tmpPositionMax = tmpTriangle.getPoint1();
 		tmpPositionMin = boxGeometry->getVertexPosition(7);
 		boxTransform->applyTo(tmpPositionMin);
 		tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
@@ -92,7 +92,7 @@ namespace mathem
 		boxTransform->applyTo(tmpTriangle);
 		tmpNormal = tmpTriangle.computeNormal();
 
-		tmpPositionMax = tmpTriangle.point1;
+		tmpPositionMax = tmpTriangle.getPoint1();
 		tmpPositionMin = boxGeometry->getVertexPosition(0);
 		boxTransform->applyTo(tmpPositionMin);
 		tmpBoxProjectionMin = tmpPositionMin * tmpNormal;
@@ -114,7 +114,7 @@ namespace mathem
 		boxTransform->applyTo(tmpTriangle);
 		tmpNormal = tmpTriangle.computeNormal();
 
-		tmpPositionMax = tmpTriangle.point1;
+		tmpPositionMax = tmpTriangle.getPoint1();
 		tmpPositionMin = boxGeometry->getVertexPosition(0);
 		boxTransform->applyTo(tmpPositionMin);
 		tmpBoxProjectionMin = tmpPositionMin * tmpNormal;

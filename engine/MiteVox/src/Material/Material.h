@@ -27,18 +27,12 @@ namespace mitevox
 		bool isDoubleSided = false;
 
 		// Color and shading
-		render::ColorRGBAf baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		render::ColorRGBAf baseColor = render::ColorRGBAf(render::ColorRGBf::WHITE());
 		float roughness = 1.0f;
-		float metallicity = 1.0f;
-		render::ColorRGBf emission = { 0.0f, 0.0f, 0.0f };	// (0.0f - 1.0f)
+		float metallicity = 0.0f;
+		render::ColorRGBf emission = render::ColorRGBf::BLACK();	// (0.0f - 1.0f)
 		float specularExponent = 8;					// (0.0f - 1000.0f)
-
-		// Transparancy
-		render::ColorRGBAf filter = { 1.0f, 1.0f, 1.0f };
-		float transparency = 0;						// (0.0f - 1.0f)
-		float opticalDensity;						// (0.001f - 10.0f)
-		float reflectionSharpness;					// (0.0f - 1000.0f)
-													
+							
 		IlluminationModel illuminationModel = IlluminationModel::PHONG;	// (0 - 10)
 
 		std::string alphaMode = "OPAQUE";

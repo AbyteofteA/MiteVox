@@ -4,14 +4,13 @@
 #include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Geometry/GeometryUtilities/computeClosestPointOnTheLine.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/PlaneGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
 #include "engine/Math/src/Utilities/almostEqual.h"
 #include "engine/Math/src/Utilities/MinAndMax.h"
 
 namespace mathem
 {
-	bool isBeforePlane(Vector3D vertex, Vector3D planeNormal, float planeDistance);
-	Vector3D projectOntoPlaneIfBehind(Vector3D vertex, Vector3D planeNormal, float planeDistance);
 	size_t getFurthestVertexInTheDirection(GeometryPrimitiveBase* meshGeometry, GeometryTransform* meshGeometryTransform, Vector3D direction);
 
 	void computeContactPointsMeshVsMesh(
@@ -29,18 +28,19 @@ namespace mathem
 		GeometryTransform* incidentMeshGeometryTransform = meshGeometryTransform2;
 
 		// Plane calculation
-		Vector3D referencePlaneNormal = collisionProperties->normal;
-		size_t furthestVertexIndex = getFurthestVertexInTheDirection(referenceMeshGeometry, referenceMeshGeometryTransform, referencePlaneNormal);
+		PlaneGeometry referencePlane;
+		referencePlane.normal = collisionProperties->normal;
+		size_t furthestVertexIndex = getFurthestVertexInTheDirection(referenceMeshGeometry, referenceMeshGeometryTransform, referencePlane.normal);
 		Vector3D planeVertex = referenceMeshGeometry->getVertexPosition(furthestVertexIndex);
 		referenceMeshGeometryTransform->applyTo(planeVertex);
-		float referencePlaneDistance = planeVertex * referencePlaneNormal;
+		referencePlane.position = planeVertex * referencePlane.normal;
 
 		// Find contact face
-		size_t closestVertexIndex = getFurthestVertexInTheDirection(incidentMeshGeometry, incidentMeshGeometryTransform, -referencePlaneNormal);
+		size_t closestVertexIndex = getFurthestVertexInTheDirection(incidentMeshGeometry, incidentMeshGeometryTransform, -referencePlane.normal);
 		Vector3D faceVerteces[4];
 		size_t faceVertecesCount = 0;
 		faceVertecesCount = incidentMeshGeometry->getFaceVerteces(
-			closestVertexIndex, -referencePlaneNormal, faceVerteces, incidentMeshGeometryTransform, equalityTolerance);
+			closestVertexIndex, -referencePlane.normal, faceVerteces, incidentMeshGeometryTransform, equalityTolerance);
 
 		float distance = 0.01f;
 		for (size_t i = 0; i < faceVertecesCount; i++)
@@ -48,7 +48,7 @@ namespace mathem
 			Vector3D faceVertex = faceVerteces[i];
 			
 			// Discard points above reference surfase
-			if (isBeforePlane(faceVertex, referencePlaneNormal, referencePlaneDistance))
+			if (referencePlane.isBeforePlane(faceVertex))
 			{
 				continue;
 			}
@@ -62,28 +62,18 @@ namespace mathem
 				Vector3D triangleNormal = resultTriangle.computeNormal();
 
 				// Don't project onto reference plane
-				if (almostEqual(triangleNormal, referencePlaneNormal, equalityTolerance))
+				if (almostEqual(triangleNormal, referencePlane.normal, equalityTolerance))
 				{
 					continue;
 				}
 
-				triangleNormal = -triangleNormal;
-				float tmpPlaneDistance = resultTriangle.point1 * triangleNormal;
-				faceVertex = projectOntoPlaneIfBehind(faceVertex, triangleNormal, tmpPlaneDistance);
+				PlaneGeometry tmpPlane;
+				tmpPlane.normal = -triangleNormal;
+				tmpPlane.position = resultTriangle.getPoint1() * tmpPlane.normal;
+				faceVertex = tmpPlane.projectOntoPlaneIfBehind(faceVertex);
 			}
 
-			// Project onto incident geometry
-			/*size_t incidentTrianglesCount = incidentMeshGeometry->getTrianglesCount();
-			for (size_t i = 0; i < incidentTrianglesCount; ++i)
-			{
-				TriangleGeometry3D resultTriangle = incidentMeshGeometry->getTrianglePositions(i);
-				incidentMeshGeometryTransform->applyTo(resultTriangle);
-				Vector3D triangleNormal = -resultTriangle.computeNormal();
-				float tmpPlaneDistance = resultTriangle.point1 * triangleNormal;
-				faceVertex = projectOntoPlaneIfBehind(faceVertex, triangleNormal, tmpPlaneDistance);
-			}*/
-
-			Vector3D referenceContactPoint = projectOntoPlaneIfBehind(faceVertex, referencePlaneNormal, referencePlaneDistance);
+			Vector3D referenceContactPoint = referencePlane.projectOntoPlaneIfBehind(faceVertex);
 			collisionProperties->tryAddNewContactPoint(
 				referenceContactPoint, 
 				faceVertex,
@@ -100,9 +90,9 @@ namespace mathem
 	// TODO: checkCollision BOX vs MESH
 	// TODO: checkCollision BOX vs RAY
 
-	void computeContactPointsWithBox(
-		GeometryPrimitiveBase* box,
-		GeometryTransform* boxTransform,
+	void computeContactPointsWithMesh(
+		GeometryPrimitiveBase* mesh,
+		GeometryTransform* meshTransform,
 		GeometryPrimitiveBase* otherGeometry,
 		GeometryTransform* otherGeometryTransform,
 		CollisionProperties* collisionProperties,
@@ -113,9 +103,10 @@ namespace mathem
 		case GeometryPrimitiveType::BOX:
 		case GeometryPrimitiveType::AXIS_ALIGNED_BOX:
 		case GeometryPrimitiveType::TRUNCATED_PYRAMID:
+		case GeometryPrimitiveType::CONVEX_HULL:
 			computeContactPointsMeshVsMesh(
-				box, 
-				boxTransform, 
+				mesh,
+				meshTransform,
 				otherGeometry, 
 				otherGeometryTransform, 
 				collisionProperties, 
@@ -131,27 +122,6 @@ namespace mathem
 		default:
 			break;
 		}
-	}
-
-	bool isBeforePlane(Vector3D vertex, Vector3D planeNormal, float planeDistance)
-	{
-		float vertexProjection = vertex * planeNormal;
-		if (vertexProjection <= planeDistance)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	Vector3D projectOntoPlaneIfBehind(Vector3D vertex, Vector3D planeNormal, float planeDistance)
-	{
-		float vertexProjection = vertex * planeNormal;
-		if (vertexProjection >= planeDistance)
-		{
-			return vertex;
-		}
-		Vector3D difference = planeNormal * (planeDistance - vertexProjection);
-		return vertex + difference;
 	}
 
 	size_t getFurthestVertexInTheDirection(GeometryPrimitiveBase* meshGeometry, GeometryTransform* meshGeometryTransform, Vector3D direction)

@@ -16,9 +16,9 @@
 
 namespace mathem
 {
-	void computeContactPointsWithBox(
-		GeometryPrimitiveBase* box,
-		GeometryTransform* boxTransform,
+	void computeContactPointsWithMesh(
+		GeometryPrimitiveBase* mesh,
+		GeometryTransform* meshTransform,
 		GeometryPrimitiveBase* otherGeometry,
 		GeometryTransform* otherGeometryTransform,
 		CollisionProperties* collisionProperties,

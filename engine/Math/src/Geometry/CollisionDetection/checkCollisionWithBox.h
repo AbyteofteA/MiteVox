@@ -49,6 +49,13 @@ namespace mathem
 		GeometryPrimitiveBase* truncatedPyramid,
 		GeometryTransform* truncatedPyramidTransform,
 		CollisionProperties* collisionProperties);
+
+	CollisionType checkCollisionBoxVsConvexHull(
+		GeometryPrimitiveBase* box,
+		GeometryTransform* boxTransform,
+		GeometryPrimitiveBase* convexHull,
+		GeometryTransform* convexHullTransform,
+		CollisionProperties* collisionProperties);
 }
 
 #endif

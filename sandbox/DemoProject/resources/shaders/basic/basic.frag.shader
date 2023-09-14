@@ -1,14 +1,17 @@
 #version 330 core
 
-in vec2 Texcoord;
-in vec3 Normal;
-in vec3 Position;
-in mat3 TangentBitangentNormal;
+in VertexDataFragment
+{
+	vec2 Texcoord;
+	vec3 Normal;
+	vec3 Position;
+	mat3 TangentBitangentNormal;
+} fragment;
 
 out vec4 outColor;
 
 // Shader settings
-uniform float gammaCorrection = 1.5f;
+uniform float gammaCorrection = 1.2f;
 
 struct Material
 {
@@ -152,7 +155,7 @@ vec3 calculateLightSourcePBR(
 	vec3 halfVector = normalize(lightDir + viewDir);
 
 	// Reflection fraction
-	vec3 specularFraction = specularFractionFunction(viewDir, halfVector, F0, roughness);
+	vec3 specularFraction = specularFractionFunction(norm, viewDir, F0, roughness);
 
 	// Refraction fraction
 	vec3 diffuseFraction = vec3(1.0f) - specularFraction;
@@ -198,17 +201,13 @@ vec3 calculateLightSource(
 
 float calculateAttenuation(float currentDistance, float range)
 {
-	// TODO: Recommended formula doesn't work for some reason
-	//float attenuation = max(min(1.0f - pow(currentDistance / range, 4.0f), 1.0f), 0.0f) / pow(currentDistance, 2.0f);
-	//float attenuation = max(1.0f - pow(currentDistance / range, 2.0f), 0.0f);
-	float attenuation = (range * range) / (currentDistance * currentDistance);
-	return attenuation;
+	return max(min(1.0f - pow(currentDistance / range, 4.0f), 1.0f), 0.0f) / pow(currentDistance, 2.0f);
 }
 
 vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, vec3 norm, float occlusion)
 {
 	// Constants
-	vec3 viewDir = normalize(viewPos - Position);
+	vec3 viewDir = normalize(viewPos - fragment.Position);
 	float roughnessSquared = pow(roughness, 2.0f); // originally ^1.0f
 	float K = (roughnessSquared + 1.0f) * (roughnessSquared + 1.0f) / 8.0f;
 	vec3 F0 = vec3(0.04f);
@@ -230,7 +229,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	// Point lights
 	for (int i = 0; i < amountOfPointLights; i++)
 	{
-		vec3 lightDir = pointLights[i].pos - Position;
+		vec3 lightDir = pointLights[i].pos - fragment.Position;
 		float distance = abs(length(lightDir));
 		float attenuation = 0.0f;
 		if (pointLights[i].range > 0.0f)
@@ -246,7 +245,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	// Spot lights
 	for (int i = 0; i < amountOfSpotLights; i++)
 	{
-		vec3 lightDir = spotLights[i].pos - Position;
+		vec3 lightDir = spotLights[i].pos - fragment.Position;
 		float distance = abs(length(lightDir));
 		float attenuation = 0.0f;
 		if (spotLights[i].range > 0.0f)
@@ -272,7 +271,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 
 float calculateLinearFog()
 {
-	float distance = length(Position - viewPos) - fogMinDistance;
+	float distance = length(fragment.Position - viewPos) - fogMinDistance;
 	float fogRange = fogMaxDistance - fogMinDistance;
 	float fogFactor = clamp(distance / fogRange, 0.0f, 1.0f);
 	return fogFactor;
@@ -281,19 +280,24 @@ float calculateLinearFog()
 void main()
 {
 	// Albedo
-	vec3 albedoFragment = material.baseColor;
+	vec4 albedoFragment = vec4(material.baseColor, 1.0f);
 	if (material.hasAlbedoMap)
 	{
-		albedoFragment *= vec3(texture(albedoMap, Texcoord));
+		albedoFragment = texture(albedoMap, fragment.Texcoord);
+	}
+
+	if (albedoFragment.a < 0.05f)
+	{
+		discard;
 	}
 
 	// Normal map
-	vec3 norm = normalize(Normal);
+	vec3 norm = normalize(fragment.Normal);
 	if (material.hasNormalMap)
 	{
-		norm = vec3(texture(normalMap, Texcoord));
+		norm = vec3(texture(normalMap, fragment.Texcoord));
 		norm = normalize(norm * 2.0f - 1.0f);
-		norm = normalize(TangentBitangentNormal * norm);
+		norm = normalize(fragment.TangentBitangentNormal * norm);
 	}
 	
 	// Metallicity and roughness
@@ -303,7 +307,7 @@ void main()
 	metallicRoughnessFragment.g = material.roughness;
 	if (material.hasMetallicRoughnessMap)
 	{
-		metallicRoughnessFragment *= vec3(texture(metallicRoughnessMap, Texcoord));
+		metallicRoughnessFragment = vec3(texture(metallicRoughnessMap, fragment.Texcoord));
 	}
 	float metallicity = metallicRoughnessFragment.b;
 	float roughness = mix(0.05f, 0.95f, metallicRoughnessFragment.g);
@@ -312,14 +316,14 @@ void main()
 	float occlusion = 1.0f;
 	if (material.hasOcclusionMap)
 	{
-		occlusion = texture(occlusionMap, Texcoord).r;
+		occlusion = texture(occlusionMap, fragment.Texcoord).r;
 	}
 
 	// Emissive map
 	vec3 emissiveFragment = vec3(0.0f);
 	if (material.hasEmissiveMap)
 	{
-		emissiveFragment = vec3(texture(emissiveMap, Texcoord));
+		emissiveFragment = vec3(texture(emissiveMap, fragment.Texcoord));
 	}
 	else
 	{
@@ -329,13 +333,13 @@ void main()
 	outColor = vec4(0.0f);
 	if (material.illuminationModel == ILLUMINATION_MODEL_UNLIT)
 	{
-		outColor = vec4(albedoFragment, 1.0f);
+		outColor = albedoFragment;
 	}
 	else
 	{
-		outColor = vec4(calculateLighting(albedoFragment, roughness, metallicity, norm, occlusion), 1.0f);
-		//outColor += vec4(emissiveFragment, 1.0f); // TODO: add light bloom
-		outColor.rgb = outColor.rgb / (outColor.rgb + vec3(1.0f));
+		outColor = vec4(calculateLighting(albedoFragment.rgb, roughness, metallicity, norm, occlusion), 1.0f);
+		outColor += vec4(emissiveFragment, 1.0f); // TODO: add light bloom
+		//outColor.rgb = outColor.rgb / (outColor.rgb + vec3(1.0f));
 		//outColor.rgb = pow(outColor.rgb, vec3(1.0f / gammaCorrection));
 	}
 

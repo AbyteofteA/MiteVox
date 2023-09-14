@@ -24,20 +24,15 @@ namespace mathem
 			break;
 		}
 		case mathem::GeometryPrimitiveType::AXIS_ALIGNED_BOX:
-			// TODO: computeContactPoints((AxisAlignedBoxGeometry*)geometryPrimitive1, geometryPrimitive1Transform, geometryPrimitive2, geometryPrimitive2Transform, collisionProperties);
-			break;
-
 		case mathem::GeometryPrimitiveType::BOX:
-			return computeContactPointsWithBox(geometryPrimitive1, geometryPrimitive1Transform, geometryPrimitive2, geometryPrimitive2Transform, collisionProperties, equalityTolerance);
+		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
+		case mathem::GeometryPrimitiveType::CONVEX_HULL:
+			return computeContactPointsWithMesh(geometryPrimitive1, geometryPrimitive1Transform, geometryPrimitive2, geometryPrimitive2Transform, collisionProperties, equalityTolerance);
 
 		case mathem::GeometryPrimitiveType::SPHERE:
 			// TODO: computeContactPoints((SphereGeometry*)geometryPrimitive1, geometryPrimitive1Transform, geometryPrimitive2, geometryPrimitive2Transform, collisionProperties);
 
 		case mathem::GeometryPrimitiveType::CAPSULE:
-			// TODO:
-			break;
-
-		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
 			// TODO:
 			break;
 

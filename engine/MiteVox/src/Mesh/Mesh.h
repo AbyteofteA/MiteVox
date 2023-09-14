@@ -37,10 +37,8 @@ namespace mitevox
         bool isTriangularMesh();
         size_t getVertecesCount();
         mathem::Vector3D getVertexPosition(uint32_t index);
-        size_t getTrianglesCount();
-        mathem::TriangleGeometry3D getTrianglePositions(uint32_t index);
 
-        void setVertexPosition(uint32_t index, mathem::Vector3D value);
+        size_t getTrianglesCount();
 
         bool isMorphable();
         size_t getMorphTargetsCount();

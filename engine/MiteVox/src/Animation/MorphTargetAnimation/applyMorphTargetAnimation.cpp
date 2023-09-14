@@ -15,7 +15,7 @@ namespace mitevox
 		{
 			MeshPrimitive* meshPrimitive = meshNode->mesh->primitives.getElement(primitiveIndex);
 			MeshPrimitive* meshAnimationTargetPrimitive = meshNode->morphAnimationTarget->primitives.getElement(primitiveIndex);
-			size_t vertecesCount = meshPrimitive->getVertecesCount();
+			size_t vertecesCount = meshPrimitive->getVertecesOrIndecesCount();
 			for (size_t vertexIndex = 0; vertexIndex < vertecesCount; ++vertexIndex)
 			{
 				// Morph positions

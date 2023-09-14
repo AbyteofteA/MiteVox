@@ -1,6 +1,7 @@
 #include "checkCollisionWithAxisAlignedBox.h"
 
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionInfo.h"
+#include "engine/Math/src/Geometry/CollisionDetection/checkCollisionWithConvexHull.h"
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/CollisionDetection/checkCollisionWithBox.h"
 
@@ -69,5 +70,17 @@ namespace mathem
 
 		GeometryPrimitiveBase box = axisAlignedBox->axisAlignedBoxToBox();
 		return checkCollisionBoxVsTruncatedPyramid(&box, axisAlignedBoxTransform, truncatedPyramid, truncatedPyramidTransform, collisionProperties);
+	}
+
+	CollisionType checkCollisionAABBvsConvexHull(
+		GeometryPrimitiveBase* axisAlignedBox,
+		GeometryTransform* axisAlignedBoxTransform,
+		GeometryPrimitiveBase* convexHull,
+		GeometryTransform* convexHullTransform,
+		CollisionProperties* collisionProperties)
+	{
+		CollisionType result = checkCollisionConvexHullVsAABB(convexHull, convexHullTransform, axisAlignedBox, axisAlignedBoxTransform, collisionProperties);
+		collisionProperties->normalBelongsToTheFirst = !collisionProperties->normalBelongsToTheFirst;
+		return result;
 	}
 }

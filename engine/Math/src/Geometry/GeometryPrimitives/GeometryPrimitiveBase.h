@@ -3,11 +3,13 @@
 
 #include "engine/Math/src/Vector.h"
 #include "engine/Math/src/Geometry/GeometryTransform.h"
+#include "engine/Math/src/Geometry/GeometryPrimitives/PlaneGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/AxisAlignedBoxGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/BoxGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TruncatedPyramidGeometry.h"
+#include "engine/MiteVox/src/Mesh/MeshPrimitive.h"
 
 #include <cstdint>
 
@@ -25,6 +27,7 @@ namespace mathem
 		SPHERE, 			/// 
 		CAPSULE,  			/// 
 		TRUNCATED_PYRAMID,	/// 
+		CONVEX_HULL,		/// 
 
 		count
 	};
@@ -45,23 +48,20 @@ namespace mathem
 		Vector3D direction = { 0.0f, 0.0f, -1.0f };
 	};
 
-	struct Plane
-	{
-		float position = 0.0f;
-		Vector3D normal = { 0.0f, 1.0f, 0.0f };
-	};
+	
 
 	union AnyGeometryPrimitive
 	{
 		Point point;
 		Line line;
 		Ray ray;
-		Plane plane;
+		PlaneGeometry plane;
 		AxisAlignedBoxGeometry AABB;
 		BoxGeometry box;
 		SphereGeometry sphere;
 		CapsuleGeometry capsule;
 		TruncatedPyramidGeometry truncatedPyramid;
+		mitevox::MeshPrimitive* convexHull;
 
 		AnyGeometryPrimitive();
 	};
@@ -79,12 +79,13 @@ namespace mathem
 		Point* getPoint();
 		Line* getLine();
 		Ray* getRay();
-		Plane* getPlane();
+		PlaneGeometry* getPlane();
 		AxisAlignedBoxGeometry* getAxisAlignedBox();
 		BoxGeometry* getBox();
 		SphereGeometry* getSphere();
 		CapsuleGeometry* getCapsule();
 		TruncatedPyramidGeometry* getTruncatedPyramid();
+		mitevox::MeshPrimitive* getConvexHull();
 
 		void setPoint(Vector3D position = { 0.0f, 0.0f, 0.0f });
 		void setLine(Vector3D point1 = { 0.0f, 0.0f, 0.0f }, Vector3D point2 = { 0.0f, 1.0f, 0.0f });
@@ -100,6 +101,7 @@ namespace mathem
 		void setCapsule(float halfHeight, float radius, GeometryTransform transform);
 		void setTruncatedPyramid();
 		void setTruncatedPyramid(float FOV, float halfWidth, float halfHeight, float nearPlane, float farPlane, GeometryTransform transform);
+		void setConvexHull(mitevox::MeshPrimitive* convexHull);
 
 		float getVolume();
 

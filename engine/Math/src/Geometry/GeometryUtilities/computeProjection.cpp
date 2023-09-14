@@ -4,6 +4,58 @@
 
 namespace mathem
 {
+	void computeProjectionForMesh(
+		mitevox::Mesh* mesh,
+		Vector3D* vector,
+		float* min,
+		float* max)
+	{
+		Vector3D point = mesh->getVertexPosition(0);
+		*max = point * (*vector); // Compute projection of the first point
+		*min = *max;
+		size_t vertecesCount = mesh->getVertecesCount();
+		for (size_t i = 1; i < vertecesCount; ++i)
+		{
+			point = mesh->getVertexPosition(i);
+			float pointProjection = point * (*vector);
+
+			if (pointProjection < *min)
+			{
+				*min = pointProjection;
+			}
+			if (pointProjection > *max)
+			{
+				*max = pointProjection;
+			}
+		}
+	}
+
+	void computeProjectionForMesh(
+		mitevox::MeshPrimitive* meshPrimitive,
+		Vector3D* vector,
+		float* min,
+		float* max)
+	{
+		Vector3D point = meshPrimitive->getVertexPosition(0);
+		*max = point * (*vector); // Compute projection of the first point
+		*min = *max;
+		size_t vertecesCount = meshPrimitive->getVertecesCount();
+		for (size_t i = 1; i < vertecesCount; ++i)
+		{
+			point = meshPrimitive->getVertexPosition(i);
+			float pointProjection = point * (*vector);
+
+			if (pointProjection < *min)
+			{
+				*min = pointProjection;
+			}
+			if (pointProjection > *max)
+			{
+				*max = pointProjection;
+			}
+		}
+	}
+
 	void computeProjection(
 		GeometryPrimitiveBase* triangularMesh,
 		GeometryTransform* parentTransform,
@@ -11,15 +63,16 @@ namespace mathem
 		float* min,
 		float* max)
 	{
-		Vector3D boxPoint = triangularMesh->getVertexPosition(0);
-		parentTransform->applyTo(boxPoint);
-		*max = boxPoint * (*vector); // Compute projection of the first point
+		Vector3D point = triangularMesh->getVertexPosition(0);
+		parentTransform->applyTo(point);
+		*max = point * (*vector); // Compute projection of the first point
 		*min = *max;
-		for (uint16_t pointIndex = 1; pointIndex < 8; ++pointIndex)
+		size_t vertecesCount = triangularMesh->getVertecesCount();
+		for (size_t i = 1; i < vertecesCount; ++i)
 		{
-			boxPoint = triangularMesh->getVertexPosition(pointIndex);
-			parentTransform->applyTo(boxPoint);
-			float pointProjection = boxPoint * (*vector);
+			point = triangularMesh->getVertexPosition(i);
+			parentTransform->applyTo(point);
+			float pointProjection = point * (*vector);
 
 			if (pointProjection < *min)
 			{
@@ -80,9 +133,9 @@ namespace mathem
 		float* min,
 		float* max)
 	{
-		Vector3D trianglePoint1 = triangle->point1;
-		Vector3D trianglePoint2 = triangle->point2;
-		Vector3D trianglePoint3 = triangle->point3;
+		Vector3D trianglePoint1 = triangle->getPoint1();
+		Vector3D trianglePoint2 = triangle->getPoint2();
+		Vector3D trianglePoint3 = triangle->getPoint3();
 		parentTransform->applyTo(trianglePoint1);
 		parentTransform->applyTo(trianglePoint2);
 		parentTransform->applyTo(trianglePoint3);

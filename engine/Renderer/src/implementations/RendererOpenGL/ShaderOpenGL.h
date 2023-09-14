@@ -23,6 +23,7 @@ namespace render
 
         unsigned int shaderID = 0;
         unsigned int vertexID = 0;
+        unsigned int geometryID = 0;
         unsigned int fragmentID = 0;
         
     private:
@@ -31,6 +32,11 @@ namespace render
         char* vertexSource = nullptr;
         int vertexCompileStatus = 0;
         char vertexInfoLog[512];
+
+        char* geometryFilename = nullptr;
+        char* geometrySource = nullptr;
+        int geometryCompileStatus = 0;
+        char geometryInfoLog[512];
 
         char* fragmentFilename = nullptr;
         char* fragmentSource = nullptr;
@@ -42,12 +48,13 @@ namespace render
 
     public:
 
-        ShaderOpenGL(char* vertexSource, char* fragmentSource, std::string shaderName);
+        ShaderOpenGL(std::string shaderName, char* vertexSource, char* fragmentSource, char* geometrySource = nullptr);
         ~ShaderOpenGL();
 
         void rename(char* _name);
 
         void loadVertexShader(char* source);
+        void loadGeometryShader(char* source);
         void loadFragmentShader(char* source);
         void deleteVertexShader();
         void deleteFragmentShader();

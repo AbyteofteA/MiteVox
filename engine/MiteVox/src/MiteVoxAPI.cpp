@@ -51,6 +51,8 @@ namespace mitevox
 	{
 		Entity* entity = engine->useEntity();
 		entity->name = name;
+		entity->collider.setType(mathem::GeometryType::POINT);
+		engine->playground->addEntity(entity);
 		return entity;
 	}
 
@@ -77,7 +79,6 @@ namespace mitevox
 		entity->setMass(0.0f);
 
 		MiteVoxAPI::getActiveScene()->activeCameraEntity = entity;
-		engine->playground->addEntity(entity);
 
 		return entity;
 	}
@@ -112,7 +113,6 @@ namespace mitevox
 		lightEntity->renderableNode->light.pointLight.lightBase.range = range;
 		lightEntity->setTranslation(position);
 		lightEntity->collider.setType(mathem::GeometryType::POINT);
-		engine->playground->addEntity(lightEntity);
 		return lightEntity;
 	}
 
@@ -122,20 +122,15 @@ namespace mitevox
 		Node* renderableNode = entity->tryAttachNewRenderableNode();
 		Mesh* mesh = renderableNode->tryAttachNewMesh();
 		MeshPrimitive* meshPrimitive = mesh->addMeshPrimitive();
-		meshPrimitive->initTriangles(12, true);
 		return entity;
 	}
 
 	Entity* MiteVoxAPI::createBox(std::string name, float halfSizeX, float halfSizeY, float halfSizeZ, mathem::Vector3D position, render::ColorRGBAf color)
 	{
-		Entity* entity = MiteVoxAPI::createEmptyEntity(name);
+		Entity* entity = MiteVoxAPI::createMeshEntity(name);
 		entity->transform.translation = position;
 
-		//entity->movementProperties.restitution = 0.9f;
-
-		Node* renderableNode = entity->tryAttachNewRenderableNode();
-		Mesh* mesh = renderableNode->tryAttachNewMesh();
-		MeshPrimitive* meshPrimitive = mesh->addMeshPrimitive();
+		MeshPrimitive* meshPrimitive = entity->renderableNode->getMeshToRender()->primitives[0];
 		meshPrimitive->initTriangles(12, true);
 		meshPrimitive->appendTopologyElements(12);
 		meshPrimitive->material->baseColor = color;
@@ -157,57 +152,30 @@ namespace mitevox
 
 		meshPrimitive->setTrianglePositions(0, cubeVertecesPositions[0], cubeVertecesPositions[1], cubeVertecesPositions[2]);
 		meshPrimitive->setTrianglePositions(1, cubeVertecesPositions[0], cubeVertecesPositions[2], cubeVertecesPositions[3]);
-		auto triangle = meshPrimitive->getTrianglePositions(0);
-		mathem::Vector3D normal = triangle.computeNormal();
-		meshPrimitive->setTriangleNormals(0, normal, normal, normal);
-		meshPrimitive->setTriangleNormals(1, normal, normal, normal);
-
 		meshPrimitive->setTrianglePositions(2, cubeVertecesPositions[4], cubeVertecesPositions[6], cubeVertecesPositions[5]);
 		meshPrimitive->setTrianglePositions(3, cubeVertecesPositions[4], cubeVertecesPositions[7], cubeVertecesPositions[6]);
-		triangle = meshPrimitive->getTrianglePositions(2);
-		normal = triangle.computeNormal();
-		meshPrimitive->setTriangleNormals(2, normal, normal, normal);
-		meshPrimitive->setTriangleNormals(3, normal, normal, normal);
 
 		// XY
 
 		meshPrimitive->setTrianglePositions(4, cubeVertecesPositions[0], cubeVertecesPositions[4], cubeVertecesPositions[5]);
 		meshPrimitive->setTrianglePositions(5, cubeVertecesPositions[0], cubeVertecesPositions[5], cubeVertecesPositions[1]);
-		triangle = meshPrimitive->getTrianglePositions(4);
-		normal = triangle.computeNormal();
-		meshPrimitive->setTriangleNormals(4, normal, normal, normal);
-		meshPrimitive->setTriangleNormals(5, normal, normal, normal);
-
 		meshPrimitive->setTrianglePositions(6, cubeVertecesPositions[3], cubeVertecesPositions[6], cubeVertecesPositions[7]);
 		meshPrimitive->setTrianglePositions(7, cubeVertecesPositions[3], cubeVertecesPositions[2], cubeVertecesPositions[6]);
-		triangle = meshPrimitive->getTrianglePositions(6);
-		normal = triangle.computeNormal();
-		meshPrimitive->setTriangleNormals(6, normal, normal, normal);
-		meshPrimitive->setTriangleNormals(7, normal, normal, normal);
 
 		// YZ
 
 		meshPrimitive->setTrianglePositions(8, cubeVertecesPositions[0], cubeVertecesPositions[3], cubeVertecesPositions[7]);
 		meshPrimitive->setTrianglePositions(9, cubeVertecesPositions[0], cubeVertecesPositions[7], cubeVertecesPositions[4]);
-		triangle = meshPrimitive->getTrianglePositions(8);
-		normal = triangle.computeNormal();
-		meshPrimitive->setTriangleNormals(8, normal, normal, normal);
-		meshPrimitive->setTriangleNormals(9, normal, normal, normal);
-
 		meshPrimitive->setTrianglePositions(10, cubeVertecesPositions[1], cubeVertecesPositions[6], cubeVertecesPositions[2]);
 		meshPrimitive->setTrianglePositions(11, cubeVertecesPositions[1], cubeVertecesPositions[5], cubeVertecesPositions[6]);
-		triangle = meshPrimitive->getTrianglePositions(10);
-		normal = triangle.computeNormal();
-		meshPrimitive->setTriangleNormals(10, normal, normal, normal);
-		meshPrimitive->setTriangleNormals(11, normal, normal, normal);
+
+		meshPrimitive->tryGenerateFlatNormals();
 
 		entity->tryGenerateHitbox();
 		entity->physicalMaterial.setRestitution(0.0f);
 		entity->physicalMaterial.setDynamicFriction(1.0f);
 		entity->physicalMaterial.setStaticFriction(1.0f);
 		entity->computeMass();
-
-		engine->playground->addEntity(entity);
 
 		return entity;
 	}
@@ -227,7 +195,7 @@ namespace mitevox
 
 	Entity* MiteVoxAPI::createPlane(std::string name, render::ColorRGBAf color)
 	{
-		Entity* entity = MiteVoxAPI::createBox(name, 10.0f, 0.5f, 10.0f, { 0.0f, -3.0f, 0.0f }, color);
+		Entity* entity = MiteVoxAPI::createBox(name, 10.0f, 0.5f, 10.0f, { 0.0f, -5.0f, 0.0f }, color);
 		entity->setMass(0.0f);
 		return entity;
 	}
@@ -286,30 +254,31 @@ namespace mitevox
 	{
 		Scene* activeScene = MiteVoxAPI::getActiveScene();
 		engine->entitiesToSimulate.clear();
-		if (engine->settings->spaceCulling)
-		{
-			// TODO:
-			activeScene->foundation->getAll(&engine->entitiesToSimulate);
-		}
-		else
-		{
-			engine->entitiesToSimulate.concatenate(&activeScene->entities);
-		}
+		//if (engine->settings->spaceCulling)
+		//{
+		//	// TODO:
+		//	activeScene->foundation->getAll(&engine->entitiesToSimulate);
+		//}
+		//else
+		//{
+		//	engine->entitiesToSimulate.concatenate(&activeScene->entities);
+		//}
+		engine->entitiesToSimulate.concatenate(&activeScene->entities);
 		return &engine->entitiesToSimulate;
 	}
 
 	safety::SafeArray<mathem::CollisionInfo<Entity*>>* MiteVoxAPI::computeCollisions()
 	{
-		/*mathem::checkCollisions(
+		mathem::checkCollisions(
 			&engine->entitiesToSimulate, 
 			&engine->collisions, 
-			engine->settings->getEqualityTolerance());*/
+			engine->settings->getEqualityTolerance());
 
-		Scene* activeScene = MiteVoxAPI::getActiveScene();
+		/*Scene* activeScene = MiteVoxAPI::getActiveScene();
 		activeScene->foundation->getCollisions(
 			&engine->collisions, 
 			&engine->dataPointsContainers, 
-			engine->settings->getEqualityTolerance());
+			engine->settings->getEqualityTolerance());*/
 		return &engine->collisions;
 	}
 

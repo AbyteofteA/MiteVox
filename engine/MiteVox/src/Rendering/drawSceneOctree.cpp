@@ -10,23 +10,20 @@ namespace mitevox
 {
 	void drawOctreeNodeRecursive(render::RendererSettings* renderer, mathem::OctreeNode<Entity*>* octreeNode, const size_t nodeCapacity)
 	{
-		render::ColorRGBAf whiteColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		render::ColorRGBAf magentaColor = { 1.0f, 0.0f, 1.0f, 1.0f };
-		render::ColorRGBAf yellowColor = { 1.0f, 1.0f, 0.0f, 1.0f };
 		mathem::GeometryTransform zeroTransform;
 
 		if (octreeNode->getOverloadCount(nodeCapacity) != 0)
 		{
-			drawGeometryPrimitive(renderer, &octreeNode->boundingBox, &zeroTransform, magentaColor);
+			drawGeometryPrimitive(renderer, &octreeNode->boundingBox, &zeroTransform, render::ColorRGBAf(render::ColorRGBf::MAGENTA()));
 			
 		}
 		else if (octreeNode->dataPoints.getElementsCount() == 0)
 		{
-			drawGeometryPrimitive(renderer, &octreeNode->boundingBox, &zeroTransform, yellowColor);
+			drawGeometryPrimitive(renderer, &octreeNode->boundingBox, &zeroTransform, render::ColorRGBAf(render::ColorRGBf::YELLOW()));
 		}
 		else
 		{
-			drawGeometryPrimitive(renderer, &octreeNode->boundingBox, &zeroTransform, whiteColor);
+			drawGeometryPrimitive(renderer, &octreeNode->boundingBox, &zeroTransform, render::ColorRGBAf(render::ColorRGBf::WHITE()));
 		}
 		//drawGeometryPrimitive(renderer, &octreeNode->boundingBox, &zeroTransform, whiteColor);
 		for (size_t i = 0; i < 8; ++i)

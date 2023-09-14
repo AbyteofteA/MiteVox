@@ -12,6 +12,8 @@ namespace mitevox
         UNSIGNED_INT = 5125,
         FLOAT = 5126
     };
+
+    size_t getDataTypeSize(ComponentDataType dataType);
 }
 
 #endif

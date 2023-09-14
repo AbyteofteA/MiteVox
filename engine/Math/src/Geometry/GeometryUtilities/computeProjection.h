@@ -7,9 +7,22 @@
 #include "engine/Math/src/Geometry/GeometryPrimitives/SphereGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/CapsuleGeometry.h"
 #include "engine/Math/src/Geometry/GeometryPrimitives/TriangleGeometry3D.h"
+#include "engine/MiteVox/src/Mesh/Mesh.h"
 
 namespace mathem
 {
+	void computeProjectionForMesh(
+		mitevox::Mesh* mesh,
+		Vector3D* vector,
+		float* min,
+		float* max);
+
+	void computeProjectionForMesh(
+		mitevox::MeshPrimitive* meshPrimitive,
+		Vector3D* vector,
+		float* min,
+		float* max);
+
 	/// <summary>
 	/// computeProjection for BoxGeometry, TruncatedPyramidGeometry and Mesh
 	/// </summary>

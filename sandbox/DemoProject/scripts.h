@@ -138,6 +138,15 @@ void processInput_Script(mitevox::Scene* scene)
 		mitevox::MiteVoxAPI::getSettings()->debug = !mitevox::MiteVoxAPI::getSettings()->debug;
 	}
 
+	if (inputHandler->isKeyPressed(GLFW_KEY_L))
+	{
+		render::setWireframeRendering(true);
+	}
+	if (inputHandler->isKeyPressed(GLFW_KEY_P))
+	{
+		render::setWireframeRendering(false);
+	}
+
 	static float timeSinceLastDrop = 0.0f;
 	timeSinceLastDrop += inputHandler->dt;
 	if (timeSinceLastDrop > 0.333f)

@@ -9,7 +9,6 @@
 
 namespace mitevox
 {
-	void applyDampingAndSleeping(safety::SafeArray<Entity*>* entitiesToSimulate, float substepDeltaTime);
 	void solveConstraints(safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions, float substepDeltaTime);
 	void deriveVelocities(safety::SafeArray<Entity*>* entitiesToSimulate, float substepDeltaTime);
 	void solveVelocities(safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions, float substepDeltaTime);

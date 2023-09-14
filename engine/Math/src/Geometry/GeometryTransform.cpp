@@ -70,9 +70,9 @@ namespace mathem
 
 	void GeometryTransform::applyTo(TriangleGeometry3D& triangle)
 	{
-		this->applyTo(triangle.point1);
-		this->applyTo(triangle.point2);
-		this->applyTo(triangle.point3);
+		this->applyTo(triangle.getPoint1());
+		this->applyTo(triangle.getPoint2());
+		this->applyTo(triangle.getPoint3());
 	}
 
 	TriangleGeometry3D GeometryTransform::applyToCopy(TriangleGeometry3D triangle)

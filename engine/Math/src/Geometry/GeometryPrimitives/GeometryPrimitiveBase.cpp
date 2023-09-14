@@ -35,7 +35,7 @@ namespace mathem
 		return &anyPrimitive.ray;
 	}
 
-	Plane* GeometryPrimitiveBase::getPlane()
+	PlaneGeometry* GeometryPrimitiveBase::getPlane()
 	{
 		return &anyPrimitive.plane;
 	}
@@ -63,6 +63,11 @@ namespace mathem
 	TruncatedPyramidGeometry* GeometryPrimitiveBase::getTruncatedPyramid()
 	{
 		return &anyPrimitive.truncatedPyramid;
+	}
+
+	mitevox::MeshPrimitive* GeometryPrimitiveBase::getConvexHull()
+	{
+		return anyPrimitive.convexHull;
 	}
 
 	void GeometryPrimitiveBase::setPoint(Vector3D position)
@@ -165,6 +170,12 @@ namespace mathem
 		anyPrimitive.truncatedPyramid.transform = transform;
 	}
 
+	void GeometryPrimitiveBase::setConvexHull(mitevox::MeshPrimitive* convexHull)
+	{
+		type = mathem::GeometryPrimitiveType::CONVEX_HULL;
+		anyPrimitive.convexHull = convexHull;
+	}
+
 	float GeometryPrimitiveBase::getVolume()
 	{
 		switch (type)
@@ -182,13 +193,16 @@ namespace mathem
 		}
 		case mathem::GeometryPrimitiveType::SPHERE:
 			// TODO:
-			break;
+			return 1.0f;
 		case mathem::GeometryPrimitiveType::CAPSULE:
 			// TODO:
-			break;
+			return 1.0f;
 		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
 			// TODO:
-			break;
+			return 1.0f;
+		case mathem::GeometryPrimitiveType::CONVEX_HULL:
+			// TODO:
+			return 1.0f;
 
 		case mathem::GeometryPrimitiveType::NONE:
 		case mathem::GeometryPrimitiveType::POINT:
@@ -213,6 +227,7 @@ namespace mathem
 		case mathem::GeometryPrimitiveType::AXIS_ALIGNED_BOX:
 		case mathem::GeometryPrimitiveType::BOX:
 		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
+		case mathem::GeometryPrimitiveType::CONVEX_HULL:
 			return true;
 
 		case mathem::GeometryPrimitiveType::NONE:
@@ -267,9 +282,9 @@ namespace mathem
 		for (size_t i = 0; i < trianglesCount; ++i)
 		{
 			TriangleGeometry3D resultTriangle = getTrianglePositions(i);
-			if (resultTriangle.point1 != targetVertex &&
-				resultTriangle.point2 != targetVertex &&
-				resultTriangle.point3 != targetVertex)
+			if (resultTriangle.getPoint1() != targetVertex &&
+				resultTriangle.getPoint2() != targetVertex &&
+				resultTriangle.getPoint3() != targetVertex)
 			{
 				continue;
 			}
@@ -296,9 +311,9 @@ namespace mathem
 				continue;
 			}
 
-			tryAppendVertex(resultTriangle.point1, faceVerteces, &faceVertecesCount, equalityTolerance);
-			tryAppendVertex(resultTriangle.point2, faceVerteces, &faceVertecesCount, equalityTolerance);
-			tryAppendVertex(resultTriangle.point3, faceVerteces, &faceVertecesCount, equalityTolerance);
+			tryAppendVertex(resultTriangle.getPoint1(), faceVerteces, &faceVertecesCount, equalityTolerance);
+			tryAppendVertex(resultTriangle.getPoint2(), faceVerteces, &faceVertecesCount, equalityTolerance);
+			tryAppendVertex(resultTriangle.getPoint3(), faceVerteces, &faceVertecesCount, equalityTolerance);
 
 			if (faceVertecesCount >= 4)
 			{
@@ -322,6 +337,8 @@ namespace mathem
 			return anyPrimitive.box.getVertecesCount();
 		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
 			return anyPrimitive.truncatedPyramid.getVertecesCount();
+		case mathem::GeometryPrimitiveType::CONVEX_HULL:
+			return anyPrimitive.convexHull->getVertecesCount();
 		case mathem::GeometryPrimitiveType::NONE:
 		case mathem::GeometryPrimitiveType::RAY:
 		case mathem::GeometryPrimitiveType::PLANE:
@@ -335,7 +352,6 @@ namespace mathem
 
 	Vector3D GeometryPrimitiveBase::getVertexPosition(uint32_t index)
 	{
-		
 		switch (type)
 		{
 		case mathem::GeometryPrimitiveType::POINT:
@@ -348,6 +364,8 @@ namespace mathem
 			return anyPrimitive.box.getVertexPosition(index);
 		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
 			return anyPrimitive.truncatedPyramid.getVertexPosition(index);
+		case mathem::GeometryPrimitiveType::CONVEX_HULL:
+			return anyPrimitive.convexHull->getVertexPosition(index);
 		case mathem::GeometryPrimitiveType::NONE:
 		case mathem::GeometryPrimitiveType::RAY:
 		case mathem::GeometryPrimitiveType::PLANE:
@@ -374,6 +392,8 @@ namespace mathem
 			return anyPrimitive.box.getTrianglesCount();
 		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
 			return anyPrimitive.truncatedPyramid.getTrianglesCount();
+		case mathem::GeometryPrimitiveType::CONVEX_HULL:
+			return anyPrimitive.convexHull->getTrianglesCount();
 		default:
 			break;
 		}
@@ -395,6 +415,8 @@ namespace mathem
 			return anyPrimitive.box.getTrianglePositions(index);
 		case mathem::GeometryPrimitiveType::TRUNCATED_PYRAMID:
 			return anyPrimitive.truncatedPyramid.getTrianglePositions(index);
+		case mathem::GeometryPrimitiveType::CONVEX_HULL:
+			return anyPrimitive.convexHull->getTrianglePositions(index);
 		default:
 			break;
 		}

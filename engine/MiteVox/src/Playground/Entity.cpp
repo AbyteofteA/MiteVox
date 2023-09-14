@@ -111,10 +111,6 @@ namespace mitevox
 			computeMomentOfInertiaForPrimitives();
 			break;
 
-		case mathem::GeometryType::MESH:
-			computeMomentOfInertiaForMesh();
-			break;
-
 		case mathem::GeometryType::SKELETON:
 			computeMomentOfInertiaForSkeleton();
 			break;
@@ -332,16 +328,21 @@ namespace mitevox
 				movementProperties.inverseMomentOfInertia = mathem::getInverse(movementProperties.momentOfInertia);
 				break;
 			}
-
+			case mathem::GeometryPrimitiveType::CONVEX_HULL: // TODO: 
+			{
+				float x = 1.0f;
+				float y = 1.0f;
+				float z = 1.0f;
+				movementProperties.momentOfInertia.m00() = (y * y + z * z) * getMass() / 12.0f;
+				movementProperties.momentOfInertia.m11() = (x * x + z * z) * getMass() / 12.0f;
+				movementProperties.momentOfInertia.m22() = (x * x + y * y) * getMass() / 12.0f;
+				movementProperties.inverseMomentOfInertia = mathem::getInverse(movementProperties.momentOfInertia);
+				break;
+			}
 			default:
 				break;
 			}
 		}
-	}
-
-	void Entity::computeMomentOfInertiaForMesh()
-	{
-		// TODO:
 	}
 
 	void Entity::computeMomentOfInertiaForSkeleton()

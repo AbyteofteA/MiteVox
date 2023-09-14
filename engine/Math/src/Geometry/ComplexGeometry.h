@@ -12,7 +12,6 @@ namespace mathem
 		NONE = 0,			/// 
 		POINT,				/// 
 		PRIMITIVES,			///
-		MESH,				/// 
 		SKELETON			/// 
 	};
 

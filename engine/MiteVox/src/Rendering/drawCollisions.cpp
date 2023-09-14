@@ -14,11 +14,6 @@ namespace mitevox
 {
 	void drawCollisions(render::RendererSettings* renderer, safety::SafeArray<mathem::CollisionInfo<Entity*>>* collisions)
 	{
-		render::ColorRGBAf redColor = { 1.0f, 0.0f, 0.0f, 1.0f };
-		render::ColorRGBAf greenColor = { 0.0f, 1.0f, 0.0f, 1.0f };
-		render::ColorRGBAf blueColor = { 0.0f, 0.0f, 1.0f, 1.0f };
-		render::ColorRGBAf magentaColor = { 1.0f, 0.0f, 1.0f, 1.0f };
-		render::ColorRGBAf cyanColor = { 0.0f, 1.0f, 1.0f, 1.0f };
 		mathem::GeometryTransform zeroTransform;
 
 		size_t collisionsCount = collisions->getElementsCount();
@@ -29,8 +24,8 @@ namespace mitevox
 			mathem::GeometryTransform* complexGeometryTransform1 = collision.object1->getTransform();
 			mathem::ComplexGeometry* complexGeometry2 = collision.object2->getCollider();
 			mathem::GeometryTransform* complexGeometryTransform2 = collision.object2->getTransform();
-			drawCollider(renderer, complexGeometry1, complexGeometryTransform1, redColor);
-			drawCollider(renderer, complexGeometry2, complexGeometryTransform2, blueColor);
+			drawCollider(renderer, complexGeometry1, complexGeometryTransform1, render::ColorRGBAf(render::ColorRGBf::RED()));
+			drawCollider(renderer, complexGeometry2, complexGeometryTransform2, render::ColorRGBAf(render::ColorRGBf::BLUE()));
 
 			mathem::Vector3D normalOrigin;
 			if (collision.properties.normalBelongsToTheFirst)
@@ -43,7 +38,7 @@ namespace mitevox
 				normalOrigin = complexGeometryTransform2->translation;
 			}
 			
-			render::drawArrow(renderer, normalOrigin, collision.properties.normal, greenColor);
+			render::drawArrow(renderer, normalOrigin, collision.properties.normal, render::ColorRGBAf(render::ColorRGBf::GREEN()));
 
 			for (size_t i = 0; i < collision.properties.contactPointsCount; ++i)
 			{
@@ -54,11 +49,11 @@ namespace mitevox
 
 				render::Point lightPoint;
 				lightPoint.position = contactPoints1GlobalCoords;
-				lightPoint.color = magentaColor;
+				lightPoint.color = render::ColorRGBAf(render::ColorRGBf::MAGENTA());
 				render::drawCross(renderer, lightPoint, 0.125f);
 
 				lightPoint.position = contactPoints2GlobalCoords;
-				lightPoint.color = cyanColor;
+				lightPoint.color = render::ColorRGBAf(render::ColorRGBf::CYAN());
 				render::drawCross(renderer, lightPoint, 0.125f);
 			}
 		}

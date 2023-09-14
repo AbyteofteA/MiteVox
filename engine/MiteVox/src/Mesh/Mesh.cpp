@@ -143,18 +143,6 @@ namespace mitevox
 		return resultTrianglesCount;
 	}
 
-	mathem::TriangleGeometry3D Mesh::getTrianglePositions(uint32_t index)
-	{
-		// TODO:
-
-		return mathem::TriangleGeometry3D();
-	}
-
-	void setVertexPosition(uint32_t index, mathem::Vector3D value)
-	{
-		// TODO:
-	}
-
 	bool Mesh::isMorphable()
 	{
 		return getMorphTargetsCount() > 0;

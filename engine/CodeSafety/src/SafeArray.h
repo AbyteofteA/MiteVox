@@ -26,6 +26,8 @@ namespace safety
         inline void resize(size_t newElementCount);
         inline void shrinkToFit();
 
+        inline bool contains(T value);
+
         inline size_t getElementsCount() const;
         inline size_t getCapacity() const;
         inline size_t getSize();
@@ -38,6 +40,7 @@ namespace safety
         inline void setAllElements(T value);
         inline void setAllElementsZeros();
         inline void insertElement(size_t index, T value); // TODO: 
+        inline T* appendElement();
         inline void appendElement(T value);
         inline void removeElement(size_t index); // TODO: 
         inline void removeElementAndSwapWithLast(size_t index);
@@ -100,8 +103,11 @@ namespace safety
     template <typename T>
     inline void SafeArray<T>::deallocate()
     {
-        delete[] _elements;
-        _elements = nullptr;
+        if (_elements)
+        {
+            delete[] _elements;
+            _elements = nullptr;
+        }
         _elementsCount = 0;
         _capacity = 0;
     }
@@ -128,8 +134,11 @@ namespace safety
         }
 
         T* tmpElements = new T[newElementCount];
-        memcpy(tmpElements, _elements, _elementsCount * sizeof(T));
-        delete[] _elements;
+        if (_elements)
+        {
+            memcpy(tmpElements, _elements, _elementsCount * sizeof(T));
+            delete[] _elements;
+        }
         _elements = tmpElements;
         _capacity = newElementCount;
     }
@@ -150,10 +159,26 @@ namespace safety
         }
 
         T* tmpElements = new T[_elementsCount];
-        memcpy(tmpElements, _elements, _elementsCount * sizeof(T));
-        delete[] _elements;
+        if (_elements)
+        {
+            memcpy(tmpElements, _elements, _elementsCount * sizeof(T));
+            delete[] _elements;
+        }
         _elements = tmpElements;
         _capacity = _elementsCount;
+    }
+
+    template <typename T>
+    inline bool SafeArray<T>::contains(T value)
+    {
+        for (size_t index = 0; index < _elementsCount; ++index)
+        {
+            if (_elements[index] == value)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     template <typename T>
@@ -272,6 +297,13 @@ namespace safety
         }
         resize(_elementsCount + 1);
         // TODO:
+    }
+
+    template <typename T>
+    inline T* SafeArray<T>::appendElement()
+    {
+        resize(_elementsCount + 1);
+        return _elements + _elementsCount - 1;
     }
 
     template <typename T>

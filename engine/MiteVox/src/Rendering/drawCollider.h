@@ -13,7 +13,7 @@ namespace mitevox
 		render::RendererSettings* renderer, 
 		mathem::ComplexGeometry* collider, 
 		mathem::GeometryTransform* transform,
-		render::ColorRGBAf color = { 0.0f, 1.0f, 0.0f, 1.0f });
+		render::ColorRGBAf color = render::ColorRGBAf(render::ColorRGBf::GREEN()));
 }
 
 #endif
