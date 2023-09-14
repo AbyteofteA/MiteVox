@@ -22,6 +22,7 @@
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithConvexHull.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkDistanceAxis.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\computeContactPointsWithMesh.cpp" />
+    <ClCompile Include="src\Geometry\GeometryGenerators\decimateMesh.cpp" />
     <ClCompile Include="src\Geometry\GeometryGenerators\makeConvexHullFromMesh.cpp" />
     <ClCompile Include="src\Geometry\GeometryGenerators\makeTetrahedron.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\PlaneGeometry.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="src\Algorithms\Sorting\bubbleSort.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithConvexHull.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\checkDistanceAxis.h" />
+    <ClInclude Include="src\Geometry\GeometryGenerators\decimateMesh.h" />
     <ClInclude Include="src\Geometry\GeometryGenerators\makeConvexHullFromMesh.h" />
     <ClInclude Include="src\Geometry\GeometryGenerators\makeTetrahedron.h" />
     <ClInclude Include="src\Geometry\GeometryPrimitives\PlaneGeometry.h" />
