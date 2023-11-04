@@ -7,7 +7,6 @@ namespace mitevox
 	Scene::Scene()
 	{
 		// TODO: add corresponding settings
-		foundation = new SceneFoundation(11.0f, 0.1f, 1, 60, 0, 100);
 		timeSinceCleanup = 0.0f;
 		timeSincePhysicsUpdate = 0.0f;
 		timeSinceAnimationsUpdate = 0.0f;
@@ -22,13 +21,12 @@ namespace mitevox
 
 	Scene::~Scene()
 	{
-		delete foundation;
+
 	}
 
 	void Scene::update(float deltaTime)
 	{
 		currentTime += deltaTime;
-		//foundation->update();
 
 		size_t scriptsCount = scripts.getElementsCount();
 		for (size_t i = 0; i < scriptsCount; ++i)

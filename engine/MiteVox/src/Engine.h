@@ -47,6 +47,7 @@ namespace mitevox
 		int basicShader = -1;
 		int primitiveShader = -1;
 		int skyboxShader = -1;
+		int shadowMapShader = -1;
 
 		mathem::PileAllocator<Entity> entitiesAllocator;
 
@@ -68,20 +69,6 @@ namespace mitevox
 
 		void uploadNodeRecursively(Node* node, int shaderID);
 		void uploadScene(Scene* scene, int shaderID);
-		
-		void renderNodeRecursively(
-			render::RendererSettings* renderer,
-			int shaderID,
-			Node* node,
-			mathem::GeometryTransform* transform,
-			render::Camera* camera,
-			mathem::GeometryTransform* cameraTransform);
-		void renderEntities(
-			float deltaTime,
-			render::RendererSettings* renderer,
-			Scene* scene,
-			render::Camera* camera,
-			mathem::GeometryTransform* cameraTransform);
 	};
 }
 

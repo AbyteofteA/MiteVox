@@ -7,6 +7,10 @@
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/MiteVox/src/EngineSettings.h"
 
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
 #include <string>
 
 namespace mitevox
@@ -80,15 +84,30 @@ namespace mitevox
 		static safety::SafeArray<mathem::CollisionInfo<Entity*>>* computeCollisions();
 		static mathem::Vector3D getGravity(Entity* entity);
 
-		// Rendering
-
-		static void renderNodeRecursively(
-			int shaderID,
-			Node* node,
-			mathem::GeometryTransform* nodeTransform,
+		static void renderScene(
+			render::RendererSettings* renderer,
+			int shadowMapShaderID,
+			int lightingShaderID,
+			mathem::Vector3D ambientLight,
+			safety::SafeArray<render::PointLight>* pointLightsArray,
+			safety::SafeArray<render::DirectionalLight>* directionalLightsArray,
+			safety::SafeArray<render::SpotLight>* spotLightsArray,
 			render::Camera* camera,
-			mathem::GeometryTransform* cameraTransform);
-		static void removeNodeRecursively(int shaderID, Node* node);
+			mathem::GeometryTransform* cameraTransform,
+			glm::mat4 viewProjectionMatrix,
+			safety::SafeArray<Entity*> entities,
+			int skyboxShaderID = -1,
+			render::Cubemap* skybox = nullptr);
+
+		static void renderSceneWithSpotLights(
+			render::RendererSettings* renderer,
+			int shadowMapShaderID,
+			int lightingShaderID,
+			safety::SafeArray<render::SpotLight>* spotLightsArray,
+			safety::SafeArray<Entity*> entities,
+			render::Camera* camera,
+			mathem::GeometryTransform* cameraTransform,
+			glm::mat4 viewProjectionMatrix);
 
 	private:
 

@@ -33,7 +33,7 @@ namespace mitevox
 		render::ColorRGBf emission = render::ColorRGBf::BLACK();	// (0.0f - 1.0f)
 		float specularExponent = 8;					// (0.0f - 1000.0f)
 							
-		IlluminationModel illuminationModel = IlluminationModel::PHONG;	// (0 - 10)
+		IlluminationModel illuminationModel = IlluminationModel::PBR;	// (0 - 10)
 
 		std::string alphaMode = "OPAQUE";
 		float alphaCutoff = 0.5f;

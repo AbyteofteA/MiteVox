@@ -65,6 +65,7 @@ namespace mitevox
 		basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
 		skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
 		primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
+		shadowMapShader = render::createShader("Shadow Map Shader", shadersDir + "/shadow_map/shadow_map");
 		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
 
 		uploadScene(playground->scenes.getElement(0), basicShader);
@@ -94,7 +95,8 @@ namespace mitevox
 		// TODO: Hide implementation.
 		while (!glfwWindowShouldClose(settings->getRendererSettings()->getWindow()))
 		{
-			GLFWwindow* window = settings->getRendererSettings()->getWindow();
+			render::RendererSettings* renderer = settings->getRendererSettings();
+			GLFWwindow* window = renderer->getWindow();
 			glfwPollEvents();
 			if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			{
@@ -102,7 +104,9 @@ namespace mitevox
 			}
 			int width, height;
 			glfwGetWindowSize(window, &width, &height);
-			glViewport(0, 0, width, height);
+			renderer->screenWidth = width;
+			renderer->screenHeight = height;
+			render::setViewport(0, 0, width, height);
 
 			// Update timers
 			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
@@ -144,10 +148,10 @@ namespace mitevox
 			collisions.clear();
 			dataPointsContainers.returnAllContainers();
 			size_t substepsCount = MiteVoxAPI::getSubstepsCount();
-			float substepDeltaTime = deltaTime / (float)substepsCount;
 			scene->timeSincePhysicsUpdate += deltaTime;
 			if (scene->timeSincePhysicsUpdate > settings->getPhysicsPeriod())
 			{
+				float substepDeltaTime = scene->timeSincePhysicsUpdate / (float)substepsCount;
 				for (size_t i = 0; i < substepsCount; ++i)
 				{
 					applyDampingAndSleeping(&entitiesToSimulate, substepDeltaTime);
@@ -156,7 +160,7 @@ namespace mitevox
 				}
 				scene->timeSincePhysicsUpdate = 0.0f;
 			}
-
+			
 			// Reset forces and torques
 			size_t entitiesToSimulateCount = entitiesToSimulate.getElementsCount();
 			for (size_t i = 0; i < entitiesToSimulateCount; ++i)
@@ -171,38 +175,46 @@ namespace mitevox
 			scene->timeSinceRendererUpdate += deltaTime;
 			if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
 			{
-				render::RendererSettings* renderer = settings->getRendererSettings();
 				scene->timeSinceRendererUpdate = 0.0f;
 				renderer->amountOfDrawCalls = 0;
 
 				pointLightsArray.clear();
 				directionalLightsArray.clear();
 				spotLightsArray.clear();
+				collectLights(&entitiesToSimulate, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
 
 				Entity* activeCameraEntity = MiteVoxAPI::getActiveCameraEntity();
 				render::Camera* camera = nullptr;
 				mathem::GeometryTransform cameraTransform = activeCameraEntity->getCamera(&camera);
+				
+				glm::mat4 viewMatrix = camera->getViewMatrix(&cameraTransform);
+				glm::mat4 viewProjectionMatrix = camera->getProjectionMatrix() * viewMatrix;
+
+				render::Cubemap* skybox = nullptr;
+				if (scene->activeSkybox >= 0)
+				{
+					skybox = &scene->skyboxes.at(scene->activeSkybox);
+				}
 
 				render::clearBufferXY(renderer->clearColor);
 				render::clearBufferZ();
 
-				if (scene->activeSkybox >= 0)
-				{
-					render::Cubemap* skybox = &scene->skyboxes.at(scene->activeSkybox);
-					render::renderSkybox(renderer, skyboxShader, skybox, camera, &cameraTransform);
-				}
-
-				renderEntities(deltaTime, renderer, scene, camera, &cameraTransform);
+				MiteVoxAPI::renderScene(
+					renderer,
+					shadowMapShader,
+					basicShader,
+					{ 0.0f, 0.0f, 0.0f },
+					& pointLightsArray,
+					& directionalLightsArray,
+					& spotLightsArray,
+					camera,
+					& cameraTransform,
+					viewProjectionMatrix,
+					entitiesToSimulate);
 
 				if (settings->debug)
 				{
 					drawAxes(renderer);
-
-					if (scene->foundation != nullptr)
-					{
-						drawSceneOctree(renderer, scene->foundation->octree);
-					}
-
 					drawCollisions(renderer, &collisions);
 				}
 
@@ -244,7 +256,6 @@ namespace mitevox
 			{
 				Entity* entity = activeScene->entities.getElement(i);
 				entity->tryGenerateHitbox();
-				activeScene->foundation->emplace(entity); // TODO: delete
 			}
 		}
 
@@ -332,67 +343,6 @@ namespace mitevox
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
 			uploadNodeRecursively(scene->entities.getElement(i)->renderableNode, shaderID);
-		}
-	}
-
-	void Engine::renderEntities(
-		float deltaTime,
-		render::RendererSettings* renderer,
-		Scene* scene,
-		render::Camera* camera,
-		mathem::GeometryTransform* cameraTransform)
-	{
-		collectLights(&entitiesToSimulate, &pointLightsArray, &directionalLightsArray, &spotLightsArray);
-
-		render::setAmbientLight(scene->ambientLight, basicShader);
-		render::uploadDirectionalLights(&directionalLightsArray, basicShader);
-		render::uploadPointLights(&pointLightsArray, basicShader);
-		render::uploadSpotLights(&spotLightsArray, basicShader);
-
-		if (renderer->backfaceCulling)
-		{
-			glEnable(GL_CULL_FACE);
-		}
-		else
-		{
-			glDisable(GL_CULL_FACE);
-		}
-
-		// Render 3D models.
-		size_t entitiesCount = entitiesToSimulate.getElementsCount();
-		for (size_t i = 0; i < entitiesCount; ++i)
-		{
-			Entity* entity = entitiesToSimulate.getElement(i);
-			
-			if (settings->debug)
-			{
-				MiteVoxAPI::renderNodeRecursively(
-					basicShader,
-					entity->renderableNode,
-					&entity->transform,
-					camera,
-					cameraTransform);
-
-				if (entity->isSleeping() == false)
-				{
-					drawCollider(settings->renderer, entity->getCollider(), &entity->transform);
-				}
-			}
-			else
-			{
-				MiteVoxAPI::renderNodeRecursively(
-					basicShader,
-					entity->renderableNode,
-					&entity->transform,
-					camera,
-					cameraTransform);
-
-				// TODO: delete
-				if (entity->isSleeping() == false)
-				{
-					drawCollider(settings->renderer, entity->getCollider(), &entity->transform);
-				}
-			}
 		}
 	}
 }

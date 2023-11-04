@@ -109,7 +109,6 @@ namespace mitevox
 		Scene* activeScene = getActiveScene();
 		size_t entitiesCount = activeScene->entities.getElementsCount();
 		activeScene->entities.appendElement(entity);
-		activeScene->foundation->emplace(entity); // TODO: delete
 		return entitiesCount;
 	}
 

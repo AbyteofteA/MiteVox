@@ -4,10 +4,10 @@
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/MiteVox/src/Playground/Entity.h"
-#include "engine/MiteVox/src/Playground/SceneFoundation.h"
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/NativeScript.h"
 #include "engine/Renderer/src/RendererAPI/Cubemap.h"
+
 #include <vector>
 #include <string>
 #include <chrono>
@@ -19,7 +19,6 @@ namespace mitevox
 	public:
 
 		std::string name = "Untitled";
-		SceneFoundation* foundation = nullptr;
 		safety::SafeArray<Entity*> entities;
 
 		mathem::Vector3D ambientLight = { 0.05f, 0.05f, 0.05f };

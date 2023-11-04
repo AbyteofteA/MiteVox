@@ -68,9 +68,10 @@ namespace render
 		glfwSwapBuffers(renderer->getWindow());
 
 		glDepthFunc(GL_LEQUAL);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 
 		if (renderer->backfaceCulling)
 		{
@@ -149,6 +150,17 @@ namespace render
 		}
 	}
 
+	void setViewport(int x, int y, int width, int height)
+	{
+		glViewport(x, y, width, height);
+	}
+
+	void activateDefaultFramebuffer(int width, int height)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)0);
+		glViewport(0, 0, width, height);
+	}
+
 	void clearBufferXY(ColorRGBf color = { 0 })
 	{
 		glClearColor(color.r, color.g, color.b, 1);
@@ -157,6 +169,7 @@ namespace render
 
 	void clearBufferZ()
 	{
+		glDepthMask(GL_TRUE);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 

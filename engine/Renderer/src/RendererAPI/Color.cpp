@@ -42,6 +42,11 @@ namespace render
 		return { 1.0f, 1.0f, 0.0f };
 	}
 
+	ColorRGBAf ColorRGBAf::NONE()
+	{
+		return { 0.0f, 0.0f, 0.0f, 0.0f };
+	}
+
 	ColorRGBAf::ColorRGBAf()
 	{
 		*this = ColorRGBAf(ColorRGBf::WHITE());

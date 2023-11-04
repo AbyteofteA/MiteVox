@@ -28,6 +28,18 @@ namespace render
 		int screenWidth = SCREEN_WIDTH;
 		int screenHeight = SCREEN_HEIGHT;
 
+		size_t pointLightShadowMapSize = 1024;
+		size_t directionalLightShadowMapSize = 2048;
+		size_t spotLightShadowMapSize = 2048;
+
+		size_t pointLightsPerCall = 16;
+		size_t directionalLightsPerCall = 16;
+		size_t spotLightsPerCall = 16;
+
+		size_t pointLightsPerFrame = 256;
+		size_t directionalLightsPerFrame = 4;
+		size_t spotLightsPerFrame = 256;
+
 		bool isFullScreen;
 		unsigned char backfaceCulling = 1;
 
@@ -41,36 +53,11 @@ namespace render
 
 		unsigned int amountOfDrawCalls = 0;
 
-		RendererSettings(int _screenWidth, int _screenHeight, bool _isFullScreen, unsigned char _backfaceCulling, ColorRGBf _clearColor)
-		{
-			screenWidth = _screenWidth;
-			screenHeight = _screenHeight;
-			isFullScreen = _isFullScreen;
-			backfaceCulling = _backfaceCulling;
-			clearColor = _clearColor;
-		}
-
-		RendererSettings(GLFWwindow* _window)
-		{
-			setWindow(_window);
-		}
-
-		~RendererSettings()
-		{
-			points.deallocate();
-			lines.deallocate();
-			triangles.deallocate();
-		}
-
-		GLFWwindow* getWindow()
-		{
-			return window;
-		}
-
-		void setWindow(GLFWwindow* _window)
-		{
-			window = _window;
-		}
+		RendererSettings(int _screenWidth, int _screenHeight, bool _isFullScreen, unsigned char _backfaceCulling, ColorRGBf _clearColor);
+		RendererSettings(GLFWwindow* _window);
+		~RendererSettings();
+		GLFWwindow* getWindow();
+		void setWindow(GLFWwindow* _window);
 
 	private:
 

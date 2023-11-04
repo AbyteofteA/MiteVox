@@ -94,6 +94,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Rendering\renderScene.cpp" />
     <ClCompile Include="src\BufferLayout\ComponentDataType.cpp" />
     <ClCompile Include="src\Physics\computePhysics.cpp" />
     <ClCompile Include="src\MiteVoxAPI.cpp" />

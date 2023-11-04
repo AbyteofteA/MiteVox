@@ -40,6 +40,24 @@ namespace render
 		return -1;
 	}
 
+	int createComputeShader(std::string name, std::string filename)
+	{
+		for (int i = 0; i < MAX_SHADERS; i++)
+		{
+			if (shaders[i] == nullptr)
+			{
+				std::string computeSource;
+
+				fileio::FileInputOutput::loadText(filename, &computeSource);
+				shaders[i] = new ShaderOpenGL(name, (char*)computeSource.c_str());
+
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
 	void useShader(int shaderID)
 	{
 		shaders[shaderID]->use();

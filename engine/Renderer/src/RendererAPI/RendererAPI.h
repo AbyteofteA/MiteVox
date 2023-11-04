@@ -16,12 +16,27 @@
 #include "engine/MiteVox/src/Skeleton/SkeletonBase.h"
 #include "engine/MiteVox/src/Playground/Node.h"
 
+#include "dependencies/glm/glm.hpp"
+#include "dependencies/glm/gtc/matrix_transform.hpp"
+#include "dependencies/glm/gtc/type_ptr.hpp"
+
 namespace render
 {
 
 //==================================================================
 //   RendererAPI interface declaration  |  ! under construction !  |
 //==================================================================
+
+	// Constants
+
+#define TEXTURE_UNIT_ALBEDO 0
+#define TEXTURE_UNIT_METALLIC_ROUGHNESS 1
+#define TEXTURE_UNIT_NORMAL 2
+#define TEXTURE_UNIT_OCCLUSION 3
+#define TEXTURE_UNIT_EMISSIVE 4
+#define TEXTURE_UNIT_ENVIRONMENT 5
+
+#define TEXTURE_UNIT_SPOT_SHADOWS_START 10 // [10; 25]
 
 	// General
 
@@ -36,6 +51,7 @@ namespace render
 printErrors(__FILE__, __LINE__);
 
 	void setWireframeRendering(bool isEnabled);
+	void setViewport(int x, int y, int width, int height);
 
 	// Shaders
 
@@ -47,12 +63,14 @@ printErrors(__FILE__, __LINE__);
 					  Expected extensions are: .vert.shader and .frag.shader
 	*****************************************************************************************/
 	int createShader(std::string name, std::string filename);
+	int createComputeShader(std::string name, std::string filename);
 	void useShader(int shaderID);
 	void deleteShader(int shaderID);
 
 	// Buffers
 
 	void createFramebuffer();
+	void activateDefaultFramebuffer(int width, int height);
 	void clearBufferXY(ColorRGBf color);
 	void clearBufferZ();
 	void display(RendererSettings* renderer);
@@ -60,12 +78,15 @@ printErrors(__FILE__, __LINE__);
 	// Primitives
 
 	void drawPoint(RendererSettings* renderer, Point point);
+	void drawPoint(RendererSettings* renderer, mathem::Vector3D position, ColorRGBAf color);
 	void drawLine(RendererSettings* renderer, Point point1, Point point2);
 	void drawTriangle(RendererSettings* renderer, Point point1, Point point2, Point point3);
 
 	void drawCross(RendererSettings* renderer, Point point, float size);
+	void drawCross(RendererSettings* renderer, mathem::Vector3D position, ColorRGBAf color, float size);
 	void drawArrow(RendererSettings* renderer, mathem::Vector3D origin, mathem::Vector3D direction, ColorRGBAf color);
 	void drawSnowflake(RendererSettings* renderer, Point point, float size);
+	void drawSnowflake(RendererSettings* renderer, mathem::Vector3D position, ColorRGBAf color, float size);
 
 	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform);
 	void renderLines(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform);
@@ -73,10 +94,11 @@ printErrors(__FILE__, __LINE__);
 
 	// Models
 
+	void resetLights(int shaderID);
 	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID);
 	void uploadDirectionalLights(safety::SafeArray<render::DirectionalLight>* lightsArray, int shaderID);
 	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID);
-	void uploadSpotLights(safety::SafeArray<render::SpotLight>* lightsArray, int shaderID);
+	void uploadSpotLights(size_t spotLightsCount, int shaderID);
 
 	void uploadMaterial(mitevox::Material* material, int shaderID);
 	void selectMaterial(mitevox::Material* material, int shaderID);
@@ -96,13 +118,43 @@ printErrors(__FILE__, __LINE__);
 		int shaderID, 
 		mitevox::Mesh* mesh,
 		mathem::GeometryTransform* transform,
-		Camera* camera, 
-		mathem::GeometryTransform* cameraTransform);
+		Camera* camera,
+		mathem::GeometryTransform* cameraTransform,
+		glm::mat4 viewProjectionMatrix);
 
 	void uploadSkybox(Cubemap* skybox, int shaderID);
 	void selectSkybox(Cubemap* skybox, int shaderID);
 	void removeSkybox(Cubemap* skybox, int shaderID);
-	void renderSkybox(RendererSettings* renderer, int shaderID, Cubemap* skybox, Camera* camera, mathem::GeometryTransform* cameraTransform);
+	void renderSkybox(
+		RendererSettings* renderer, 
+		int shaderID, 
+		Cubemap* skybox, 
+		Camera* camera, 
+		mathem::GeometryTransform* cameraTransform);
+
+	// Shadows
+
+	void tryAllocateSpotLightShadowMaps(size_t count);
+	void tryAllocateDirectionalLightShadowMaps(size_t count);
+	void tryAllocatePointLightShadowMaps(size_t count);
+	void selectSpotLightShadowMap(int shaderID, size_t index);
+	void selectDirectionalLightShadowMap(int shaderID, size_t index);
+	void selectPointLightShadowMap(int shaderID, size_t index);
+	void renderMeshToSpotLightShadowMap(
+		RendererSettings* renderer,
+		int shaderID,
+		mitevox::Mesh* mesh,
+		mathem::GeometryTransform* transform);
+	void renderMeshToDirectionalLightShadowMap(
+		RendererSettings* renderer,
+		int shaderID,
+		mitevox::Mesh* mesh,
+		mathem::GeometryTransform* transform);
+	void renderMeshToPointLightShadowMap(
+		RendererSettings* renderer,
+		int shaderID,
+		mitevox::Mesh* mesh,
+		mathem::GeometryTransform* transform);
 }
 
 //==================================================================

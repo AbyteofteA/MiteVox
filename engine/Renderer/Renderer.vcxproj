@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\implementations\RendererOpenGL\SpotLightShadowMapOpenGL.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\RendererOpenGL.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\ShaderOpenGL.h" />
     <ClInclude Include="src\RendererAPI\RendererAPI.h" />
@@ -39,6 +40,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\implementations\RendererOpenGL\API_ShadowFunctions.cpp" />
+    <ClCompile Include="src\implementations\RendererOpenGL\SpotLightShadowMapOpenGL.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_GeneralFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_ModelFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.cpp" />
@@ -49,6 +52,7 @@
     <ClCompile Include="src\RendererAPI\Color.cpp" />
     <ClCompile Include="src\RendererAPI\Cubemap.cpp" />
     <ClCompile Include="src\RendererAPI\Light.cpp" />
+    <ClCompile Include="src\RendererAPI\RendererSettings.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

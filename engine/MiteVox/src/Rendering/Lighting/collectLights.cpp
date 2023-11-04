@@ -23,7 +23,7 @@ namespace mitevox
 		case render::LightType::DIRECTIONAL:
 		{
 			mathem::Vector3D lightDirection = { 0.0f, 0.0f, -1.0f };
-			node->light.directionalLight.direction = transform.rotation.rotate(lightDirection);
+			node->light.directionalLight.direction = transform.rotation.rotate(node->light.directionalLight.direction);
 			resultDirectionalLightsArray->appendElement(node->light.directionalLight);
 			break;
 		}
@@ -32,7 +32,7 @@ namespace mitevox
 		{
 			node->light.spotLight.position = transform.translation;
 			mathem::Vector3D lightDirection = { 0.0f, 0.0f, -1.0f };
-			node->light.spotLight.direction = transform.rotation.rotate(lightDirection);
+			node->light.spotLight.direction = transform.rotation.rotate(node->light.spotLight.direction);
 			resultSpotLightsArray->appendElement(node->light.spotLight);
 			break;
 		}

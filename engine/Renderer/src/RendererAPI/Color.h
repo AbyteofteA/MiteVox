@@ -26,6 +26,8 @@ namespace render
 		float b;
 		float a;
 
+		static ColorRGBAf NONE();
+
 		ColorRGBAf();
 		ColorRGBAf(float r, float g, float b, float a);
 		ColorRGBAf(ColorRGBf color);

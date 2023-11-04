@@ -22,6 +22,13 @@ namespace render
         compileAndLink();
     }
 
+    ShaderOpenGL::ShaderOpenGL(std::string shaderName, char* computeSource)
+    {
+        name = shaderName;
+        loadComputeShader(computeSource);
+        compileAndLink();
+    }
+
     ShaderOpenGL::~ShaderOpenGL()
     {
         deleteVertexShader();
@@ -64,72 +71,41 @@ namespace render
         }
     }
 
-    void ShaderOpenGL::deleteVertexShader()
+    void ShaderOpenGL::loadComputeShader(char* source)
     {
-        glDetachShader(shaderID, vertexID);
-        glDeleteShader(vertexID);
-    }
-
-    void ShaderOpenGL::deleteFragmentShader()
-    {
-        glDetachShader(shaderID, fragmentID);
-        glDeleteShader(fragmentID);
+        if (source != nullptr)
+        {
+            computeSource = source;
+            computeID = glCreateShader(GL_COMPUTE_SHADER);
+            glShaderSource(computeID, 1, &computeSource, nullptr);
+        }
     }
 
     void ShaderOpenGL::deleteProgram()
     {
+        deleteVertexShader();
+        deleteGeometryShader();
+        deleteFragmentShader();
+        deleteComputeShader();
         glDeleteProgram(shaderID);
     }
 
     int ShaderOpenGL::compileAndLink()
     {
-        glCompileShader(vertexID);
-        glGetShaderiv(vertexID, GL_COMPILE_STATUS, &vertexCompileStatus);
-        glGetShaderInfoLog(vertexID, 512, nullptr, vertexInfoLog);
-        if (vertexCompileStatus == 0)
+        if (vertexID != 0 &&
+            fragmentID != 0)
         {
-            std::cout << "ERROR: " << vertexInfoLog << std::endl;
-            assert(vertexCompileStatus != 0);
+            return compileAndLinkRegular();
+        }
+        else if (computeID != 0)
+        {
+            return compileAndLinkCompute();
         }
 
-        if (geometrySource)
-        {
-            glCompileShader(geometryID);
-            glGetShaderiv(geometryID, GL_COMPILE_STATUS, &geometryCompileStatus);
-            glGetShaderInfoLog(geometryID, 512, nullptr, geometryInfoLog);
-            if (geometryCompileStatus == 0)
-            {
-                std::cout << "ERROR: " << geometryInfoLog << std::endl;
-                assert(geometryCompileStatus != 0);
-            }
-        }
-
-        glCompileShader(fragmentID);
-        glGetShaderiv(fragmentID, GL_COMPILE_STATUS, &fragmentCompileStatus);
-        glGetShaderInfoLog(fragmentID, 512, nullptr, fragmentInfoLog);
-        if (fragmentCompileStatus == 0)
-        {
-            std::cout << "ERROR: " << fragmentInfoLog << std::endl;
-            assert(fragmentCompileStatus != 0);
-        }
-
-        shaderID = glCreateProgram();
-        glAttachShader(shaderID, vertexID);
-        if (geometrySource)
-        {
-            glAttachShader(shaderID, geometryID);
-        }
-        glAttachShader(shaderID, fragmentID);
-        glLinkProgram(shaderID);
-        glGetProgramiv(shaderID, GL_LINK_STATUS, &programLinkStatus);
-        glGetProgramInfoLog(shaderID, 512, nullptr, programInfoLog);
-        if (programLinkStatus == 0)
-        {
-            std::cout << "ERROR: " << programInfoLog << std::endl;
-            assert(programLinkStatus != 0);
-        }
-        
-        return programLinkStatus;
+        programLinkStatus = 0;
+        std::cout << "ERROR: " << "Nothing to compile" << std::endl;
+        assert(programLinkStatus != 0);
+        return 0;
     }
 
     bool ShaderOpenGL::use()
@@ -215,6 +191,11 @@ namespace render
         glUniform3fv(glGetUniformLocation(shaderID, name), 1, vector.data);
     }
 
+    void ShaderOpenGL::setIntVector3D(const char* name, int x, int y, int z)
+    {
+        glUniform3i(glGetUniformLocation(shaderID, name), x, y, z);
+    }
+
     void ShaderOpenGL::setVector4D(const char* name, mathem::Vector4D vector)
     {
         glUniform4fv(glGetUniformLocation(shaderID, name), 1, vector.data);
@@ -243,5 +224,117 @@ namespace render
     void ShaderOpenGL::setMatrix4x4Array(const char* name, safety::SafeArray<mathem::Matrix4x4>* matrices)
     {
         glUniformMatrix4fv(glGetUniformLocation(shaderID, name), matrices->getElementsCount(), GL_FALSE, (float*)matrices->getElementsArray());
+    }
+
+    void ShaderOpenGL::deleteVertexShader()
+    {
+        if (vertexID != 0)
+        {
+            glDetachShader(shaderID, vertexID);
+            glDeleteShader(vertexID);
+        }
+    }
+
+    void ShaderOpenGL::deleteGeometryShader()
+    {
+        if (geometryID != 0)
+        {
+            glDetachShader(shaderID, geometryID);
+            glDeleteShader(geometryID);
+        }
+    }
+
+    void ShaderOpenGL::deleteFragmentShader()
+    {
+        if (fragmentID != 0)
+        {
+            glDetachShader(shaderID, fragmentID);
+            glDeleteShader(fragmentID);
+        }
+    }
+
+    void ShaderOpenGL::deleteComputeShader()
+    {
+        if (computeID != 0)
+        {
+            glDetachShader(shaderID, computeID);
+            glDeleteShader(computeID);
+        }
+    }
+
+    int ShaderOpenGL::compileAndLinkRegular()
+    {
+        glCompileShader(vertexID);
+        glGetShaderiv(vertexID, GL_COMPILE_STATUS, &vertexCompileStatus);
+        glGetShaderInfoLog(vertexID, 512, nullptr, vertexInfoLog);
+        if (vertexCompileStatus == 0)
+        {
+            std::cout << "ERROR: " << vertexInfoLog << std::endl;
+            assert(vertexCompileStatus != 0);
+        }
+
+        if (geometrySource)
+        {
+            glCompileShader(geometryID);
+            glGetShaderiv(geometryID, GL_COMPILE_STATUS, &geometryCompileStatus);
+            glGetShaderInfoLog(geometryID, 512, nullptr, geometryInfoLog);
+            if (geometryCompileStatus == 0)
+            {
+                std::cout << "ERROR: " << geometryInfoLog << std::endl;
+                assert(geometryCompileStatus != 0);
+            }
+        }
+
+        glCompileShader(fragmentID);
+        glGetShaderiv(fragmentID, GL_COMPILE_STATUS, &fragmentCompileStatus);
+        glGetShaderInfoLog(fragmentID, 512, nullptr, fragmentInfoLog);
+        if (fragmentCompileStatus == 0)
+        {
+            std::cout << "ERROR: " << fragmentInfoLog << std::endl;
+            assert(fragmentCompileStatus != 0);
+        }
+
+        shaderID = glCreateProgram();
+        glAttachShader(shaderID, vertexID);
+        if (geometrySource)
+        {
+            glAttachShader(shaderID, geometryID);
+        }
+        glAttachShader(shaderID, fragmentID);
+        glLinkProgram(shaderID);
+        glGetProgramiv(shaderID, GL_LINK_STATUS, &programLinkStatus);
+        glGetProgramInfoLog(shaderID, 512, nullptr, programInfoLog);
+        if (programLinkStatus == 0)
+        {
+            std::cout << "ERROR: " << programInfoLog << std::endl;
+            assert(programLinkStatus != 0);
+        }
+
+        return programLinkStatus;
+    }
+
+    int ShaderOpenGL::compileAndLinkCompute()
+    {
+        glCompileShader(computeID);
+        glGetShaderiv(computeID, GL_COMPILE_STATUS, &computeCompileStatus);
+        glGetShaderInfoLog(computeID, 512, nullptr, computeInfoLog);
+        if (computeCompileStatus == 0)
+        {
+            std::cout << "ERROR: " << computeInfoLog << std::endl;
+            assert(computeCompileStatus != 0);
+        }
+
+        shaderID = glCreateProgram();
+        glAttachShader(shaderID, computeID);
+        glLinkProgram(shaderID);
+        glGetProgramiv(shaderID, GL_LINK_STATUS, &programLinkStatus);
+        glGetProgramInfoLog(shaderID, 512, nullptr, programInfoLog);
+        if (programLinkStatus == 0)
+        {
+            std::cout << "ERROR: " << programInfoLog << std::endl;
+            assert(programLinkStatus != 0);
+        }
+
+        return programLinkStatus;
     }
 }

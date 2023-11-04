@@ -15,26 +15,37 @@
 
 namespace render
 {
-	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID)
+	void resetLights(int shaderID)
 	{
-		if (!render::shaders[shaderID]->use())
+		if (!shaders[shaderID]->use())
 			return;
 
-		render::shaders[shaderID]->setVector3D("ambientLight", ambientLightColor);
+		shaders[shaderID]->setVector3D("ambientLight", mathem::Vector3D::zero());
+		shaders[shaderID]->setInt("amountOfDirectionalLights", 0);
+		shaders[shaderID]->setInt("amountOfPointLights", 0);
+		shaders[shaderID]->setInt("amountOfSpotLights", 0);
+	}
+
+	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID)
+	{
+		if (!shaders[shaderID]->use())
+			return;
+
+		shaders[shaderID]->setVector3D("ambientLight", ambientLightColor);
 		PRINT_RENDERER_ERRORS;
 	}
 
-	void uploadDirectionalLights(safety::SafeArray<render::DirectionalLight>* lightsArray, int shaderID)
+	void uploadDirectionalLights(safety::SafeArray<DirectionalLight>* lightsArray, int shaderID)
 	{
-		if (!render::shaders[shaderID]->use())
+		if (!shaders[shaderID]->use())
 			return;
 
 		size_t lightsCount = lightsArray->getElementsCount();
-		render::shaders[shaderID]->setInt("amountOfDirectionalLights", lightsCount);
+		shaders[shaderID]->setInt("amountOfDirectionalLights", lightsCount);
 
 		for (size_t i = 0; i < lightsCount; ++i)
 		{
-			render::DirectionalLight directionalLight = lightsArray->getElement(i);
+			DirectionalLight directionalLight = lightsArray->getElement(i);
 
 			std::string indexStr = std::to_string(i);
 			static const std::string directionalLights = "directionalLights[";
@@ -45,32 +56,32 @@ namespace render
 			std::string colorResult = directionalLights + indexStr + color;
 			std::string intensityResult = directionalLights + indexStr + intensity;
 
-			render::shaders[shaderID]->setVec3(
+			shaders[shaderID]->setVec3(
 				directionResult.c_str(),
 				directionalLight.direction.x(),
 				directionalLight.direction.y(),
 				directionalLight.direction.z());
-			render::shaders[shaderID]->setVec3(
+			shaders[shaderID]->setVec3(
 				colorResult.c_str(),
 				directionalLight.lightBase.color.r,
 				directionalLight.lightBase.color.g,
 				directionalLight.lightBase.color.b);
 
-			render::shaders[shaderID]->setFloat(intensityResult.c_str(), directionalLight.lightBase.intensity);
+			shaders[shaderID]->setFloat(intensityResult.c_str(), directionalLight.lightBase.intensity);
 		}
 	}
 
-	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID)
+	void uploadPointLights(safety::SafeArray<PointLight>* lightsArray, int shaderID)
 	{
-		if (!render::shaders[shaderID]->use())
+		if (!shaders[shaderID]->use())
 			return;
 
 		size_t lightsCount = lightsArray->getElementsCount();
-		render::shaders[shaderID]->setInt("amountOfPointLights", lightsCount);
+		shaders[shaderID]->setInt("amountOfPointLights", lightsCount);
 
 		for (size_t i = 0; i < lightsCount; ++i)
 		{
-			render::PointLight pointLight = lightsArray->getElement(i);
+			PointLight pointLight = lightsArray->getElement(i);
 			
 			std::string indexStr = std::to_string(i);
 			static const std::string pointLights = "pointLights[";
@@ -83,82 +94,36 @@ namespace render
 			std::string intensityResult = pointLights + indexStr + intensity;
 			std::string rangeResult = pointLights + indexStr + range;
 
-			render::shaders[shaderID]->setVec3(
+			shaders[shaderID]->setVec3(
 				posResult.c_str(), 
 				pointLight.position.x(), 
 				pointLight.position.y(), 
 				pointLight.position.z());
-			render::shaders[shaderID]->setVec3(
+			shaders[shaderID]->setVec3(
 				colorResult.c_str(), 
 				pointLight.lightBase.color.r, 
 				pointLight.lightBase.color.g, 
 				pointLight.lightBase.color.b);
 			
-			render::shaders[shaderID]->setFloat(intensityResult.c_str(), pointLight.lightBase.intensity);
-			render::shaders[shaderID]->setFloat(rangeResult.c_str(), pointLight.lightBase.range);
+			shaders[shaderID]->setFloat(intensityResult.c_str(), pointLight.lightBase.intensity);
+			shaders[shaderID]->setFloat(rangeResult.c_str(), pointLight.lightBase.range);
 		}
 	}
 
-	void uploadSpotLights(safety::SafeArray<render::SpotLight>* lightsArray, int shaderID)
+	void uploadSpotLights(size_t spotLightsCount, int shaderID)
 	{
-		if (!render::shaders[shaderID]->use())
+		if (!shaders[shaderID]->use())
 			return;
 
-		size_t lightsCount = lightsArray->getElementsCount();
-		render::shaders[shaderID]->setInt("amountOfSpotLights", lightsCount);
+		shaders[shaderID]->setInt("amountOfSpotLights", spotLightsCount);
 
-		for (size_t i = 0; i < lightsCount; ++i)
+		for (size_t i = 0; i < spotLightsCount; ++i)
 		{
-			render::SpotLight pointLight = lightsArray->getElement(i);
-
-			std::string indexStr = std::to_string(i);
-			static const std::string spotLights = "spotLights[";
-			static const std::string pos = "].pos";
-			static const std::string direction = "].direction";
-			static const std::string innerConeAngle = "].innerConeAngle";
-			static const std::string outerConeAngle = "].outerConeAngle";
-			static const std::string color = "].color";
-			static const std::string intensity = "].intensity";
-			static const std::string range = "].range";
-			std::string posResult = spotLights + indexStr + pos;
-			std::string directionResult = spotLights + indexStr + direction;
-			std::string innerConeAngleResult = spotLights + indexStr + innerConeAngle;
-			std::string outerConeAngleResult = spotLights + indexStr + outerConeAngle;
-			std::string colorResult = spotLights + indexStr + color;
-			std::string intensityResult = spotLights + indexStr + intensity;
-			std::string rangeResult = spotLights + indexStr + range;
-
-			render::shaders[shaderID]->setVec3(
-				posResult.c_str(),
-				pointLight.position.x(),
-				pointLight.position.y(),
-				pointLight.position.z());
-			render::shaders[shaderID]->setVec3(
-				directionResult.c_str(),
-				pointLight.direction.x(),
-				pointLight.direction.y(),
-				pointLight.direction.z());
-
-			render::shaders[shaderID]->setFloat(innerConeAngleResult.c_str(), pointLight.innerConeAngle);
-			render::shaders[shaderID]->setFloat(outerConeAngleResult.c_str(), pointLight.outerConeAngle);
-
-			render::shaders[shaderID]->setVec3(
-				colorResult.c_str(),
-				pointLight.lightBase.color.r,
-				pointLight.lightBase.color.g,
-				pointLight.lightBase.color.b);
-
-			render::shaders[shaderID]->setFloat(intensityResult.c_str(), pointLight.lightBase.intensity);
-			render::shaders[shaderID]->setFloat(rangeResult.c_str(), pointLight.lightBase.range);
+			SpotLightShadowMapOpenGL& spotLightShadowMap = spotLightShadowMaps[i];
+			spotLightShadowMap.passToLightingShader(shaderID, i);
 		}
+		PRINT_RENDERER_ERRORS;
 	}
-
-#define TEXTURE_UNIT_ALBEDO 0
-#define TEXTURE_UNIT_METALLIC_ROUGHNESS 1
-#define TEXTURE_UNIT_NORMAL 2
-#define TEXTURE_UNIT_OCCLUSION 3
-#define TEXTURE_UNIT_EMISSIVE 4
-#define TEXTURE_UNIT_ENVIRONMENT 7
 
 	void uploadMaterial(mitevox::Material* material, int shaderID)
 	{
@@ -171,7 +136,7 @@ namespace render
 				glBindTexture(GL_TEXTURE_2D, albedoMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, albedoMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, albedoMap->sampler->wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, albedoMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, albedoMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					albedoMap->getWidth(),
@@ -190,7 +155,7 @@ namespace render
 				glBindTexture(GL_TEXTURE_2D, metallicRoughnessMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, metallicRoughnessMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, metallicRoughnessMap->sampler->wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, metallicRoughnessMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, metallicRoughnessMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					metallicRoughnessMap->getWidth(),
@@ -209,7 +174,7 @@ namespace render
 				glBindTexture(GL_TEXTURE_2D, normalMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, normalMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, normalMap->sampler->wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, normalMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, normalMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					normalMap->getWidth(),
@@ -228,7 +193,7 @@ namespace render
 				glBindTexture(GL_TEXTURE_2D, occlusionMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, occlusionMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, occlusionMap->sampler->wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, occlusionMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, occlusionMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					occlusionMap->getWidth(),
@@ -247,7 +212,7 @@ namespace render
 				glBindTexture(GL_TEXTURE_2D, emissiveMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, emissiveMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, emissiveMap->sampler->wrappingModeV);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, emissiveMap->sampler->minificationFilter);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, emissiveMap->sampler->magnificationFilter);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					emissiveMap->getWidth(),
@@ -617,7 +582,8 @@ namespace render
 		mitevox::Mesh* mesh,
 		mathem::GeometryTransform* transform,
 		Camera* camera,
-		mathem::GeometryTransform* cameraTransform)
+		mathem::GeometryTransform* cameraTransform,
+		glm::mat4 viewProjectionMatrix)
 	{
 		if (!shaders[shaderID]->use())
 			return;
@@ -632,7 +598,6 @@ namespace render
 		mathem::Matrix4x4 modelMatrix = mathem::transformToMatrix(*transform);
 		shaders[shaderID]->setMatrix4x4("modelMatrix", modelMatrix);
 
-		glm::mat4 viewProjectionMatrix = camera->getViewProjectionMatrix(cameraTransform);
 		shaders[shaderID]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
 
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
@@ -727,7 +692,12 @@ namespace render
 		glDeleteTextures(1, &skybox->textureID);
 	}
 
-	void renderSkybox(RendererSettings* renderer, int shaderID, Cubemap* skybox, Camera* camera, mathem::GeometryTransform* cameraTransform)
+	void renderSkybox(
+		RendererSettings* renderer, 
+		int shaderID, 
+		Cubemap* skybox, 
+		Camera* camera, 
+		mathem::GeometryTransform* cameraTransform)
 	{
 		if (!shaders[shaderID]->use())
 			return;
@@ -739,8 +709,9 @@ namespace render
 
 		mathem::GeometryTransform cameraTransformOrientationOnly;
 		cameraTransformOrientationOnly.rotation = cameraTransform->rotation;
-		glm::mat4 viewProjectionMatrix = camera->getViewProjectionMatrix(&cameraTransformOrientationOnly);
-		shaders[shaderID]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
+		glm::mat4 viewMatrix = camera->getViewMatrix(&cameraTransformOrientationOnly);
+		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
+		shaders[shaderID]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 
 		renderer->amountOfDrawCalls++;
 

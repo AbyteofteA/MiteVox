@@ -31,7 +31,8 @@ namespace render
 
 		Camera();
 		Camera(float _FOV, int _width, int _height, float _nearCullPlane = 0.001f, float _farCullPlane = 100000.f);
-		glm::mat4 getViewProjectionMatrix(mathem::GeometryTransform* cameraTransform);
+		glm::mat4 getViewMatrix(mathem::GeometryTransform* cameraTransform);
+		glm::mat4 getProjectionMatrix();
 	};
 }
 

@@ -3,14 +3,23 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include <utility>
 
 namespace render
 {
-	
 	void drawPoint(RendererSettings* renderer, Point point)
 	{
 		renderer->points.appendElement(point);
 	}
+
+	void drawPoint(RendererSettings* renderer, mathem::Vector3D position, ColorRGBAf color)
+	{
+		Point point;
+		point.position = position;
+		point.color = color;
+		renderer->points.appendElement(point);
+	}
+
 	void drawLine(RendererSettings* renderer, Point point1, Point point2)
 	{
 		renderer->lines.appendElement(point1);
@@ -42,6 +51,14 @@ namespace render
 		render::drawLine(renderer, point1, point4);
 		render::drawLine(renderer, point2, point5);
 		render::drawLine(renderer, point3, point6);
+	}
+
+	void drawCross(RendererSettings* renderer, mathem::Vector3D position, ColorRGBAf color, float size)
+	{
+		Point point;
+		point.position = position;
+		point.color = color;
+		drawCross(renderer, point, size);
 	}
 
 	void drawArrow(RendererSettings* renderer, mathem::Vector3D origin, mathem::Vector3D direction, ColorRGBAf color)
@@ -86,20 +103,29 @@ namespace render
 		render::drawLine(renderer, point4, point7);
 	}
 
+	void drawSnowflake(RendererSettings* renderer, mathem::Vector3D position, ColorRGBAf color, float size)
+	{
+		Point point;
+		point.position = position;
+		point.color = color;
+		drawSnowflake(renderer, point, size);
+	}
+
 	void renderPoints(RendererSettings* renderer, Camera* camera, mathem::GeometryTransform* cameraTransform)
 	{
 		unsigned int shaderIndex = renderer->primitiveShaderID;
 		if (!shaders[shaderIndex]->use())
 			return;
 
-		unsigned int amountOfPoints = renderer->points.getElementsCount();
-		if (amountOfPoints <= 0)
+		size_t amountOfPoints = renderer->points.getElementsCount();
+		if (amountOfPoints == 0)
 			return;
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 positionTransform = camera->getViewProjectionMatrix(cameraTransform);
-		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
+		glm::mat4 viewMatrix = camera->getViewMatrix(cameraTransform);
+		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
+		shaders[shaderIndex]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 
 		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
 		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
@@ -108,7 +134,7 @@ namespace render
 		glGenBuffers(1, &pointsVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfPoints,
-			renderer->points.getElementsArray(), GL_STATIC_DRAW);
+		renderer->points.getElementsArray(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		unsigned int pointsArrayID;
@@ -139,14 +165,15 @@ namespace render
 		if (!shaders[shaderIndex]->use())
 			return;
 
-		unsigned int amountOfLines = renderer->lines.getElementsCount();
-		if (amountOfLines <= 0)
+		size_t amountOfLines = renderer->lines.getElementsCount();
+		if (amountOfLines == 0)
 			return;
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 viewProjectionMatrix = camera->getViewProjectionMatrix(cameraTransform);
-		shaders[shaderIndex]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
+		glm::mat4 viewMatrix = camera->getViewMatrix(cameraTransform);
+		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
+		shaders[shaderIndex]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 
 		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
 		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
@@ -155,7 +182,7 @@ namespace render
 		glGenBuffers(1, &linesVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, linesVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfLines,
-			renderer->lines.getElementsArray(), GL_STATIC_DRAW);
+		renderer->lines.getElementsArray(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		unsigned int linesArrayID;
@@ -186,14 +213,15 @@ namespace render
 		if (!shaders[shaderIndex]->use())
 			return;
 
-		unsigned int amountOfTriangles = renderer->triangles.getElementsCount();
-		if (amountOfTriangles <= 0)
+		size_t amountOfTriangles = renderer->triangles.getElementsCount();
+		if (amountOfTriangles == 0)
 			return;
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 positionTransform = camera->getViewProjectionMatrix(cameraTransform);
-		shaders[shaderIndex]->setMat4("positionTransform", positionTransform);
+		glm::mat4 viewMatrix = camera->getViewMatrix(cameraTransform);
+		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
+		shaders[shaderIndex]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 
 		GLint posAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "position");
 		GLint colorAttrib = glGetAttribLocation(shaders[shaderIndex]->shaderID, "color");
@@ -202,7 +230,7 @@ namespace render
 		glGenBuffers(1, &trianglesVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, trianglesVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * amountOfTriangles,
-			renderer->triangles.getElementsArray(), GL_STATIC_DRAW);
+		renderer->triangles.getElementsArray(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		unsigned int trianglesArrayID;

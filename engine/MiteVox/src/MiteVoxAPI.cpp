@@ -134,8 +134,7 @@ namespace mitevox
 		meshPrimitive->initTriangles(12, true);
 		meshPrimitive->appendTopologyElements(12);
 		meshPrimitive->material->baseColor = color;
-		//meshPrimitive->material->illuminationModel = 0;
-
+		
 		const mathem::Vector3D cubeVertecesPositions[8] =
 		{
 			{-halfSizeX, -halfSizeY, -halfSizeZ}, 
@@ -195,7 +194,7 @@ namespace mitevox
 
 	Entity* MiteVoxAPI::createPlane(std::string name, render::ColorRGBAf color)
 	{
-		Entity* entity = MiteVoxAPI::createBox(name, 10.0f, 0.5f, 10.0f, { 0.0f, -5.0f, 0.0f }, color);
+		Entity* entity = MiteVoxAPI::createBox(name, 10.0f, 1.5f, 10.0f, { 0.0f, -1.5f, 0.0f }, color);
 		entity->setMass(0.0f);
 		return entity;
 	}
@@ -254,15 +253,6 @@ namespace mitevox
 	{
 		Scene* activeScene = MiteVoxAPI::getActiveScene();
 		engine->entitiesToSimulate.clear();
-		//if (engine->settings->spaceCulling)
-		//{
-		//	// TODO:
-		//	activeScene->foundation->getAll(&engine->entitiesToSimulate);
-		//}
-		//else
-		//{
-		//	engine->entitiesToSimulate.concatenate(&activeScene->entities);
-		//}
 		engine->entitiesToSimulate.concatenate(&activeScene->entities);
 		return &engine->entitiesToSimulate;
 	}
@@ -274,11 +264,6 @@ namespace mitevox
 			&engine->collisions, 
 			engine->settings->getEqualityTolerance());
 
-		/*Scene* activeScene = MiteVoxAPI::getActiveScene();
-		activeScene->foundation->getCollisions(
-			&engine->collisions, 
-			&engine->dataPointsContainers, 
-			engine->settings->getEqualityTolerance());*/
 		return &engine->collisions;
 	}
 
@@ -294,51 +279,5 @@ namespace mitevox
 			// TODO: return scene->computeLocalGravity();
 		}
 		return activeScene->globalGravity;
-	}
-
-	void MiteVoxAPI::renderNodeRecursively(
-		int shaderID,
-		Node* node,
-		mathem::GeometryTransform* nodeTransform,
-		render::Camera* camera,
-		mathem::GeometryTransform* cameraTransform)
-	{
-		mathem::GeometryTransform nodeGlobalTransform = *nodeTransform * node->transform;
-
-		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
-		{
-			render::tryUploadSkeleton(node, shaderID);
-			if (meshToRender->isUploaded == false)
-			{
-				render::uploadMesh(meshToRender, shaderID);
-			}
-			render::RendererSettings* rendererSettings = MiteVoxAPI::getSettings()->getRendererSettings();
-			render::renderMesh(rendererSettings, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
-		}
-		
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			MiteVoxAPI::renderNodeRecursively(
-				shaderID,
-				node->children.getElement(i),
-				&nodeGlobalTransform,
-				camera,
-				cameraTransform);
-		}
-	}
-
-	void MiteVoxAPI::removeNodeRecursively(int shaderID, Node* node)
-	{
-		if (mitevox::Mesh* meshToRender = node->getMeshToRender())
-		{
-			render::removeMesh(meshToRender, shaderID);
-		}
-
-		size_t childrenCount = node->children.getElementsCount();
-		for (size_t i = 0; i < childrenCount; ++i)
-		{
-			MiteVoxAPI::removeNodeRecursively(shaderID, node->children.getElement(i));
-		}
 	}
 }
