@@ -10,6 +10,16 @@ namespace render
 
 	};
 
+	enum struct CubemapSides
+	{
+		RIGHT = 0,
+		LEFT,
+		UP,
+		DOWN,
+		BACK,
+		FRONT
+	};
+
 	struct Cubemap
 	{
 		Cubemap();

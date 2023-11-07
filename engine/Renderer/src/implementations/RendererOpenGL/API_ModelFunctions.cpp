@@ -20,7 +20,6 @@ namespace render
 		if (!shaders[shaderID]->use())
 			return;
 
-		shaders[shaderID]->setVector3D("ambientLight", mathem::Vector3D::zero());
 		shaders[shaderID]->setInt("amountOfDirectionalLights", 0);
 		shaders[shaderID]->setInt("amountOfPointLights", 0);
 		shaders[shaderID]->setInt("amountOfSpotLights", 0);
@@ -35,17 +34,18 @@ namespace render
 		PRINT_RENDERER_ERRORS;
 	}
 
-	void uploadDirectionalLights(safety::SafeArray<DirectionalLight>* lightsArray, int shaderID)
+	void uploadDirectionalLights(safety::SafeArray<DirectionalLight>* lightsArray, size_t offset, size_t count, int shaderID)
 	{
 		if (!shaders[shaderID]->use())
 			return;
 
-		size_t lightsCount = lightsArray->getElementsCount();
-		shaders[shaderID]->setInt("amountOfDirectionalLights", lightsCount);
+		size_t remainingDirectionalLightsCount = lightsArray->getElementsCount() - offset;
+		count = std::min(count, remainingDirectionalLightsCount);
+		shaders[shaderID]->setInt("amountOfDirectionalLights", count);
 
-		for (size_t i = 0; i < lightsCount; ++i)
+		for (size_t i = 0; i < count; ++i)
 		{
-			DirectionalLight directionalLight = lightsArray->getElement(i);
+			DirectionalLight directionalLight = lightsArray->getElement(i + offset);
 
 			std::string indexStr = std::to_string(i);
 			static const std::string directionalLights = "directionalLights[";
@@ -71,17 +71,19 @@ namespace render
 		}
 	}
 
-	void uploadPointLights(safety::SafeArray<PointLight>* lightsArray, int shaderID)
+	void uploadPointLights(safety::SafeArray<PointLight>* lightsArray, size_t offset, size_t count, int shaderID)
 	{
 		if (!shaders[shaderID]->use())
 			return;
 
-		size_t lightsCount = lightsArray->getElementsCount();
-		shaders[shaderID]->setInt("amountOfPointLights", lightsCount);
+		size_t remainingPointLightsCount = lightsArray->getElementsCount() - offset;
+		count = std::min(count, remainingPointLightsCount);
 
-		for (size_t i = 0; i < lightsCount; ++i)
+		shaders[shaderID]->setInt("amountOfPointLights", count);
+
+		for (size_t i = 0; i < count; ++i)
 		{
-			PointLight pointLight = lightsArray->getElement(i);
+			PointLight pointLight = lightsArray->getElement(i + offset);
 			
 			std::string indexStr = std::to_string(i);
 			static const std::string pointLights = "pointLights[";
@@ -110,17 +112,59 @@ namespace render
 		}
 	}
 
-	void uploadSpotLights(size_t spotLightsCount, int shaderID)
+	void uploadSpotLights(safety::SafeArray<render::SpotLight>* lightsArray, size_t offset, size_t count, int shaderID)
 	{
 		if (!shaders[shaderID]->use())
 			return;
 
-		shaders[shaderID]->setInt("amountOfSpotLights", spotLightsCount);
+		size_t remainingSpotLightsCount = lightsArray->getElementsCount() - offset;
+		count = std::min(count, remainingSpotLightsCount);
 
-		for (size_t i = 0; i < spotLightsCount; ++i)
+		shaders[shaderID]->setInt("amountOfSpotLights", count);
+
+		for (size_t i = 0; i < count; ++i)
 		{
-			SpotLightShadowMapOpenGL& spotLightShadowMap = spotLightShadowMaps[i];
-			spotLightShadowMap.passToLightingShader(shaderID, i);
+			render::SpotLight spotLight = lightsArray->getElement(i + offset);
+
+			std::string indexStr = std::to_string(i);
+			static const std::string spotLights = "spotLights[";
+			static const std::string pos = "].pos";
+			static const std::string direction = "].direction";
+			static const std::string innerConeAngle = "].innerConeAngle";
+			static const std::string outerConeAngle = "].outerConeAngle";
+			static const std::string color = "].color";
+			static const std::string intensity = "].intensity";
+			static const std::string range = "].range";
+			std::string posResult = spotLights + indexStr + pos;
+			std::string directionResult = spotLights + indexStr + direction;
+			std::string innerConeAngleResult = spotLights + indexStr + innerConeAngle;
+			std::string outerConeAngleResult = spotLights + indexStr + outerConeAngle;
+			std::string colorResult = spotLights + indexStr + color;
+			std::string intensityResult = spotLights + indexStr + intensity;
+			std::string rangeResult = spotLights + indexStr + range;
+
+			shaders[shaderID]->setVec3(
+				posResult.c_str(),
+				spotLight.position.x(),
+				spotLight.position.y(),
+				spotLight.position.z());
+			shaders[shaderID]->setVec3(
+				directionResult.c_str(),
+				spotLight.direction.x(),
+				spotLight.direction.y(),
+				spotLight.direction.z());
+
+			shaders[shaderID]->setFloat(innerConeAngleResult.c_str(), spotLight.innerConeAngle);
+			shaders[shaderID]->setFloat(outerConeAngleResult.c_str(), spotLight.outerConeAngle);
+
+			shaders[shaderID]->setVec3(
+				colorResult.c_str(),
+				spotLight.lightBase.color.r,
+				spotLight.lightBase.color.g,
+				spotLight.lightBase.color.b);
+
+			shaders[shaderID]->setFloat(intensityResult.c_str(), spotLight.lightBase.intensity);
+			shaders[shaderID]->setFloat(rangeResult.c_str(), spotLight.lightBase.range);
 		}
 		PRINT_RENDERER_ERRORS;
 	}

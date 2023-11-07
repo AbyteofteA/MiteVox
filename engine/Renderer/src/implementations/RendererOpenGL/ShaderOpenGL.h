@@ -64,6 +64,7 @@ namespace render
         void setMatrix3x3(const char* name, mathem::Matrix3x3 matrix);
         void setMatrix4x4(const char* name, mathem::Matrix4x4 matrix);
         void setMatrix4x4Array(const char* name, safety::SafeArray<mathem::Matrix4x4>* matrices);
+        void setMat4Array(const char* name, safety::SafeArray<glm::mat4>* matrices);
 
     private:
 

@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\implementations\RendererOpenGL\SpotLightShadowMapOpenGL.h" />
+    <ClInclude Include="src\implementations\RendererOpenGL\ShadowMapPack.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\RendererOpenGL.h" />
     <ClInclude Include="src\implementations\RendererOpenGL\ShaderOpenGL.h" />
     <ClInclude Include="src\RendererAPI\RendererAPI.h" />
@@ -40,8 +40,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\implementations\RendererOpenGL\ShadowMapPack.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_ShadowFunctions.cpp" />
-    <ClCompile Include="src\implementations\RendererOpenGL\SpotLightShadowMapOpenGL.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_GeneralFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_ModelFunctions.cpp" />
     <ClCompile Include="src\implementations\RendererOpenGL\API_PrimitiveFunctions.cpp" />

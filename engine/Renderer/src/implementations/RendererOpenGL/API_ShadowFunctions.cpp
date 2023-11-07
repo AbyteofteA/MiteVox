@@ -4,37 +4,7 @@
 
 namespace render
 {
-	void tryAllocateSpotLightShadowMaps(size_t count)
-	{
-		spotLightShadowMaps.resize(count);
-	}
-
-	void tryAllocateDirectionalLightShadowMaps(size_t count)
-	{
-		// TODO: 
-	}
-
-	void tryAllocatePointLightShadowMaps(size_t count)
-	{
-		// TODO: 
-	}
-
-	void selectSpotLightShadowMap(int shaderID, size_t index)
-	{
-		spotLightShadowMaps[index].activate(shaderID);
-	}
-
-	void selectDirectionalLightShadowMap(int shaderID, size_t index)
-	{
-		// TODO: 
-	}
-
-	void selectPointLightShadowMap(int shaderID, size_t index)
-	{
-		// TODO: 
-	}
-
-	void renderMeshToSpotLightShadowMap(
+	void renderMeshToShadowMap(
 		RendererSettings* renderer,
 		int shaderID,
 		mitevox::Mesh* mesh,
@@ -68,23 +38,5 @@ namespace render
 
 			PRINT_RENDERER_ERRORS;
 		}
-	}
-
-	void renderMeshToDirectionalLightShadowMap(
-		RendererSettings* renderer,
-		int shaderID,
-		mitevox::Mesh* mesh,
-		mathem::GeometryTransform* transform)
-	{
-		// TODO: 
-	}
-
-	void renderMeshToPointLightShadowMap(
-		RendererSettings* renderer,
-		int shaderID,
-		mitevox::Mesh* mesh,
-		mathem::GeometryTransform* transform)
-	{
-		// TODO: 
 	}
 }

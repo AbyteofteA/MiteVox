@@ -80,8 +80,10 @@ struct SpotLight
 #define MAX_OF_SPOT_LIGHTS 16
 uniform int amountOfSpotLights;
 uniform SpotLight spotLights[MAX_OF_SPOT_LIGHTS];
-uniform sampler2D spotShadowMaps[MAX_OF_SPOT_LIGHTS];
-uniform mat4 spotLightMatrices[MAX_OF_SPOT_LIGHTS];
+
+#define SHADOW_MAP_PACK_SIZE 16
+uniform sampler2DArray shadowMapPack;
+uniform mat4 lightMatrices[SHADOW_MAP_PACK_SIZE];
 
 uniform vec3 fogColor = vec3(0.05f, 0.05f, 0.05f);
 uniform float fogMinDistance = 20.0f;
@@ -175,16 +177,6 @@ vec3 calculateLightSourcePBR(
 	float dotNormLightDir = max(dot(norm, lightDir), 0.0f);
 	vec3 halfVector = normalize(lightDir + viewDir);
 
-	// Reflection fraction
-	vec3 specularFraction = specularFractionFunction(norm, viewDir, F0, roughness);
-
-	// Refraction fraction
-	vec3 diffuseFraction = vec3(1.0f) - specularFraction;
-	diffuseFraction *= (1.0f - metallicity);
-
-	// Diffuse component
-	vec3 diffuseBRDF = diffuseFraction * albedoFragment / PI;
-
 	// Specular component
 	float microfacetsAlignment = normalDistributionFunction(norm, halfVector, roughness);
 	float microfacetShadowing = geometryFunction(dotNormLightDir, K) * geometryFunction(dotNormViewDir, K);
@@ -227,11 +219,157 @@ float calculateAttenuation(float currentDistance, float range)
 	return max(min(1.0f - pow(currentDistance / range, 4.0f), 1.0f), 0.0f) / pow(currentDistance, 2.0f);
 }
 
+float calculateSpotShadow(int lightIndex)
+{
+	float shadowFraction = 0.0f;
+	vec4 fragmentLightSpace = lightMatrices[lightIndex] * vec4(fragment.Position, 1.0f);
+	fragmentLightSpace.xyz /= fragmentLightSpace.w;
+	if (fragmentLightSpace.z <= 1.0f)
+	{
+		fragmentLightSpace.xyz = fragmentLightSpace.xyz * 0.5f + 0.5f;
+		vec2 pixelSize = 1.0f / textureSize(shadowMapPack, 0).xy;
+		int radius = 2;
+		for (int x = -radius; x <= radius; ++x)
+		{
+			for (int y = -radius; y <= radius; ++y)
+			{
+				vec3 samplePos;
+				samplePos.xy = fragmentLightSpace.xy + vec2(x, y) * pixelSize;
+				samplePos.z = lightIndex;
+				float closestDepth = texture(shadowMapPack, samplePos).r;
+				float currentDepth = fragmentLightSpace.z;
+				if (currentDepth > closestDepth)
+				{
+					shadowFraction += 1.0f;
+				}
+			}
+		}
+		shadowFraction /= 25.0f;
+	}
+	return 1.0f - shadowFraction;
+}
+
+vec3 sampleCubemap(vec3 direction)
+{
+	/// result.x = U
+	/// result.y = V
+	/// result.z = index of cubemap texture
+	vec3 result = vec3(0.0f);
+
+	// Determine side of the cubemap
+
+	bool positiveX = direction.x > 0.0f;
+	bool positiveY = direction.y > 0.0f;
+	bool positiveZ = direction.z > 0.0f;
+
+	float absX = abs(direction.x);
+	float absY = abs(direction.y);
+	float absZ = abs(direction.z);
+	float maxAxis = max(absX, absY);
+	maxAxis = max(maxAxis, absZ);
+
+	// Stretch the direction vector so that it touches the unit cube
+	direction /= maxAxis;
+
+	// Select UV values based on the cubemap side and current shadow cubemap matrices
+
+	if (maxAxis == absX)
+	{
+		if (positiveX)
+		{
+			result.x = direction.z;
+			result.y = direction.y;
+			result.z = 0;
+		}
+		else
+		{
+			result.x = -direction.z;
+			result.y = direction.y;
+			result.z = 1;
+		}
+	}
+	if (maxAxis == absY)
+	{
+		if (positiveY) 
+		{
+			result.x = direction.x;
+			result.y = direction.z;
+			result.z = 2;
+		}
+		else
+		{
+			result.x = direction.x;
+			result.y = -direction.z;
+			result.z = 3;
+		}
+	}
+	if (maxAxis == absZ)
+	{
+		if (positiveZ) 
+		{
+			result.x = -direction.x;
+			result.y = direction.y;
+			result.z = 4;
+		}
+		else
+		{
+			result.x = direction.x;
+			result.y = direction.y;
+			result.z = 5;
+		}
+	}
+
+	// Convert UV to [0, 1] range
+
+	result.x = 0.5f * result.x + 0.5f;
+	result.y = 0.5f * result.y + 0.5f;
+	return result;
+}
+
+float calculatePointShadow(int lightIndex)
+{
+	float shadowFraction = 0.0f;
+	vec3 lightToFragmentDir = fragment.Position - pointLights[lightIndex].pos;
+	lightToFragmentDir = normalize(lightToFragmentDir);
+	
+	vec3 samplePos = sampleCubemap(lightToFragmentDir);
+
+	int lightMatrixIndex = int(samplePos.z);
+	vec4 fragmentLightSpace = lightMatrices[lightMatrixIndex] * vec4(fragment.Position, 1.0f);
+	fragmentLightSpace.xyz /= fragmentLightSpace.w;
+	if (fragmentLightSpace.z <= 1.0f)
+	{
+		fragmentLightSpace.xyz = fragmentLightSpace.xyz * 0.5f + 0.5f;
+		float currentDepth = fragmentLightSpace.z;
+
+		float pixelSize = 2.0f / textureSize(shadowMapPack, 0).x;
+		int radius = 1;
+		for (int x = -radius; x <= radius; ++x)
+		{
+			for (int y = -radius; y <= radius; ++y)
+			{
+				for (int z = -radius; z <= radius; ++z)
+				{
+					vec3 sampleDir = lightToFragmentDir + pixelSize * vec3(x, y, z);
+					samplePos = sampleCubemap(sampleDir);
+					float closestDepth = texture(shadowMapPack, samplePos).r;
+					if (currentDepth > closestDepth)
+					{
+						shadowFraction += 1.0f;
+					}
+				}
+			}
+		}
+		shadowFraction /= 27.0f;
+	}
+	return 1.0f - shadowFraction;
+}
+
 vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, vec3 norm, float occlusion)
 {
 	// Ambient light
 	vec3 result = vec3(0.0f);
-	//vec3 result = ambientLight * occlusion * albedoFragment;
+	result = ambientLight * occlusion * diffuseBRDF;
 
 	// Directional lights
 	for (int i = 0; i < amountOfDirectionalLights; i++)
@@ -245,6 +383,8 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	// Point lights
 	for (int i = 0; i < amountOfPointLights; i++)
 	{
+		float shadowFraction = calculatePointShadow(i);
+
 		vec3 lightDir = pointLights[i].pos - fragment.Position;
 		float distance = abs(length(lightDir));
 		float attenuation = 0.0f;
@@ -252,7 +392,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 		{
 			attenuation = calculateAttenuation(distance, pointLights[i].range);
 		}
-		vec3 lightColor = pointLights[i].color * pointLights[i].intensity * attenuation;
+		vec3 lightColor = pointLights[i].color * pointLights[i].intensity * attenuation * shadowFraction;
 		lightDir = normalize(lightDir);
 		
 		result += calculateLightSource(albedoFragment, roughness, metallicity, F0, K, norm, viewDir, dotNormViewDir, lightDir, lightColor);
@@ -261,29 +401,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	// Spot lights
 	for (int i = 0; i < amountOfSpotLights; i++)
 	{
-		float shadowFraction = 0.0f;
-		vec4 fragmentLightSpace = spotLightMatrices[i] * vec4(fragment.Position, 1.0f);
-		fragmentLightSpace.xyz /= fragmentLightSpace.w;
-		if (fragmentLightSpace.z <= 1.0f)
-		{
-			fragmentLightSpace.xyz = fragmentLightSpace.xyz * 0.5f + 0.5f;
-			vec2 pixelSize = 1.0f / textureSize(spotShadowMaps[i], 0);
-			int radius = 2;
-			for (int x = -radius; x <= radius; ++x)
-			{
-				for (int y = -radius; y <= radius; ++y)
-				{
-					float closestDepth = texture(spotShadowMaps[i], fragmentLightSpace.xy + vec2(x, y) * pixelSize).r;
-					float currentDepth = fragmentLightSpace.z;
-					if (currentDepth > closestDepth)
-					{
-						shadowFraction += 1.0f;
-					}
-				}
-			}
-			shadowFraction /= 25.0f;
-		}
-		shadowFraction = 1.0f - shadowFraction;
+		float shadowFraction = calculateSpotShadow(i);
 
 		vec3 lightDir = spotLights[i].pos - fragment.Position;
 		float distance = abs(length(lightDir));
@@ -377,21 +495,21 @@ void main()
 	K = (roughnessSquared + 1.0f) * (roughnessSquared + 1.0f) / 8.0f;
 	F0 = vec3(0.04f);
 	F0 = mix(F0, albedoFragment.rgb, metallicity);
-	dotNormViewDir = max(dot(norm, viewDir), 0.0f);
-	specularFraction = specularFractionFunction(norm, viewDir, F0, roughness);
-	diffuseFraction = vec3(1.0f) - specularFraction;
+	dotNormViewDir = max(dot(norm, viewDir), 0.05f); // (Clamping to 0.0f causes artifacts)
+	specularFraction = specularFractionFunction(norm, viewDir, F0, roughness); // Reflection fraction
+	diffuseFraction = vec3(1.0f) - specularFraction; // Refraction fraction
 	diffuseFraction *= (1.0f - metallicity);
 	diffuseBRDF = diffuseFraction * albedoFragment.rgb / PI;
 
 	vec4 resultColor = vec4(calculateLighting(albedoFragment.rgb, roughness, metallicity, norm, occlusion), 1.0f);
 	resultColor += vec4(emissiveFragment, 1.0f);
 
-	//resultColor.rgb = resultColor.rgb / (resultColor.rgb + vec3(1.0f));
-	//resultColor.rgb = pow(resultColor.rgb, vec3(1.0f / gammaCorrection));
+	resultColor.rgb = resultColor.rgb / (resultColor.rgb + vec3(1.0f));
+	resultColor.rgb = pow(resultColor.rgb, vec3(1.0f / gammaCorrection));
 
 	// Linear fog
-	//float fogFactor = calculateLinearFog();
-	//resultColor.rgb = mix(resultColor.rgb, fogColor, fogFactor);
+	float fogFactor = calculateLinearFog();
+	resultColor.rgb = mix(resultColor.rgb, fogColor, fogFactor);
 
 	outColor = resultColor;
 }

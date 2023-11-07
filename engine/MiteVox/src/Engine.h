@@ -47,7 +47,7 @@ namespace mitevox
 		int basicShader = -1;
 		int primitiveShader = -1;
 		int skyboxShader = -1;
-		int shadowMapShader = -1;
+		int shadowMapPackShader = -1;
 
 		mathem::PileAllocator<Entity> entitiesAllocator;
 

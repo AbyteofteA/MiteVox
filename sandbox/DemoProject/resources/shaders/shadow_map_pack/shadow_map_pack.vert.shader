@@ -1,4 +1,4 @@
-#version 450 core
+#version 330 core
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
@@ -9,7 +9,6 @@ layout(location = 5) in uvec4 joints;
 layout(location = 6) in vec4 weights;
 layout(location = 7) in vec4 tangent;
 
-uniform mat4 viewProjectionMatrix;
 uniform mat4 modelMatrix;
 
 uniform int jointsCount;
@@ -27,7 +26,6 @@ void main()
 			weights.w * jointMatrices[joints.w];
 	}
 
-	mat4 poseModelMatrix = modelMatrix * poseMatrix;
-	gl_Position = viewProjectionMatrix * poseModelMatrix * vec4(position, 1.0);
+	gl_Position = modelMatrix * poseMatrix * vec4(position, 1.0f);
 }
 

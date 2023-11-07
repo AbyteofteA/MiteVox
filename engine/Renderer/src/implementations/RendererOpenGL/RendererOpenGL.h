@@ -7,12 +7,12 @@
 
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Renderer/src/implementations/RendererOpenGL/ShaderOpenGL.h"
-#include "engine/Renderer/src/implementations/RendererOpenGL/SpotLightShadowMapOpenGL.h"
+#include "engine/Renderer/src/implementations/RendererOpenGL/ShadowMapPack.h"
 
 namespace render
 {
 	extern ShaderOpenGL* shaders[MAX_SHADERS]; // TODO: replace with SafeArray
-	extern safety::SafeArray<SpotLightShadowMapOpenGL> spotLightShadowMaps;
+	extern ShadowMapPack shadowMapPack;
 }
 
 #endif

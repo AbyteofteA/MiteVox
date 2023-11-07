@@ -96,9 +96,9 @@ printErrors(__FILE__, __LINE__);
 
 	void resetLights(int shaderID);
 	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID);
-	void uploadDirectionalLights(safety::SafeArray<render::DirectionalLight>* lightsArray, int shaderID);
-	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, int shaderID);
-	void uploadSpotLights(size_t spotLightsCount, int shaderID);
+	void uploadDirectionalLights(safety::SafeArray<render::DirectionalLight>* lightsArray, size_t offset, size_t count, int shaderID);
+	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, size_t offset, size_t count, int shaderID);
+	void uploadSpotLights(safety::SafeArray<render::SpotLight>* lightsArray, size_t offset, size_t count, int shaderID);
 
 	void uploadMaterial(mitevox::Material* material, int shaderID);
 	void selectMaterial(mitevox::Material* material, int shaderID);
@@ -134,23 +134,7 @@ printErrors(__FILE__, __LINE__);
 
 	// Shadows
 
-	void tryAllocateSpotLightShadowMaps(size_t count);
-	void tryAllocateDirectionalLightShadowMaps(size_t count);
-	void tryAllocatePointLightShadowMaps(size_t count);
-	void selectSpotLightShadowMap(int shaderID, size_t index);
-	void selectDirectionalLightShadowMap(int shaderID, size_t index);
-	void selectPointLightShadowMap(int shaderID, size_t index);
-	void renderMeshToSpotLightShadowMap(
-		RendererSettings* renderer,
-		int shaderID,
-		mitevox::Mesh* mesh,
-		mathem::GeometryTransform* transform);
-	void renderMeshToDirectionalLightShadowMap(
-		RendererSettings* renderer,
-		int shaderID,
-		mitevox::Mesh* mesh,
-		mathem::GeometryTransform* transform);
-	void renderMeshToPointLightShadowMap(
+	void renderMeshToShadowMap(
 		RendererSettings* renderer,
 		int shaderID,
 		mitevox::Mesh* mesh,

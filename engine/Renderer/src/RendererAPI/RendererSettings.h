@@ -28,7 +28,7 @@ namespace render
 		int screenWidth = SCREEN_WIDTH;
 		int screenHeight = SCREEN_HEIGHT;
 
-		size_t pointLightShadowMapSize = 1024;
+		size_t pointLightShadowMapSize = 2048;
 		size_t directionalLightShadowMapSize = 2048;
 		size_t spotLightShadowMapSize = 2048;
 

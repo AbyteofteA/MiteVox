@@ -65,7 +65,7 @@ namespace mitevox
 		basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
 		skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
 		primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
-		shadowMapShader = render::createShader("Shadow Map Shader", shadersDir + "/shadow_map/shadow_map");
+		shadowMapPackShader = render::createShader("Shadow Map Pack Shader", shadersDir + "/shadow_map_pack/shadow_map_pack");
 		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
 
 		uploadScene(playground->scenes.getElement(0), basicShader);
@@ -201,9 +201,9 @@ namespace mitevox
 
 				MiteVoxAPI::renderScene(
 					renderer,
-					shadowMapShader,
+					shadowMapPackShader,
 					basicShader,
-					{ 0.0f, 0.0f, 0.0f },
+					{ 0.15f, 0.15f, 0.15f },
 					& pointLightsArray,
 					& directionalLightsArray,
 					& spotLightsArray,

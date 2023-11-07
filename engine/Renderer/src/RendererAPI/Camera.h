@@ -25,12 +25,12 @@ namespace render
 		std::string _name;
 		float FOV = 45.f;
 		float aspectRatio = 1.777777f;
-		float nearCullPlane = 0.1f;
-		float farCullPlane = 100000.f;
+		float nearCullPlane = 0.001f;
+		float farCullPlane = 1500.0f;
 		mathem::Vector3D upDirection = { 0.0f, 1.0f, 0.0f };
 
 		Camera();
-		Camera(float _FOV, int _width, int _height, float _nearCullPlane = 0.001f, float _farCullPlane = 100000.f);
+		Camera(float _FOV, int _width, int _height, float _nearCullPlane = 0.001f, float _farCullPlane = 1500.0f);
 		glm::mat4 getViewMatrix(mathem::GeometryTransform* cameraTransform);
 		glm::mat4 getProjectionMatrix();
 	};

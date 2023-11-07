@@ -70,7 +70,7 @@ namespace render
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
+		//glBlendFunc(GL_ONE, GL_ONE);
 		glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 
 		if (renderer->backfaceCulling)

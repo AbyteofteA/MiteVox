@@ -226,6 +226,11 @@ namespace render
         glUniformMatrix4fv(glGetUniformLocation(shaderID, name), matrices->getElementsCount(), GL_FALSE, (float*)matrices->getElementsArray());
     }
 
+    void ShaderOpenGL::setMat4Array(const char* name, safety::SafeArray<glm::mat4>* matrices)
+    {
+        glUniformMatrix4fv(glGetUniformLocation(shaderID, name), matrices->getElementsCount(), GL_FALSE, (float*)matrices->getElementsArray());
+    }
+
     void ShaderOpenGL::deleteVertexShader()
     {
         if (vertexID != 0)

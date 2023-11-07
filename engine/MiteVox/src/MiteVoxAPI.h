@@ -109,6 +109,16 @@ namespace mitevox
 			mathem::GeometryTransform* cameraTransform,
 			glm::mat4 viewProjectionMatrix);
 
+		static void renderSceneWithPointLights(
+			render::RendererSettings* renderer,
+			int shadowMapShaderID,
+			int lightingShaderID,
+			safety::SafeArray<render::PointLight>* pointLightsArray,
+			safety::SafeArray<Entity*> entities,
+			render::Camera* camera,
+			mathem::GeometryTransform* cameraTransform,
+			glm::mat4 viewProjectionMatrix);
+
 	private:
 
 		static Engine* engine;

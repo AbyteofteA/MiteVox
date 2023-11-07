@@ -44,10 +44,11 @@ namespace mitevox
 		
 		render::resetLights(lightingShaderID);
 		render::setAmbientLight(ambientLight, lightingShaderID);
-		render::uploadDirectionalLights(directionalLightsArray, lightingShaderID);
-		render::uploadPointLights(pointLightsArray, lightingShaderID);
+		//render::uploadDirectionalLights(directionalLightsArray, lightingShaderID);
+		//render::uploadPointLights(pointLightsArray, lightingShaderID);
 		
 		glDepthFunc(GL_LEQUAL);
+		glDisable(GL_BLEND);
 		
 		// TODO: replace with G-Buffer rendering
 		size_t entitiesCount = entities.getElementsCount();
@@ -65,6 +66,7 @@ namespace mitevox
 		}
 
 		renderSceneWithSpotLights(renderer, shadowMapShaderID, lightingShaderID, spotLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
+		renderSceneWithPointLights(renderer, shadowMapShaderID, lightingShaderID, pointLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
 	}
 
 	void renderNodeRecursively(
@@ -107,7 +109,7 @@ namespace mitevox
 		}
 	}
 
-	void renderNodeToSpotLightShadowMapRecursively(
+	void renderNodeToShadowMapRecursively(
 		render::RendererSettings* renderer,
 		int shaderID,
 		Node* node,
@@ -122,13 +124,13 @@ namespace mitevox
 			{
 				render::uploadMesh(meshToRender, shaderID);
 			}
-			render::renderMeshToSpotLightShadowMap(renderer, shaderID, meshToRender, &nodeGlobalTransform);
+			render::renderMeshToShadowMap(renderer, shaderID, meshToRender, &nodeGlobalTransform);
 		}
 
 		size_t childrenCount = node->children.getElementsCount();
 		for (size_t i = 0; i < childrenCount; ++i)
 		{
-			renderNodeToSpotLightShadowMapRecursively(
+			renderNodeToShadowMapRecursively(
 				renderer,
 				shaderID,
 				node->children.getElement(i),
@@ -136,7 +138,7 @@ namespace mitevox
 		}
 	}
 
-	void renderSceneToSpotLightShadowMap(
+	void renderSceneToShadowMap(
 		render::RendererSettings* renderer,
 		int shaderID,
 		safety::SafeArray<Entity*> entities)
@@ -147,7 +149,7 @@ namespace mitevox
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
 			Entity* entity = entities.getElement(i);
-			renderNodeToSpotLightShadowMapRecursively(
+			renderNodeToShadowMapRecursively(
 				renderer,
 				shaderID,
 				entity->renderableNode,
@@ -176,26 +178,22 @@ namespace mitevox
 			render::useShader(shadowMapShaderID);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
-			glDepthFunc(GL_LEQUAL);
+			glDepthFunc(GL_LESS);
 
 			size_t spotLightsPerCall = std::min(spotLightsCount - spotLightOffset, renderer->spotLightsPerCall);
-			render::tryAllocateSpotLightShadowMaps(spotLightsPerCall);
-
-			for (size_t i = 0; i < spotLightsPerCall; ++i)
-			{
-				render::SpotLight spotLight = spotLightsArray->getElement(i + spotLightOffset);
-				render::SpotLightShadowMapOpenGL& spotLightShadowMap = render::spotLightShadowMaps[i];
-				spotLightShadowMap.init(renderer->spotLightShadowMapSize, renderer->spotLightShadowMapSize, spotLight);
-				render::selectSpotLightShadowMap(shadowMapShaderID, i);
-				render::clearBufferZ();
-				renderSceneToSpotLightShadowMap(renderer, shadowMapShaderID, entities);
-			}
+			render::shadowMapPack.init(spotLightsPerCall, renderer->spotLightShadowMapSize, renderer->spotLightShadowMapSize);
+			render::shadowMapPack.makeLightMatrices(spotLightsArray, spotLightOffset, spotLightsPerCall);
+			render::shadowMapPack.activate(shadowMapShaderID);
+			render::clearBufferZ();
+			renderSceneToShadowMap(renderer, shadowMapShaderID, entities);
 
 			// Render the scene
 
 			render::activateDefaultFramebuffer(renderer->screenWidth, renderer->screenHeight);
 			render::useShader(lightingShaderID);
-			render::uploadSpotLights(spotLightsPerCall, lightingShaderID);
+			render::resetLights(lightingShaderID);
+			render::uploadSpotLights(spotLightsArray, spotLightOffset, spotLightsPerCall, lightingShaderID);
+			render::shadowMapPack.passToLightingShader(lightingShaderID);
 
 			glCullFace(GL_BACK);
 			if (renderer->backfaceCulling)
@@ -206,7 +204,8 @@ namespace mitevox
 			{
 				glDisable(GL_CULL_FACE);
 			}
-			glDepthFunc(GL_EQUAL);
+			glDepthFunc(GL_LEQUAL);
+			glEnable(GL_BLEND);
 
 			size_t entitiesCount = entities.getElementsCount();
 			for (size_t i = 0; i < entitiesCount; ++i)
@@ -223,6 +222,71 @@ namespace mitevox
 			}
 
 			spotLightOffset += spotLightsPerCall;
+		}
+	}
+
+	void MiteVoxAPI::renderSceneWithPointLights(
+		render::RendererSettings* renderer,
+		int shadowMapShaderID,
+		int lightingShaderID,
+		safety::SafeArray<render::PointLight>* pointLightsArray,
+		safety::SafeArray<Entity*> entities,
+		render::Camera* camera,
+		mathem::GeometryTransform* cameraTransform,
+		glm::mat4 viewProjectionMatrix)
+	{
+		size_t lightsCount = pointLightsArray->getElementsCount();
+
+		for (size_t i = 0; i < lightsCount; ++i)
+		{
+			render::PointLight pointLight = pointLightsArray->getElement(i);
+
+			// Render shadow maps
+
+			render::useShader(shadowMapShaderID);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_FRONT);
+			glDepthFunc(GL_LESS);
+
+			render::shadowMapPack.init(6, renderer->pointLightShadowMapSize, renderer->pointLightShadowMapSize);
+			render::shadowMapPack.makeLightMatrices(pointLight);
+			render::shadowMapPack.activate(shadowMapShaderID);
+			render::clearBufferZ();
+			renderSceneToShadowMap(renderer, shadowMapShaderID, entities);
+
+			// Render the scene
+
+			render::activateDefaultFramebuffer(renderer->screenWidth, renderer->screenHeight);
+			render::useShader(lightingShaderID);
+			render::resetLights(lightingShaderID);
+			render::uploadPointLights(pointLightsArray, i, 1, lightingShaderID);
+			render::shadowMapPack.passToLightingShader(lightingShaderID);
+
+			glCullFace(GL_BACK);
+			if (renderer->backfaceCulling)
+			{
+				glEnable(GL_CULL_FACE);
+			}
+			else
+			{
+				glDisable(GL_CULL_FACE);
+			}
+			glDepthFunc(GL_LEQUAL);
+			glEnable(GL_BLEND);
+
+			size_t entitiesCount = entities.getElementsCount();
+			for (size_t i = 0; i < entitiesCount; ++i)
+			{
+				Entity* entity = entities.getElement(i);
+				renderNodeRecursively(
+					renderer,
+					lightingShaderID,
+					entity->renderableNode,
+					&entity->transform,
+					camera,
+					cameraTransform,
+					viewProjectionMatrix);
+			}
 		}
 	}
 }
