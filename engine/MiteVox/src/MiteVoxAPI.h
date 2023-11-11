@@ -87,7 +87,8 @@ namespace mitevox
 		static void renderScene(
 			render::RendererSettings* renderer,
 			int shadowMapShaderID,
-			int lightingShaderID,
+			int gBufferShaderID,
+			int deferredLightingShaderID,
 			mathem::Vector3D ambientLight,
 			safety::SafeArray<render::PointLight>* pointLightsArray,
 			safety::SafeArray<render::DirectionalLight>* directionalLightsArray,
@@ -98,6 +99,14 @@ namespace mitevox
 			safety::SafeArray<Entity*> entities,
 			int skyboxShaderID = -1,
 			render::Cubemap* skybox = nullptr);
+
+		static void renderSceneToGbuffer(
+			render::RendererSettings* renderer,
+			int shaderID,
+			render::Camera* camera,
+			mathem::GeometryTransform* cameraTransform,
+			glm::mat4 viewProjectionMatrix,
+			safety::SafeArray<Entity*> entities);
 
 		static void renderSceneWithSpotLights(
 			render::RendererSettings* renderer,

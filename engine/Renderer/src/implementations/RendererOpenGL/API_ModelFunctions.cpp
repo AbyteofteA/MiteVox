@@ -15,11 +15,52 @@
 
 namespace render
 {
+	size_t screenQuadVBO = 0;
+	size_t screenQuadID = 0;
+	size_t getScreenQuadID()
+	{
+		if (screenQuadID == 0)
+		{
+			glGenBuffers(1, &screenQuadVBO); // TODO: glDeleteBuffers(1, &screenQuadVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, screenQuadVBO);
+			glGenVertexArrays(1, &screenQuadID);
+			glBindVertexArray(screenQuadID);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24, screenQuad, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(DEFAULT_ATTRIBUTE_POSITION);
+			glVertexAttribPointer(DEFAULT_ATTRIBUTE_POSITION, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+			glEnableVertexAttribArray(DEFAULT_ATTRIBUTE_TEX_COORD_0);
+			glVertexAttribPointer(DEFAULT_ATTRIBUTE_TEX_COORD_0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
+		}
+		return screenQuadID;
+	}
+
+	size_t unitCubeVBO = 0;
+	size_t unitCubeID = 0;
+	size_t getUnitCubeID()
+	{
+		if (unitCubeID == 0)
+		{
+			glGenBuffers(1, &unitCubeVBO); // TODO: glDeleteBuffers(1, &unitCubeVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, unitCubeVBO);
+			glGenVertexArrays(1, &unitCubeID);
+			glBindVertexArray(unitCubeID);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 108, unitCubePositions, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(DEFAULT_ATTRIBUTE_POSITION);
+			glVertexAttribPointer(DEFAULT_ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
+		}
+		return unitCubeID;
+	}
+
 	void resetLights(int shaderID)
 	{
 		if (!shaders[shaderID]->use())
 			return;
 
+		shaders[shaderID]->setVector3D("ambientLight", mathem::Vector3D::zero());
 		shaders[shaderID]->setInt("amountOfDirectionalLights", 0);
 		shaders[shaderID]->setInt("amountOfPointLights", 0);
 		shaders[shaderID]->setInt("amountOfSpotLights", 0);
@@ -169,14 +210,13 @@ namespace render
 		PRINT_RENDERER_ERRORS;
 	}
 
-	void uploadMaterial(mitevox::Material* material, int shaderID)
+	void uploadMaterial(mitevox::Material* material)
 	{
 		if (mitevox::Texture* albedoMap = material->albedoMap)
 		{
 			if (albedoMap->ID == 0)
 			{
 				glGenTextures(1, &albedoMap->ID);
-				glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_ALBEDO);
 				glBindTexture(GL_TEXTURE_2D, albedoMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, albedoMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, albedoMap->sampler->wrappingModeV);
@@ -187,7 +227,6 @@ namespace render
 					albedoMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 					albedoMap->image->imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
-				shaders[shaderID]->setInt("albedoMap", TEXTURE_UNIT_ALBEDO);
 			}
 		}
 		if (mitevox::Texture* metallicRoughnessMap = material->metallicRoughnessMap)
@@ -195,7 +234,6 @@ namespace render
 			if (metallicRoughnessMap->ID == 0)
 			{
 				glGenTextures(1, &metallicRoughnessMap->ID);
-				glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_METALLIC_ROUGHNESS);
 				glBindTexture(GL_TEXTURE_2D, metallicRoughnessMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, metallicRoughnessMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, metallicRoughnessMap->sampler->wrappingModeV);
@@ -206,7 +244,6 @@ namespace render
 					metallicRoughnessMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 					metallicRoughnessMap->image->imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
-				shaders[shaderID]->setInt("metallicRoughnessMap", TEXTURE_UNIT_METALLIC_ROUGHNESS);
 			}
 		}
 		if (mitevox::Texture* normalMap = material->normalMap)
@@ -214,7 +251,6 @@ namespace render
 			if (normalMap->ID == 0)
 			{
 				glGenTextures(1, &normalMap->ID);
-				glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_NORMAL);
 				glBindTexture(GL_TEXTURE_2D, normalMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, normalMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, normalMap->sampler->wrappingModeV);
@@ -225,7 +261,6 @@ namespace render
 					normalMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
 					normalMap->image->imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
-				shaders[shaderID]->setInt("normalMap", TEXTURE_UNIT_NORMAL);
 			}
 		}
 		if (mitevox::Texture* occlusionMap = material->occlusionMap)
@@ -233,7 +268,6 @@ namespace render
 			if (occlusionMap->ID == 0)
 			{
 				glGenTextures(1, &occlusionMap->ID);
-				glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_OCCLUSION);
 				glBindTexture(GL_TEXTURE_2D, occlusionMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, occlusionMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, occlusionMap->sampler->wrappingModeV);
@@ -244,7 +278,6 @@ namespace render
 					occlusionMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
 					occlusionMap->image->imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
-				shaders[shaderID]->setInt("occlusionMap", TEXTURE_UNIT_OCCLUSION);
 			}
 		}
 		if (mitevox::Texture* emissiveMap = material->emissiveMap)
@@ -252,7 +285,6 @@ namespace render
 			if (emissiveMap->ID == 0)
 			{
 				glGenTextures(1, &emissiveMap->ID);
-				glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_EMISSIVE);
 				glBindTexture(GL_TEXTURE_2D, emissiveMap->ID);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, emissiveMap->sampler->wrappingModeU);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, emissiveMap->sampler->wrappingModeV);
@@ -263,7 +295,6 @@ namespace render
 					emissiveMap->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
 					emissiveMap->image->imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
-				shaders[shaderID]->setInt("emissiveMap", TEXTURE_UNIT_EMISSIVE);
 			}
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -286,6 +317,7 @@ namespace render
 			shaders[shaderID]->setBool("material.hasAlbedoMap", true);
 			glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_ALBEDO);
 			glBindTexture(GL_TEXTURE_2D, material->albedoMap->ID);
+			shaders[shaderID]->setInt("albedoMap", TEXTURE_UNIT_ALBEDO);
 		}
 		else
 		{
@@ -297,6 +329,7 @@ namespace render
 			shaders[shaderID]->setBool("material.hasMetallicRoughnessMap", true);
 			glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_METALLIC_ROUGHNESS);
 			glBindTexture(GL_TEXTURE_2D, material->metallicRoughnessMap->ID);
+			shaders[shaderID]->setInt("metallicRoughnessMap", TEXTURE_UNIT_METALLIC_ROUGHNESS);
 		}
 		else
 		{
@@ -308,6 +341,7 @@ namespace render
 			shaders[shaderID]->setBool("material.hasNormalMap", true);
 			glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_NORMAL);
 			glBindTexture(GL_TEXTURE_2D, material->normalMap->ID);
+			shaders[shaderID]->setInt("normalMap", TEXTURE_UNIT_NORMAL);
 		}
 		else
 		{
@@ -318,6 +352,7 @@ namespace render
 			shaders[shaderID]->setBool("material.hasOcclusionMap", true);
 			glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_OCCLUSION);
 			glBindTexture(GL_TEXTURE_2D, material->occlusionMap->ID);
+			shaders[shaderID]->setInt("occlusionMap", TEXTURE_UNIT_OCCLUSION);
 		}
 		else
 		{
@@ -328,6 +363,7 @@ namespace render
 			shaders[shaderID]->setBool("material.hasEmissiveMap", true);
 			glActiveTexture(GL_TEXTURE0 + TEXTURE_UNIT_EMISSIVE);
 			glBindTexture(GL_TEXTURE_2D, material->emissiveMap->ID);
+			shaders[shaderID]->setInt("emissiveMap", TEXTURE_UNIT_EMISSIVE);
 		}
 		else
 		{
@@ -339,7 +375,7 @@ namespace render
 		PRINT_RENDERER_ERRORS;
 	}
 
-	void removeMaterial(mitevox::Material* material, int shaderID)
+	void removeMaterial(mitevox::Material* material)
 	{
 		glDeleteTextures(1, &material->albedoMap->ID);
 		glDeleteTextures(1, &material->metallicRoughnessMap->ID);
@@ -474,11 +510,8 @@ namespace render
 		return nullptr;
 	}
 
-	void uploadMesh(mitevox::Mesh* mesh, int shaderID)
+	void uploadMesh(mitevox::Mesh* mesh)
 	{
-		if (!shaders[shaderID]->use())
-			return;
-
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{
@@ -550,7 +583,7 @@ namespace render
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-			uploadMaterial(meshPrimitive->material, shaderID);
+			uploadMaterial(meshPrimitive->material);
 
 			PRINT_RENDERER_ERRORS;
 		}
@@ -560,11 +593,8 @@ namespace render
 		checkMeshBuffers(mesh);
 	}
 
-	void updateMesh(mitevox::Mesh* mesh, int shaderID)
+	void updateMesh(mitevox::Mesh* mesh)
 	{
-		if (!shaders[shaderID]->use())
-			return;
-
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{
@@ -593,11 +623,8 @@ namespace render
 		mesh->isUploaded = true;
 	}
 
-	void removeMesh(mitevox::Mesh* mesh, int shaderID)
+	void removeMesh(mitevox::Mesh* mesh)
 	{
-		if (!shaders[shaderID]->use())
-			return;
-
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
 		{

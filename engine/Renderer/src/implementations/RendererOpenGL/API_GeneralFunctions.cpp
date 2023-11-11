@@ -23,7 +23,7 @@ namespace render
 		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-		glfwWindowHint(GLFW_SAMPLES, 4);
+		glfwWindowHint(GLFW_SAMPLES, 1);
 
 		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -62,6 +62,11 @@ namespace render
 			fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		}
 
+		int windowSizeWidth, windowSizeHeight;
+		glfwGetWindowSize(window, &windowSizeWidth, &windowSizeHeight);
+		renderer->screenWidth = windowSizeWidth;
+		renderer->screenHeight = windowSizeHeight;
+
 		glEnable(GL_MULTISAMPLE);
 		glClearColor((GLclampf)renderer->clearColor.r, (GLclampf)renderer->clearColor.g, (GLclampf)renderer->clearColor.b, (GLclampf)1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -70,7 +75,7 @@ namespace render
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
-		//glBlendFunc(GL_ONE, GL_ONE);
+		glBlendFunc(GL_ONE, GL_ONE);
 		glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 
 		if (renderer->backfaceCulling)
@@ -85,6 +90,9 @@ namespace render
 		renderer->points.reserve(PRIMITIVE_BUFFER_SIZE);
 		renderer->lines.reserve(PRIMITIVE_BUFFER_SIZE * 2);
 		renderer->triangles.reserve(PRIMITIVE_BUFFER_SIZE * 3);
+
+		getUnitCubeID(); // Allocate the cube with the first call
+		getScreenQuadID(); // Allocate with the first call
 
 		return renderer;
 	}
@@ -153,28 +161,5 @@ namespace render
 	void setViewport(int x, int y, int width, int height)
 	{
 		glViewport(x, y, width, height);
-	}
-
-	void activateDefaultFramebuffer(int width, int height)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)0);
-		glViewport(0, 0, width, height);
-	}
-
-	void clearBufferXY(ColorRGBf color = { 0 })
-	{
-		glClearColor(color.r, color.g, color.b, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
-
-	void clearBufferZ()
-	{
-		glDepthMask(GL_TRUE);
-		glClear(GL_DEPTH_BUFFER_BIT);
-	}
-
-	void display(RendererSettings* renderer)
-	{
-		glfwSwapBuffers(renderer->getWindow());
 	}
 }

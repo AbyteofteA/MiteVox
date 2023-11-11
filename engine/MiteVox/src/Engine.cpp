@@ -62,13 +62,16 @@ namespace mitevox
 		// Compile shaders.
 
 		std::string shadersDir = settings->getResourceDir() + "/shaders";
-		basicShader = render::createShader("Basic Shader", shadersDir + "/basic/basic");
 		skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
 		primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
 		shadowMapPackShader = render::createShader("Shadow Map Pack Shader", shadersDir + "/shadow_map_pack/shadow_map_pack");
+		gBufferShader = render::createShader("G-Buffer shader", shadersDir + "/gbuffer/gbuffer");
+		deferredLightingShader = render::createShader("Deferred lighting shader", shadersDir + "/deferred_lighting/deferred_lighting");
 		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
 
-		uploadScene(playground->scenes.getElement(0), basicShader);
+		uploadScene(playground->scenes.getElement(0));
+
+		render::createGbuffer(settings->getRendererSettings());
 
 		onCreate();
 	}
@@ -196,14 +199,15 @@ namespace mitevox
 					skybox = &scene->skyboxes.at(scene->activeSkybox);
 				}
 
-				render::clearBufferXY(renderer->clearColor);
+				render::clearBufferXY();
 				render::clearBufferZ();
 
 				MiteVoxAPI::renderScene(
 					renderer,
 					shadowMapPackShader,
-					basicShader,
-					{ 0.15f, 0.15f, 0.15f },
+					gBufferShader,
+					deferredLightingShader,
+					{ 0.0f, 0.0f, 0.0f },
 					& pointLightsArray,
 					& directionalLightsArray,
 					& spotLightsArray,
@@ -283,7 +287,7 @@ namespace mitevox
 		if (node->mesh != nullptr && node->mesh->isMorphable())
 		{
 			applyMorphTargetAnimation(node);
-			render::updateMesh(node->getMeshToRender(), basicShader);
+			render::updateMesh(node->getMeshToRender());
 		}
 
 		if (node->skeleton)
@@ -318,21 +322,21 @@ namespace mitevox
 		}
 	}
 
-	void Engine::uploadNodeRecursively(Node* node, int shaderID)
+	void Engine::uploadNodeRecursively(Node* node)
 	{
 		if (Mesh* meshToRender = node->getMeshToRender())
 		{
-			render::uploadMesh(meshToRender, shaderID);
+			render::uploadMesh(meshToRender);
 		}
 
 		size_t childrenCount = node->children.getElementsCount();
 		for (size_t i = 0; i < childrenCount; ++i)
 		{
-			uploadNodeRecursively(node->children.getElement(i), shaderID);
+			uploadNodeRecursively(node->children.getElement(i));
 		}
 	}
 
-	void Engine::uploadScene(Scene* scene, int shaderID)
+	void Engine::uploadScene(Scene* scene)
 	{
 		if (scene == nullptr)
 		{
@@ -342,7 +346,7 @@ namespace mitevox
 		size_t entitiesCount = scene->entities.getElementsCount();
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
-			uploadNodeRecursively(scene->entities.getElement(i)->renderableNode, shaderID);
+			uploadNodeRecursively(scene->entities.getElement(i)->renderableNode);
 		}
 	}
 }

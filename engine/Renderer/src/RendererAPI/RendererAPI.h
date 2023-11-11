@@ -38,6 +38,15 @@ namespace render
 
 #define TEXTURE_UNIT_SPOT_SHADOWS_START 10 // [10; 25]
 
+#define DEFAULT_ATTRIBUTE_POSITION 0
+#define DEFAULT_ATTRIBUTE_NORMAL 1
+#define DEFAULT_ATTRIBUTE_TEX_COORD_0 2
+#define DEFAULT_ATTRIBUTE_TEX_COORD_1 3
+#define DEFAULT_ATTRIBUTE_COLOR 4
+#define DEFAULT_ATTRIBUTE_JOINTS 5
+#define DEFAULT_ATTRIBUTE_WEIGHTS 6
+#define DEFAULT_ATTRIBUTE_TANGENT 7
+
 	// General
 
 	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor);
@@ -69,11 +78,19 @@ printErrors(__FILE__, __LINE__);
 
 	// Buffers
 
-	void createFramebuffer();
-	void activateDefaultFramebuffer(int width, int height);
-	void clearBufferXY(ColorRGBf color);
+	void activateDefaultFramebuffer(RendererSettings* renderer);
+	void clearBufferXY(ColorRGBf color = ColorRGBf::BLACK());
 	void clearBufferZ();
 	void display(RendererSettings* renderer);
+	void createGbuffer(RendererSettings* renderer);
+	void activateGbuffer(RendererSettings* renderer);
+	void renderSceneFromGbuffer(
+		RendererSettings* renderer, 
+		int shaderID,
+		Camera* camera, 
+		mathem::GeometryTransform* cameraTransform);
+	void deleteGbuffer();
+
 
 	// Primitives
 
@@ -94,15 +111,20 @@ printErrors(__FILE__, __LINE__);
 
 	// Models
 
+	size_t getScreenQuadID();
+	extern const float screenQuad[];
+	size_t getUnitCubeID();
+	extern const float unitCubePositions[];
+
 	void resetLights(int shaderID);
 	void setAmbientLight(mathem::Vector3D ambientLightColor, int shaderID);
 	void uploadDirectionalLights(safety::SafeArray<render::DirectionalLight>* lightsArray, size_t offset, size_t count, int shaderID);
 	void uploadPointLights(safety::SafeArray<render::PointLight>* lightsArray, size_t offset, size_t count, int shaderID);
 	void uploadSpotLights(safety::SafeArray<render::SpotLight>* lightsArray, size_t offset, size_t count, int shaderID);
 
-	void uploadMaterial(mitevox::Material* material, int shaderID);
+	void uploadMaterial(mitevox::Material* material);
 	void selectMaterial(mitevox::Material* material, int shaderID);
-	void removeMaterial(mitevox::Material* material, int shaderID);
+	void removeMaterial(mitevox::Material* material);
 
 	void uploadBufferView(mitevox::BufferView* bufferView);
 	void updateBufferView(mitevox::BufferView* bufferView);
@@ -110,9 +132,9 @@ printErrors(__FILE__, __LINE__);
 
 	mitevox::SkeletonBase* tryUploadSkeleton(mitevox::Node* node, int shaderID);
 
-	void uploadMesh(mitevox::Mesh* mesh, int shaderID);
-	void updateMesh(mitevox::Mesh* mesh, int shaderID);
-	void removeMesh(mitevox::Mesh* mesh, int shaderID);
+	void uploadMesh(mitevox::Mesh* mesh);
+	void updateMesh(mitevox::Mesh* mesh);
+	void removeMesh(mitevox::Mesh* mesh);
 	void renderMesh(
 		RendererSettings* renderer, 
 		int shaderID, 

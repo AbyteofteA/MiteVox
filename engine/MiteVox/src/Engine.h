@@ -44,10 +44,11 @@ namespace mitevox
 
 		Playground* playground;
 
-		int basicShader = -1;
 		int primitiveShader = -1;
 		int skyboxShader = -1;
 		int shadowMapPackShader = -1;
+		int gBufferShader = -1;
+		int deferredLightingShader = -1;
 
 		mathem::PileAllocator<Entity> entitiesAllocator;
 
@@ -67,8 +68,8 @@ namespace mitevox
 		void animateNodeRecursively(Node* node, float deltaTime);
 		void animateNodes(safety::SafeArray<Entity*>* entities, float deltaTime);
 
-		void uploadNodeRecursively(Node* node, int shaderID);
-		void uploadScene(Scene* scene, int shaderID);
+		void uploadNodeRecursively(Node* node);
+		void uploadScene(Scene* scene);
 	};
 }
 

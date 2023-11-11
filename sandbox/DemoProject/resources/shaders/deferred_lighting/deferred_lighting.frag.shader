@@ -1,48 +1,23 @@
 #version 330 core
 
-in VertexDataFragment
-{
-	vec2 Texcoord;
-	vec3 Normal;
-	vec3 Position;
-	mat3 TangentBitangentNormal;
-} fragment;
-
+in vec2 Texcoord;
 out vec4 outColor;
 
 // Shader settings
 uniform float gammaCorrection = 1.2f;
-
-struct Material
-{
-	vec3 baseColor;
-	float roughness;
-	float metallicity;
-	float specularExponent;
-	vec3 emission;
-
-	bool hasAlbedoMap;
-	bool hasMetallicRoughnessMap;
-	bool hasNormalMap;
-	bool hasOcclusionMap;
-	bool hasEmissiveMap;
-
-	int illuminationModel;
-};
 
 #define ILLUMINATION_MODEL_NONE 0
 #define ILLUMINATION_MODEL_UNLIT 1
 #define ILLUMINATION_MODEL_PHONG 2
 #define ILLUMINATION_MODEL_PBR 32
 
-uniform sampler2D albedoMap;
-uniform sampler2D metallicRoughnessMap;
-uniform sampler2D normalMap;
-uniform sampler2D occlusionMap;
-uniform sampler2D emissiveMap;
+uniform sampler2D positionTexture;
+uniform sampler2D normalTexture;
+uniform sampler2D albedoTexture;
+uniform sampler2D materialTexture;
+uniform sampler2D depthTexture;
 
 uniform vec3 viewPos;
-uniform Material material;
 
 uniform vec3 ambientLight;
 
@@ -92,11 +67,13 @@ uniform float fogMaxDistance = 50.0f;
 
 // Precomputed properties
 
+vec3 position = vec3(0.0f);
 vec4 albedoFragment = vec4(0.0f);
 vec3 norm = vec3(0.0f);
 float metallicity = 0.0f;
 float roughness = 1.0f;
 float occlusion = 1.0f;
+float depth = 0.0f;
 vec3 emissiveFragment = vec3(0.0f);
 
 vec3 viewDir = vec3(0.0f);
@@ -116,7 +93,6 @@ vec3 calculateLightSourcePhong(
 	float roughness,
 	float metallicity,
 	vec3 norm,
-	vec3 viewDir,
 	vec3 lightDir,
 	vec3 lightColor)
 {
@@ -153,7 +129,7 @@ float geometryFunction(float dotProduct, float K)
 /// <summary>
 /// Fresnel-Schlick equation
 /// </summary>
-vec3 specularFractionFunction(vec3 viewDir, vec3 halfVector, vec3 F0, float roughness)
+vec3 specularFractionFunction(vec3 halfVector, vec3 F0, float roughness)
 {
 	float dotViewDirHalf = max(dot(viewDir, halfVector), 0.0f);
 	return F0 + (1.0f - F0) * pow(clamp(1.0f - dotViewDirHalf, 0.0f, 1.0f), 5.0f);
@@ -169,7 +145,6 @@ vec3 calculateLightSourcePBR(
 	vec3 F0, 
 	float K, 
 	vec3 norm, 
-	vec3 viewDir, 
 	float dotNormViewDir, 
 	vec3 lightDir, 
 	vec3 lightColor)
@@ -192,18 +167,18 @@ vec3 calculateLightSource(
 	vec3 F0,
 	float K,
 	vec3 norm,
-	vec3 viewDir,
 	float dotNormViewDir,
 	vec3 lightDir,
 	vec3 lightColor)
 {
-	switch (material.illuminationModel)
+    int illuminationModel = ILLUMINATION_MODEL_PBR;
+	switch (illuminationModel)
 	{
 	case ILLUMINATION_MODEL_PHONG:
-		return calculateLightSourcePhong(albedoFragment, roughness, metallicity, norm, viewDir, lightDir, lightColor);
+		return calculateLightSourcePhong(albedoFragment, roughness, metallicity, norm, lightDir, lightColor);
 
 	case ILLUMINATION_MODEL_PBR:
-		return calculateLightSourcePBR(albedoFragment, roughness, metallicity, F0, K, norm, viewDir, dotNormViewDir, lightDir, lightColor);
+		return calculateLightSourcePBR(albedoFragment, roughness, metallicity, F0, K, norm, dotNormViewDir, lightDir, lightColor);
 
 	case ILLUMINATION_MODEL_UNLIT:
 		return albedoFragment;
@@ -216,13 +191,15 @@ vec3 calculateLightSource(
 
 float calculateAttenuation(float currentDistance, float range)
 {
-	return max(min(1.0f - pow(currentDistance / range, 4.0f), 1.0f), 0.0f) / pow(currentDistance, 2.0f);
+	//return max(min(1.0f - pow(currentDistance / range, 4.0f), 1.0f), 0.0f) / pow(currentDistance, 2.0f);
+	//return 0.5f * cos(PI * clamp(currentDistance / range, 0.0f, 1.0f)) + 0.5;
+	return pow(1.0f - sin(0.5f * PI * clamp(currentDistance / range, 0.0f, 1.0f)), 1.5f);
 }
 
 float calculateSpotShadow(int lightIndex)
 {
 	float shadowFraction = 0.0f;
-	vec4 fragmentLightSpace = lightMatrices[lightIndex] * vec4(fragment.Position, 1.0f);
+	vec4 fragmentLightSpace = lightMatrices[lightIndex] * vec4(position, 1.0f);
 	fragmentLightSpace.xyz /= fragmentLightSpace.w;
 	if (fragmentLightSpace.z <= 1.0f)
 	{
@@ -329,13 +306,13 @@ vec3 sampleCubemap(vec3 direction)
 float calculatePointShadow(int lightIndex)
 {
 	float shadowFraction = 0.0f;
-	vec3 lightToFragmentDir = fragment.Position - pointLights[lightIndex].pos;
+	vec3 lightToFragmentDir = position - pointLights[lightIndex].pos;
 	lightToFragmentDir = normalize(lightToFragmentDir);
 	
 	vec3 samplePos = sampleCubemap(lightToFragmentDir);
 
 	int lightMatrixIndex = int(samplePos.z);
-	vec4 fragmentLightSpace = lightMatrices[lightMatrixIndex] * vec4(fragment.Position, 1.0f);
+	vec4 fragmentLightSpace = lightMatrices[lightMatrixIndex] * vec4(position, 1.0f);
 	fragmentLightSpace.xyz /= fragmentLightSpace.w;
 	if (fragmentLightSpace.z <= 1.0f)
 	{
@@ -369,7 +346,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 {
 	// Ambient light
 	vec3 result = vec3(0.0f);
-	result = ambientLight * occlusion * diffuseBRDF;
+	result = 0.05f * occlusion * albedoFragment;
 
 	// Directional lights
 	for (int i = 0; i < amountOfDirectionalLights; i++)
@@ -377,7 +354,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 		vec3 lightDir = -directionalLights[i].direction;
 		vec3 lightColor = directionalLights[i].color * directionalLights[i].intensity;
 		lightDir = normalize(lightDir);
-		result += calculateLightSource(albedoFragment, roughness, metallicity, F0, K, norm, viewDir, dotNormViewDir, lightDir, lightColor);
+		result += calculateLightSource(albedoFragment, roughness, metallicity, F0, K, norm, dotNormViewDir, lightDir, lightColor);
 	}
 
 	// Point lights
@@ -385,7 +362,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	{
 		float shadowFraction = calculatePointShadow(i);
 
-		vec3 lightDir = pointLights[i].pos - fragment.Position;
+		vec3 lightDir = pointLights[i].pos - position;
 		float distance = abs(length(lightDir));
 		float attenuation = 0.0f;
 		if (pointLights[i].range > 0.0f)
@@ -395,7 +372,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 		vec3 lightColor = pointLights[i].color * pointLights[i].intensity * attenuation * shadowFraction;
 		lightDir = normalize(lightDir);
 		
-		result += calculateLightSource(albedoFragment, roughness, metallicity, F0, K, norm, viewDir, dotNormViewDir, lightDir, lightColor);
+		result += calculateLightSource(albedoFragment, roughness, metallicity, F0, K, norm, dotNormViewDir, lightDir, lightColor);
 	}
 
 	// Spot lights
@@ -403,7 +380,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	{
 		float shadowFraction = calculateSpotShadow(i);
 
-		vec3 lightDir = spotLights[i].pos - fragment.Position;
+		vec3 lightDir = spotLights[i].pos - position;
 		float distance = abs(length(lightDir));
 		float attenuation = 0.0f;
 		if (spotLights[i].range > 0.0f)
@@ -420,7 +397,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 			float epsilon = cos(spotLights[i].innerConeAngle) - cos(spotLights[i].outerConeAngle);
 			float spotLightIntensity = clamp((theta - cos(spotLights[i].outerConeAngle)) / epsilon, 0.0f, 1.0f);
 			lightColor *= spotLightIntensity;
-			result += calculateLightSource(albedoFragment, roughness, metallicity, F0, K, norm, viewDir, dotNormViewDir, lightDir, lightColor);
+			result += calculateLightSource(albedoFragment, roughness, metallicity, F0, K, norm, dotNormViewDir, lightDir, lightColor);
 		}
 	}
 
@@ -429,7 +406,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 
 float calculateLinearFog()
 {
-	float distance = length(fragment.Position - viewPos) - fogMinDistance;
+	float distance = length(position - viewPos) - fogMinDistance;
 	float fogRange = fogMaxDistance - fogMinDistance;
 	float fogFactor = clamp(distance / fogRange, 0.0f, 1.0f);
 	return fogFactor;
@@ -437,80 +414,52 @@ float calculateLinearFog()
 
 void main()
 {
-	// Albedo
-	albedoFragment = vec4(material.baseColor, 1.0f);
-	if (material.hasAlbedoMap)
-	{
-		albedoFragment = texture(albedoMap, fragment.Texcoord);
-	}
-
-	if (albedoFragment.a < 0.05f)
+    vec4 positionTextureFragment = texture(positionTexture, Texcoord);
+	vec4 normalTextureFragment = texture(normalTexture, Texcoord);
+	vec4 albedoTextureFragment = texture(albedoTexture, Texcoord);
+	vec4 materialTextureFragment = texture(materialTexture, Texcoord);
+	vec4 depthTextureFragment = texture(depthTexture, Texcoord);
+    
+    if (materialTextureFragment.x < 1.0f)
 	{
 		discard;
 	}
-
-	// Normal map
-	norm = normalize(fragment.Normal);
-	if (material.hasNormalMap)
-	{
-		norm = vec3(texture(normalMap, fragment.Texcoord));
-		norm = normalize(norm * 2.0f - 1.0f);
-		norm = normalize(fragment.TangentBitangentNormal * norm);
-	}
+    
+	position = positionTextureFragment.rgb;
+	norm = normalTextureFragment.rgb;
+    albedoFragment = vec4(albedoTextureFragment.rgb, 1.0f);
+	emissiveFragment = vec3(
+        positionTextureFragment.a, 
+        normalTextureFragment.a, 
+        materialTextureFragment.a);
+    metallicity = materialTextureFragment.b;
+    roughness = materialTextureFragment.g;
+    occlusion = albedoTextureFragment.a;
+    depth = depthTextureFragment.r;
 	
-	// Emissive map
-	emissiveFragment = vec3(0.0f);
-	if (material.hasEmissiveMap)
-	{
-		emissiveFragment = vec3(texture(emissiveMap, fragment.Texcoord));
-	}
-	else
-	{
-		emissiveFragment = material.emission;
-	}
-	
-	// Metallicity and roughness
-	vec3 metallicRoughnessFragment;
-	metallicRoughnessFragment.r = 0.0f;
-	metallicRoughnessFragment.b = material.metallicity;
-	metallicRoughnessFragment.g = material.roughness;
-	if (material.hasMetallicRoughnessMap)
-	{
-		metallicRoughnessFragment = vec3(texture(metallicRoughnessMap, fragment.Texcoord));
-	}
-	metallicity = metallicRoughnessFragment.b;
-	roughness = mix(0.01f, 0.99f, metallicRoughnessFragment.g);
-
-	// Occlusion
-	occlusion = 1.0f;
-	if (material.hasOcclusionMap)
-	{
-		occlusion = texture(occlusionMap, fragment.Texcoord).r;
-	}
-
 	// Precomputed properties
-	vec3 viewVector = viewPos - fragment.Position;
-	viewDir = normalize(viewVector);
+	viewDir = viewPos - position;
+	viewDir = normalize(viewDir);
 	roughnessSquared = pow(roughness, 2.0f); // originally ^1.0f
 	K = (roughnessSquared + 1.0f) * (roughnessSquared + 1.0f) / 8.0f;
 	F0 = vec3(0.04f);
 	F0 = mix(F0, albedoFragment.rgb, metallicity);
 	dotNormViewDir = max(dot(norm, viewDir), 0.05f); // (Clamping to 0.0f causes artifacts)
-	specularFraction = specularFractionFunction(norm, viewDir, F0, roughness); // Reflection fraction
+	specularFraction = specularFractionFunction(norm, F0, roughness); // Reflection fraction
 	diffuseFraction = vec3(1.0f) - specularFraction; // Refraction fraction
 	diffuseFraction *= (1.0f - metallicity);
 	diffuseBRDF = diffuseFraction * albedoFragment.rgb / PI;
-
+    
 	vec4 resultColor = vec4(calculateLighting(albedoFragment.rgb, roughness, metallicity, norm, occlusion), 1.0f);
 	resultColor += vec4(emissiveFragment, 1.0f);
-
-	resultColor.rgb = resultColor.rgb / (resultColor.rgb + vec3(1.0f));
-	resultColor.rgb = pow(resultColor.rgb, vec3(1.0f / gammaCorrection));
-
+    
+	//resultColor.rgb = resultColor.rgb / (resultColor.rgb + vec3(1.0f));
+	//resultColor.rgb = pow(resultColor.rgb, vec3(1.0f / gammaCorrection));
+    
 	// Linear fog
-	float fogFactor = calculateLinearFog();
-	resultColor.rgb = mix(resultColor.rgb, fogColor, fogFactor);
-
+	//float fogFactor = calculateLinearFog();
+	//resultColor.rgb = mix(resultColor.rgb, fogColor, fogFactor);
+    
 	outColor = resultColor;
 }
 

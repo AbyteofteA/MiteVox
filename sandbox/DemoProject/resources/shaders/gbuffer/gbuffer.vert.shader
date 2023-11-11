@@ -9,13 +9,13 @@ layout(location = 5) in uvec4 joints;
 layout(location = 6) in vec4 weights;
 layout(location = 7) in vec4 tangent;
 
-out VertexDataGeometry
+out VertexDataFragment
 {
 	vec2 Texcoord;
 	vec3 Normal;
 	vec3 Position;
 	mat3 TangentBitangentNormal;
-} vertex;
+} fragment;
 
 uniform mat4 viewProjectionMatrix;
 uniform mat4 modelMatrix;
@@ -37,12 +37,11 @@ void main()
 
 	mat4 poseModelMatrix = modelMatrix * poseMatrix;
 
-	vertex.Texcoord = texcoord_0;
-	vertex.Normal = normalize(vec3(transpose(inverse(poseModelMatrix)) * vec4(normal, 1.0)));
-	vec3 bitangent = cross(vertex.Normal, tangent.xyz);
-	vertex.TangentBitangentNormal = mat3(tangent.xyz, bitangent, vertex.Normal);
-
-	vertex.Position = vec3(poseModelMatrix * vec4(position, 1.0));
-	gl_Position = viewProjectionMatrix * vec4(vertex.Position, 1.0);
+	fragment.Texcoord = texcoord_0;
+	fragment.Normal = normalize(vec3(transpose(inverse(poseModelMatrix)) * vec4(normal, 1.0)));
+	vec3 bitangent = cross(fragment.Normal, tangent.xyz);
+	fragment.TangentBitangentNormal = mat3(tangent.xyz, bitangent, fragment.Normal);
+	fragment.Position = vec3(poseModelMatrix * vec4(position, 1.0));
+	gl_Position = viewProjectionMatrix * vec4(fragment.Position, 1.0);
 }
 

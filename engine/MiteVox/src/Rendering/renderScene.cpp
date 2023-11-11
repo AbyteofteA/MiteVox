@@ -23,7 +23,8 @@ namespace mitevox
 	void MiteVoxAPI::renderScene(
 		render::RendererSettings* renderer,
 		int shadowMapShaderID,
-		int lightingShaderID,
+		int gBufferShaderID,
+		int deferredLightingShaderID,
 		mathem::Vector3D ambientLight,
 		safety::SafeArray<render::PointLight>* pointLightsArray,
 		safety::SafeArray<render::DirectionalLight>* directionalLightsArray,
@@ -35,38 +36,44 @@ namespace mitevox
 		int skyboxShaderID,
 		render::Cubemap* skybox)
 	{
-		if (skybox)
-		{
-			render::renderSkybox(renderer, skyboxShaderID, skybox, camera, cameraTransform);
-		}
-		
-		render::useShader(lightingShaderID);
-		
-		render::resetLights(lightingShaderID);
-		render::setAmbientLight(ambientLight, lightingShaderID);
-		//render::uploadDirectionalLights(directionalLightsArray, lightingShaderID);
-		//render::uploadPointLights(pointLightsArray, lightingShaderID);
-		
+		renderSceneToGbuffer(renderer, gBufferShaderID, camera, cameraTransform, viewProjectionMatrix, entities);
+		render::activateDefaultFramebuffer(renderer);
+		render::useShader(deferredLightingShaderID);
+		renderSceneWithSpotLights(renderer, shadowMapShaderID, deferredLightingShaderID, spotLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
+		renderSceneWithPointLights(renderer, shadowMapShaderID, deferredLightingShaderID, pointLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
+	}
+
+	void MiteVoxAPI::renderSceneToGbuffer(
+		render::RendererSettings* renderer,
+		int shaderID,
+		render::Camera* camera,
+		mathem::GeometryTransform* cameraTransform,
+		glm::mat4 viewProjectionMatrix,
+		safety::SafeArray<Entity*> entities)
+	{
+		render::activateGbuffer(renderer);
+		render::setViewport(0, 0, renderer->screenWidth, renderer->screenHeight);
+		render::clearBufferXY();
+		render::clearBufferZ();
+		render::useShader(shaderID);
+
+		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glDisable(GL_BLEND);
-		
-		// TODO: replace with G-Buffer rendering
+
 		size_t entitiesCount = entities.getElementsCount();
 		for (size_t i = 0; i < entitiesCount; ++i)
 		{
 			Entity* entity = entities.getElement(i);
 			renderNodeRecursively(
 				renderer,
-				lightingShaderID,
+				shaderID,
 				entity->renderableNode,
 				&entity->transform,
 				camera,
 				cameraTransform,
 				viewProjectionMatrix);
 		}
-
-		renderSceneWithSpotLights(renderer, shadowMapShaderID, lightingShaderID, spotLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
-		renderSceneWithPointLights(renderer, shadowMapShaderID, lightingShaderID, pointLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
 	}
 
 	void renderNodeRecursively(
@@ -90,7 +97,7 @@ namespace mitevox
 			render::tryUploadSkeleton(node, shaderID);
 			if (meshToRender->isUploaded == false)
 			{
-				render::uploadMesh(meshToRender, shaderID);
+				render::uploadMesh(meshToRender);
 			}
 			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform, viewProjectionMatrix);
 		}
@@ -122,7 +129,7 @@ namespace mitevox
 			render::tryUploadSkeleton(node, shaderID);
 			if (meshToRender->isUploaded == false)
 			{
-				render::uploadMesh(meshToRender, shaderID);
+				render::uploadMesh(meshToRender);
 			}
 			render::renderMeshToShadowMap(renderer, shaderID, meshToRender, &nodeGlobalTransform);
 		}
@@ -176,6 +183,7 @@ namespace mitevox
 			// Render shadow maps
 
 			render::useShader(shadowMapShaderID);
+			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
 			glDepthFunc(GL_LESS);
@@ -189,7 +197,7 @@ namespace mitevox
 
 			// Render the scene
 
-			render::activateDefaultFramebuffer(renderer->screenWidth, renderer->screenHeight);
+			render::activateDefaultFramebuffer(renderer);
 			render::useShader(lightingShaderID);
 			render::resetLights(lightingShaderID);
 			render::uploadSpotLights(spotLightsArray, spotLightOffset, spotLightsPerCall, lightingShaderID);
@@ -206,20 +214,13 @@ namespace mitevox
 			}
 			glDepthFunc(GL_LEQUAL);
 			glEnable(GL_BLEND);
+			glDisable(GL_DEPTH_TEST);
 
-			size_t entitiesCount = entities.getElementsCount();
-			for (size_t i = 0; i < entitiesCount; ++i)
-			{
-				Entity* entity = entities.getElement(i);
-				renderNodeRecursively(
-					renderer,
-					lightingShaderID,
-					entity->renderableNode,
-					&entity->transform,
-					camera,
-					cameraTransform,
-					viewProjectionMatrix);
-			}
+			renderSceneFromGbuffer(
+				renderer,
+				lightingShaderID,
+				camera,
+				cameraTransform);
 
 			spotLightOffset += spotLightsPerCall;
 		}
@@ -244,6 +245,7 @@ namespace mitevox
 			// Render shadow maps
 
 			render::useShader(shadowMapShaderID);
+			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
 			glDepthFunc(GL_LESS);
@@ -256,7 +258,7 @@ namespace mitevox
 
 			// Render the scene
 
-			render::activateDefaultFramebuffer(renderer->screenWidth, renderer->screenHeight);
+			render::activateDefaultFramebuffer(renderer);
 			render::useShader(lightingShaderID);
 			render::resetLights(lightingShaderID);
 			render::uploadPointLights(pointLightsArray, i, 1, lightingShaderID);
@@ -273,20 +275,13 @@ namespace mitevox
 			}
 			glDepthFunc(GL_LEQUAL);
 			glEnable(GL_BLEND);
+			glDisable(GL_DEPTH_TEST);
 
-			size_t entitiesCount = entities.getElementsCount();
-			for (size_t i = 0; i < entitiesCount; ++i)
-			{
-				Entity* entity = entities.getElement(i);
-				renderNodeRecursively(
-					renderer,
-					lightingShaderID,
-					entity->renderableNode,
-					&entity->transform,
-					camera,
-					cameraTransform,
-					viewProjectionMatrix);
-			}
+			renderSceneFromGbuffer(
+				renderer,
+				lightingShaderID,
+				camera,
+				cameraTransform);
 		}
 	}
 }
