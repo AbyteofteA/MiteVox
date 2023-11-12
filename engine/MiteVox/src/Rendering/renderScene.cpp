@@ -41,6 +41,10 @@ namespace mitevox
 		render::useShader(deferredLightingShaderID);
 		renderSceneWithSpotLights(renderer, shadowMapShaderID, deferredLightingShaderID, spotLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
 		renderSceneWithPointLights(renderer, shadowMapShaderID, deferredLightingShaderID, pointLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
+		render::copyDepthFromGbufferToDefaultFramebuffer(renderer);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		glDepthMask(GL_TRUE);
 	}
 
 	void MiteVoxAPI::renderSceneToGbuffer(
@@ -58,7 +62,7 @@ namespace mitevox
 		render::useShader(shaderID);
 
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
+		glDepthFunc(GL_LESS);
 		glDisable(GL_BLEND);
 
 		size_t entitiesCount = entities.getElementsCount();
@@ -187,6 +191,7 @@ namespace mitevox
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
 			glDepthFunc(GL_LESS);
+			glDepthMask(GL_TRUE);
 
 			size_t spotLightsPerCall = std::min(spotLightsCount - spotLightOffset, renderer->spotLightsPerCall);
 			render::shadowMapPack.init(spotLightsPerCall, renderer->spotLightShadowMapSize, renderer->spotLightShadowMapSize);
@@ -212,9 +217,9 @@ namespace mitevox
 			{
 				glDisable(GL_CULL_FACE);
 			}
-			glDepthFunc(GL_LEQUAL);
 			glEnable(GL_BLEND);
 			glDisable(GL_DEPTH_TEST);
+			glDepthMask(GL_FALSE);
 
 			renderSceneFromGbuffer(
 				renderer,
@@ -249,6 +254,7 @@ namespace mitevox
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
 			glDepthFunc(GL_LESS);
+			glDepthMask(GL_TRUE);
 
 			render::shadowMapPack.init(6, renderer->pointLightShadowMapSize, renderer->pointLightShadowMapSize);
 			render::shadowMapPack.makeLightMatrices(pointLight);
@@ -273,9 +279,9 @@ namespace mitevox
 			{
 				glDisable(GL_CULL_FACE);
 			}
-			glDepthFunc(GL_LEQUAL);
 			glEnable(GL_BLEND);
 			glDisable(GL_DEPTH_TEST);
+			glDepthMask(GL_FALSE);
 
 			renderSceneFromGbuffer(
 				renderer,

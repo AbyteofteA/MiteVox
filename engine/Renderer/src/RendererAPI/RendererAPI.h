@@ -89,6 +89,7 @@ printErrors(__FILE__, __LINE__);
 		int shaderID,
 		Camera* camera, 
 		mathem::GeometryTransform* cameraTransform);
+	void copyDepthFromGbufferToDefaultFramebuffer(RendererSettings* renderer);
 	void deleteGbuffer();
 
 
