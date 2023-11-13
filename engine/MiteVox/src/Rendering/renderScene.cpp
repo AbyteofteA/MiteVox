@@ -25,6 +25,7 @@ namespace mitevox
 		int shadowMapShaderID,
 		int gBufferShaderID,
 		int deferredLightingShaderID,
+		int postprocessingShaderID,
 		mathem::Vector3D ambientLight,
 		safety::SafeArray<render::PointLight>* pointLightsArray,
 		safety::SafeArray<render::DirectionalLight>* directionalLightsArray,
@@ -36,15 +37,45 @@ namespace mitevox
 		int skyboxShaderID,
 		render::Cubemap* skybox)
 	{
+		// Render geometry to G-buffer
+		render::activateGbuffer(renderer);
+		render::clearBufferXY();
+		render::clearBufferZ();
 		renderSceneToGbuffer(renderer, gBufferShaderID, camera, cameraTransform, viewProjectionMatrix, entities);
-		render::activateDefaultFramebuffer(renderer);
-		render::useShader(deferredLightingShaderID);
+
+		// Render lighting to main canvas
+		render::activateMainCanvas(renderer);
+		render::clearBufferXY();
+		render::clearBufferZ();
 		renderSceneWithSpotLights(renderer, shadowMapShaderID, deferredLightingShaderID, spotLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
 		renderSceneWithPointLights(renderer, shadowMapShaderID, deferredLightingShaderID, pointLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
-		render::copyDepthFromGbufferToDefaultFramebuffer(renderer);
+		render::copyDepthFromGbufferToMainCanvas(renderer);
+
+		// TODO: 
+		//if (settings->debug)
+		//{
+		//	drawAxes(renderer);
+		//	drawCollisions(renderer, &collisions);
+		//}
+
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_TRUE);
+
+		// Render primitives to main canvas
+		render::renderPoints(renderer, camera, cameraTransform);
+		render::renderLines(renderer, camera, cameraTransform);
+		render::renderTriangles(renderer, camera, cameraTransform);
+
+		glDepthMask(GL_FALSE);
+
+		// Render main canvas to default framebuffer
+		render::activateDefaultFramebuffer(renderer);
+		render::clearBufferXY();
+		render::clearBufferZ();
+		render::renderSceneFromMainCanvas(renderer, postprocessingShaderID);
+
+		render::display(renderer);
 	}
 
 	void MiteVoxAPI::renderSceneToGbuffer(
@@ -55,10 +86,6 @@ namespace mitevox
 		glm::mat4 viewProjectionMatrix,
 		safety::SafeArray<Entity*> entities)
 	{
-		render::activateGbuffer(renderer);
-		render::setViewport(0, 0, renderer->screenWidth, renderer->screenHeight);
-		render::clearBufferXY();
-		render::clearBufferZ();
 		render::useShader(shaderID);
 
 		glEnable(GL_DEPTH_TEST);
@@ -202,7 +229,7 @@ namespace mitevox
 
 			// Render the scene
 
-			render::activateDefaultFramebuffer(renderer);
+			render::activateMainCanvas(renderer);
 			render::useShader(lightingShaderID);
 			render::resetLights(lightingShaderID);
 			render::uploadSpotLights(spotLightsArray, spotLightOffset, spotLightsPerCall, lightingShaderID);
@@ -264,7 +291,7 @@ namespace mitevox
 
 			// Render the scene
 
-			render::activateDefaultFramebuffer(renderer);
+			render::activateMainCanvas(renderer);
 			render::useShader(lightingShaderID);
 			render::resetLights(lightingShaderID);
 			render::uploadPointLights(pointLightsArray, i, 1, lightingShaderID);

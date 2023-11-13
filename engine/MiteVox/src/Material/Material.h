@@ -25,6 +25,7 @@ namespace mitevox
 
 		std::string name;
 		bool isDoubleSided = false;
+		bool isTriplanar = false;
 
 		// Color and shading
 		render::ColorRGBAf baseColor = render::ColorRGBAf(render::ColorRGBf::WHITE());

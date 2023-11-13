@@ -49,6 +49,7 @@ namespace mitevox
 		int shadowMapPackShader = -1;
 		int gBufferShader = -1;
 		int deferredLightingShader = -1;
+		int postprocessingShader = -1;
 
 		mathem::PileAllocator<Entity> entitiesAllocator;
 

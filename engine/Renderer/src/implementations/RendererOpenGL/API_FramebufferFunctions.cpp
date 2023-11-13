@@ -9,6 +9,13 @@
 
 namespace render
 {
+	void renderScreenQuad()
+	{
+		glBindVertexArray(getScreenQuadID());
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
+
 	void activateDefaultFramebuffer(RendererSettings* renderer)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)0);
@@ -82,7 +89,7 @@ namespace render
 		// Depth texture
 		glGenTextures(1, &depthTextureID);
 		glBindTexture(GL_TEXTURE_2D, depthTextureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, renderer->screenWidth, renderer->screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, renderer->screenWidth, renderer->screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -115,15 +122,76 @@ namespace render
 		setViewport(0, 0, renderer->screenWidth, renderer->screenHeight);
 	}
 
+	void deleteGbuffer()
+	{
+		if (positionTextureID)
+		{
+			glDeleteTextures(1, (GLuint*)&positionTextureID);
+		}
+		if (normalTextureID)
+		{
+			glDeleteTextures(1, (GLuint*)&normalTextureID);
+		}
+		if (albedoTextureID)
+		{
+			glDeleteTextures(1, (GLuint*)&albedoTextureID);
+		}
+		if (materialTextureID)
+		{
+			glDeleteTextures(1, (GLuint*)&materialTextureID);
+		}
+		if (gBufferID)
+		{
+			glDeleteFramebuffers(1, (GLuint*)&gBufferID);
+		}
+	}
+
+	size_t mainCanvasBufferID = 0;
+	size_t mainCanvasTextureID = 0;
+	size_t mainCanvasDepthRenderbufferID = 0;
+
+	void createMainCanvas(RendererSettings* renderer)
+	{
+		glGenTextures(1, &mainCanvasTextureID);
+		glBindTexture(GL_TEXTURE_2D, mainCanvasTextureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, renderer->screenWidth, renderer->screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glGenRenderbuffers(1, &mainCanvasDepthRenderbufferID);
+		glBindRenderbuffer(GL_RENDERBUFFER, mainCanvasDepthRenderbufferID);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, renderer->screenWidth, renderer->screenHeight);
+
+		glGenFramebuffers(1, &mainCanvasBufferID);
+		glBindFramebuffer(GL_FRAMEBUFFER, mainCanvasBufferID);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mainCanvasTextureID, 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mainCanvasDepthRenderbufferID);
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cout << "ERROR: " << "Cannot create main canvas" << std::endl;
+			assert(status != 0);
+		}
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void activateMainCanvas(RendererSettings* renderer)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)mainCanvasBufferID);
+		setViewport(0, 0, renderer->screenWidth, renderer->screenHeight);
+	}
+
 	void renderSceneFromGbuffer(
 		RendererSettings* renderer,
 		int shaderID,
 		Camera* camera,
 		mathem::GeometryTransform* cameraTransform)
 	{
-		setViewport(0, 0, renderer->screenWidth, renderer->screenHeight);
-		//std::cout << "Screen resolution: " << renderer->screenWidth << "x" << renderer->screenHeight << std::endl;
-
 		shaders[shaderID]->setVec3("viewPos",
 			cameraTransform->translation.x(),
 			cameraTransform->translation.y(),
@@ -149,16 +217,13 @@ namespace render
 		glBindTexture(GL_TEXTURE_2D, depthTextureID);
 		shaders[shaderID]->setInt("depthTexture", 4);
 
-		glBindVertexArray(getScreenQuadID());
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		glBindVertexArray(0);
+		drawScreenQuad();
 	}
 
-	void copyDepthFromGbufferToDefaultFramebuffer(RendererSettings* renderer)
+	void copyDepthFromGbufferToMainCanvas(RendererSettings* renderer)
 	{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferID);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mainCanvasBufferID);
 		glBlitFramebuffer(
 			0,
 			0,
@@ -170,31 +235,30 @@ namespace render
 			renderer->screenHeight,
 			GL_DEPTH_BUFFER_BIT,
 			GL_NEAREST);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void deleteGbuffer()
+	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID)
 	{
-		if (positionTextureID)
-		{
-			glDeleteTextures(1, (GLuint*)&positionTextureID);
-		}
-		if (normalTextureID)
-		{
-			glDeleteTextures(1, (GLuint*)&normalTextureID);
-		}
-		if (albedoTextureID)
-		{
-			glDeleteTextures(1, (GLuint*)&albedoTextureID);
-		}
-		if (materialTextureID)
-		{
-			glDeleteTextures(1, (GLuint*)&materialTextureID);
-		}
-		if (gBufferID)
-		{
-			glDeleteFramebuffers(1, (GLuint*)&gBufferID);
-		}
+		render::useShader(shaderID);
+
+		// TODO: Set Parameters
+
+		glActiveTexture(GL_TEXTURE0 + 0);
+		glBindTexture(GL_TEXTURE_2D, mainCanvasTextureID);
+		shaders[shaderID]->setInt("mainCanvasTexture", 0);
+
+		drawScreenQuad();
 	}
 
+	void deleteMainCanvas()
+	{
+		if (mainCanvasTextureID)
+		{
+			glDeleteTextures(1, (GLuint*)&mainCanvasTextureID);
+		}
+		if (mainCanvasBufferID)
+		{
+			glDeleteFramebuffers(1, (GLuint*)&mainCanvasBufferID);
+		}
+	}
 }

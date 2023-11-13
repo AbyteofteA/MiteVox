@@ -67,11 +67,13 @@ namespace mitevox
 		shadowMapPackShader = render::createShader("Shadow Map Pack Shader", shadersDir + "/shadow_map_pack/shadow_map_pack");
 		gBufferShader = render::createShader("G-Buffer shader", shadersDir + "/gbuffer/gbuffer");
 		deferredLightingShader = render::createShader("Deferred lighting shader", shadersDir + "/deferred_lighting/deferred_lighting");
+		postprocessingShader = render::createShader("Postprocessing shader", shadersDir + "/postprocessing/postprocessing");
 		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
 
 		uploadScene(playground->scenes.getElement(0));
 
 		render::createGbuffer(settings->getRendererSettings());
+		render::createMainCanvas(settings->getRendererSettings());
 
 		onCreate();
 	}
@@ -199,14 +201,12 @@ namespace mitevox
 					skybox = &scene->skyboxes.at(scene->activeSkybox);
 				}
 
-				render::clearBufferXY();
-				render::clearBufferZ();
-
 				MiteVoxAPI::renderScene(
 					renderer,
 					shadowMapPackShader,
 					gBufferShader,
 					deferredLightingShader,
+					postprocessingShader,
 					{ 0.0f, 0.0f, 0.0f },
 					& pointLightsArray,
 					& directionalLightsArray,
@@ -215,19 +215,6 @@ namespace mitevox
 					& cameraTransform,
 					viewProjectionMatrix,
 					entitiesToSimulate);
-
-				if (settings->debug)
-				{
-					drawAxes(renderer);
-					drawCollisions(renderer, &collisions);
-				}
-
-				// Render primitives.
-				render::renderPoints(renderer, camera, &cameraTransform);
-				render::renderLines(renderer, camera, &cameraTransform);
-				render::renderTriangles(renderer, camera, &cameraTransform);
-
-				render::display(renderer);
 			}
 
 			//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;

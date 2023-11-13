@@ -78,19 +78,24 @@ printErrors(__FILE__, __LINE__);
 
 	// Buffers
 
+	void renderScreenQuad();
 	void activateDefaultFramebuffer(RendererSettings* renderer);
 	void clearBufferXY(ColorRGBf color = ColorRGBf::BLACK());
 	void clearBufferZ();
 	void display(RendererSettings* renderer);
 	void createGbuffer(RendererSettings* renderer);
 	void activateGbuffer(RendererSettings* renderer);
-	void renderSceneFromGbuffer(
-		RendererSettings* renderer, 
-		int shaderID,
-		Camera* camera, 
-		mathem::GeometryTransform* cameraTransform);
-	void copyDepthFromGbufferToDefaultFramebuffer(RendererSettings* renderer);
 	void deleteGbuffer();
+	void createMainCanvas(RendererSettings* renderer);
+	void activateMainCanvas(RendererSettings* renderer);
+	void renderSceneFromGbuffer(
+		RendererSettings* renderer,
+		int shaderID,
+		Camera* camera,
+		mathem::GeometryTransform* cameraTransform);
+	void copyDepthFromGbufferToMainCanvas(RendererSettings* renderer);
+	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID);
+	void deleteMainCanvas();
 
 
 	// Primitives

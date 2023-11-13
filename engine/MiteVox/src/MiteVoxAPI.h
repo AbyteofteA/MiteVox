@@ -89,6 +89,7 @@ namespace mitevox
 			int shadowMapShaderID,
 			int gBufferShaderID,
 			int deferredLightingShaderID,
+			int postprocessingShaderID,
 			mathem::Vector3D ambientLight,
 			safety::SafeArray<render::PointLight>* pointLightsArray,
 			safety::SafeArray<render::DirectionalLight>* directionalLightsArray,

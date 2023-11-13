@@ -346,7 +346,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 {
 	// Ambient light
 	vec3 result = vec3(0.0f);
-	result = 0.05f * occlusion * albedoFragment;
+	result = ambientLight * occlusion * albedoFragment;
 
 	// Directional lights
 	for (int i = 0; i < amountOfDirectionalLights; i++)
