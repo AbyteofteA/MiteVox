@@ -62,18 +62,20 @@ namespace mitevox
 		// Compile shaders.
 
 		std::string shadersDir = settings->getResourceDir() + "/shaders";
-		skyboxShader = render::createShader("Skybox Shader", shadersDir + "/skybox/skybox");
-		primitiveShader = render::createShader("Primitive Shader", shadersDir + "/primitive/primitive");
-		shadowMapPackShader = render::createShader("Shadow Map Pack Shader", shadersDir + "/shadow_map_pack/shadow_map_pack");
+		skyboxShader = render::createShader("Skybox shader", shadersDir + "/skybox/skybox");
+		primitiveShader = render::createShader("Primitive shader", shadersDir + "/primitive/primitive");
+		shadowMapPackShader = render::createShader("Shadow map pack shader", shadersDir + "/shadow_map_pack/shadow_map_pack");
 		gBufferShader = render::createShader("G-Buffer shader", shadersDir + "/gbuffer/gbuffer");
 		deferredLightingShader = render::createShader("Deferred lighting shader", shadersDir + "/deferred_lighting/deferred_lighting");
 		postprocessingShader = render::createShader("Postprocessing shader", shadersDir + "/postprocessing/postprocessing");
-		settings->getRendererSettings()->primitiveShaderID = primitiveShader;
+
+		render::RendererSettings* renderer = settings->getRendererSettings();
+		renderer->primitiveShaderID = primitiveShader;
 
 		uploadScene(playground->scenes.getElement(0));
 
-		render::createGbuffer(settings->getRendererSettings());
-		render::createMainCanvas(settings->getRendererSettings());
+		render::createGbuffer(renderer);
+		render::createMainCanvas(renderer);
 
 		onCreate();
 	}
@@ -144,8 +146,16 @@ namespace mitevox
 			scene->timeSinceCleanup += deltaTime;
 			if (scene->timeSinceCleanup > settings->getCleanupPeriod())
 			{
+				Entity* activeCameraEntity = MiteVoxAPI::getActiveCameraEntity();
+				render::Camera* camera = nullptr;
+				mathem::GeometryTransform cameraTransform = activeCameraEntity->getCamera(&camera);
+
 				scene->timeSinceCleanup = 0.0f;
 				std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
+				std::cout << "Camera position: \n\t" << 
+					"X: " << cameraTransform.translation.x() << "\n\t" <<
+					"Y: " << cameraTransform.translation.y() << "\n\t" <<
+					"Z: " << cameraTransform.translation.z() << std::endl << std::endl;
 				// TODO: Implement cleanup.
 			}
 
@@ -192,8 +202,7 @@ namespace mitevox
 				render::Camera* camera = nullptr;
 				mathem::GeometryTransform cameraTransform = activeCameraEntity->getCamera(&camera);
 				
-				glm::mat4 viewMatrix = camera->getViewMatrix(&cameraTransform);
-				glm::mat4 viewProjectionMatrix = camera->getProjectionMatrix() * viewMatrix;
+				camera->updateMatrices(&cameraTransform);
 
 				render::Cubemap* skybox = nullptr;
 				if (scene->activeSkybox >= 0)
@@ -213,7 +222,6 @@ namespace mitevox
 					& spotLightsArray,
 					camera,
 					& cameraTransform,
-					viewProjectionMatrix,
 					entitiesToSimulate);
 			}
 

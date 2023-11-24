@@ -123,7 +123,7 @@ namespace render
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 viewMatrix = camera->getViewMatrix(cameraTransform);
+		glm::mat4 viewMatrix = camera->getViewMatrix();
 		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
 		shaders[shaderIndex]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 
@@ -171,7 +171,7 @@ namespace render
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 viewMatrix = camera->getViewMatrix(cameraTransform);
+		glm::mat4 viewMatrix = camera->getViewMatrix();
 		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
 		shaders[shaderIndex]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 
@@ -219,7 +219,7 @@ namespace render
 
 		renderer->amountOfDrawCalls++;
 
-		glm::mat4 viewMatrix = camera->getViewMatrix(cameraTransform);
+		glm::mat4 viewMatrix = camera->getViewMatrix();
 		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
 		shaders[shaderIndex]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 

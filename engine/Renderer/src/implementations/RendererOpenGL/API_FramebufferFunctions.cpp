@@ -1,5 +1,13 @@
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 
+#include "engine/Math/src/Vector.h"
+#include "engine/Math/src/NumericalAnalysis/Intertolation.h"
+#include "engine/CodeSafety/src/SafeArray.h"
+
+#ifdef NDEBUG
+	#undef NDEBUG
+#endif
+
 #include <cassert>
 #include <iostream>
 
@@ -9,6 +17,57 @@
 
 namespace render
 {
+	int printFramebufferStatus()
+	{
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_COMPLETE:
+			std::cout << "Framebuffer complete" << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_UNDEFINED:
+			std::cout << "ERROR: GL_FRAMEBUFFER_UNDEFINED " << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			std::cout << "ERROR: GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT " << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			std::cout << "ERROR: GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT " << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+			std::cout << "ERROR: GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER " << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+			std::cout << "ERROR: GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER " << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			std::cout << "ERROR: GL_FRAMEBUFFER_UNSUPPORTED " << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+			std::cout << "ERROR: GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE " << std::endl;
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+			std::cout << "ERROR: GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS " << std::endl;
+			break;
+
+		case 0:
+		default:
+			std::cout << "ERROR: Unknown framebuffer error" << std::endl;
+			break;
+		}
+
+		return status;
+	}
+
 	void renderScreenQuad()
 	{
 		glBindVertexArray(getScreenQuadID());
@@ -53,7 +112,7 @@ namespace render
 		// Position texture
 		glGenTextures(1, &positionTextureID);
 		glBindTexture(GL_TEXTURE_2D, positionTextureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, renderer->screenWidth, renderer->screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, renderer->screenWidth, renderer->screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -105,11 +164,11 @@ namespace render
 		unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 		glDrawBuffers(4, attachments);
 
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		GLenum status = printFramebufferStatus();
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
 			std::cout << "ERROR: " << "Cannot create G-Buffer" << std::endl;
-			assert(status != 0);
+			assert(status == GL_FRAMEBUFFER_COMPLETE);
 		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -139,6 +198,10 @@ namespace render
 		if (materialTextureID)
 		{
 			glDeleteTextures(1, (GLuint*)&materialTextureID);
+		}
+		if (depthTextureID)
+		{
+			glDeleteTextures(1, (GLuint*)&depthTextureID);
 		}
 		if (gBufferID)
 		{
@@ -173,7 +236,7 @@ namespace render
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
 			std::cout << "ERROR: " << "Cannot create main canvas" << std::endl;
-			assert(status != 0);
+			assert(status == GL_FRAMEBUFFER_COMPLETE);
 		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -192,10 +255,13 @@ namespace render
 		Camera* camera,
 		mathem::GeometryTransform* cameraTransform)
 	{
+		shaders[shaderID]->setCamera(camera);
 		shaders[shaderID]->setVec3("viewPos",
 			cameraTransform->translation.x(),
 			cameraTransform->translation.y(),
 			cameraTransform->translation.z());
+		shaders[shaderID]->setCameraMatrices(camera);
+		shaders[shaderID]->setCameraInverseMatrices(camera);
 
 		glActiveTexture(GL_TEXTURE0 + 0);
 		glBindTexture(GL_TEXTURE_2D, positionTextureID);
@@ -213,11 +279,7 @@ namespace render
 		glBindTexture(GL_TEXTURE_2D, materialTextureID);
 		shaders[shaderID]->setInt("materialTexture", 3);
 
-		glActiveTexture(GL_TEXTURE0 + 4);
-		glBindTexture(GL_TEXTURE_2D, depthTextureID);
-		shaders[shaderID]->setInt("depthTexture", 4);
-
-		drawScreenQuad();
+		renderScreenQuad();
 	}
 
 	void copyDepthFromGbufferToMainCanvas(RendererSettings* renderer)
@@ -247,7 +309,7 @@ namespace render
 		glBindTexture(GL_TEXTURE_2D, mainCanvasTextureID);
 		shaders[shaderID]->setInt("mainCanvasTexture", 0);
 
-		drawScreenQuad();
+		renderScreenQuad();
 	}
 
 	void deleteMainCanvas()

@@ -163,7 +163,7 @@ namespace render
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(-spotLight.position.x(), -spotLight.position.y(), -spotLight.position.z()));
 
 		glm::mat4 projectionMatrix = glm::mat4(1.0f);
-		projectionMatrix = glm::perspective(spotLight.outerConeAngle * 2.0f, 1.0f, 0.001f, spotLight.lightBase.range);
+		projectionMatrix = glm::perspective(spotLight.outerConeAngle * 2.0f, 1.0f, 0.1f, spotLight.lightBase.range);
 
 		return projectionMatrix * viewMatrix;
 	}

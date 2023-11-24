@@ -3,9 +3,6 @@
 in vec2 Texcoord;
 out vec4 outColor;
 
-// Shader settings
-uniform float gammaCorrection = 1.2f;
-
 #define ILLUMINATION_MODEL_NONE 0
 #define ILLUMINATION_MODEL_UNLIT 1
 #define ILLUMINATION_MODEL_PHONG 2
@@ -15,9 +12,16 @@ uniform sampler2D positionTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D albedoTexture;
 uniform sampler2D materialTexture;
-uniform sampler2D depthTexture;
 
+uniform float nearPlane = 0.001f;
+uniform float farPlane = 1500.0f;
 uniform vec3 viewPos;
+uniform mat4 viewMatrix;
+uniform mat4 viewOrientationMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 inverseViewMatrix;
+uniform mat4 inverseViewOrientationMatrix;
+uniform mat4 inverseProjectionMatrix;
 
 uniform vec3 ambientLight;
 
@@ -60,30 +64,25 @@ uniform SpotLight spotLights[MAX_OF_SPOT_LIGHTS];
 uniform sampler2DArray shadowMapPack;
 uniform mat4 lightMatrices[SHADOW_MAP_PACK_SIZE];
 
-uniform vec3 fogColor = vec3(0.05f, 0.05f, 0.05f);
-uniform float fogMinDistance = 20.0f;
-uniform float fogMaxDistance = 50.0f;
-
-
 // Precomputed properties
 
 vec3 position = vec3(0.0f);
+vec3 positionWorld = vec3(0.0f);
 vec4 albedoFragment = vec4(0.0f);
 vec3 norm = vec3(0.0f);
+vec3 normWorld = vec3(0.0f);
 float metallicity = 0.0f;
 float roughness = 1.0f;
 float occlusion = 1.0f;
-float depth = 0.0f;
 vec3 emissiveFragment = vec3(0.0f);
 
 vec3 viewDir = vec3(0.0f);
+vec3 viewDirWorld = vec3(0.0f);
 float roughnessSquared = 0.0f;
 float K = 0.0f;
 vec3 F0 = vec3(0.0f);
 float dotNormViewDir = 0.0f;
-vec3 specularFraction = vec3(0.0f);
-vec3 diffuseFraction = vec3(0.0f);
-vec3 diffuseBRDF = vec3(0.0f);
+float shadowMapTextureSize = 0.0f;
 
 #define PI 3.1415926535897932384626433832795
 #define ALMOST_ZERO 0.000001
@@ -98,7 +97,7 @@ vec3 calculateLightSourcePhong(
 {
 	float dotNormLightDir = max(dot(norm, lightDir), 0.0f);
 	vec3 reflectDir = reflect(-lightDir, norm);
-	float dotViewReflectDir = max(dot(viewDir, reflectDir), 0.0f);
+	float dotViewReflectDir = max(dot(viewDirWorld, reflectDir), 0.0f);
 
 	vec3 diffuse = albedoFragment * lightColor;
 	float smoothness = (1.0f - roughness);
@@ -129,7 +128,7 @@ float geometryFunction(float dotProduct, float K)
 /// <summary>
 /// Fresnel-Schlick equation
 /// </summary>
-vec3 specularFractionFunction(vec3 halfVector, vec3 F0, float roughness)
+vec3 specularFractionFunction(vec3 viewDir, vec3 halfVector, vec3 F0, float roughness)
 {
 	float dotViewDirHalf = max(dot(viewDir, halfVector), 0.0f);
 	return F0 + (1.0f - F0) * pow(clamp(1.0f - dotViewDirHalf, 0.0f, 1.0f), 5.0f);
@@ -150,7 +149,15 @@ vec3 calculateLightSourcePBR(
 	vec3 lightColor)
 {
 	float dotNormLightDir = max(dot(norm, lightDir), 0.0f);
-	vec3 halfVector = normalize(lightDir + viewDir);
+	vec3 halfVector = normalize(lightDir + viewDirWorld);
+
+    vec3 specularFraction = 
+        specularFractionFunction(viewDirWorld, halfVector, F0, roughness); // Reflection fraction
+	vec3 diffuseFraction = vec3(1.0f) - specularFraction; // Refraction fraction
+	diffuseFraction *= (1.0f - metallicity);
+    
+    // Diffuse component
+	vec3 diffuseBRDF = diffuseFraction * albedoFragment.rgb / PI;
 
 	// Specular component
 	float microfacetsAlignment = normalDistributionFunction(norm, halfVector, roughness);
@@ -199,12 +206,12 @@ float calculateAttenuation(float currentDistance, float range)
 float calculateSpotShadow(int lightIndex)
 {
 	float shadowFraction = 0.0f;
-	vec4 fragmentLightSpace = lightMatrices[lightIndex] * vec4(position, 1.0f);
+	vec4 fragmentLightSpace = lightMatrices[lightIndex] * vec4(positionWorld, 1.0f);
 	fragmentLightSpace.xyz /= fragmentLightSpace.w;
 	if (fragmentLightSpace.z <= 1.0f)
 	{
 		fragmentLightSpace.xyz = fragmentLightSpace.xyz * 0.5f + 0.5f;
-		vec2 pixelSize = 1.0f / textureSize(shadowMapPack, 0).xy;
+		float pixelSize = 1.0f / shadowMapTextureSize;
 		int radius = 2;
 		for (int x = -radius; x <= radius; ++x)
 		{
@@ -303,41 +310,52 @@ vec3 sampleCubemap(vec3 direction)
 	return result;
 }
 
+vec3 getPerpendicularVector(vec3 vectorA)
+{
+    vec3 vectorB = vec3(-1.0f, 0.0f, 0.0f);
+    if (abs(dot(vectorB, vectorA)) < 0.000001f)
+    {
+		vectorB = vec3(0.0f, 0.0f, -1.0f);
+    }
+    return cross(vectorB, vectorA);
+}
+
 float calculatePointShadow(int lightIndex)
 {
 	float shadowFraction = 0.0f;
-	vec3 lightToFragmentDir = position - pointLights[lightIndex].pos;
+	vec3 lightToFragmentDir = positionWorld - pointLights[lightIndex].pos;
 	lightToFragmentDir = normalize(lightToFragmentDir);
 	
 	vec3 samplePos = sampleCubemap(lightToFragmentDir);
 
 	int lightMatrixIndex = int(samplePos.z);
-	vec4 fragmentLightSpace = lightMatrices[lightMatrixIndex] * vec4(position, 1.0f);
+	vec4 fragmentLightSpace = lightMatrices[lightMatrixIndex] * vec4(positionWorld, 1.0f);
 	fragmentLightSpace.xyz /= fragmentLightSpace.w;
 	if (fragmentLightSpace.z <= 1.0f)
 	{
 		fragmentLightSpace.xyz = fragmentLightSpace.xyz * 0.5f + 0.5f;
 		float currentDepth = fragmentLightSpace.z;
 
-		float pixelSize = 2.0f / textureSize(shadowMapPack, 0).x;
-		int radius = 1;
+        vec3 perpendicularDir1 = normalize(getPerpendicularVector(lightToFragmentDir));
+        vec3 perpendicularDir2 = normalize(cross(lightToFragmentDir, perpendicularDir1));
+
+		float pixelSize = 1.0f / shadowMapTextureSize;
+		int radius = 2;
 		for (int x = -radius; x <= radius; ++x)
 		{
 			for (int y = -radius; y <= radius; ++y)
 			{
-				for (int z = -radius; z <= radius; ++z)
-				{
-					vec3 sampleDir = lightToFragmentDir + pixelSize * vec3(x, y, z);
-					samplePos = sampleCubemap(sampleDir);
-					float closestDepth = texture(shadowMapPack, samplePos).r;
-					if (currentDepth > closestDepth)
-					{
-						shadowFraction += 1.0f;
-					}
-				}
+                vec3 perpendicularOffset = perpendicularDir1 * x + perpendicularDir2 * y;
+                vec3 sampleDir = lightToFragmentDir + pixelSize * perpendicularOffset;
+                samplePos = sampleCubemap(sampleDir);
+                float closestDepth = texture(shadowMapPack, samplePos).r;
+                if (currentDepth > closestDepth)
+                {
+                    shadowFraction += 1.0f;
+                }
 			}
 		}
-		shadowFraction /= 27.0f;
+		shadowFraction /= 25.0f;
 	}
 	return 1.0f - shadowFraction;
 }
@@ -346,7 +364,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 {
 	// Ambient light
 	vec3 result = vec3(0.0f);
-	result = ambientLight * occlusion * albedoFragment;
+	result = (1.0f - metallicity) * albedoFragment * 0.02f * occlusion;
 
 	// Directional lights
 	for (int i = 0; i < amountOfDirectionalLights; i++)
@@ -362,7 +380,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	{
 		float shadowFraction = calculatePointShadow(i);
 
-		vec3 lightDir = pointLights[i].pos - position;
+		vec3 lightDir = pointLights[i].pos - positionWorld;
 		float distance = abs(length(lightDir));
 		float attenuation = 0.0f;
 		if (pointLights[i].range > 0.0f)
@@ -380,7 +398,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	{
 		float shadowFraction = calculateSpotShadow(i);
 
-		vec3 lightDir = spotLights[i].pos - position;
+		vec3 lightDir = spotLights[i].pos - positionWorld;
 		float distance = abs(length(lightDir));
 		float attenuation = 0.0f;
 		if (spotLights[i].range > 0.0f)
@@ -404,21 +422,12 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	return result;
 }
 
-float calculateLinearFog()
-{
-	float distance = length(position - viewPos) - fogMinDistance;
-	float fogRange = fogMaxDistance - fogMinDistance;
-	float fogFactor = clamp(distance / fogRange, 0.0f, 1.0f);
-	return fogFactor;
-}
-
 void main()
 {
     vec4 positionTextureFragment = texture(positionTexture, Texcoord);
 	vec4 normalTextureFragment = texture(normalTexture, Texcoord);
 	vec4 albedoTextureFragment = texture(albedoTexture, Texcoord);
 	vec4 materialTextureFragment = texture(materialTexture, Texcoord);
-	vec4 depthTextureFragment = texture(depthTexture, Texcoord);
     
     if (materialTextureFragment.x < 1.0f)
 	{
@@ -426,7 +435,9 @@ void main()
 	}
     
 	position = positionTextureFragment.rgb;
+    positionWorld = vec3(inverseViewMatrix * vec4(position, 1.0f));
 	norm = normalTextureFragment.rgb;
+	normWorld = normalize(vec3(inverseViewOrientationMatrix * vec4(norm, 1.0f)));
     albedoFragment = vec4(albedoTextureFragment.rgb, 1.0f);
 	emissiveFragment = vec3(
         positionTextureFragment.a, 
@@ -435,30 +446,20 @@ void main()
     metallicity = materialTextureFragment.b;
     roughness = materialTextureFragment.g;
     occlusion = albedoTextureFragment.a;
-    depth = depthTextureFragment.r;
 	
 	// Precomputed properties
-	viewDir = viewPos - position;
+	viewDir = -position;
 	viewDir = normalize(viewDir);
+	viewDirWorld = vec3(inverseViewOrientationMatrix * vec4(viewDir, 1.0f));
 	roughnessSquared = pow(roughness, 2.0f); // originally ^1.0f
 	K = (roughnessSquared + 1.0f) * (roughnessSquared + 1.0f) / 8.0f;
 	F0 = vec3(0.04f);
 	F0 = mix(F0, albedoFragment.rgb, metallicity);
 	dotNormViewDir = max(dot(norm, viewDir), 0.05f); // (Clamping to 0.0f causes artifacts)
-	specularFraction = specularFractionFunction(norm, F0, roughness); // Reflection fraction
-	diffuseFraction = vec3(1.0f) - specularFraction; // Refraction fraction
-	diffuseFraction *= (1.0f - metallicity);
-	diffuseBRDF = diffuseFraction * albedoFragment.rgb / PI;
+	shadowMapTextureSize = textureSize(shadowMapPack, 0).x;
     
-	vec4 resultColor = vec4(calculateLighting(albedoFragment.rgb, roughness, metallicity, norm, occlusion), 1.0f);
+	vec4 resultColor = vec4(calculateLighting(albedoFragment.rgb, roughness, metallicity, normWorld, occlusion), 1.0f);
 	resultColor += vec4(emissiveFragment, 1.0f);
-    
-	//resultColor.rgb = resultColor.rgb / (resultColor.rgb + vec3(1.0f));
-	//resultColor.rgb = pow(resultColor.rgb, vec3(1.0f / gammaCorrection));
-    
-	// Linear fog
-	//float fogFactor = calculateLinearFog();
-	//resultColor.rgb = mix(resultColor.rgb, fogColor, fogFactor);
     
 	outColor = resultColor;
 }

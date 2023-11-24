@@ -17,8 +17,7 @@ namespace mitevox
 		Node* node,
 		mathem::GeometryTransform* nodeTransform,
 		render::Camera* camera,
-		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix);
+		mathem::GeometryTransform* cameraTransform);
 
 	void MiteVoxAPI::renderScene(
 		render::RendererSettings* renderer,
@@ -32,7 +31,6 @@ namespace mitevox
 		safety::SafeArray<render::SpotLight>* spotLightsArray,
 		render::Camera* camera,
 		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix,
 		safety::SafeArray<Entity*> entities,
 		int skyboxShaderID,
 		render::Cubemap* skybox)
@@ -41,15 +39,16 @@ namespace mitevox
 		render::activateGbuffer(renderer);
 		render::clearBufferXY();
 		render::clearBufferZ();
-		renderSceneToGbuffer(renderer, gBufferShaderID, camera, cameraTransform, viewProjectionMatrix, entities);
+		renderSceneToGbuffer(renderer, gBufferShaderID, camera, cameraTransform, entities);
+		render::copyDepthFromGbufferToMainCanvas(renderer);
 
 		// Render lighting to main canvas
 		render::activateMainCanvas(renderer);
 		render::clearBufferXY();
-		render::clearBufferZ();
-		renderSceneWithSpotLights(renderer, shadowMapShaderID, deferredLightingShaderID, spotLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
-		renderSceneWithPointLights(renderer, shadowMapShaderID, deferredLightingShaderID, pointLightsArray, entities, camera, cameraTransform, viewProjectionMatrix);
-		render::copyDepthFromGbufferToMainCanvas(renderer);
+		renderSceneWithSpotLights(
+			renderer, shadowMapShaderID, deferredLightingShaderID, spotLightsArray, entities, camera, cameraTransform);
+		renderSceneWithPointLights(
+			renderer, shadowMapShaderID, deferredLightingShaderID, pointLightsArray, entities, camera, cameraTransform);
 
 		// TODO: 
 		//if (settings->debug)
@@ -58,6 +57,7 @@ namespace mitevox
 		//	drawCollisions(renderer, &collisions);
 		//}
 
+		render::setAdditiveBlending();
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_TRUE);
@@ -83,14 +83,14 @@ namespace mitevox
 		int shaderID,
 		render::Camera* camera,
 		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix,
 		safety::SafeArray<Entity*> entities)
 	{
 		render::useShader(shaderID);
 
+		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
-		glDisable(GL_BLEND);
+		render::disableBlending();
 
 		size_t entitiesCount = entities.getElementsCount();
 		for (size_t i = 0; i < entitiesCount; ++i)
@@ -102,8 +102,7 @@ namespace mitevox
 				entity->renderableNode,
 				&entity->transform,
 				camera,
-				cameraTransform,
-				viewProjectionMatrix);
+				cameraTransform);
 		}
 	}
 
@@ -113,8 +112,7 @@ namespace mitevox
 		Node* node,
 		mathem::GeometryTransform* nodeTransform,
 		render::Camera* camera,
-		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix)
+		mathem::GeometryTransform* cameraTransform)
 	{
 		mathem::GeometryTransform nodeGlobalTransform = *nodeTransform * node->transform;
 
@@ -130,7 +128,7 @@ namespace mitevox
 			{
 				render::uploadMesh(meshToRender);
 			}
-			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform, viewProjectionMatrix);
+			render::renderMesh(renderer, shaderID, meshToRender, &nodeGlobalTransform, camera, cameraTransform);
 		}
 
 		size_t childrenCount = node->children.getElementsCount();
@@ -142,8 +140,7 @@ namespace mitevox
 				node->children.getElement(i),
 				&nodeGlobalTransform,
 				camera,
-				cameraTransform, 
-				viewProjectionMatrix);
+				cameraTransform);
 		}
 	}
 
@@ -202,8 +199,7 @@ namespace mitevox
 		safety::SafeArray<render::SpotLight>* spotLightsArray,
 		safety::SafeArray<Entity*> entities,
 		render::Camera* camera,
-		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix)
+		mathem::GeometryTransform* cameraTransform)
 	{
 		size_t spotLightsCount = spotLightsArray->getElementsCount();
 		size_t spotLightsPerFrame = std::min(spotLightsCount, renderer->spotLightsPerFrame);
@@ -214,6 +210,7 @@ namespace mitevox
 			// Render shadow maps
 
 			render::useShader(shadowMapShaderID);
+			render::disableBlending();
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
@@ -244,7 +241,7 @@ namespace mitevox
 			{
 				glDisable(GL_CULL_FACE);
 			}
-			glEnable(GL_BLEND);
+			render::setAdditiveBlending();
 			glDisable(GL_DEPTH_TEST);
 			glDepthMask(GL_FALSE);
 
@@ -265,8 +262,7 @@ namespace mitevox
 		safety::SafeArray<render::PointLight>* pointLightsArray,
 		safety::SafeArray<Entity*> entities,
 		render::Camera* camera,
-		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix)
+		mathem::GeometryTransform* cameraTransform)
 	{
 		size_t lightsCount = pointLightsArray->getElementsCount();
 
@@ -277,6 +273,7 @@ namespace mitevox
 			// Render shadow maps
 
 			render::useShader(shadowMapShaderID);
+			render::disableBlending();
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
@@ -306,7 +303,7 @@ namespace mitevox
 			{
 				glDisable(GL_CULL_FACE);
 			}
-			glEnable(GL_BLEND);
+			render::setAdditiveBlending();
 			glDisable(GL_DEPTH_TEST);
 			glDepthMask(GL_FALSE);
 

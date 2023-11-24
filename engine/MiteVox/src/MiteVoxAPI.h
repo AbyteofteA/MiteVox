@@ -31,6 +31,7 @@ namespace mitevox
 		static size_t getRandom();
 		static size_t getRandom(size_t min, size_t max);
 		static float getRandom(float min, float max);
+		static mathem::Vector3D getRandomDirection();
 
 		// Queries
 
@@ -96,7 +97,6 @@ namespace mitevox
 			safety::SafeArray<render::SpotLight>* spotLightsArray,
 			render::Camera* camera,
 			mathem::GeometryTransform* cameraTransform,
-			glm::mat4 viewProjectionMatrix,
 			safety::SafeArray<Entity*> entities,
 			int skyboxShaderID = -1,
 			render::Cubemap* skybox = nullptr);
@@ -106,7 +106,6 @@ namespace mitevox
 			int shaderID,
 			render::Camera* camera,
 			mathem::GeometryTransform* cameraTransform,
-			glm::mat4 viewProjectionMatrix,
 			safety::SafeArray<Entity*> entities);
 
 		static void renderSceneWithSpotLights(
@@ -116,8 +115,7 @@ namespace mitevox
 			safety::SafeArray<render::SpotLight>* spotLightsArray,
 			safety::SafeArray<Entity*> entities,
 			render::Camera* camera,
-			mathem::GeometryTransform* cameraTransform,
-			glm::mat4 viewProjectionMatrix);
+			mathem::GeometryTransform* cameraTransform);
 
 		static void renderSceneWithPointLights(
 			render::RendererSettings* renderer,
@@ -126,8 +124,7 @@ namespace mitevox
 			safety::SafeArray<render::PointLight>* pointLightsArray,
 			safety::SafeArray<Entity*> entities,
 			render::Camera* camera,
-			mathem::GeometryTransform* cameraTransform,
-			glm::mat4 viewProjectionMatrix);
+			mathem::GeometryTransform* cameraTransform);
 
 	private:
 

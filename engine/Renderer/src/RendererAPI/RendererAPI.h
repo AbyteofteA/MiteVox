@@ -61,6 +61,9 @@ printErrors(__FILE__, __LINE__);
 
 	void setWireframeRendering(bool isEnabled);
 	void setViewport(int x, int y, int width, int height);
+	void disableBlending();
+	void setAdditiveBlending();
+	void setAlphaBlending();
 
 	// Shaders
 
@@ -78,11 +81,14 @@ printErrors(__FILE__, __LINE__);
 
 	// Buffers
 
+	int printFramebufferStatus();
 	void renderScreenQuad();
+
 	void activateDefaultFramebuffer(RendererSettings* renderer);
 	void clearBufferXY(ColorRGBf color = ColorRGBf::BLACK());
 	void clearBufferZ();
 	void display(RendererSettings* renderer);
+
 	void createGbuffer(RendererSettings* renderer);
 	void activateGbuffer(RendererSettings* renderer);
 	void deleteGbuffer();
@@ -96,7 +102,6 @@ printErrors(__FILE__, __LINE__);
 	void copyDepthFromGbufferToMainCanvas(RendererSettings* renderer);
 	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID);
 	void deleteMainCanvas();
-
 
 	// Primitives
 
@@ -147,8 +152,7 @@ printErrors(__FILE__, __LINE__);
 		mitevox::Mesh* mesh,
 		mathem::GeometryTransform* transform,
 		Camera* camera,
-		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix);
+		mathem::GeometryTransform* cameraTransform);
 
 	void uploadSkybox(Cubemap* skybox, int shaderID);
 	void selectSkybox(Cubemap* skybox, int shaderID);

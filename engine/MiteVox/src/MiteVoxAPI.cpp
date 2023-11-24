@@ -42,6 +42,16 @@ namespace mitevox
 		return mathem::lerp<float>(min, max, randomFactor);
 	}
 
+	mathem::Vector3D MiteVoxAPI::getRandomDirection()
+	{
+		mathem::Vector3D direction;
+		direction.x() = MiteVoxAPI::getRandom(-1.0f, 1.0f);
+		direction.y() = MiteVoxAPI::getRandom(-1.0f, 1.0f);
+		direction.z() = MiteVoxAPI::getRandom(-1.0f, 1.0f);
+		direction.normalize();
+		return direction;
+	}
+
 	EngineSettings* MiteVoxAPI::getSettings()
 	{
 		return engine->settings;

@@ -17,8 +17,10 @@ out VertexDataFragment
 	mat3 TangentBitangentNormal;
 } fragment;
 
-uniform mat4 viewProjectionMatrix;
 uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 viewOrientationMatrix;
+uniform mat4 projectionMatrix;
 
 uniform int jointsCount;
 uniform mat4 jointMatrices[32];
@@ -35,13 +37,13 @@ void main()
 			weights.w * jointMatrices[joints.w];
 	}
 
-	mat4 poseModelMatrix = modelMatrix * poseMatrix;
+	mat4 poseModelViewMatrix = viewMatrix * modelMatrix * poseMatrix;
 
 	fragment.Texcoord = texcoord_0;
-	fragment.Normal = normalize(vec3(transpose(inverse(poseModelMatrix)) * vec4(normal, 1.0)));
+	fragment.Normal = normalize(vec3(transpose(inverse(poseModelViewMatrix)) * vec4(normal, 1.0)));
 	vec3 bitangent = cross(fragment.Normal, tangent.xyz);
 	fragment.TangentBitangentNormal = mat3(tangent.xyz, bitangent, fragment.Normal);
-	fragment.Position = vec3(poseModelMatrix * vec4(position, 1.0));
-	gl_Position = viewProjectionMatrix * vec4(fragment.Position, 1.0);
+	fragment.Position = vec3(poseModelViewMatrix * vec4(position, 1.0));
+	gl_Position = projectionMatrix * vec4(fragment.Position, 1.0);
 }
 

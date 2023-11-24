@@ -74,9 +74,7 @@ namespace render
 
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-		glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+		render::setAdditiveBlending();
 
 		if (renderer->backfaceCulling)
 		{
@@ -161,5 +159,22 @@ namespace render
 	void setViewport(int x, int y, int width, int height)
 	{
 		glViewport(x, y, width, height);
+	}
+
+	void disableBlending()
+	{
+		glDisable(GL_BLEND);
+	}
+
+	void setAdditiveBlending()
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+	}
+
+	void setAlphaBlending()
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 }

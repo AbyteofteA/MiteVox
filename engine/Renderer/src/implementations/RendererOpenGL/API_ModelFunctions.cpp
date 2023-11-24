@@ -653,8 +653,7 @@ namespace render
 		mitevox::Mesh* mesh,
 		mathem::GeometryTransform* transform,
 		Camera* camera,
-		mathem::GeometryTransform* cameraTransform,
-		glm::mat4 viewProjectionMatrix)
+		mathem::GeometryTransform* cameraTransform)
 	{
 		if (!shaders[shaderID]->use())
 			return;
@@ -668,8 +667,7 @@ namespace render
 
 		mathem::Matrix4x4 modelMatrix = mathem::transformToMatrix(*transform);
 		shaders[shaderID]->setMatrix4x4("modelMatrix", modelMatrix);
-
-		shaders[shaderID]->setMat4("viewProjectionMatrix", viewProjectionMatrix);
+		shaders[shaderID]->setCameraMatrices(camera);
 
 		int64_t meshesPrimitivesCount = mesh->primitives.getElementsCount();
 		for (int64_t primitiveIndex = 0; primitiveIndex < meshesPrimitivesCount; ++primitiveIndex)
@@ -780,7 +778,7 @@ namespace render
 
 		mathem::GeometryTransform cameraTransformOrientationOnly;
 		cameraTransformOrientationOnly.rotation = cameraTransform->rotation;
-		glm::mat4 viewMatrix = camera->getViewMatrix(&cameraTransformOrientationOnly);
+		glm::mat4 viewMatrix = camera->makeViewMatrix(&cameraTransformOrientationOnly);
 		glm::mat4 projectionMatrix = camera->getProjectionMatrix();
 		shaders[shaderID]->setMat4("viewProjectionMatrix", projectionMatrix * viewMatrix);
 

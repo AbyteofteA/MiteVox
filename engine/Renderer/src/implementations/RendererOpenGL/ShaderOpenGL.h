@@ -2,8 +2,10 @@
 #define SHADEROPENGL_H
 
 #include "engine/Math/src/Vector.h"
+#include "engine/Math/src/Geometry/GeometryTransform.h"
 #include "engine/Math/src/Matrix.h"
 #include "engine/CodeSafety/src/SafeArray.h"
+#include "engine/Renderer/src/RendererAPI/Camera.h"
 
 #include "dependencies/glm/glm.hpp"
 #include "dependencies/glm/gtc/matrix_transform.hpp"
@@ -63,8 +65,13 @@ namespace render
         void setMatrix2x2(const char* name, mathem::Matrix2x2 matrix);
         void setMatrix3x3(const char* name, mathem::Matrix3x3 matrix);
         void setMatrix4x4(const char* name, mathem::Matrix4x4 matrix);
+        void setVector3DArray(const char* name, safety::SafeArray<mathem::Vector3D>* vectors);
         void setMatrix4x4Array(const char* name, safety::SafeArray<mathem::Matrix4x4>* matrices);
         void setMat4Array(const char* name, safety::SafeArray<glm::mat4>* matrices);
+
+        void setCamera(Camera* camera);
+        void setCameraMatrices(Camera* camera);
+        void setCameraInverseMatrices(Camera* camera);
 
     private:
 

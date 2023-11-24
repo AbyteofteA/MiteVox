@@ -221,6 +221,11 @@ namespace render
         glUniformMatrix4fv(glGetUniformLocation(shaderID, name), 1, GL_FALSE, matrix.data);
     }
 
+    void ShaderOpenGL::setVector3DArray(const char* name, safety::SafeArray<mathem::Vector3D>* vectors)
+    {
+        glUniform3fv(glGetUniformLocation(shaderID, name), vectors->getElementsCount(), (float*)vectors->getElementsArray());
+    }
+
     void ShaderOpenGL::setMatrix4x4Array(const char* name, safety::SafeArray<mathem::Matrix4x4>* matrices)
     {
         glUniformMatrix4fv(glGetUniformLocation(shaderID, name), matrices->getElementsCount(), GL_FALSE, (float*)matrices->getElementsArray());
@@ -229,6 +234,26 @@ namespace render
     void ShaderOpenGL::setMat4Array(const char* name, safety::SafeArray<glm::mat4>* matrices)
     {
         glUniformMatrix4fv(glGetUniformLocation(shaderID, name), matrices->getElementsCount(), GL_FALSE, (float*)matrices->getElementsArray());
+    }
+
+    void ShaderOpenGL::setCamera(Camera* camera)
+    {
+        setFloat("nearPlane", camera->nearCullPlane);
+        setFloat("farPlane", camera->farCullPlane);
+    }
+
+    void ShaderOpenGL::setCameraMatrices(Camera* camera)
+    {
+        setMat4("viewMatrix", camera->getViewMatrix());
+        setMat4("viewOrientationMatrix", camera->getViewOrientationMatrix());
+        setMat4("projectionMatrix", camera->getProjectionMatrix());
+    }
+
+    void ShaderOpenGL::setCameraInverseMatrices(Camera* camera)
+    {
+        setMat4("inverseViewMatrix", glm::inverse(camera->getViewMatrix()));
+        setMat4("inverseViewOrientationMatrix", glm::inverse(camera->getViewOrientationMatrix()));
+        setMat4("inverseProjectionMatrix", glm::inverse(camera->getProjectionMatrix()));
     }
 
     void ShaderOpenGL::deleteVertexShader()
