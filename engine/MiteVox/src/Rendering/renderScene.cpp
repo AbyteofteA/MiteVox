@@ -74,7 +74,7 @@ namespace mitevox
 		render::activateDefaultFramebuffer(renderer);
 		render::clearBufferXY();
 		render::clearBufferZ();
-		render::renderSceneFromMainCanvas(renderer, postprocessingShaderID);
+		render::renderSceneFromMainCanvas(renderer, postprocessingShaderID, MiteVoxAPI::getCurrentDeltaTime());
 
 		render::display(renderer);
 	}

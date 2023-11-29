@@ -101,7 +101,7 @@ printErrors(__FILE__, __LINE__);
 		mathem::GeometryTransform* cameraTransform,
 		float deltaTime);
 	void copyDepthFromGbufferToMainCanvas(RendererSettings* renderer);
-	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID);
+	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID, float deltaTime);
 	void deleteMainCanvas();
 
 	// Primitives

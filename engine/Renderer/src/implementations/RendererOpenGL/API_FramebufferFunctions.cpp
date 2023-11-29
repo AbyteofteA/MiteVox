@@ -301,11 +301,11 @@ namespace render
 			GL_NEAREST);
 	}
 
-	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID)
+	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID, float deltaTime)
 	{
 		render::useShader(shaderID);
 
-		// TODO: Set Parameters
+		shaders[shaderID]->setFloat("deltaTime", deltaTime);
 
 		glActiveTexture(GL_TEXTURE0 + 0);
 		glBindTexture(GL_TEXTURE_2D, mainCanvasTextureID);

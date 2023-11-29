@@ -68,7 +68,6 @@ int shadowSamplesCount = 20;
 
 // Precomputed properties
 
-vec2 screenUV = vec2(0.0f);
 float noiseFromScreenUV = 0.0f;
 vec3 position = vec3(0.0f);
 vec3 positionWorld = vec3(0.0f);
@@ -467,13 +466,13 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 
 float noise(vec2 screenUV)
 {
-   return fract(12345.06789f * sin(dot(screenUV.xy, vec2(12.34f, 67.89f)) + deltaTime));
+	screenUV += vec2(1.0f - deltaTime, deltaTime);
+	return fract(12345.06789f * sin(dot(screenUV.xy, vec2(123.45f, 678.90f))));
 }
 
 void main()
 {
-    screenUV = gl_FragCoord.xy / textureSize(positionTexture, 0);
-    noiseFromScreenUV = noise(screenUV);
+    noiseFromScreenUV = noise(Texcoord);
     
     vec4 positionTextureFragment = texture(positionTexture, Texcoord);
 	vec4 normalTextureFragment = texture(normalTexture, Texcoord);
