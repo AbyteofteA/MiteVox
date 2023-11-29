@@ -253,8 +253,10 @@ namespace render
 		RendererSettings* renderer,
 		int shaderID,
 		Camera* camera,
-		mathem::GeometryTransform* cameraTransform)
+		mathem::GeometryTransform* cameraTransform,
+		float deltaTime)
 	{
+		shaders[shaderID]->setFloat("deltaTime", deltaTime);
 		shaders[shaderID]->setCamera(camera);
 		shaders[shaderID]->setVec3("viewPos",
 			cameraTransform->translation.x(),

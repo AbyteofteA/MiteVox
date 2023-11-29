@@ -70,6 +70,7 @@ namespace mitevox
 		glDepthMask(GL_FALSE);
 
 		// Render main canvas to default framebuffer
+		render::disableBlending();
 		render::activateDefaultFramebuffer(renderer);
 		render::clearBufferXY();
 		render::clearBufferZ();
@@ -212,8 +213,7 @@ namespace mitevox
 			render::useShader(shadowMapShaderID);
 			render::disableBlending();
 			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			glDisable(GL_CULL_FACE);
 			glDepthFunc(GL_LESS);
 			glDepthMask(GL_TRUE);
 
@@ -249,7 +249,8 @@ namespace mitevox
 				renderer,
 				lightingShaderID,
 				camera,
-				cameraTransform);
+				cameraTransform,
+				MiteVoxAPI::getCurrentDeltaTime());
 
 			spotLightOffset += spotLightsPerCall;
 		}
@@ -275,8 +276,7 @@ namespace mitevox
 			render::useShader(shadowMapShaderID);
 			render::disableBlending();
 			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			glDisable(GL_CULL_FACE);
 			glDepthFunc(GL_LESS);
 			glDepthMask(GL_TRUE);
 
@@ -311,7 +311,8 @@ namespace mitevox
 				renderer,
 				lightingShaderID,
 				camera,
-				cameraTransform);
+				cameraTransform,
+				MiteVoxAPI::getCurrentDeltaTime());
 		}
 	}
 }

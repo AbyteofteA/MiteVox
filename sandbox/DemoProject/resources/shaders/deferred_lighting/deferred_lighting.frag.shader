@@ -13,6 +13,7 @@ uniform sampler2D normalTexture;
 uniform sampler2D albedoTexture;
 uniform sampler2D materialTexture;
 
+uniform float deltaTime = 0.0f;
 uniform float nearPlane = 0.001f;
 uniform float farPlane = 1500.0f;
 uniform vec3 viewPos;
@@ -63,9 +64,12 @@ uniform SpotLight spotLights[MAX_OF_SPOT_LIGHTS];
 #define SHADOW_MAP_PACK_SIZE 16
 uniform sampler2DArray shadowMapPack;
 uniform mat4 lightMatrices[SHADOW_MAP_PACK_SIZE];
+int shadowSamplesCount = 20;
 
 // Precomputed properties
 
+vec2 screenUV = vec2(0.0f);
+float noiseFromScreenUV = 0.0f;
 vec3 position = vec3(0.0f);
 vec3 positionWorld = vec3(0.0f);
 vec4 albedoFragment = vec4(0.0f);
@@ -82,9 +86,10 @@ float roughnessSquared = 0.0f;
 float K = 0.0f;
 vec3 F0 = vec3(0.0f);
 float dotNormViewDir = 0.0f;
-float shadowMapTextureSize = 0.0f;
+float shadowMapPixelSize = 0.0f;
 
 #define PI 3.1415926535897932384626433832795
+#define GOLDEN_ANGLE 2.399967f
 #define ALMOST_ZERO 0.000001
 
 vec3 calculateLightSourcePhong(
@@ -213,7 +218,14 @@ float convertToLinearDepth(float depthFragment, float near, float far)
 float projectSpotShadowTexelSize(vec3 lightToFragment, vec3 lightDirection, float lightOuterConeAngle)
 {
     float positionProjection = abs(dot(lightToFragment, lightDirection));
-    return 2.0f * positionProjection * tan(lightOuterConeAngle) / shadowMapTextureSize;
+    return 2.0f * positionProjection * tan(lightOuterConeAngle) * shadowMapPixelSize;
+}
+
+vec2 vogelDisk(int sampleIndex, int samplesCount, float angularOffset)
+{
+    float radius = sqrt(sampleIndex + 0.5f) / sqrt(samplesCount);
+    float angle = sampleIndex * GOLDEN_ANGLE + angularOffset;
+    return vec2(radius * cos(angle), radius * sin(angle));
 }
 
 float calculateSpotShadow(int lightIndex, vec3 lightDir)
@@ -226,8 +238,8 @@ float calculateSpotShadow(int lightIndex, vec3 lightDir)
     
     // Calculate offsets
     float normalDotLightDirection = 1.0f - dot(normWorld, -lightToFragmentDir);
-    float depthOffset = max(6.0f * normalDotLightDirection, 2.0f) * shadowMapTexelSize;
-    float normalOffset = max(4.0f * normalDotLightDirection, 2.0f) * shadowMapTexelSize;
+    float depthOffset = max(10.0f * normalDotLightDirection, 8.0f) * shadowMapTexelSize;
+    float normalOffset = max(8.0f * normalDotLightDirection, 2.0f) * shadowMapTexelSize;
     
 	float shadowFraction = 0.0f;
 	vec4 fragmentLightSpace = lightMatrices[lightIndex] * vec4(positionWorld, 1.0f);
@@ -241,24 +253,20 @@ float calculateSpotShadow(int lightIndex, vec3 lightDir)
 	modifiedFragmentLightSpace.xyz /= modifiedFragmentLightSpace.w;
     modifiedFragmentLightSpace.xyz = modifiedFragmentLightSpace.xyz * 0.5f + 0.5f;
     
-    float pixelSize = 1.0f / shadowMapTextureSize;
-    int radius = 2;
-    for (int x = -radius; x <= radius; ++x)
+    for (int i = 0; i < shadowSamplesCount; ++i)
     {
-        for (int y = -radius; y <= radius; ++y)
-        {
-            vec3 samplePos;
-            samplePos.xy = modifiedFragmentLightSpace.xy + vec2(x, y) * pixelSize;
-            samplePos.z = lightIndex;
-            float closestDepth = texture(shadowMapPack, samplePos).r;
-            closestDepth = convertToLinearDepth(closestDepth, 0.1f, spotLights[lightIndex].range);
-            
-            shadowFraction += (fragmentDepthFromLightsView - depthOffset) > closestDepth ? 1.0f : 0.0f;
-        }
+        vec2 sampleOffset = vogelDisk(i, shadowSamplesCount, noiseFromScreenUV * 2.0f * PI);
+        vec3 samplePos;
+        samplePos.xy = modifiedFragmentLightSpace.xy + sampleOffset * 8.0f * shadowMapPixelSize;
+        samplePos.z = lightIndex;
+        
+        float closestDepth = texture(shadowMapPack, samplePos).r;
+        closestDepth = convertToLinearDepth(closestDepth, 0.1f, spotLights[lightIndex].range);
+        
+        shadowFraction += (fragmentDepthFromLightsView - depthOffset) > closestDepth ? 1.0f : 0.0f;
     }
-    shadowFraction /= 25.0f;
+    shadowFraction /= shadowSamplesCount;
     shadowFraction *= fragmentLightSpace.z <= 1.0f ? 1.0f : 0.0f;
-    
 	return 1.0f - shadowFraction;
 }
 
@@ -322,7 +330,7 @@ vec3 getPerpendicularVector(vec3 vectorA)
     return cross(vectorB, vectorA);
 }
 
-vec3 cubemapDirections[6] = vec3[6]
+const vec3 cubemapDirections[6] = vec3[6]
 (
     vec3(1.0f, 0.0f, 0.0f),
     vec3(-1.0f, 0.0f, 0.0f),
@@ -332,10 +340,22 @@ vec3 cubemapDirections[6] = vec3[6]
     vec3(0.0f, 0.0f, -1.0f)
 );
 
+const mat3 cubemapSidesOrientations[6] = mat3[6]
+(
+    mat3(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f)),
+    mat3(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 1.0f, 0.0f), vec3(-1.0f, 0.0f, 0.0f)),
+    
+    mat3(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f)),
+    mat3(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, -1.0f, 0.0f)),
+    
+    mat3(vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f)),
+    mat3(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 0.0f, -1.0f))
+);
+
 float projectPointShadowTexelSize(vec3 lightToFragment, int cubemapSide)
 {
     float positionProjection = abs(dot(lightToFragment, cubemapDirections[cubemapSide]));
-    return 2.0f * positionProjection / shadowMapTextureSize;
+    return 2.0f * positionProjection * shadowMapPixelSize;
 }
 
 float calculatePointShadow(int lightIndex)
@@ -351,8 +371,8 @@ float calculatePointShadow(int lightIndex)
     
     // Calculate offsets
     float normalDotLightDirection = 1.0f - dot(normWorld, -lightToFragmentDir);
-    float depthOffset = max(6.0f * normalDotLightDirection, 2.0f) * shadowMapTexelSize;
-    float normalOffset = max(4.0f * normalDotLightDirection, 2.0f) * shadowMapTexelSize;
+    float depthOffset = max(10.0f * normalDotLightDirection, 8.0f) * shadowMapTexelSize;
+    float normalOffset = max(8.0f * normalDotLightDirection, 0.0f) * shadowMapTexelSize;
     
     // Calculate sample position based on the fragment position shifted by normal
     vec3 modifiedPositionWorld = positionWorld + normalOffset * normWorld;
@@ -366,27 +386,19 @@ float calculatePointShadow(int lightIndex)
     fragmentLightSpace.xyz = fragmentLightSpace.xyz * 0.5f + 0.5f;
     float fragmentDepthFromLightsView = convertToLinearDepth(fragmentLightSpace.z, 0.1f, pointLights[lightIndex].range);
 
-    vec3 perpendicularDir1 = getPerpendicularVector(lightToFragmentDir);
-    vec3 perpendicularDir2 = cross(lightToFragmentDir, perpendicularDir1);
-
-    float pixelSize = 1.0f / shadowMapTextureSize;
-    int radius = 2;
-    for (int x = -radius; x <= radius; ++x)
+    for (int i = 0; i < shadowSamplesCount; ++i)
     {
-        for (int y = -radius; y <= radius; ++y)
-        {
-            vec3 perpendicularOffset = perpendicularDir1 * x + perpendicularDir2 * y;
-            vec3 sampleDir = lightToFragmentDir + pixelSize * perpendicularOffset;
-            samplePos = sampleCubemap(sampleDir);
-            float closestDepth = texture(shadowMapPack, samplePos).r;
-            closestDepth = convertToLinearDepth(closestDepth, 0.1f, pointLights[lightIndex].range);
-            
-            shadowFraction += (fragmentDepthFromLightsView - depthOffset) > closestDepth ? 1.0f : 0.0f;
-        }
+        vec2 sampleOffset = vogelDisk(i, shadowSamplesCount, noiseFromScreenUV * 2.0f * PI);
+        sampleOffset *= (16.0f * shadowMapPixelSize);
+        sampleOffset = 2.0f * samplePos.xy - 1.0f + sampleOffset;
+        vec3 sampleDir = cubemapSidesOrientations[lightMatrixIndex] * vec3(sampleOffset, 1.0f);
+        vec3 currentSamplePos = sampleCubemap(sampleDir);
+        
+        float closestDepth = convertToLinearDepth(texture(shadowMapPack, currentSamplePos).r, 0.1f, pointLights[lightIndex].range);
+        shadowFraction += (fragmentDepthFromLightsView - depthOffset) > closestDepth ? 1.0f : 0.0f;
     }
-    shadowFraction /= 25.0f;
+    shadowFraction /= shadowSamplesCount;
     shadowFraction *= fragmentLightSpace.z <= 1.0f ? 1.0f : 0.0f;
-    
 	return 1.0f - shadowFraction;
 }
 
@@ -394,7 +406,7 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 {
 	// Ambient light
 	vec3 result = vec3(0.0f);
-	result = (1.0f - metallicity) * albedoFragment * 0.02f * occlusion;
+	result = (1.0f - metallicity) * albedoFragment * 0.025f * occlusion;
 
 	// Directional lights
 	for (int i = 0; i < amountOfDirectionalLights; i++)
@@ -453,8 +465,16 @@ vec3 calculateLighting(vec3 albedoFragment, float roughness, float metallicity, 
 	return result;
 }
 
+float noise(vec2 screenUV)
+{
+   return fract(12345.06789f * sin(dot(screenUV.xy, vec2(12.34f, 67.89f)) + deltaTime));
+}
+
 void main()
 {
+    screenUV = gl_FragCoord.xy / textureSize(positionTexture, 0);
+    noiseFromScreenUV = noise(screenUV);
+    
     vec4 positionTextureFragment = texture(positionTexture, Texcoord);
 	vec4 normalTextureFragment = texture(normalTexture, Texcoord);
 	vec4 albedoTextureFragment = texture(albedoTexture, Texcoord);
@@ -487,7 +507,7 @@ void main()
 	F0 = vec3(0.04f);
 	F0 = mix(F0, albedoFragment.rgb, metallicity);
 	dotNormViewDir = max(dot(norm, viewDir), 0.05f); // (Clamping to 0.0f causes artifacts)
-	shadowMapTextureSize = textureSize(shadowMapPack, 0).x;
+	shadowMapPixelSize = 1.0f / textureSize(shadowMapPack, 0).x;
     
 	vec4 resultColor = vec4(calculateLighting(albedoFragment.rgb, roughness, metallicity, normWorld, occlusion), 1.0f);
 	resultColor += vec4(emissiveFragment, 1.0f);

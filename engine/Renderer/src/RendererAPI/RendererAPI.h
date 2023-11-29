@@ -98,7 +98,8 @@ printErrors(__FILE__, __LINE__);
 		RendererSettings* renderer,
 		int shaderID,
 		Camera* camera,
-		mathem::GeometryTransform* cameraTransform);
+		mathem::GeometryTransform* cameraTransform,
+		float deltaTime);
 	void copyDepthFromGbufferToMainCanvas(RendererSettings* renderer);
 	void renderSceneFromMainCanvas(RendererSettings* renderer, int shaderID);
 	void deleteMainCanvas();
