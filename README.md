@@ -15,14 +15,17 @@ The project is built with ``Visual Studio 2022``.
 :robot: AI's virtual playground
 
 ## Screenshots
-![](docs/mitevox_demo.png)
+
+![](docs/mitevox_screenshot_1.png)
+[Sponza](https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Sponza) atrium
+
+![](docs/mitevox_screenshot_2.png)
+[BrainStem](https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/BrainStem) and physically scattered boxes
 
 ## Structure & features
 
-### Demo project(s)
-The solution contains an example project: `sandbox / DemoProject`
-
 ### engine / MiteVox
+- API file: MiteVoxAPI.h
 The core of the engine. It defines the **entry point**.
 - Skeletal animations
 - Morph target animations (per-vertex animations)
@@ -31,19 +34,30 @@ The core of the engine. It defines the **entry point**.
 ### engine / Renderer
 - API file: RendererAPI.h
 - Rendering APIs: OpenGL
+- Deferred rendering
 - Multiple lights
+- Light types: Point-light, Directional light, Spot-light
+- Shadow maps for Point-light, Spot-light
+- Several shadow maps are rendered per draw call (via layered rendering)
+- PBR
 
 ### engine / FileIO
 - API file: FileInputOutput.h
-Contains implementation of asynchronous file loader & parser.
+- Contains implementation of asynchronous file loader & parser.
 
 ### engine / Math
 - Vectors, Matrices, Quaternions
 - Data structures: Buffer, Half-table
-- Numerical analysis:
-  - Interpolation: Linear
 - Graphs:
   - Trees: Binary search tree, Octree
+- 3D collision detection using Hyperplane Separation Theorem
+- Convex hull generation from a mesh
+- Mesh decimation
+
+### engine / Physics
+- 3D rigid body simulation using Newtonian physics
+- 3D rigid body simulation using Position Based Dynamics
+- Object sleeping
 
 ### engine / AIModels
 - ML-models:
@@ -55,19 +69,8 @@ Contains implementation of asynchronous file loader & parser.
     - HopfieldNetwork
   - NeuralNetwork: class that joins different types of NNs
 
-### engine / Physics
-Has an implementation of AABB collisions and defines rigid body.
-
 ### engine / UIEventHandler
-Has a basic user I/O setup. It definitely needs redesign...
-
-## :bug: Known bugs & limitations :bug:
-- [ ] Skinned mesh uses global transform of the node that instantiates the mesh instead of global transform of the skeleton root.
-- [ ] InterpolationTest : collider calculation anomaly
-- [ ] .obj parser doesn't support polygon grouping by material.
-- [ ] .obj parser doesn't support polygon grouping by smoothing.
-- [ ] Binary search tree has global variables.
-- [ ] The project should be built with CMake.
+- Has a basic user I/O setup.
 
 ## External dependencies (included)
 - [GLEW (The OpenGL Extension Wrangler Library)](https://github.com/nigels-com/glew)
@@ -77,9 +80,9 @@ Has a basic user I/O setup. It definitely needs redesign...
 
 ## References
 1. [Learn OpenGL](https://learnopengl.com)
-2. [Some materials](http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html)
+2. [Detailed Rigid Body Simulation with Extended Position Based Dynamics](https://matthias-research.github.io/pages/publications/PBDBodies.pdf)
 3. [McGuire Computer Graphics Archive](https://casual-effects.com/g3d/data10/index.html)
 4. [A Simple Entity Component System. Austin Morlan](https://austinmorlan.com/posts/entity_component_system)
 5. [JSON Standard (ECMA 404)](https://www.ecma-international.org/publications-and-standards/standards/ecma-404/)
 6. [Neural networks. 3Blue1Brown](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
-
+7. [Backpropagation in Convulutional Neural Networks from Scratch](https://www.youtube.com/watch?v=z9hJzduHToc)
