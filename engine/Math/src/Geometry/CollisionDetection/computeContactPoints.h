@@ -44,8 +44,8 @@ namespace mathem
 			return;
 		}
 
-		GeometryTransform* complexGeometryTransform1 = collisionInfo->object1->getTransform();
-		GeometryTransform* complexGeometryTransform2 = collisionInfo->object2->getTransform();
+		GeometryTransform* complexGeometryTransform1 = collisionInfo->object1->getResultTransform();
+		GeometryTransform* complexGeometryTransform2 = collisionInfo->object2->getResultTransform();
 
 		collisionInfo->properties.resetContactPoints();
 

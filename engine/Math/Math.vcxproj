@@ -27,7 +27,6 @@
     <ClCompile Include="src\Geometry\GeometryGenerators\makeTetrahedron.cpp" />
     <ClCompile Include="src\Geometry\GeometryPrimitives\PlaneGeometry.cpp" />
     <ClCompile Include="src\Calculus\Sequences.cpp" />
-    <ClCompile Include="src\Generators\NoiseGenerators\PerlinNoiseGenerator.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithAxisAlignedBox.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithBox.cpp" />
     <ClCompile Include="src\Geometry\CollisionDetection\checkCollisionWithPoint.cpp" />
@@ -65,7 +64,6 @@
     <ClInclude Include="src\Utilities\almostEqual.h" />
     <ClInclude Include="src\DataStructures\PileAllocator.h" />
     <ClInclude Include="src\DataStructures\PileOfContainers.h" />
-    <ClInclude Include="src\Float.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithAxisAlignedBox.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithBox.h" />
     <ClInclude Include="src\Geometry\CollisionDetection\checkCollisionWithPoint.h" />
@@ -83,7 +81,6 @@
     <ClInclude Include="src\Utilities\Convertations.h" />
     <ClInclude Include="src\DataStructures\HalfTable.h" />
     <ClInclude Include="src\DataStructures\HyperData.h" />
-    <ClInclude Include="src\Generators\NoiseGenerators\PerlinNoiseGenerator.h" />
     <ClInclude Include="src\Generators\UniqueIDGenerator.h" />
     <ClInclude Include="src\DataStructures\Graphs\BinarySearchTree.h" />
     <ClInclude Include="src\DataStructures\Graphs\Octree.h" />

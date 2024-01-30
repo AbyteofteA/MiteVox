@@ -111,7 +111,6 @@
     <ClCompile Include="src\Rendering\drawLightSource.cpp" />
     <ClCompile Include="src\Rendering\drawSceneOctree.cpp" />
     <ClCompile Include="src\Rendering\Lighting\collectLights.cpp" />
-    <ClCompile Include="src\Playground\SceneFoundation.cpp" />
     <ClCompile Include="src\Skeleton\NodeBasedSkeleton.cpp" />
     <ClCompile Include="src\Skeleton\SkeletonBase.cpp" />
     <ClCompile Include="src\Animation\MorphTargetAnimation\applyMorphTargetAnimation.cpp" />
@@ -128,6 +127,7 @@
     <ClCompile Include="src\Playground\Node.cpp" />
     <ClCompile Include="src\Playground\Playground.cpp" />
     <ClCompile Include="src\Playground\Scene.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Physics\computePhysics.h" />
@@ -144,7 +144,6 @@
     <ClInclude Include="src\Rendering\drawLightSource.h" />
     <ClInclude Include="src\Rendering\drawSceneOctree.h" />
     <ClInclude Include="src\Rendering\Lighting\collectLights.h" />
-    <ClInclude Include="src\Playground\SceneFoundation.h" />
     <ClInclude Include="src\Skeleton\NodeBasedSkeleton.h" />
     <ClInclude Include="src\Skeleton\SkeletonBase.h" />
     <ClInclude Include="src\Animation\MorphTargetAnimation\applyMorphTargetAnimation.h" />
@@ -169,6 +168,7 @@
     <ClInclude Include="src\Playground\Scene.h" />
     <ClInclude Include="src\EngineSettings.h" />
     <ClInclude Include="src\NativeScript.h" />
+    <ClInclude Include="src\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AIModels\AIModels.vcxproj">

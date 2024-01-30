@@ -27,8 +27,8 @@ namespace mitevox
 
 	void separateObjects(mathem::CollisionInfo<Entity*>* collisionInfo)
 	{
-		mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getTransform();
-		mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getTransform();
+		mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getResultTransform();
+		mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getResultTransform();
 		MovementProperties* movementProperties1 = &collisionInfo->object1->movementProperties;
 		MovementProperties* movementProperties2 = &collisionInfo->object2->movementProperties;
 
@@ -49,8 +49,8 @@ namespace mitevox
 
 	void resolveCollisionNewtonian(mathem::CollisionInfo<Entity*>* collisionInfo, float deltaTime, float equalityTolerance)
 	{
-		mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getTransform();
-		mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getTransform();
+		mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getResultTransform();
+		mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getResultTransform();
 		MovementProperties* movementProperties1 = &collisionInfo->object1->movementProperties;
 		MovementProperties* movementProperties2 = &collisionInfo->object2->movementProperties;
 		PhysicalMaterial* physicalMaterial1 = &collisionInfo->object1->physicalMaterial;

@@ -68,8 +68,10 @@ namespace render
 		return status;
 	}
 
-	void renderScreenQuad()
+	void renderScreenQuad(RendererSettings* renderer)
 	{
+		renderer->amountOfDrawCalls++;
+
 		glBindVertexArray(getScreenQuadID());
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
@@ -281,7 +283,7 @@ namespace render
 		glBindTexture(GL_TEXTURE_2D, materialTextureID);
 		shaders[shaderID]->setInt("materialTexture", 3);
 
-		renderScreenQuad();
+		renderScreenQuad(renderer);
 	}
 
 	void copyDepthFromGbufferToMainCanvas(RendererSettings* renderer)
@@ -311,7 +313,7 @@ namespace render
 		glBindTexture(GL_TEXTURE_2D, mainCanvasTextureID);
 		shaders[shaderID]->setInt("mainCanvasTexture", 0);
 
-		renderScreenQuad();
+		renderScreenQuad(renderer);
 	}
 
 	void deleteMainCanvas()

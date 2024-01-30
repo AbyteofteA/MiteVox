@@ -81,7 +81,7 @@ void main()
 	{
 		metallicRoughnessFragment = vec3(texture(metallicRoughnessMap, fragment.Texcoord));
 	}
-    float roughness = mix(0.01f, 0.99f, metallicRoughnessFragment.g);
+    float roughness = mix(0.05f, 0.95f, metallicRoughnessFragment.g);
 	float metallicity = metallicRoughnessFragment.b;
 
 	// Occlusion

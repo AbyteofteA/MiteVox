@@ -47,17 +47,19 @@ void processInput_Script(mitevox::Scene* scene)
 
 	InputHandler* inputHandler = InputHandler::getInstance();
 	mitevox::Entity* activeCameraEntity = mitevox::MiteVoxAPI::getActiveCameraEntity();
-	mathem::GeometryTransform* cameraEntityTransform = &activeCameraEntity->transform;
-
-	cameraEntityTransform->rotation.rotateByEulers(
-		((float)inputHandler->mouseDeltaY) * cameraSensitivity,
-		((float)inputHandler->mouseDeltaX) * cameraSensitivity,
-		0.0f);
+	activeCameraEntity->transform.addOrientation(
+		{
+			((float)inputHandler->mouseDeltaY) * cameraSensitivity,
+			((float)inputHandler->mouseDeltaX) * cameraSensitivity,
+			0.0f
+		}
+	);
 
 	// "Up" vector is opposite gravity direction
 	mathem::Vector3D upDirection = -mitevox::MiteVoxAPI::getGravity(activeCameraEntity);
 	upDirection.normalize();
-	cameraEntityTransform->rotation = cameraEntityTransform->rotation.lookRotation(upDirection);
+	activeCameraEntity->transform.setOrientation(
+		activeCameraEntity->transform.getOrientation().lookRotation(upDirection));
 
 	//float cameraRotationX, cameraRotationY, cameraRotationZ = 0.0f;
 	//cameraEntityTransform->rotation.toEulers(&cameraRotationX, &cameraRotationY, &cameraRotationZ);
@@ -68,28 +70,8 @@ void processInput_Script(mitevox::Scene* scene)
 
 	mathem::Vector3D movementVector = movementVector = getMovementDirection(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_A, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
 	movementVector *= movementStep;
-	movementVector = cameraEntityTransform->rotation.rotate(movementVector);
-	cameraEntityTransform->translation += movementVector;
-	
-	mathem::Vector3D rotation = {0.0f, 0.0f, 0.0f};
-	if (inputHandler->isKeyPressed(GLFW_KEY_X))
-	{
-		rotation.x() = 0.785f;
-	}
-	if (inputHandler->isKeyPressed(GLFW_KEY_C))
-	{
-		rotation.y() = 0.785f;
-	}
-	if (inputHandler->isKeyPressed(GLFW_KEY_V))
-	{
-		rotation.z() = 0.785f;
-	}
-	rotation *= (float)inputHandler->dt;
-
-	mitevox::Entity* entity = mitevox::MiteVoxAPI::getActiveScene()->entities.getElement(3);
-	entity->transform.rotation.rotateByEulersRadians(rotation.x(), rotation.y(), rotation.z());
-	movementVector = getMovementDirection(GLFW_KEY_KP_8, GLFW_KEY_KP_2, GLFW_KEY_KP_6, GLFW_KEY_KP_4, GLFW_KEY_KP_9, GLFW_KEY_KP_3);
-	entity->applyForce(movementVector * 15.0f);
+	movementVector = activeCameraEntity->transform.getOrientation().rotate(movementVector);
+	activeCameraEntity->transform.addPosition(movementVector);
 
 	if (inputHandler->isKeyPressed(GLFW_KEY_1))
 	{
@@ -133,18 +115,13 @@ void processInput_Script(mitevox::Scene* scene)
 		}
 	}
 
-	if (inputHandler->isKeyPressed(GLFW_KEY_GRAVE_ACCENT))
-	{
-		mitevox::MiteVoxAPI::getSettings()->debug = !mitevox::MiteVoxAPI::getSettings()->debug;
-	}
-
 	if (inputHandler->isKeyPressed(GLFW_KEY_L))
 	{
-		render::setWireframeRendering(true);
+		mitevox::MiteVoxAPI::getSettings()->debug = true;
 	}
 	if (inputHandler->isKeyPressed(GLFW_KEY_P))
 	{
-		render::setWireframeRendering(false);
+		mitevox::MiteVoxAPI::getSettings()->debug = false;
 	}
 
 	static float timeSinceLastDrop = 0.0f;
@@ -157,9 +134,9 @@ void processInput_Script(mitevox::Scene* scene)
 			mitevox::Entity* e = mitevox::MiteVoxAPI::createBox(
 				"Dropped Cube",
 				mitevox::MiteVoxAPI::getRandom(0.15f, 1.0f),
+				mitevox::MiteVoxAPI::getRandom(0.15f, 0.5f),
 				mitevox::MiteVoxAPI::getRandom(0.15f, 1.0f),
-				mitevox::MiteVoxAPI::getRandom(0.15f, 1.0f),
-				cameraEntityTransform->translation,
+				activeCameraEntity->transform.getPosition(),
 				{
 					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f),
 					mitevox::MiteVoxAPI::getRandom(0.05f, 1.0f),

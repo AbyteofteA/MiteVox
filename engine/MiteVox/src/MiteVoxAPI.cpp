@@ -32,8 +32,9 @@ namespace mitevox
 
 	size_t MiteVoxAPI::getRandom(size_t min, size_t max)
 	{
-		size_t randomFactor = (size_t)std::rand() / (size_t)RAND_MAX;
-		return mathem::lerp<size_t>(min, max, randomFactor);
+		size_t randomRange = max - min + 1;
+		size_t random = (size_t)std::rand() % randomRange;
+		return random + min;
 	}
 
 	float MiteVoxAPI::getRandom(float min, float max)
@@ -79,7 +80,7 @@ namespace mitevox
 	Entity* MiteVoxAPI::createFPSCharacter(std::string name)
 	{
 		Entity* entity = MiteVoxAPI::createEmptyEntity(name);
-		entity->transform.translation = { 0.0f, 0.0f, 20.0f };
+		entity->transform.setPosition({ 0.0f, 0.0f, 20.0f });
 		entity->renderableNode = new Node();
 		entity->renderableNode->camera = new render::Camera();
 		entity->collider.setType(mathem::GeometryType::POINT);
@@ -121,7 +122,7 @@ namespace mitevox
 		lightEntity->renderableNode->light.pointLight.lightBase.color = color;
 		lightEntity->renderableNode->light.pointLight.lightBase.intensity = intensity;
 		lightEntity->renderableNode->light.pointLight.lightBase.range = range;
-		lightEntity->setTranslation(position);
+		lightEntity->transform.setPosition(position);
 		lightEntity->collider.setType(mathem::GeometryType::POINT);
 		return lightEntity;
 	}
@@ -138,7 +139,7 @@ namespace mitevox
 	Entity* MiteVoxAPI::createBox(std::string name, float halfSizeX, float halfSizeY, float halfSizeZ, mathem::Vector3D position, render::ColorRGBAf color)
 	{
 		Entity* entity = MiteVoxAPI::createMeshEntity(name);
-		entity->transform.translation = position;
+		entity->transform.setPosition(position);
 
 		MeshPrimitive* meshPrimitive = entity->renderableNode->getMeshToRender()->primitives[0];
 		meshPrimitive->initTriangles(12, true);

@@ -15,9 +15,9 @@ namespace mitevox
 		awake(MiteVoxAPI::getSleepTime());
 	}
 
-	mathem::GeometryTransform* Entity::getTransform()
+	mathem::GeometryTransform* Entity::getResultTransform()
 	{
-		return &transform;
+		return transform.getRelativeTransform();
 	}
 
 	bool Entity::hasCamera()
@@ -27,7 +27,7 @@ namespace mitevox
 
 	mathem::GeometryTransform Entity::getCamera(render::Camera** cameraResult)
 	{
-		return renderableNode->getCameraRecursively(cameraResult, &transform);
+		return renderableNode->getCameraRecursively(cameraResult, transform.getRelativeTransform());
 	}
 
 	mathem::Vector3D Entity::getViewRay()
@@ -37,36 +37,6 @@ namespace mitevox
 		mathem::GeometryTransform cameraTransform = getCamera(&c);
 		viewRay = cameraTransform.rotation.rotate(viewRay);
 		return viewRay;
-	}
-
-	void Entity::resetTransform()
-	{
-		transform.reset();
-	}
-
-	void Entity::setTransform(mathem::GeometryTransform transform)
-	{
-		transform = transform;
-	}
-
-	void Entity::setTranslation(mathem::Vector3D translation)
-	{
-		transform.translation = translation;
-	}
-
-	void Entity::setRotation(mathem::Quaternion quaternion)
-	{
-		transform.rotation = quaternion;
-	}
-
-	void Entity::setRotation(mathem::Vector3D eulersRadians)
-	{
-		transform.rotation.fromEulersRadians(eulersRadians.x(), eulersRadians.y(), eulersRadians.z());
-	}
-
-	void Entity::setScale(mathem::Vector3D scale)
-	{
-		transform.scale = scale;
 	}
 
 	void Entity::computeMass()
@@ -124,7 +94,7 @@ namespace mitevox
 
 	mathem::Matrix3x3 Entity::getMomentOfInertia()
 	{
-		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(transform.rotation));
+		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(transform.getOrientation()));
 		mathem::Matrix3x3 objectOrientationTransposed = getTransposed(objectOrientation);
 
 		mathem::Matrix3x3 momentOfInertia;
@@ -136,7 +106,7 @@ namespace mitevox
 
 	mathem::Matrix3x3 Entity::getInverseMomentOfInertia()
 	{
-		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(transform.rotation));
+		mathem::Matrix3x3 objectOrientation = mathem::toMatrix3x3(mathem::quaternionToMatrix(transform.getOrientation()));
 		mathem::Matrix3x3 objectOrientationTransposed = getTransposed(objectOrientation);
 
 		mathem::Matrix3x3 inverseMomentOfInertia;
@@ -243,7 +213,7 @@ namespace mitevox
 		{
 			awake(MiteVoxAPI::getSleepTime());
 			movementProperties.externalForces += force;
-			point = transform.rotation.rotate(point);
+			point = transform.getOrientation().rotate(point);
 			movementProperties.externalTorque += mathem::crossProduct(point, force);
 		}
 	}
@@ -276,16 +246,16 @@ namespace mitevox
 
 	void Entity::integrateVelocities(float deltaTime)
 	{
-		transform.translation += movementProperties.velocity * deltaTime;
+		transform.addPosition(movementProperties.velocity * deltaTime);
 		
 		mathem::Quaternion deltaOrientation(
 			movementProperties.angularVelocity.x(),
 			movementProperties.angularVelocity.y(),
 			movementProperties.angularVelocity.z(),
 			0.0f);
-		mathem::Quaternion worldDeltaOrientation = deltaOrientation.multiplyCopy(transform.rotation);
-		transform.rotation.components += worldDeltaOrientation.components * 0.5f * deltaTime;
-		transform.rotation.normalize();
+		mathem::Quaternion worldDeltaOrientation = deltaOrientation.multiplyCopy(transform.getOrientation());
+		transform.getOrientation().components += worldDeltaOrientation.components * 0.5f * deltaTime;
+		transform.getOrientation().normalize();
 	}
 
 	void Entity::resetForces()

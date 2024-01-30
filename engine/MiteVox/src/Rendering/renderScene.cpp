@@ -2,6 +2,10 @@
 
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/Playground/Entity.h"
+#include "engine/MiteVox/src/Rendering/drawCollider.h"
+#include "engine/MiteVox/src/Rendering/drawCollisions.h"
+#include "engine/MiteVox/src/Rendering/drawSceneOctree.h"
+#include "engine/MiteVox/src/Rendering/drawAxes.h"
 #include "engine/MiteVox/src/Rendering/drawLightSource.h"
 #include "engine/Renderer/src/RendererAPI/Color.h"
 #include "engine/Renderer/src/RendererAPI/Camera.h"
@@ -32,15 +36,23 @@ namespace mitevox
 		render::Camera* camera,
 		mathem::GeometryTransform* cameraTransform,
 		safety::SafeArray<Entity*> entities,
+		bool debug,
 		int skyboxShaderID,
 		render::Cubemap* skybox)
 	{
+		if (debug)
+		{
+			render::setWireframeRendering(true);
+		}
+
 		// Render geometry to G-buffer
 		render::activateGbuffer(renderer);
 		render::clearBufferXY();
 		render::clearBufferZ();
 		renderSceneToGbuffer(renderer, gBufferShaderID, camera, cameraTransform, entities);
 		render::copyDepthFromGbufferToMainCanvas(renderer);
+
+		render::setWireframeRendering(false);
 
 		// Render lighting to main canvas
 		render::activateMainCanvas(renderer);
@@ -51,11 +63,11 @@ namespace mitevox
 			renderer, shadowMapShaderID, deferredLightingShaderID, pointLightsArray, entities, camera, cameraTransform);
 
 		// TODO: 
-		//if (settings->debug)
-		//{
-		//	drawAxes(renderer);
-		//	drawCollisions(renderer, &collisions);
-		//}
+		if (debug)
+		{
+			drawAxes(renderer);
+			//drawCollisions(renderer, &collisions);
+		}
 
 		render::setAdditiveBlending();
 		glEnable(GL_DEPTH_TEST);
@@ -101,7 +113,7 @@ namespace mitevox
 				renderer,
 				shaderID,
 				entity->renderableNode,
-				&entity->transform,
+				entity->getResultTransform(),
 				camera,
 				cameraTransform);
 		}
@@ -189,7 +201,7 @@ namespace mitevox
 				renderer,
 				shaderID,
 				entity->renderableNode,
-				&entity->transform);
+				entity->getResultTransform());
 		}
 	}
 
@@ -213,7 +225,8 @@ namespace mitevox
 			render::useShader(shadowMapShaderID);
 			render::disableBlending();
 			glEnable(GL_DEPTH_TEST);
-			glDisable(GL_CULL_FACE);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 			glDepthFunc(GL_LESS);
 			glDepthMask(GL_TRUE);
 
@@ -276,7 +289,8 @@ namespace mitevox
 			render::useShader(shadowMapShaderID);
 			render::disableBlending();
 			glEnable(GL_DEPTH_TEST);
-			glDisable(GL_CULL_FACE);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 			glDepthFunc(GL_LESS);
 			glDepthMask(GL_TRUE);
 

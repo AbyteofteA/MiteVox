@@ -2,6 +2,7 @@
 #define MITEVOX_ENTITY_H
 
 #include "engine/Math/src/Geometry/ComplexGeometry.h"
+#include "engine/MiteVox/src/Transform.h"
 #include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/MiteVox/src/Animation/Animation.h"
 #include "engine/MiteVox/src/Physics/PhysicalMaterial.h"
@@ -19,9 +20,9 @@ namespace mitevox
 
         std::string name;
 
-        mathem::GeometryTransform transform;
+        Transform transform;
         MovementProperties movementProperties;
-        PhysicalMaterial physicalMaterial; // TOOD: make a reference
+        PhysicalMaterial physicalMaterial; // TODO: make a reference
 		mathem::ComplexGeometry collider;
         float timeUntilSleep = 1.0f;
 
@@ -45,13 +46,7 @@ namespace mitevox
         /// </summary>
         mathem::Vector3D getViewRay();
 
-        mathem::GeometryTransform* getTransform();
-        void resetTransform();
-        void setTransform(mathem::GeometryTransform transform);
-        void setTranslation(mathem::Vector3D translation);
-        void setRotation(mathem::Quaternion quaternion);
-        void setRotation(mathem::Vector3D eulersRadians);
-        void setScale(mathem::Vector3D scale);
+        mathem::GeometryTransform* getResultTransform();
 
         /// <summary>
         /// Computes mass based on density and volume. Setting the mass must the last thing in the setup of an Entity

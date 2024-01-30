@@ -3,7 +3,6 @@
 
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/Math/src/Utilities/MinAndMax.h"
-#include "engine/Math/src/Float.h"
 
 #include <cmath>
 #include <algorithm>
@@ -21,9 +20,6 @@ namespace mathem
 	typedef Vector<float, 2> Vector2D;
 	typedef Vector<float, 3> Vector3D;
 	typedef Vector<float, 4> Vector4D;
-
-	typedef Vector<Float, 3> Float3D;
-	typedef Vector<Float, 4> Float4D;
 
 	VECTOR_TEMPLATE
 	class Vector

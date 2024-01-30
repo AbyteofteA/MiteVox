@@ -68,7 +68,7 @@ namespace mitevox
 				resultPointLightsArray,
 				resultDirectionalLightsArray,
 				resultSpotLightsArray,
-				entity->transform);
+				*entity->getResultTransform());
 		}
 	}
 }

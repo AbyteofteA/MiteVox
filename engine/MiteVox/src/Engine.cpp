@@ -3,11 +3,6 @@
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/MiteVox/src/Playground/Playground.h"
-#include "engine/MiteVox/src/Rendering/drawCollider.h"
-#include "engine/MiteVox/src/Rendering/drawCollisions.h"
-#include "engine/MiteVox/src/Rendering/drawSceneOctree.h"
-#include "engine/MiteVox/src/Rendering/drawAxes.h"
-#include "engine/MiteVox/src/Rendering/drawLightSource.h"
 #include "engine/MiteVox/src/Rendering/Lighting/collectLights.h"
 #include "engine/MiteVox/src/Physics/computePhysics.h"
 #include "engine/MiteVox/src/MiteVoxAPI.h"
@@ -113,7 +108,6 @@ namespace mitevox
 			glfwGetWindowSize(window, &width, &height);
 			renderer->screenWidth = width;
 			renderer->screenHeight = height;
-			render::setViewport(0, 0, width, height);
 
 			// Update timers
 			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
@@ -142,24 +136,34 @@ namespace mitevox
 			// Space culling
 			MiteVoxAPI::collectEntitiesToSimulate();
 
+			// Update transforms
+			Entity* activeCameraEntity = MiteVoxAPI::getActiveCameraEntity();
+			size_t entitiesToSimulateCount = entitiesToSimulate.getElementsCount();
+			for (size_t i = 0; i < entitiesToSimulateCount; ++i)
+			{
+				Entity* entity = entitiesToSimulate.getElement(i);
+				entity->transform.updateCoordinates();
+				entity->transform.computeRelativeTransform(&activeCameraEntity->transform);
+			}
+
 			// Cleanup
 			scene->timeSinceCleanup += deltaTime;
 			if (scene->timeSinceCleanup > settings->getCleanupPeriod())
 			{
-				Entity* activeCameraEntity = MiteVoxAPI::getActiveCameraEntity();
-				render::Camera* camera = nullptr;
-				mathem::GeometryTransform cameraTransform = activeCameraEntity->getCamera(&camera);
+				RegionCoord cameraRegionCoord = activeCameraEntity->transform.getRegionCoord();
+				mathem::Vector3D cameraPosition = activeCameraEntity->transform.getPosition();
 
 				scene->timeSinceCleanup = 0.0f;
 				std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
-				std::cout << "Camera position: \n\t" << 
-					"X: " << cameraTransform.translation.x() << "\n\t" <<
-					"Y: " << cameraTransform.translation.y() << "\n\t" <<
-					"Z: " << cameraTransform.translation.z() << std::endl << std::endl;
+				std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
+				std::cout << "Camera position: \n\t" <<
+					"regionX: " << cameraRegionCoord.x() << "\tX: " << cameraPosition.x() << "\n\t" <<
+					"regionY: " << cameraRegionCoord.y() << "\tY: " << cameraPosition.y() << "\n\t" <<
+					"regionZ: " << cameraRegionCoord.z() << "\tZ: " << cameraPosition.z() << std::endl << std::endl;
 				// TODO: Implement cleanup.
 			}
 
-			// Physics and Transform
+			// Physics
 			collisions.clear();
 			dataPointsContainers.returnAllContainers();
 			size_t substepsCount = MiteVoxAPI::getSubstepsCount();
@@ -177,7 +181,6 @@ namespace mitevox
 			}
 			
 			// Reset forces and torques
-			size_t entitiesToSimulateCount = entitiesToSimulate.getElementsCount();
 			for (size_t i = 0; i < entitiesToSimulateCount; ++i)
 			{
 				Entity* entity = entitiesToSimulate.getElement(i);
@@ -222,16 +225,9 @@ namespace mitevox
 					& spotLightsArray,
 					camera,
 					& cameraTransform,
-					entitiesToSimulate);
+					entitiesToSimulate,
+					settings->debug);
 			}
-
-			//std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
-		}
-
-		if (playground)
-		{
-			fileio::CodecGLTF* playgroundGLTF = new fileio::CodecGLTF(playground);
-			playgroundGLTF->saveToFile(settings->executionDir + "\\playground.gltf");
 		}
 	}
 

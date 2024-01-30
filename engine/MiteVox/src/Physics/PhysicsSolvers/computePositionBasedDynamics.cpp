@@ -62,8 +62,8 @@ namespace mitevox
 			computeContactPoints(collisionInfo, MiteVoxAPI::getSettings()->getEqualityTolerance());
 			collisions->setElement(i, *collisionInfo);
 
-			mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getTransform();
-			mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getTransform();
+			mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getResultTransform();
+			mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getResultTransform();
 			MovementProperties* movementProperties1 = &collisionInfo->object1->movementProperties;
 			MovementProperties* movementProperties2 = &collisionInfo->object2->movementProperties;
 			PhysicalMaterial* physicalMaterial1 = &collisionInfo->object1->physicalMaterial;
@@ -183,9 +183,9 @@ namespace mitevox
 				entity->movementProperties.previousAngularVelocity = entity->movementProperties.angularVelocity;
 
 				entity->movementProperties.velocity =
-					(entity->transform.translation - entity->movementProperties.previousPosition) * inverseSubstepDeltaTime;
+					(entity->transform.getPosition() - entity->movementProperties.previousPosition) * inverseSubstepDeltaTime;
 
-				mathem::Quaternion deltaOrientation = entity->transform.rotation.multiplyCopy(entity->movementProperties.previousOrientation.getReciprocal());
+				mathem::Quaternion deltaOrientation = entity->transform.getOrientation().multiplyCopy(entity->movementProperties.previousOrientation.getReciprocal());
 				entity->movementProperties.angularVelocity = (deltaOrientation.binary.vector * 2.0f) * inverseSubstepDeltaTime;
 				if (deltaOrientation.binary.scalar < 0.0f)
 				{
@@ -207,8 +207,8 @@ namespace mitevox
 				continue;
 			}
 
-			mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getTransform();
-			mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getTransform();
+			mathem::GeometryTransform* objectTransform1 = collisionInfo->object1->getResultTransform();
+			mathem::GeometryTransform* objectTransform2 = collisionInfo->object2->getResultTransform();
 			MovementProperties* movementProperties1 = &collisionInfo->object1->movementProperties;
 			MovementProperties* movementProperties2 = &collisionInfo->object2->movementProperties;
 			PhysicalMaterial* physicalMaterial1 = &collisionInfo->object1->physicalMaterial;

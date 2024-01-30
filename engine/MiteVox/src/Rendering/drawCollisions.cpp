@@ -21,9 +21,9 @@ namespace mitevox
 		{
 			mathem::CollisionInfo<Entity*> collision = collisions->getElement(i);
 			mathem::ComplexGeometry* complexGeometry1 = collision.object1->getCollider();
-			mathem::GeometryTransform* complexGeometryTransform1 = collision.object1->getTransform();
+			mathem::GeometryTransform* complexGeometryTransform1 = collision.object1->getResultTransform();
 			mathem::ComplexGeometry* complexGeometry2 = collision.object2->getCollider();
-			mathem::GeometryTransform* complexGeometryTransform2 = collision.object2->getTransform();
+			mathem::GeometryTransform* complexGeometryTransform2 = collision.object2->getResultTransform();
 			drawCollider(renderer, complexGeometry1, complexGeometryTransform1, render::ColorRGBAf(render::ColorRGBf::RED()));
 			drawCollider(renderer, complexGeometry2, complexGeometryTransform2, render::ColorRGBAf(render::ColorRGBf::BLUE()));
 

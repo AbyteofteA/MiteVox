@@ -31,8 +31,8 @@ namespace mitevox
 		{
 			Entity* entity = entitiesToSimulate->getElement(i);
 
-			entity->movementProperties.previousPosition = entity->transform.translation;
-			entity->movementProperties.previousOrientation = entity->transform.rotation;
+			entity->movementProperties.previousPosition = entity->transform.getPosition();
+			entity->movementProperties.previousOrientation = entity->transform.getOrientation();
 			if (entity->movementProperties.inverseMass != 0.0f)
 			{
 				mathem::Vector3D gravity = MiteVoxAPI::getGravity(entity);

@@ -98,6 +98,7 @@ namespace mitevox
 			render::Camera* camera,
 			mathem::GeometryTransform* cameraTransform,
 			safety::SafeArray<Entity*> entities,
+			bool debug = false,
 			int skyboxShaderID = -1,
 			render::Cubemap* skybox = nullptr);
 

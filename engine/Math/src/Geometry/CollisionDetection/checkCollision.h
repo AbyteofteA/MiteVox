@@ -38,8 +38,8 @@ namespace mathem
 			return CollisionType::NONE;
 		}
 
-		GeometryTransform* complexGeometryTransform1 = object1->getTransform();
-		GeometryTransform* complexGeometryTransform2 = object2->getTransform();
+		GeometryTransform* complexGeometryTransform1 = object1->getResultTransform();
+		GeometryTransform* complexGeometryTransform2 = object2->getResultTransform();
 
 		size_t objectPrimitivesCount1 = complexGeometry1->getPrimitivesCount();
 		for (size_t primitiveIndex1 = 0; primitiveIndex1 < objectPrimitivesCount1; primitiveIndex1++)
@@ -73,7 +73,7 @@ namespace mathem
 				collisionInfo->properties.normal = -collisionInfo->properties.normal;
 			}
 
-			Vector3D distance = collisionInfo->object2->transform.translation - collisionInfo->object1->transform.translation;
+			Vector3D distance = collisionInfo->object2->transform.getPosition() - collisionInfo->object1->transform.getPosition();
 			//assert(("ERROR: Normal is not alligned", distance * collisionInfo->properties.normal >= 0.0f));
 			assert(("ERROR: penetrationDepth is negative", collisionInfo->properties.penetrationDepth >= 0.0f));
 		}

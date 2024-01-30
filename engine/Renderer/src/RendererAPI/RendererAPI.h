@@ -82,7 +82,7 @@ printErrors(__FILE__, __LINE__);
 	// Buffers
 
 	int printFramebufferStatus();
-	void renderScreenQuad();
+	void renderScreenQuad(RendererSettings* renderer);
 
 	void activateDefaultFramebuffer(RendererSettings* renderer);
 	void clearBufferXY(ColorRGBf color = ColorRGBf::BLACK());
