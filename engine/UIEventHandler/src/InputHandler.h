@@ -45,12 +45,17 @@ public:
 	InputHandler(InputHandler& other) = delete;
 	void operator=(const InputHandler&) = delete;
 
-	static void init(GLFWwindow* _window);
+	static void init(int screenWidth, int screenHeight, bool isFullScreen);
 	static InputHandler* getInstance();
 
-	void getWindowSize(int* x, int* y);
+	void pollEvents();
+	void createWindow(int screenWidth, int screenHeight, bool isFullScreen);
+	void display();
+	int windowShouldClose();
+	void closeWindow();
+	void getWindowSize(int& x, int& y);
 	void setWindowSize(int x, int y);
-	void getMousePosition(double* x, double* y);
+	void getMousePosition(double& x, double& y);
 	void setMousePosition(double x, double y);
 	void setMousePositionCenter();
 
@@ -68,7 +73,7 @@ private:
 	static InputHandler* instance;
 	static std::mutex mutex;
 
-	InputHandler(GLFWwindow* _window);
+	InputHandler();
 
 	void resetMouseInfo();
 	void afterPushDelay();

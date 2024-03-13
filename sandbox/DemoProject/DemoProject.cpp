@@ -7,9 +7,6 @@
 #include "engine/MiteVox/src/MiteVox.h"
 #include "engine/MiteVox/src/Mesh/Mesh.h"
 
-#include "engine/FileIO/src/FileLoaderAsync.h"
-#include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
-
 #include "scripts.h"
 
 #include <filesystem>

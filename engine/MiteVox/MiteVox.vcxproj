@@ -94,6 +94,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ResourceManager\Resource.cpp" />
+    <ClCompile Include="src\ResourceManager\ResourceManager.cpp" />
     <ClCompile Include="src\Rendering\renderScene.cpp" />
     <ClCompile Include="src\BufferLayout\ComponentDataType.cpp" />
     <ClCompile Include="src\Physics\computePhysics.cpp" />
@@ -125,11 +127,13 @@
     <ClCompile Include="src\Mesh\MeshPrimitive.cpp" />
     <ClCompile Include="src\MiteVox_main.h" />
     <ClCompile Include="src\Playground\Node.cpp" />
-    <ClCompile Include="src\Playground\Playground.cpp" />
+    <ClCompile Include="src\Playground\Asset3D.cpp" />
     <ClCompile Include="src\Playground\Scene.cpp" />
     <ClCompile Include="src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ResourceManager\Resource.h" />
+    <ClInclude Include="src\ResourceManager\ResourceManager.h" />
     <ClInclude Include="src\Physics\computePhysics.h" />
     <ClInclude Include="src\MiteVoxAPI.h" />
     <ClInclude Include="src\Physics\MovementProperties.h" />
@@ -164,7 +168,7 @@
     <ClInclude Include="src\MiteVox.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Playground\Node.h" />
-    <ClInclude Include="src\Playground\Playground.h" />
+    <ClInclude Include="src\Playground\Asset3D.h" />
     <ClInclude Include="src\Playground\Scene.h" />
     <ClInclude Include="src\EngineSettings.h" />
     <ClInclude Include="src\NativeScript.h" />

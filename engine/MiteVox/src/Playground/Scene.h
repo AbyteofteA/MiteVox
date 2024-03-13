@@ -4,7 +4,6 @@
 #include "engine/CodeSafety/src/SafeArray.h"
 #include "engine/MiteVox/src/Playground/Node.h"
 #include "engine/MiteVox/src/Playground/Entity.h"
-#include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/NativeScript.h"
 #include "engine/Renderer/src/RendererAPI/Cubemap.h"
 
@@ -30,8 +29,6 @@ namespace mitevox
 
 		safety::SafeArray<NativeScript> scripts;
 
-		EngineSettings* settings = nullptr;
-
 		float timeSinceCleanup = 0.0f;
 		float timeSincePhysicsUpdate = 0.0f;
 		float timeSinceAnimationsUpdate = 0.0f;
@@ -39,7 +36,6 @@ namespace mitevox
 		float currentTime = 0.0f;
 
 		Scene();
-		Scene(EngineSettings* _settings);
 		~Scene();
 
 		void update(float deltaTime);

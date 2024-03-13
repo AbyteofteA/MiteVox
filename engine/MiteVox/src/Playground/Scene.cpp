@@ -1,7 +1,5 @@
 #include "Scene.h"
 
-#include "engine/MiteVox/src/EngineSettings.h"
-
 namespace mitevox
 {
 	Scene::Scene()
@@ -12,11 +10,6 @@ namespace mitevox
 		timeSinceAnimationsUpdate = 0.0f;
 		timeSinceRendererUpdate = 0.0f;
 		currentTime = 0.0f;
-	}
-
-	Scene::Scene(EngineSettings* _settings) : Scene()
-	{
-		settings = _settings;
 	}
 
 	Scene::~Scene()

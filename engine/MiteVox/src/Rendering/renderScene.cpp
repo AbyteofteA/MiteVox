@@ -87,8 +87,6 @@ namespace mitevox
 		render::clearBufferXY();
 		render::clearBufferZ();
 		render::renderSceneFromMainCanvas(renderer, postprocessingShaderID, MiteVoxAPI::getCurrentDeltaTime());
-
-		render::display(renderer);
 	}
 
 	void MiteVoxAPI::renderSceneToGbuffer(

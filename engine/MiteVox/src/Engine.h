@@ -1,8 +1,9 @@
 #ifndef MITEVOX_ENGINE_H
 #define MITEVOX_ENGINE_H
 
-#include "EngineSettings.h"
-#include "engine/MiteVox/src/Playground/Playground.h"
+#include "engine/MiteVox/src/ResourceManager/ResourceManager.h"
+#include "engine/MiteVox/src/EngineSettings.h"
+#include "engine/MiteVox/src/Playground/Asset3D.h"
 #include "engine/MiteVox/src/Playground/Entity.h"
 #include "engine/Renderer/src/RendererAPI/Color.h"
 #include "engine/Math/src/DataStructures/PileAllocator.h"
@@ -25,7 +26,8 @@ namespace mitevox
 
 	public:
 
-		EngineSettings* settings;
+		ResourceManager resourceManager;
+		EngineSettings settings;
 
 		Engine(int argc, char* argv[]);
 		~Engine();
@@ -42,7 +44,7 @@ namespace mitevox
 		float deltaTime = 0.0f;
 		std::chrono::steady_clock::time_point prevCycleTime;
 
-		Playground* playground;
+		Asset3D* playground;
 
 		int primitiveShader = -1;
 		int skyboxShader = -1;

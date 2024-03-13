@@ -10,27 +10,9 @@
 
 namespace mitevox
 {
-	EngineSettings::EngineSettings(std::string _executionPath)
+	EngineSettings::EngineSettings(std::string executableDir)
 	{
-		executionDir = _executionPath;
-
-		fileio::JSON* engineConfig = new fileio::JSON();
-		engineConfig->readFromFile(executionDir + "\\engine_config.json");
-
-		fromJSON(engineConfig);
-
-		InputHandler::init(renderer->getWindow());
-
-		delete engineConfig;
-	}
-
-	EngineSettings::~EngineSettings()
-	{
-		if (renderer)
-		{
-			render::closeRenderer(renderer);
-			delete renderer;
-		}
+		this->executableDir = fs::absolute(fs::path(executableDir)).parent_path().string();
 	}
 
 	void EngineSettings::fromJSON(fileio::JSON* json)
@@ -45,7 +27,7 @@ namespace mitevox
 		setPhysicsPeriod(generalConfig->getFieldNumberOrDefault("physics_period", 0.06f));
 		setRendererPeriod(generalConfig->getFieldNumberOrDefault("renderer_period", 0.017f));
 
-		fs::path _executionPath = fs::path(executionDir);
+		fs::path _executionPath = fs::path(executableDir);
 		fs::current_path(_executionPath);
 
 		logConsole = loggingConfig->getFieldBooleanOrDefault("log_console", true);
@@ -65,21 +47,8 @@ namespace mitevox
 		int screenWidth = (int)rendererConfig->getFieldNumberOrDefault("screen_width", 720.0f);
 		int screenHeight = (int)rendererConfig->getFieldNumberOrDefault("screen_height", 480.0f);
 		bool backfaceCulling = rendererConfig->getFieldBooleanOrDefault("back_culling", true);
-
 		// TODO: move clearColor to engine_config.json .
-		renderer = render::initRenderer(screenWidth, screenHeight, false, backfaceCulling, { 0.05f, 0.05f, 0.05f });
-		if (renderer)
-		{
-			logger.logInfo("EngineSettings", "Window is created.");
-			logger.logInfo("EngineSettings", "Vendor: " + render::getVendorName());
-			logger.logInfo("EngineSettings", "Renderer: " + render::getRendererName());
-			logger.logInfo("EngineSettings", "Version: " + render::getVersion());
-			logger.logInfo("EngineSettings", "Language Version: " + render::getLanguageVersion());
-		}
-		else
-		{
-			logger.logError("EngineSettings", "Cannot create window!");
-		}
+		renderer.set(screenWidth, screenHeight, false, backfaceCulling, { 0.05f, 0.05f, 0.05f });
 	}
 
 	fileio::JSON* EngineSettings::toJSON()
@@ -103,9 +72,9 @@ namespace mitevox
 		pathsConfig->setField("config_dir", configDir);
 		pathsConfig->setField("resource_dir", resourceDir);
 
-		rendererConfig->setField("screen_width", (double)renderer->screenWidth);
-		rendererConfig->setField("screen_height", (double)renderer->screenHeight);
-		rendererConfig->setField("back_culling", (bool)renderer->backfaceCulling);
+		rendererConfig->setField("screen_width", (double)renderer.screenWidth);
+		rendererConfig->setField("screen_height", (double)renderer.screenHeight);
+		rendererConfig->setField("back_culling", (bool)renderer.backfaceCulling);
 
 		return json;
 	}
@@ -115,9 +84,9 @@ namespace mitevox
 		return logDir;
 	}
 
-	std::string EngineSettings::getExecutionDir()
+	std::string EngineSettings::getExecutableDir()
 	{
-		return executionDir;
+		return executableDir;
 	}
 
 	std::string EngineSettings::getResourceDir()
@@ -208,7 +177,7 @@ namespace mitevox
 		equalityTolerance = safety::ensureRange(value, 0.0000001f, 0.01f);
 	}
 
-	render::RendererSettings* EngineSettings::getRendererSettings()
+	render::RendererSettings& EngineSettings::getRendererSettings()
 	{
 		return renderer;
 	}

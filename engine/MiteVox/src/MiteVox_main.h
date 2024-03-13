@@ -14,9 +14,6 @@ int main(int argc, char* argv[])
 	}
 	catch (std::exception exc) 
 	{
-		render::RendererSettings* renderer = MiteVox->settings->getRendererSettings();
-		render::closeRenderer(renderer);
-
 		std::cerr << exc.what();
 		getchar();
 	}

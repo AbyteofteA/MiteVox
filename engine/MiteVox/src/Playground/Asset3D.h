@@ -1,8 +1,5 @@
-
 #ifndef PLAYGROUND_H
 #define PLAYGROUND_H
-
-#include "engine/MiteVox/src/EngineSettings.h"
 
 #include "engine/MiteVox/src/BufferLayout/BufferView.h"
 #include "engine/MiteVox/src/BufferLayout/BufferViewAccessor.h"
@@ -25,11 +22,6 @@
 
 #include <string>
 
-namespace fileio
-{
-	class PlaygroundCodecGLTF;
-}
-
 namespace mitevox
 {
 	/// <summary>
@@ -37,24 +29,21 @@ namespace mitevox
 	/// TODO: implement serialization to glTF, CBOR
 	/// TODO: implement deserialization from CBOR
 	/// </summary>
-	class Playground
+	class Asset3D
 	{
-		friend class fileio::PlaygroundCodecGLTF;
-
 	public:
 
 		std::string name = "Untitled";
-		std::string file;
 		size_t activeScene = 0;
 
-		Playground(std::string _name = "Untitled");
-		~Playground();
+		Asset3D(std::string _name = "Untitled");
+		~Asset3D();
 
 		void updateAssets();
 
-		size_t createDefaultScene(EngineSettings* settings);
-		size_t createScene(std::string name, EngineSettings* settings);
-		size_t createActiveScene(std::string name, EngineSettings* settings);
+		size_t createDefaultScene();
+		size_t createScene(std::string name);
+		size_t createActiveScene(std::string name);
 		void deleteScene(size_t index);
 		Scene* getActiveScene();
 

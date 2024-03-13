@@ -1,8 +1,6 @@
-
-#include "Playground.h"
+#include "Asset3D.h"
 
 #include "engine/MiteVox/src/Playground/Scene.h"
-#include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/Math/src/Generators/UniqueIDGenerator.h"
 
 #include <string>
@@ -11,7 +9,7 @@ namespace fs = std::filesystem;
 
 namespace mitevox
 {
-	Playground::Playground(std::string _name)
+	Asset3D::Asset3D(std::string _name)
 	{
 		name = _name;
 
@@ -49,7 +47,7 @@ namespace mitevox
 		//safety::SafeArray<SkeletonBase*> skeletons;
 	}
 
-	Playground::~Playground()
+	Asset3D::~Asset3D()
 	{
 		size_t scenesCount = scenes.getElementsCount();
 		for (size_t i = 0; i < scenesCount; ++i)
@@ -58,7 +56,7 @@ namespace mitevox
 		}
 	}
 
-	void Playground::updateAssets()
+	void Asset3D::updateAssets()
 	{
 		size_t scenesCount = scenes.getElementsCount();
 		for (size_t i = 0; i < scenesCount; ++i)
@@ -70,41 +68,41 @@ namespace mitevox
 
 	// TODO: How to add assets?
 
-	size_t Playground::createDefaultScene(EngineSettings* settings)
+	size_t Asset3D::createDefaultScene()
 	{
-		size_t index = createActiveScene("Default Scene", settings);
+		size_t index = createActiveScene("Default Scene");
 		Scene* defaultScene = scenes.getElement(index);
 
 
 		return index;
 	}
 
-	size_t Playground::createScene(std::string name, EngineSettings* settings)
+	size_t Asset3D::createScene(std::string name)
 	{
-		Scene* newScene = new Scene(settings);
+		Scene* newScene = new Scene();
 		newScene->name = name;
 		scenes.appendElement(newScene);
 		return scenes.getElementsCount() - 1;
 	}
 
-	size_t Playground::createActiveScene(std::string name, EngineSettings* settings)
+	size_t Asset3D::createActiveScene(std::string name)
 	{
-		size_t index = createScene(name, settings);
+		size_t index = createScene(name);
 		return activeScene = index;
 	}
 
-	void Playground::deleteScene(size_t index)
+	void Asset3D::deleteScene(size_t index)
 	{
 		delete scenes.getElement(index);
 		scenes.removeElement(index);
 	}
 
-	Scene* Playground::getActiveScene()
+	Scene* Asset3D::getActiveScene()
 	{
 		return scenes.getElement(activeScene);
 	}
 
-	size_t Playground::addEntity(Entity* entity)
+	size_t Asset3D::addEntity(Entity* entity)
 	{
 		Scene* activeScene = getActiveScene();
 		size_t entitiesCount = activeScene->entities.getElementsCount();
@@ -112,7 +110,7 @@ namespace mitevox
 		return entitiesCount;
 	}
 
-	void Playground::removeEntity(Entity* entity)
+	void Asset3D::removeEntity(Entity* entity)
 	{
 		Scene* activeScene = getActiveScene();
 		size_t entitiesCount = activeScene->entities.getElementsCount();

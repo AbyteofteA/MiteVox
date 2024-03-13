@@ -53,15 +53,9 @@ namespace render
 
 		unsigned int amountOfDrawCalls = 0;
 
-		RendererSettings(int _screenWidth, int _screenHeight, bool _isFullScreen, unsigned char _backfaceCulling, ColorRGBf _clearColor);
-		RendererSettings(GLFWwindow* _window);
+		RendererSettings();
 		~RendererSettings();
-		GLFWwindow* getWindow();
-		void setWindow(GLFWwindow* _window);
-
-	private:
-
-		GLFWwindow* window = nullptr;
+		void set(int _screenWidth, int _screenHeight, bool _isFullScreen, unsigned char _backfaceCulling, ColorRGBf _clearColor);
 	};
 }
 

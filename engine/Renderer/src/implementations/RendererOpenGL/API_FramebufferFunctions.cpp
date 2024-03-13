@@ -95,11 +95,6 @@ namespace render
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
-	void display(RendererSettings* renderer)
-	{
-		glfwSwapBuffers(renderer->getWindow());
-	}
-
 	size_t gBufferID = 0;
 	size_t positionTextureID = 0;
 	size_t normalTextureID = 0;

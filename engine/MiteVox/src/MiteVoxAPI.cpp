@@ -55,7 +55,7 @@ namespace mitevox
 
 	EngineSettings* MiteVoxAPI::getSettings()
 	{
-		return engine->settings;
+		return &engine->settings;
 	}
 
 	Entity* MiteVoxAPI::createEmptyEntity(std::string name)
@@ -212,52 +212,52 @@ namespace mitevox
 
 	float MiteVoxAPI::getCurrentDeltaTime()
 	{
-		return engine->deltaTime / (float)engine->settings->physics.substepsCount;
+		return engine->deltaTime / (float)engine->settings.physics.substepsCount;
 	}
 
 	PhysicsSolverType MiteVoxAPI::getPhysicsSolverType()
 	{
-		return engine->settings->physics.physicsSolver;
+		return engine->settings.physics.physicsSolver;
 	}
 
 	size_t MiteVoxAPI::getSubstepsCount()
 	{
-		return engine->settings->physics.substepsCount;
+		return engine->settings.physics.substepsCount;
 	}
 
 	float MiteVoxAPI::getSleepTime()
 	{
-		return engine->settings->physics.sleepTime;
+		return engine->settings.physics.sleepTime;
 	}
 
 	float MiteVoxAPI::getMaxLinearSpeed()
 	{
-		return engine->settings->physics.maxLinearSpeed;
+		return engine->settings.physics.maxLinearSpeed;
 	}
 
 	float MiteVoxAPI::getMaxAngularSpeed()
 	{
-		return engine->settings->physics.maxAngularSpeed;
+		return engine->settings.physics.maxAngularSpeed;
 	}
 
 	float MiteVoxAPI::getLinearDamping()
 	{
-		return engine->settings->physics.linearDamping;
+		return engine->settings.physics.linearDamping;
 	}
 
 	float MiteVoxAPI::getAngularDamping()
 	{
-		return engine->settings->physics.angularDamping;
+		return engine->settings.physics.angularDamping;
 	}
 
 	float MiteVoxAPI::getLinearSleepThreshold()
 	{
-		return engine->settings->physics.linearSleepThreshold;
+		return engine->settings.physics.linearSleepThreshold;
 	}
 
 	float MiteVoxAPI::getAngularSleepThreshold()
 	{
-		return engine->settings->physics.angularSleepThreshold;
+		return engine->settings.physics.angularSleepThreshold;
 	}
 
 	safety::SafeArray<Entity*>* MiteVoxAPI::collectEntitiesToSimulate()
@@ -273,7 +273,7 @@ namespace mitevox
 		mathem::checkCollisions(
 			&engine->entitiesToSimulate, 
 			&engine->collisions, 
-			engine->settings->getEqualityTolerance());
+			engine->settings.getEqualityTolerance());
 
 		return &engine->collisions;
 	}

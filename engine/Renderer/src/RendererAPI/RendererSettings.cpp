@@ -2,18 +2,9 @@
 
 namespace render
 {
-	RendererSettings::RendererSettings(int _screenWidth, int _screenHeight, bool _isFullScreen, unsigned char _backfaceCulling, ColorRGBf _clearColor)
+	RendererSettings::RendererSettings()
 	{
-		screenWidth = _screenWidth;
-		screenHeight = _screenHeight;
-		isFullScreen = _isFullScreen;
-		backfaceCulling = _backfaceCulling;
-		clearColor = _clearColor;
-	}
 
-	RendererSettings::RendererSettings(GLFWwindow* _window)
-	{
-		setWindow(_window);
 	}
 
 	RendererSettings::~RendererSettings()
@@ -23,13 +14,16 @@ namespace render
 		triangles.deallocate();
 	}
 
-	GLFWwindow* RendererSettings::getWindow()
+	void RendererSettings::set(int _screenWidth, int _screenHeight, bool _isFullScreen, unsigned char _backfaceCulling, ColorRGBf _clearColor)
 	{
-		return window;
-	}
+		screenWidth = _screenWidth;
+		screenHeight = _screenHeight;
+		isFullScreen = _isFullScreen;
+		backfaceCulling = _backfaceCulling;
+		clearColor = _clearColor;
 
-	void RendererSettings::setWindow(GLFWwindow* _window)
-	{
-		window = _window;
+		points.reserve(1024);
+		lines.reserve(1024 * 2);
+		triangles.reserve(1024 * 3);
 	}
 }

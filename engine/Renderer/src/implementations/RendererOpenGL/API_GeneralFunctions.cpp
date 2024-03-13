@@ -7,53 +7,8 @@
 
 namespace render
 {
-	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor)
+	void initRenderer(ColorRGBf clearColor)
 	{
-		RendererSettings* renderer = new RendererSettings(width, height, isFullScreen, backfaceCulling, clearColor);
-
-		if (!glfwInit())
-		{
-			return nullptr;
-		}
-
-		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-
-		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-		glfwWindowHint(GLFW_SAMPLES, 1);
-
-		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-		glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
-		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
-
-		GLFWwindow* window = nullptr;
-		if (isFullScreen)
-		{
-			window = glfwCreateWindow(mode->width, mode->height, "MiteVox", monitor, nullptr);
-		}
-		else
-		{
-			window = glfwCreateWindow(mode->width, mode->height, "MiteVox", nullptr, nullptr);
-		}
-		//glfwHideWindow(window);
-
-		renderer->setWindow(window);
-
-		if (renderer->getWindow() == nullptr)
-		{
-			std::cout << "Failed to create GLFW window" << std::endl;
-			glfwTerminate();
-			return nullptr;
-		}
-		
-		glfwMakeContextCurrent(renderer->getWindow());
-		glfwSwapInterval(0);
-
 		glewExperimental = GL_TRUE;
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
@@ -62,43 +17,16 @@ namespace render
 			fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		}
 
-		int windowSizeWidth, windowSizeHeight;
-		glfwGetWindowSize(window, &windowSizeWidth, &windowSizeHeight);
-		renderer->screenWidth = windowSizeWidth;
-		renderer->screenHeight = windowSizeHeight;
-
-		glEnable(GL_MULTISAMPLE);
-		glClearColor((GLclampf)renderer->clearColor.r, (GLclampf)renderer->clearColor.g, (GLclampf)renderer->clearColor.b, (GLclampf)1.0f);
+		glDisable(GL_MULTISAMPLE);
+		glClearColor((GLclampf)clearColor.r, (GLclampf)clearColor.g, (GLclampf)clearColor.b, (GLclampf)1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glfwSwapBuffers(renderer->getWindow());
-
+		
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
 		render::setAdditiveBlending();
 
-		if (renderer->backfaceCulling)
-		{
-			glEnable(GL_CULL_FACE);
-		}
-		else
-		{
-			glDisable(GL_CULL_FACE);
-		}
-
-		renderer->points.reserve(PRIMITIVE_BUFFER_SIZE);
-		renderer->lines.reserve(PRIMITIVE_BUFFER_SIZE * 2);
-		renderer->triangles.reserve(PRIMITIVE_BUFFER_SIZE * 3);
-
 		getUnitCubeID(); // Allocate the cube with the first call
 		getScreenQuadID(); // Allocate with the first call
-
-		return renderer;
-	}
-
-	void closeRenderer(RendererSettings* renderer)
-	{
-		glfwWindowShouldClose(renderer->getWindow());
-		glfwTerminate();
 	}
 
 	std::string getVendorName()

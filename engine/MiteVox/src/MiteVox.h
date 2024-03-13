@@ -8,7 +8,7 @@
 #include "engine/MiteVox/src/MiteVoxAPI.h"
 #include "engine/MiteVox/src/NativeScript.h"
 #include "engine/MiteVox/src/Playground/Scene.h"
-#include "engine/MiteVox/src/Playground/Playground.h"
+#include "engine/MiteVox/src/Playground/Asset3D.h"
 #include "engine/MiteVox/src/Playground/Entity.h"
 #include "engine/MiteVox/src/Engine.h"
 

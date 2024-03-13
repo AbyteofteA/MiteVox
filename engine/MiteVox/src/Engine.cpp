@@ -2,13 +2,13 @@
 
 #include "engine/MiteVox/src/EngineSettings.h"
 #include "engine/MiteVox/src/Playground/Node.h"
-#include "engine/MiteVox/src/Playground/Playground.h"
+#include "engine/MiteVox/src/Playground/Asset3D.h"
 #include "engine/MiteVox/src/Rendering/Lighting/collectLights.h"
 #include "engine/MiteVox/src/Physics/computePhysics.h"
 #include "engine/MiteVox/src/MiteVoxAPI.h"
 #include "engine/Math/src/Geometry/CollisionDetection/CollisionTable.h"
 
-#include "engine/FileIO/src/Formats/CodecGLTF/CodecGLTF.h"
+#include "engine/FileIO/src/Formats/Asset3DCodecGLTF/Asset3DCodecGLTF.h"
 #include "engine/MiteVox/src/Animation/MorphTargetAnimation/applyMorphTargetAnimation.h"
 
 #include <iostream>
@@ -20,15 +20,24 @@ namespace fs = std::filesystem;
 namespace mitevox
 {
 	Engine::Engine(int argc, char* argv[]) : 
+		settings(argv[0]),
 		dataPointsContainers(32, 8) // TODO: add to EngineSettings
 	{
 		MiteVoxAPI::init(this);
+		resourceManager.readConfig(settings);
 		mathem::CollisionTable::tryInit();
 
-		prevCycleTime = std::chrono::steady_clock::now();
+		render::RendererSettings& rendererSettings = settings.getRendererSettings();
+		InputHandler::init(
+			rendererSettings.screenWidth, 
+			rendererSettings.screenHeight, 
+			rendererSettings.isFullScreen);
+		InputHandler::getInstance()->getWindowSize(rendererSettings.screenWidth, rendererSettings.screenHeight);
+		render::initRenderer(rendererSettings.clearColor);
+		render::createGbuffer(&rendererSettings);
+		render::createMainCanvas(&rendererSettings);
 
-		std::string executionDir = fs::absolute(fs::path(argv[0])).parent_path().string();
-		settings = new EngineSettings(executionDir);
+		prevCycleTime = std::chrono::steady_clock::now();
 
 		entitiesAllocator.allocate(256); // TODO: add to EngineSettings
 
@@ -40,23 +49,22 @@ namespace mitevox
 
 		// TODO: add to EngineSettings
 
-		playground = new Playground();
 		if (argc > 1)
 		{
-			fileio::CodecGLTF* playgroundGLTF = new fileio::CodecGLTF(playground);
-			playgroundGLTF->readFromFile(std::string(argv[1]));
+			resourceManager.readAssets3D(std::string(argv[1]));
+			playground = resourceManager.getAssets3D(0);
 			// TODO: add checks
 		}
 		else
 		{
-			playground->createDefaultScene(settings);
+			playground->createDefaultScene();
 		}
 
 		preparePlayground();
 
 		// Compile shaders.
 
-		std::string shadersDir = settings->getResourceDir() + "/shaders";
+		std::string shadersDir = settings.getResourceDir() + "/shaders";
 		skyboxShader = render::createShader("Skybox shader", shadersDir + "/skybox/skybox");
 		primitiveShader = render::createShader("Primitive shader", shadersDir + "/primitive/primitive");
 		shadowMapPackShader = render::createShader("Shadow map pack shader", shadersDir + "/shadow_map_pack/shadow_map_pack");
@@ -64,13 +72,9 @@ namespace mitevox
 		deferredLightingShader = render::createShader("Deferred lighting shader", shadersDir + "/deferred_lighting/deferred_lighting");
 		postprocessingShader = render::createShader("Postprocessing shader", shadersDir + "/postprocessing/postprocessing");
 
-		render::RendererSettings* renderer = settings->getRendererSettings();
-		renderer->primitiveShaderID = primitiveShader;
+		rendererSettings.primitiveShaderID = primitiveShader;
 
 		uploadScene(playground->scenes.getElement(0));
-
-		render::createGbuffer(renderer);
-		render::createMainCanvas(renderer);
 
 		onCreate();
 	}
@@ -78,13 +82,7 @@ namespace mitevox
 	Engine::~Engine()
 	{
 		onDestroy();
-		
-		if (playground)
-		{
-			delete playground;
-		}
-		
-		delete settings;
+		resourceManager.close();
 	}
 
 	void Engine::initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, render::ColorRGBf clearColor)
@@ -94,20 +92,18 @@ namespace mitevox
 
 	void Engine::run()
 	{
+		InputHandler* inputHandler = InputHandler::getInstance();
+		render::RendererSettings& renderer = settings.getRendererSettings();
+
 		// TODO: Hide implementation.
-		while (!glfwWindowShouldClose(settings->getRendererSettings()->getWindow()))
+		while (inputHandler->windowShouldClose() == false)
 		{
-			render::RendererSettings* renderer = settings->getRendererSettings();
-			GLFWwindow* window = renderer->getWindow();
-			glfwPollEvents();
-			if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			inputHandler->pollEvents();
+			if (inputHandler->isKeyPressed(GLFW_KEY_ESCAPE))
 			{
-				glfwSetWindowShouldClose(window, true);
+				inputHandler->closeWindow();
 			}
-			int width, height;
-			glfwGetWindowSize(window, &width, &height);
-			renderer->screenWidth = width;
-			renderer->screenHeight = height;
+			inputHandler->getWindowSize(renderer.screenWidth, renderer.screenHeight);
 
 			// Update timers
 			std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
@@ -122,7 +118,6 @@ namespace mitevox
 
 			onUpdate();
 
-			InputHandler* inputHandler = InputHandler::getInstance();
 			inputHandler->update();
 			
 			Scene* scene = playground->getActiveScene();
@@ -148,14 +143,14 @@ namespace mitevox
 
 			// Cleanup
 			scene->timeSinceCleanup += deltaTime;
-			if (scene->timeSinceCleanup > settings->getCleanupPeriod())
+			if (scene->timeSinceCleanup > settings.getCleanupPeriod())
 			{
 				RegionCoord cameraRegionCoord = activeCameraEntity->transform.getRegionCoord();
 				mathem::Vector3D cameraPosition = activeCameraEntity->transform.getPosition();
 
 				scene->timeSinceCleanup = 0.0f;
 				std::cout << "FPS: " << 1.0f / deltaTime << std::endl;
-				std::cout << "Amount of draw calls: " << settings->getRendererSettings()->amountOfDrawCalls << std::endl;
+				std::cout << "Amount of draw calls: " << settings.getRendererSettings().amountOfDrawCalls << std::endl;
 				std::cout << "Camera position: \n\t" <<
 					"regionX: " << cameraRegionCoord.x() << "\tX: " << cameraPosition.x() << "\n\t" <<
 					"regionY: " << cameraRegionCoord.y() << "\tY: " << cameraPosition.y() << "\n\t" <<
@@ -168,14 +163,14 @@ namespace mitevox
 			dataPointsContainers.returnAllContainers();
 			size_t substepsCount = MiteVoxAPI::getSubstepsCount();
 			scene->timeSincePhysicsUpdate += deltaTime;
-			if (scene->timeSincePhysicsUpdate > settings->getPhysicsPeriod())
+			if (scene->timeSincePhysicsUpdate > settings.getPhysicsPeriod())
 			{
 				float substepDeltaTime = scene->timeSincePhysicsUpdate / (float)substepsCount;
 				for (size_t i = 0; i < substepsCount; ++i)
 				{
 					applyDampingAndSleeping(&entitiesToSimulate, substepDeltaTime);
 					computeIntegration(&entitiesToSimulate, substepDeltaTime);
-					computePhysics(MiteVoxAPI::getPhysicsSolverType(), substepDeltaTime, settings->equalityTolerance);
+					computePhysics(MiteVoxAPI::getPhysicsSolverType(), substepDeltaTime, settings.equalityTolerance);
 				}
 				scene->timeSincePhysicsUpdate = 0.0f;
 			}
@@ -191,10 +186,10 @@ namespace mitevox
 
 			// Renderer
 			scene->timeSinceRendererUpdate += deltaTime;
-			if (scene->timeSinceRendererUpdate > settings->getRendererPeriod())
+			if (scene->timeSinceRendererUpdate > settings.getRendererPeriod())
 			{
 				scene->timeSinceRendererUpdate = 0.0f;
-				renderer->amountOfDrawCalls = 0;
+				renderer.amountOfDrawCalls = 0;
 
 				pointLightsArray.clear();
 				directionalLightsArray.clear();
@@ -214,7 +209,7 @@ namespace mitevox
 				}
 
 				MiteVoxAPI::renderScene(
-					renderer,
+					&renderer,
 					shadowMapPackShader,
 					gBufferShader,
 					deferredLightingShader,
@@ -226,7 +221,9 @@ namespace mitevox
 					camera,
 					& cameraTransform,
 					entitiesToSimulate,
-					settings->debug);
+					settings.debug);
+
+				inputHandler->display();
 			}
 		}
 	}
@@ -258,12 +255,6 @@ namespace mitevox
 		if (1/*playground->cameras.getElementsCount() == 0*/)
 		{
 			MiteVoxAPI::createFPSCharacter("FPS Character");
-		}
-
-		size_t scenesCount = playground->scenes.getElementsCount();
-		for (size_t i = 0; i < scenesCount; ++i)
-		{
-			playground->scenes.getElement(i)->settings = this->settings;
 		}
 
 		size_t animationsCount = playground->animations.getElementsCount();

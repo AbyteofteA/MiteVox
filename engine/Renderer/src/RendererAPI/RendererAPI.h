@@ -49,8 +49,7 @@ namespace render
 
 	// General
 
-	RendererSettings* initRenderer(int width, int height, bool isFullScreen, bool backfaceCulling, ColorRGBf clearColor);
-	void closeRenderer(RendererSettings* renderer);
+	void initRenderer(ColorRGBf clearColor);
 	std::string getVendorName();
 	std::string getRendererName();
 	std::string getVersion();
@@ -87,7 +86,6 @@ printErrors(__FILE__, __LINE__);
 	void activateDefaultFramebuffer(RendererSettings* renderer);
 	void clearBufferXY(ColorRGBf color = ColorRGBf::BLACK());
 	void clearBufferZ();
-	void display(RendererSettings* renderer);
 
 	void createGbuffer(RendererSettings* renderer);
 	void activateGbuffer(RendererSettings* renderer);

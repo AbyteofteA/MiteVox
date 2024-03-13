@@ -1,7 +1,6 @@
 #ifndef MITEVOX_SETTINGS_H
 #define MITEVOX_SETTINGS_H
 
-#include "engine/FileIO/src/Formats/JSON/JSON.h"
 #include "engine/Renderer/src/RendererAPI/RendererAPI.h"
 #include "engine/MiteVox/src/Profiler/Logger.h"
 #include "engine/MiteVox/src/Physics/PhysicsSolverType.h"
@@ -23,8 +22,7 @@ namespace mitevox
 		bool debug = true;
 		bool spaceCulling = true; // TODO: add to EngineSettings
 
-		EngineSettings(std::string _executionPath);
-		~EngineSettings();
+		explicit EngineSettings(std::string executableDir);
 
 		void fromJSON(fileio::JSON* json);
 		fileio::JSON* toJSON();
@@ -32,7 +30,7 @@ namespace mitevox
 		// Getters //
 
 		std::string getLogDir();
-		std::string getExecutionDir();
+		std::string getExecutableDir();
 		std::string getResourceDir();
 		std::string getConfigDir();
 
@@ -51,7 +49,7 @@ namespace mitevox
 		float getEqualityTolerance();
 		void setEqualityTolerance(float value);
 
-		render::RendererSettings* getRendererSettings();
+		render::RendererSettings& getRendererSettings();
 
 	private:
 
@@ -64,7 +62,7 @@ namespace mitevox
 		bool logFile = true;
 		std::string logDir = "";
 
-		std::string executionDir = "";
+		std::string executableDir = "";
 		std::string resourceDir = "";
 		std::string configDir = "";
 		std::string savesDir = "";
@@ -84,7 +82,7 @@ namespace mitevox
 			float angularSleepThreshold = 0.075f;
 		} physics;
 
-		render::RendererSettings* renderer = nullptr;
+		render::RendererSettings renderer;
 	};
 
 
